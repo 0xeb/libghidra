@@ -73,6 +73,26 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(protobuf)
 
+# Protobuf v29.3 ships abseil-cpp 20240722.0, whose AbseilConfigureCopts.cmake
+# misdetects the arch on macOS Apple Silicon and pins -msse4.1/-maes onto the
+# random_internal_randen_hwaes* targets, which clang rejects when targeting
+# arm64. Strip those x86-only flags so the targets build (the sources have
+# preprocessor guards that cleanly fall back without HW AES).
+if(APPLE)
+    foreach(_libghidra_absl_target
+        random_internal_randen_hwaes
+        random_internal_randen_hwaes_impl
+    )
+        if(TARGET ${_libghidra_absl_target})
+            get_target_property(_libghidra_hwaes_opts ${_libghidra_absl_target} COMPILE_OPTIONS)
+            if(_libghidra_hwaes_opts)
+                list(REMOVE_ITEM _libghidra_hwaes_opts "-msse4.1" "-maes" "-mssse3" "-msse4.2")
+                set_property(TARGET ${_libghidra_absl_target} PROPERTY COMPILE_OPTIONS ${_libghidra_hwaes_opts})
+            endif()
+        endif()
+    endforeach()
+endif()
+
 # ============================================================================
 # Auto-regenerate C++ protobuf stubs when .proto files change
 # ============================================================================
