@@ -1,0 +1,40 @@
+# Build outputs
+build*/
+build-qc/
+dist/
+*.obj
+*.lib
+*.exe
+*.pdb
+*.ilk
+*.exp
+
+# IDE directories
+.vs/
+.vscode/
+.idea/
+
+# Stale build trees
+cpp/build-rpc/
+
+# Language-specific build/codegen outputs
+rust/target/
+python/build/
+python/dist/
+python/src/*.egg-info/
+python/generated/
+*.egg-info/
+__pycache__/
+
+# Extension build/install artifacts
+ghidra-extension/.gradle/
+ghidra-extension/build/
+ghidra-extension/dist/
+ghidra-extension/lib/
+
+# Runtime artifacts
+*_state.xml
+*.ghidra_state.xml
+
+# Local private notes
+CLAUDE.md

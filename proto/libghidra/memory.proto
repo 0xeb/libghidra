@@ -1,0 +1,81 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "MemoryProto";
+
+import "libghidra/common.proto";
+
+// Field 1 reserved for future common request context.
+message ReadBytesRequest {
+  uint64 address = 2;
+  uint32 length = 3;
+}
+
+message ReadBytesResponse {
+  bytes data = 1;
+}
+
+// Field 1 reserved for future common request context.
+message WriteBytesRequest {
+  uint64 address = 2;
+  bytes data = 3;
+}
+
+message WriteBytesResponse {
+  uint32 bytes_written = 1;
+}
+
+message BytePatch {
+  uint64 address = 1;
+  bytes data = 2;
+}
+
+// Field 1 reserved for future common request context.
+message PatchBytesBatchRequest {
+  repeated BytePatch patches = 2;
+}
+
+message PatchBytesBatchResponse {
+  uint32 patch_count = 1;
+  uint32 bytes_written = 2;
+}
+
+message MemoryBlockRecord {
+  string name = 1;
+  uint64 start_address = 2;
+  uint64 end_address = 3;
+  uint64 size = 4;
+  bool is_read = 5;
+  bool is_write = 6;
+  bool is_execute = 7;
+  bool is_volatile = 8;
+  bool is_initialized = 9;
+  string source_name = 10;
+  string comment = 11;
+}
+
+// Field 1 reserved for future common request context.
+message ListMemoryBlocksRequest {
+  Pagination page = 2;
+}
+
+message ListMemoryBlocksResponse {
+  repeated MemoryBlockRecord blocks = 1;
+}
+
+service MemoryService {
+  rpc ReadBytes(ReadBytesRequest) returns (ReadBytesResponse);
+  rpc WriteBytes(WriteBytesRequest) returns (WriteBytesResponse);
+  rpc PatchBytesBatch(PatchBytesBatchRequest) returns (PatchBytesBatchResponse);
+  rpc ListMemoryBlocks(ListMemoryBlocksRequest) returns (ListMemoryBlocksResponse);
+}

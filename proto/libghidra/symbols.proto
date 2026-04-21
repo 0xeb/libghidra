@@ -1,0 +1,77 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "SymbolsProto";
+
+import "libghidra/common.proto";
+
+message SymbolRecord {
+  uint64 symbol_id = 1;
+  uint64 address = 2;
+  string name = 3;
+  string full_name = 4;
+  string type = 5;
+  string namespace_name = 6;
+  string source = 7;
+  bool is_primary = 8;
+  bool is_external = 9;
+  bool is_dynamic = 10;
+}
+
+// Field 1 reserved for future common request context.
+message GetSymbolRequest {
+  uint64 address = 2;
+}
+
+message GetSymbolResponse {
+  SymbolRecord symbol = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListSymbolsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListSymbolsResponse {
+  repeated SymbolRecord symbols = 1;
+}
+
+// Field 1 reserved for future common request context.
+message RenameSymbolRequest {
+  uint64 address = 2;
+  string new_name = 3;
+}
+
+message RenameSymbolResponse {
+  bool renamed = 1;
+  string name = 2;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteSymbolRequest {
+  uint64 address = 2;
+  string name = 3;
+}
+
+message DeleteSymbolResponse {
+  bool deleted = 1;
+  uint32 deleted_count = 2;
+}
+
+service SymbolsService {
+  rpc GetSymbol(GetSymbolRequest) returns (GetSymbolResponse);
+  rpc ListSymbols(ListSymbolsRequest) returns (ListSymbolsResponse);
+  rpc RenameSymbol(RenameSymbolRequest) returns (RenameSymbolResponse);
+  rpc DeleteSymbol(DeleteSymbolRequest) returns (DeleteSymbolResponse);
+}

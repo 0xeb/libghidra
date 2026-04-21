@@ -1,0 +1,97 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "DecompilerProto";
+
+import "libghidra/common.proto";
+
+enum DecompileLocalKind {
+  DECOMPILE_LOCAL_KIND_UNSPECIFIED = 0;
+  DECOMPILE_LOCAL_KIND_PARAM = 1;
+  DECOMPILE_LOCAL_KIND_LOCAL = 2;
+  DECOMPILE_LOCAL_KIND_TEMP = 3;
+}
+
+message DecompileLocalRecord {
+  string local_id = 1;
+  DecompileLocalKind kind = 2;
+  string name = 3;
+  string data_type = 4;
+  string storage = 5;
+  int32 ordinal = 6;
+}
+
+enum DecompileTokenKind {
+  DECOMPILE_TOKEN_KIND_UNSPECIFIED = 0;
+  DECOMPILE_TOKEN_KIND_KEYWORD = 1;
+  DECOMPILE_TOKEN_KIND_COMMENT = 2;
+  DECOMPILE_TOKEN_KIND_TYPE = 3;
+  DECOMPILE_TOKEN_KIND_FUNCTION = 4;
+  DECOMPILE_TOKEN_KIND_VARIABLE = 5;
+  DECOMPILE_TOKEN_KIND_CONST = 6;
+  DECOMPILE_TOKEN_KIND_PARAMETER = 7;
+  DECOMPILE_TOKEN_KIND_GLOBAL = 8;
+  DECOMPILE_TOKEN_KIND_DEFAULT = 9;
+  DECOMPILE_TOKEN_KIND_ERROR = 10;
+  DECOMPILE_TOKEN_KIND_SPECIAL = 11;
+}
+
+message DecompileTokenRecord {
+  string text = 1;
+  DecompileTokenKind kind = 2;
+  int32 line_number = 3;
+  int32 column_offset = 4;
+  string var_name = 5;
+  string var_type = 6;
+  string var_storage = 7;
+}
+
+message DecompileRecord {
+  uint64 function_entry_address = 1;
+  string function_name = 2;
+  string prototype = 3;
+  string pseudocode = 4;
+  bool completed = 5;
+  bool is_fallback = 6;
+  string error_message = 7;
+  repeated DecompileLocalRecord locals = 8;
+  repeated DecompileTokenRecord tokens = 9;
+}
+
+// Field 1 reserved for future common request context.
+message DecompileFunctionRequest {
+  uint64 address = 2;
+  uint32 timeout_ms = 3;
+}
+
+message DecompileFunctionResponse {
+  DecompileRecord decompilation = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListDecompilationsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+  uint32 timeout_ms = 4;
+}
+
+message ListDecompilationsResponse {
+  repeated DecompileRecord decompilations = 1;
+}
+
+service DecompilerService {
+  rpc DecompileFunction(DecompileFunctionRequest)
+      returns (DecompileFunctionResponse);
+  rpc ListDecompilations(ListDecompilationsRequest)
+      returns (ListDecompilationsResponse);
+}

@@ -1,0 +1,305 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "ListingProto";
+
+import "libghidra/common.proto";
+
+enum CommentKind {
+  COMMENT_KIND_UNSPECIFIED = 0;
+  COMMENT_KIND_EOL = 1;
+  COMMENT_KIND_PRE = 2;
+  COMMENT_KIND_POST = 3;
+  COMMENT_KIND_PLATE = 4;
+  COMMENT_KIND_REPEATABLE = 5;
+}
+
+message InstructionRecord {
+  uint64 address = 1;
+  string mnemonic = 2;
+  string operand_text = 3;
+  string disassembly = 4;
+  uint32 length = 5;
+}
+
+// Field 1 reserved for future common request context.
+message GetInstructionRequest {
+  uint64 address = 2;
+}
+
+message GetInstructionResponse {
+  InstructionRecord instruction = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListInstructionsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListInstructionsResponse {
+  repeated InstructionRecord instructions = 1;
+}
+
+message CommentRecord {
+  uint64 address = 1;
+  CommentKind kind = 2;
+  string text = 3;
+}
+
+// Field 1 reserved for future common request context.
+message GetCommentsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message GetCommentsResponse {
+  repeated CommentRecord comments = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetCommentRequest {
+  uint64 address = 2;
+  CommentKind kind = 3;
+  string text = 4;
+}
+
+message SetCommentResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteCommentRequest {
+  uint64 address = 2;
+  CommentKind kind = 3;
+}
+
+message DeleteCommentResponse {
+  bool deleted = 1;
+}
+
+// Field 1 reserved for future common request context.
+message RenameDataItemRequest {
+  uint64 address = 2;
+  string new_name = 3;
+}
+
+message RenameDataItemResponse {
+  bool updated = 1;
+  string name = 2;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteDataItemRequest {
+  uint64 address = 2;
+}
+
+message DeleteDataItemResponse {
+  bool deleted = 1;
+}
+
+message DataItemRecord {
+  uint64 address = 1;
+  uint64 end_address = 2;
+  string name = 3;
+  string data_type = 4;
+  uint64 size = 5;
+  string value_repr = 6;
+}
+
+// Field 1 reserved for future common request context.
+message ListDataItemsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListDataItemsResponse {
+  repeated DataItemRecord data_items = 1;
+}
+
+message BookmarkRecord {
+  uint64 address = 1;
+  string type = 2;
+  string category = 3;
+  string comment = 4;
+}
+
+// Field 1 reserved for future common request context.
+message ListBookmarksRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+  string type_filter = 4;
+  string category_filter = 5;
+}
+
+message ListBookmarksResponse {
+  repeated BookmarkRecord bookmarks = 1;
+}
+
+// Field 1 reserved for future common request context.
+message AddBookmarkRequest {
+  uint64 address = 2;
+  string type = 3;
+  string category = 4;
+  string comment = 5;
+}
+
+message AddBookmarkResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteBookmarkRequest {
+  uint64 address = 2;
+  string type = 3;
+  string category = 4;
+}
+
+message DeleteBookmarkResponse {
+  bool deleted = 1;
+}
+
+message BreakpointRecord {
+  uint64 address = 1;
+  bool enabled = 2;
+  string kind = 3;
+  uint64 size = 4;
+  string condition = 5;
+  string group = 6;
+}
+
+// Field 1 reserved for future common request context.
+message ListBreakpointsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+  string kind_filter = 4;
+  string group_filter = 5;
+}
+
+message ListBreakpointsResponse {
+  repeated BreakpointRecord breakpoints = 1;
+}
+
+// Field 1 reserved for future common request context.
+message AddBreakpointRequest {
+  uint64 address = 2;
+  string kind = 3;
+  uint64 size = 4;
+  bool enabled = 5;
+  string condition = 6;
+  string group = 7;
+}
+
+message AddBreakpointResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetBreakpointEnabledRequest {
+  uint64 address = 2;
+  bool enabled = 3;
+}
+
+message SetBreakpointEnabledResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetBreakpointKindRequest {
+  uint64 address = 2;
+  string kind = 3;
+}
+
+message SetBreakpointKindResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetBreakpointSizeRequest {
+  uint64 address = 2;
+  uint64 size = 3;
+}
+
+message SetBreakpointSizeResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetBreakpointConditionRequest {
+  uint64 address = 2;
+  string condition = 3;
+}
+
+message SetBreakpointConditionResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetBreakpointGroupRequest {
+  uint64 address = 2;
+  string group = 3;
+}
+
+message SetBreakpointGroupResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteBreakpointRequest {
+  uint64 address = 2;
+}
+
+message DeleteBreakpointResponse {
+  bool deleted = 1;
+}
+
+message DefinedStringRecord {
+  uint64 address = 1;
+  string value = 2;
+  uint32 length = 3;
+  string data_type = 4;
+  string encoding = 5;
+}
+
+// Field 1 reserved for future common request context.
+message ListDefinedStringsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListDefinedStringsResponse {
+  repeated DefinedStringRecord strings = 1;
+}
+
+service ListingService {
+  rpc GetInstruction(GetInstructionRequest) returns (GetInstructionResponse);
+  rpc ListInstructions(ListInstructionsRequest) returns (ListInstructionsResponse);
+  rpc GetComments(GetCommentsRequest) returns (GetCommentsResponse);
+  rpc SetComment(SetCommentRequest) returns (SetCommentResponse);
+  rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse);
+  rpc RenameDataItem(RenameDataItemRequest) returns (RenameDataItemResponse);
+  rpc DeleteDataItem(DeleteDataItemRequest) returns (DeleteDataItemResponse);
+  rpc ListDataItems(ListDataItemsRequest) returns (ListDataItemsResponse);
+  rpc ListBookmarks(ListBookmarksRequest) returns (ListBookmarksResponse);
+  rpc AddBookmark(AddBookmarkRequest) returns (AddBookmarkResponse);
+  rpc DeleteBookmark(DeleteBookmarkRequest) returns (DeleteBookmarkResponse);
+  rpc ListBreakpoints(ListBreakpointsRequest) returns (ListBreakpointsResponse);
+  rpc AddBreakpoint(AddBreakpointRequest) returns (AddBreakpointResponse);
+  rpc SetBreakpointEnabled(SetBreakpointEnabledRequest) returns (SetBreakpointEnabledResponse);
+  rpc SetBreakpointKind(SetBreakpointKindRequest) returns (SetBreakpointKindResponse);
+  rpc SetBreakpointSize(SetBreakpointSizeRequest) returns (SetBreakpointSizeResponse);
+  rpc SetBreakpointCondition(SetBreakpointConditionRequest) returns (SetBreakpointConditionResponse);
+  rpc SetBreakpointGroup(SetBreakpointGroupRequest) returns (SetBreakpointGroupResponse);
+  rpc DeleteBreakpoint(DeleteBreakpointRequest) returns (DeleteBreakpointResponse);
+  rpc ListDefinedStrings(ListDefinedStringsRequest) returns (ListDefinedStringsResponse);
+}

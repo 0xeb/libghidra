@@ -1,0 +1,250 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*", "V*"]
+  pull_request:
+    branches: ["**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  JAVA_VERSION: "21"
+  GHIDRA_RELEASE_URL: "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.0.4_build/ghidra_12.0.4_PUBLIC_20260303.zip"
+
+jobs:
+  build-sdk:
+    name: Build SDK (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-latest
+            artifact_name: cpp-sdk-linux
+          - name: macOS
+            os: macos-latest
+            artifact_name: cpp-sdk-macos
+          - name: Windows
+            os: windows-latest
+            artifact_name: cpp-sdk-windows
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Configure C++ SDK
+        run: >
+          cmake -S cpp -B build/cpp
+          -DCMAKE_BUILD_TYPE=Release
+          -DLIBGHIDRA_WITH_LOCAL=OFF
+          -DLIBGHIDRA_BUILD_EXAMPLES=ON
+
+      - name: Build C++ SDK
+        run: cmake --build build/cpp --config Release
+
+      - name: Install C++ SDK
+        run: >
+          cmake --install build/cpp
+          --config Release
+          --prefix "${{ github.workspace }}/artifacts/cpp-install"
+
+      - name: Smoke test Python package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e python
+          python -c "import libghidra; print(libghidra.__file__)"
+
+      - name: Build and test Rust SDK
+        run: |
+          cargo build --manifest-path rust/Cargo.toml --examples
+          cargo test --manifest-path rust/Cargo.toml
+
+      - name: Upload C++ SDK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ github.workspace }}/artifacts/cpp-install
+
+  package-python:
+    name: Package Python SDK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Build Python distributions
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build python
+
+      - name: Smoke test built wheel
+        run: |
+          python -m pip install python/dist/*.whl
+          python -c "import libghidra; print(libghidra.__file__)"
+
+      - name: Upload Python artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-sdk
+          path: python/dist/*
+
+  package-rust:
+    name: Package Rust SDK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Package crate
+        run: cargo package --manifest-path rust/Cargo.toml --allow-dirty --no-verify
+
+      - name: Upload Rust artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-sdk
+          path: rust/target/package/*.crate
+
+  build-extension-linux:
+    name: Build Extension (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Download Ghidra distribution
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ghidra"
+          curl -L --retry 5 --output "$RUNNER_TEMP/ghidra/ghidra.zip" "$GHIDRA_RELEASE_URL"
+          unzip -q "$RUNNER_TEMP/ghidra/ghidra.zip" -d "$RUNNER_TEMP/ghidra/dist"
+          GHIDRA_INSTALL_DIR="$(find "$RUNNER_TEMP/ghidra/dist" -maxdepth 1 -type d -name 'ghidra_*_PUBLIC*' | head -n 1)"
+          if [ -z "$GHIDRA_INSTALL_DIR" ]; then
+            echo "Failed to locate extracted Ghidra distribution root." >&2
+            exit 1
+          fi
+          echo "GHIDRA_INSTALL_DIR=$GHIDRA_INSTALL_DIR" >> "$GITHUB_ENV"
+          echo "GHIDRAAPI_REAL_BINARY_PATH=$GHIDRA_INSTALL_DIR/GPL/GnuDisassembler/data/little.elf" >> "$GITHUB_ENV"
+
+      - name: Test and build extension
+        run: >
+          gradle -p ghidra-extension
+          test buildExtension installExtension
+          -PGHIDRA_INSTALL_DIR="${{ env.GHIDRA_INSTALL_DIR }}"
+
+      - name: Verify installed extension layout
+        shell: bash
+        run: |
+          test -f "${GHIDRA_INSTALL_DIR}/Ghidra/Extensions/LibGhidraHost/extension.properties"
+          test -d "${GHIDRA_INSTALL_DIR}/Ghidra/Extensions/LibGhidraHost/lib"
+          ls -la ghidra-extension/dist
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghidra-extension-linux
+          path: ghidra-extension/dist/*.zip
+
+  publish-draft-release:
+    name: Publish Draft Release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - build-sdk
+      - package-python
+      - package-rust
+      - build-extension-linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download C++ SDK artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cpp-sdk-*
+          path: cpp-artifacts
+          merge-multiple: false
+
+      - name: Download Python artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: python-sdk
+          path: python-artifacts
+
+      - name: Download Rust artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: rust-sdk
+          path: rust-artifacts
+
+      - name: Download extension artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ghidra-extension-linux
+          path: extension-artifacts
+
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release
+
+          for dir in cpp-artifacts/cpp-sdk-*; do
+            platform="${dir##*cpp-sdk-}"
+            (
+              cd "$dir"
+              zip -r9 "$GITHUB_WORKSPACE/release/libghidra-cpp-${platform}-${GITHUB_REF_NAME}.zip" .
+            )
+          done
+
+          EXTENSION_ZIP="$(find extension-artifacts -maxdepth 1 -type f -name '*.zip' | head -n 1)"
+          cp "$EXTENSION_ZIP" "release/libghidra-extension-${GITHUB_REF_NAME}.zip"
+
+          zip -j9 "release/libghidra-python-${GITHUB_REF_NAME}.zip" python-artifacts/*
+          zip -j9 "release/libghidra-rust-${GITHUB_REF_NAME}.zip" rust-artifacts/*.crate
+
+          ls -la release
+
+      - name: Create draft GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: libghidra ${{ github.ref_name }}
+          draft: true
+          prerelease: ${{ contains(github.ref_name, 'alpha') }}
+          generate_release_notes: true
+          files: release/*

@@ -1,0 +1,75 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "SessionProto";
+
+import "libghidra/common.proto";
+
+message OpenProgramRequest {
+  string project_path = 1;
+  string project_name = 2;
+  string program_path = 3;
+  bool analyze = 4;
+  bool read_only = 5;
+}
+
+message OpenProgramResponse {
+  string program_name = 2;
+  string language_id = 3;
+  string compiler_spec = 4;
+  uint64 image_base = 5;
+}
+
+// Field 1 reserved for future common request context.
+message CloseProgramRequest {
+  ShutdownPolicy shutdown_policy = 2;
+}
+
+message CloseProgramResponse {
+  bool closed = 1;
+}
+
+message SaveProgramRequest {}
+
+message SaveProgramResponse {
+  bool saved = 1;
+}
+
+message DiscardProgramRequest {}
+
+message DiscardProgramResponse {
+  bool discarded = 1;
+}
+
+message GetRevisionRequest {}
+
+message GetRevisionResponse {
+  uint64 revision = 1;
+}
+
+message ShutdownRequest {
+  ShutdownPolicy shutdown_policy = 1;
+}
+
+message ShutdownResponse {
+  bool accepted = 1;
+}
+
+service SessionService {
+  rpc OpenProgram(OpenProgramRequest) returns (OpenProgramResponse);
+  rpc CloseProgram(CloseProgramRequest) returns (CloseProgramResponse);
+  rpc SaveProgram(SaveProgramRequest) returns (SaveProgramResponse);
+  rpc DiscardProgram(DiscardProgramRequest) returns (DiscardProgramResponse);
+  rpc GetRevision(GetRevisionRequest) returns (GetRevisionResponse);
+  rpc Shutdown(ShutdownRequest) returns (ShutdownResponse);
+}

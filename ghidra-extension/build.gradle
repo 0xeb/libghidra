@@ -1,0 +1,146 @@
+/* ###
+ * IP: GHIDRA
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Standalone extension build — requires GHIDRA_INSTALL_DIR pointing at a Ghidra distribution.
+//
+// Usage:
+//   gradle buildExtension    -PGHIDRA_INSTALL_DIR=C:/ghidra_dist/ghidra_12.1_DEV
+//   gradle installExtension  -PGHIDRA_INSTALL_DIR=C:/ghidra_dist/ghidra_12.1_DEV
+
+if (!hasProperty('GHIDRA_INSTALL_DIR')) {
+    throw new GradleException("GHIDRA_INSTALL_DIR is not defined. " +
+        "Pass -PGHIDRA_INSTALL_DIR=<path-to-ghidra-distribution>")
+}
+
+apply from: new File(GHIDRA_INSTALL_DIR, "support/buildExtension.gradle")
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.google.protobuf:protobuf-java:4.29.3'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += ['src/main/generated', 'ghidra_scripts']
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Auto-regenerate Java protobuf stubs when .proto files change.
+// Finds protoc via: -PPROTOC project property, PROTOC env var, or PATH.
+// Best-effort: logs a warning and uses pre-generated stubs if protoc is
+// not available.
+// ---------------------------------------------------------------------------
+def protocBin = null
+if (hasProperty('PROTOC')) {
+    protocBin = file(PROTOC)
+} else if (System.getenv('PROTOC')) {
+    protocBin = file(System.getenv('PROTOC'))
+} else {
+    // Try to find protoc on PATH
+    def pathDirs = System.getenv('PATH')?.split(File.pathSeparator) ?: []
+    def exeName = org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'protoc.exe' : 'protoc'
+    for (dir in pathDirs) {
+        def candidate = new File(dir, exeName)
+        if (candidate.isFile() && candidate.canExecute()) {
+            protocBin = candidate
+            break
+        }
+    }
+}
+
+def protoRoot = file("${projectDir}/../proto")
+def protoDir = file("${protoRoot}/libghidra")
+def generatedDir = file("${projectDir}/src/main/generated")
+
+if (protocBin != null && protocBin.isFile()) {
+    task generateProto(type: Exec) {
+        description = 'Regenerate Java protobuf stubs from .proto files'
+        inputs.dir(protoDir)
+        outputs.dir(generatedDir)
+
+        def protoFiles = fileTree(protoDir).matching { include '*.proto' }.files.collect { it.absolutePath }
+
+        commandLine protocBin.absolutePath,
+            "--proto_path=${protoRoot.absolutePath}",
+            "--java_out=${generatedDir.absolutePath}",
+            *protoFiles
+    }
+
+    compileJava.dependsOn generateProto
+} else {
+    def generatedJavaStubs = fileTree(generatedDir).matching { include '**/*.java' }
+    if (generatedJavaStubs.isEmpty()) {
+        throw new GradleException('libghidra: protoc not found and no pre-generated Java stubs are available. ' +
+            'Set PROTOC env var or -PPROTOC=<path> to enable regeneration.')
+    }
+    logger.lifecycle('libghidra: protoc not found — using pre-generated Java stubs.')
+}
+
+// ---------------------------------------------------------------------------
+// Install extension into the Ghidra distribution.
+// Builds the ZIP (via buildExtension), then extracts it into
+// <GHIDRA_INSTALL_DIR>/Ghidra/Extensions/LibGhidraHost/.
+// ---------------------------------------------------------------------------
+task installExtension {
+    dependsOn buildExtension
+    description = 'Build and install the extension into the Ghidra distribution'
+    group = 'ghidra'
+
+    doLast {
+        def distDir = file("${projectDir}/dist")
+        def zips = distDir.listFiles()?.findAll { it.name.endsWith('.zip') }
+        if (!zips) {
+            throw new GradleException("No ZIP found in ${distDir}")
+        }
+        def zipFile = zips.max { it.lastModified() }
+
+        def installDir = file("${GHIDRA_INSTALL_DIR}/Ghidra/Extensions/LibGhidraHost")
+        if (installDir.exists()) {
+            delete installDir
+        }
+        installDir.mkdirs()
+
+        // Extract ZIP, stripping the top-level directory
+        def zipTree = zipTree(zipFile)
+        copy {
+            from zipTree
+            into installDir
+            eachFile { fcd ->
+                // Strip top-level dir (e.g. "LibGhidraHost/lib/foo.jar" -> "lib/foo.jar")
+                def segments = fcd.relativePath.segments
+                if (segments.length > 1) {
+                    fcd.relativePath = new RelativePath(!fcd.file.isDirectory(),
+                        segments[1..-1] as String[])
+                } else {
+                    fcd.exclude()
+                }
+            }
+            includeEmptyDirs = false
+        }
+
+        println "\nInstalled to ${installDir}:"
+        installDir.eachFileRecurse { f ->
+            println "  ${installDir.toPath().relativize(f.toPath())}"
+        }
+    }
+}

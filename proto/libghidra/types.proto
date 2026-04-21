@@ -1,0 +1,511 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "TypesProto";
+
+import "libghidra/common.proto";
+
+message TypeRecord {
+  uint64 type_id = 1;
+  string name = 2;
+  string path_name = 3;
+  string category_path = 4;
+  string display_name = 5;
+  string kind = 6;
+  int32 length = 7;
+  bool is_not_yet_defined = 8;
+  string source_archive = 9;
+  string universal_id = 10;
+}
+
+message TypeAliasRecord {
+  uint64 type_id = 1;
+  string path_name = 2;
+  string name = 3;
+  string target_type = 4;
+  string declaration = 5;
+}
+
+message TypeUnionRecord {
+  uint64 type_id = 1;
+  string path_name = 2;
+  string name = 3;
+  uint64 size = 4;
+  string declaration = 5;
+}
+
+message TypeEnumRecord {
+  uint64 type_id = 1;
+  string path_name = 2;
+  string name = 3;
+  uint64 width = 4;
+  bool signed = 5;
+  string declaration = 6;
+}
+
+message TypeEnumMemberRecord {
+  uint64 type_id = 1;
+  string type_path_name = 2;
+  string type_name = 3;
+  uint64 ordinal = 4;
+  string name = 5;
+  int64 value = 6;
+  string comment = 7;
+}
+
+message TypeMemberRecord {
+  uint64 parent_type_id = 1;
+  string parent_type_path_name = 2;
+  string parent_type_name = 3;
+  uint64 ordinal = 4;
+  string name = 5;
+  string member_type = 6;
+  int64 offset = 7;
+  uint64 size = 8;
+  string comment = 9;
+}
+
+message ParameterRecord {
+  int32 ordinal = 1;
+  string name = 2;
+  string data_type = 3;
+  string formal_data_type = 4;
+  bool is_auto_parameter = 5;
+  bool is_forced_indirect = 6;
+}
+
+message FunctionSignatureRecord {
+  uint64 function_entry_address = 1;
+  string function_name = 2;
+  string prototype = 3;
+  string return_type = 4;
+  bool has_var_args = 5;
+  string calling_convention = 6;
+  repeated ParameterRecord parameters = 7;
+}
+
+// Field 1 reserved for future common request context.
+message GetTypeRequest {
+  string path = 2;
+}
+
+message GetTypeResponse {
+  TypeRecord type = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListTypesRequest {
+  string query = 2;
+  Pagination page = 3;
+}
+
+message ListTypesResponse {
+  repeated TypeRecord types = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListTypeAliasesRequest {
+  string query = 2;
+  Pagination page = 3;
+}
+
+message ListTypeAliasesResponse {
+  repeated TypeAliasRecord aliases = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListTypeUnionsRequest {
+  string query = 2;
+  Pagination page = 3;
+}
+
+message ListTypeUnionsResponse {
+  repeated TypeUnionRecord unions = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListTypeEnumsRequest {
+  string query = 2;
+  Pagination page = 3;
+}
+
+message ListTypeEnumsResponse {
+  repeated TypeEnumRecord enums = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListTypeEnumMembersRequest {
+  string type = 2;
+  Pagination page = 3;
+}
+
+message ListTypeEnumMembersResponse {
+  repeated TypeEnumMemberRecord members = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListTypeMembersRequest {
+  string type = 2;
+  Pagination page = 3;
+}
+
+message ListTypeMembersResponse {
+  repeated TypeMemberRecord members = 1;
+}
+
+// Field 1 reserved for future common request context.
+message GetFunctionSignatureRequest {
+  uint64 address = 2;
+}
+
+message GetFunctionSignatureResponse {
+  FunctionSignatureRecord signature = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListFunctionSignaturesRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListFunctionSignaturesResponse {
+  repeated FunctionSignatureRecord signatures = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetFunctionSignatureRequest {
+  uint64 address = 2;
+  string prototype = 3;
+  string calling_convention = 4;
+}
+
+message SetFunctionSignatureResponse {
+  bool updated = 1;
+  string function_name = 2;
+  string prototype = 3;
+}
+
+// Field 1 reserved for future common request context.
+message RenameFunctionParameterRequest {
+  uint64 address = 2;
+  int32 ordinal = 3;
+  string new_name = 4;
+}
+
+message RenameFunctionParameterResponse {
+  bool updated = 1;
+  string name = 2;
+}
+
+// Field 1 reserved for future common request context.
+message SetFunctionParameterTypeRequest {
+  uint64 address = 2;
+  int32 ordinal = 3;
+  string data_type = 4;
+}
+
+message SetFunctionParameterTypeResponse {
+  bool updated = 1;
+  string data_type = 2;
+}
+
+// Field 1 reserved for future common request context.
+message RenameFunctionLocalRequest {
+  uint64 address = 2;
+  string local_id = 3;
+  string new_name = 4;
+}
+
+message RenameFunctionLocalResponse {
+  bool updated = 1;
+  string local_id = 2;
+  string name = 3;
+}
+
+// Field 1 reserved for future common request context.
+message SetFunctionLocalTypeRequest {
+  uint64 address = 2;
+  string local_id = 3;
+  string data_type = 4;
+}
+
+message SetFunctionLocalTypeResponse {
+  bool updated = 1;
+  string local_id = 2;
+  string data_type = 3;
+}
+
+// Field 1 reserved for future common request context.
+message ApplyDataTypeRequest {
+  uint64 address = 2;
+  string data_type = 3;
+}
+
+message ApplyDataTypeResponse {
+  bool updated = 1;
+  string data_type = 2;
+}
+
+// Field 1 reserved for future common request context.
+message CreateTypeRequest {
+  string name = 2;
+  string kind = 3;
+  uint64 size = 4;
+}
+
+message CreateTypeResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteTypeRequest {
+  string type = 2;
+}
+
+message DeleteTypeResponse {
+  bool deleted = 1;
+}
+
+// Field 1 reserved for future common request context.
+message RenameTypeRequest {
+  string type = 2;
+  string new_name = 3;
+}
+
+message RenameTypeResponse {
+  bool updated = 1;
+  string name = 2;
+}
+
+// Field 1 reserved for future common request context.
+message CreateTypeAliasRequest {
+  string name = 2;
+  string target_type = 3;
+}
+
+message CreateTypeAliasResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteTypeAliasRequest {
+  string type = 2;
+}
+
+message DeleteTypeAliasResponse {
+  bool deleted = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetTypeAliasTargetRequest {
+  string type = 2;
+  string target_type = 3;
+}
+
+message SetTypeAliasTargetResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message CreateTypeEnumRequest {
+  string name = 2;
+  uint64 width = 3;
+  bool signed = 4;
+}
+
+message CreateTypeEnumResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteTypeEnumRequest {
+  string type = 2;
+}
+
+message DeleteTypeEnumResponse {
+  bool deleted = 1;
+}
+
+// Field 1 reserved for future common request context.
+message AddTypeEnumMemberRequest {
+  string type = 2;
+  string name = 3;
+  int64 value = 4;
+}
+
+message AddTypeEnumMemberResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteTypeEnumMemberRequest {
+  string type = 2;
+  uint64 ordinal = 3;
+}
+
+message DeleteTypeEnumMemberResponse {
+  bool deleted = 1;
+}
+
+// Field 1 reserved for future common request context.
+message RenameTypeEnumMemberRequest {
+  string type = 2;
+  uint64 ordinal = 3;
+  string new_name = 4;
+}
+
+message RenameTypeEnumMemberResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetTypeEnumMemberValueRequest {
+  string type = 2;
+  uint64 ordinal = 3;
+  int64 value = 4;
+}
+
+message SetTypeEnumMemberValueResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message AddTypeMemberRequest {
+  string type = 2;
+  string name = 3;
+  string member_type = 4;
+  uint64 size = 5;
+}
+
+message AddTypeMemberResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteTypeMemberRequest {
+  string type = 2;
+  uint64 ordinal = 3;
+}
+
+message DeleteTypeMemberResponse {
+  bool deleted = 1;
+}
+
+// Field 1 reserved for future common request context.
+message RenameTypeMemberRequest {
+  string type = 2;
+  uint64 ordinal = 3;
+  string new_name = 4;
+}
+
+message RenameTypeMemberResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetTypeMemberTypeRequest {
+  string type = 2;
+  uint64 ordinal = 3;
+  string member_type = 4;
+}
+
+message SetTypeMemberTypeResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetTypeMemberCommentRequest {
+  string type = 2;
+  uint64 ordinal = 3;
+  string comment = 4;
+}
+
+message SetTypeMemberCommentResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message SetTypeEnumMemberCommentRequest {
+  string type = 2;
+  uint64 ordinal = 3;
+  string comment = 4;
+}
+
+message SetTypeEnumMemberCommentResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ParseDeclarationsRequest {
+  string source_text = 2;
+}
+
+message ParseDeclarationsResponse {
+  int32 types_created = 1;
+  repeated string type_names = 2;
+  repeated string errors = 3;
+}
+
+service TypesService {
+  rpc GetType(GetTypeRequest) returns (GetTypeResponse);
+  rpc ListTypes(ListTypesRequest) returns (ListTypesResponse);
+  rpc ListTypeAliases(ListTypeAliasesRequest) returns (ListTypeAliasesResponse);
+  rpc ListTypeUnions(ListTypeUnionsRequest) returns (ListTypeUnionsResponse);
+  rpc ListTypeEnums(ListTypeEnumsRequest) returns (ListTypeEnumsResponse);
+  rpc ListTypeEnumMembers(ListTypeEnumMembersRequest)
+      returns (ListTypeEnumMembersResponse);
+  rpc ListTypeMembers(ListTypeMembersRequest) returns (ListTypeMembersResponse);
+  rpc GetFunctionSignature(GetFunctionSignatureRequest)
+      returns (GetFunctionSignatureResponse);
+  rpc ListFunctionSignatures(ListFunctionSignaturesRequest)
+      returns (ListFunctionSignaturesResponse);
+  rpc SetFunctionSignature(SetFunctionSignatureRequest)
+      returns (SetFunctionSignatureResponse);
+  rpc RenameFunctionParameter(RenameFunctionParameterRequest)
+      returns (RenameFunctionParameterResponse);
+  rpc SetFunctionParameterType(SetFunctionParameterTypeRequest)
+      returns (SetFunctionParameterTypeResponse);
+  rpc RenameFunctionLocal(RenameFunctionLocalRequest)
+      returns (RenameFunctionLocalResponse);
+  rpc SetFunctionLocalType(SetFunctionLocalTypeRequest)
+      returns (SetFunctionLocalTypeResponse);
+  rpc ApplyDataType(ApplyDataTypeRequest) returns (ApplyDataTypeResponse);
+  rpc CreateType(CreateTypeRequest) returns (CreateTypeResponse);
+  rpc DeleteType(DeleteTypeRequest) returns (DeleteTypeResponse);
+  rpc RenameType(RenameTypeRequest) returns (RenameTypeResponse);
+  rpc CreateTypeAlias(CreateTypeAliasRequest) returns (CreateTypeAliasResponse);
+  rpc DeleteTypeAlias(DeleteTypeAliasRequest) returns (DeleteTypeAliasResponse);
+  rpc SetTypeAliasTarget(SetTypeAliasTargetRequest)
+      returns (SetTypeAliasTargetResponse);
+  rpc CreateTypeEnum(CreateTypeEnumRequest) returns (CreateTypeEnumResponse);
+  rpc DeleteTypeEnum(DeleteTypeEnumRequest) returns (DeleteTypeEnumResponse);
+  rpc AddTypeEnumMember(AddTypeEnumMemberRequest)
+      returns (AddTypeEnumMemberResponse);
+  rpc DeleteTypeEnumMember(DeleteTypeEnumMemberRequest)
+      returns (DeleteTypeEnumMemberResponse);
+  rpc RenameTypeEnumMember(RenameTypeEnumMemberRequest)
+      returns (RenameTypeEnumMemberResponse);
+  rpc SetTypeEnumMemberValue(SetTypeEnumMemberValueRequest)
+      returns (SetTypeEnumMemberValueResponse);
+  rpc AddTypeMember(AddTypeMemberRequest) returns (AddTypeMemberResponse);
+  rpc DeleteTypeMember(DeleteTypeMemberRequest) returns (DeleteTypeMemberResponse);
+  rpc RenameTypeMember(RenameTypeMemberRequest) returns (RenameTypeMemberResponse);
+  rpc SetTypeMemberType(SetTypeMemberTypeRequest)
+      returns (SetTypeMemberTypeResponse);
+  rpc SetTypeMemberComment(SetTypeMemberCommentRequest)
+      returns (SetTypeMemberCommentResponse);
+  rpc SetTypeEnumMemberComment(SetTypeEnumMemberCommentRequest)
+      returns (SetTypeEnumMemberCommentResponse);
+  rpc ParseDeclarations(ParseDeclarationsRequest)
+      returns (ParseDeclarationsResponse);
+}

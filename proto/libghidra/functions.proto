@@ -1,0 +1,259 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "FunctionsProto";
+
+import "libghidra/common.proto";
+
+message FunctionRecord {
+  uint64 entry_address = 1;
+  string name = 2;
+  uint64 start_address = 3;
+  uint64 end_address = 4;
+  uint64 size = 5;
+  string namespace_name = 6;
+  string prototype = 7;
+  bool is_thunk = 8;
+  uint32 parameter_count = 9;
+}
+
+// Field 1 reserved for future common request context.
+message GetFunctionRequest {
+  uint64 address = 2;
+}
+
+message GetFunctionResponse {
+  FunctionRecord function = 1;
+}
+
+// Field 1 reserved for future common request context.
+message ListFunctionsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListFunctionsResponse {
+  repeated FunctionRecord functions = 1;
+}
+
+// Field 1 reserved for future common request context.
+message RenameFunctionRequest {
+  uint64 address = 2;
+  string new_name = 3;
+}
+
+message RenameFunctionResponse {
+  bool renamed = 1;
+  string name = 2;
+}
+
+message BasicBlockRecord {
+  uint64 function_entry = 1;
+  uint64 start_address = 2;
+  uint64 end_address = 3;
+  uint32 in_degree = 4;
+  uint32 out_degree = 5;
+}
+
+// Field 1 reserved for future common request context.
+message ListBasicBlocksRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListBasicBlocksResponse {
+  repeated BasicBlockRecord blocks = 1;
+}
+
+message CFGEdgeRecord {
+  uint64 function_entry = 1;
+  uint64 src_block_start = 2;
+  uint64 dst_block_start = 3;
+  string edge_kind = 4;
+}
+
+// Field 1 reserved for future common request context.
+message ListCFGEdgesRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListCFGEdgesResponse {
+  repeated CFGEdgeRecord edges = 1;
+}
+
+// Function tags — Ghidra-native categorization
+message FunctionTagRecord {
+  string name = 1;
+  string comment = 2;
+}
+
+message ListFunctionTagsRequest {
+}
+
+message ListFunctionTagsResponse {
+  repeated FunctionTagRecord tags = 1;
+}
+
+// Field 1 reserved for future common request context.
+message CreateFunctionTagRequest {
+  string name = 2;
+  string comment = 3;
+}
+
+message CreateFunctionTagResponse {
+  bool created = 1;
+}
+
+// Field 1 reserved for future common request context.
+message DeleteFunctionTagRequest {
+  string name = 2;
+}
+
+message DeleteFunctionTagResponse {
+  bool deleted = 1;
+}
+
+message FunctionTagMappingRecord {
+  uint64 function_entry = 1;
+  string tag_name = 2;
+}
+
+// Field 1 reserved for future common request context.
+message ListFunctionTagMappingsRequest {
+  uint64 function_entry = 2;
+}
+
+message ListFunctionTagMappingsResponse {
+  repeated FunctionTagMappingRecord mappings = 1;
+}
+
+// Field 1 reserved for future common request context.
+message TagFunctionRequest {
+  uint64 function_entry = 2;
+  string tag_name = 3;
+}
+
+message TagFunctionResponse {
+  bool updated = 1;
+}
+
+// Field 1 reserved for future common request context.
+message UntagFunctionRequest {
+  uint64 function_entry = 2;
+  string tag_name = 3;
+}
+
+message UntagFunctionResponse {
+  bool updated = 1;
+}
+
+// Switch table — from decompiler JumpTable analysis.
+message SwitchCaseRecord {
+  int64 value = 1;
+  uint64 target_address = 2;
+}
+
+message SwitchTableRecord {
+  uint64 function_entry = 1;
+  uint64 switch_address = 2;
+  uint32 case_count = 3;
+  repeated SwitchCaseRecord cases = 4;
+  uint64 default_address = 5;
+}
+
+// Field 1 reserved for future common request context.
+message ListSwitchTablesRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListSwitchTablesResponse {
+  repeated SwitchTableRecord switch_tables = 1;
+}
+
+// Dominator tree — computed from CFG via GraphAlgorithms.
+message DominatorRecord {
+  uint64 function_entry = 1;
+  uint64 block_address = 2;
+  uint64 idom_address = 3;
+  uint32 depth = 4;
+  bool is_entry = 5;
+}
+
+// Field 1 reserved for future common request context.
+message ListDominatorsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListDominatorsResponse {
+  repeated DominatorRecord dominators = 1;
+}
+
+// Post-dominator tree — computed from reversed CFG.
+message PostDominatorRecord {
+  uint64 function_entry = 1;
+  uint64 block_address = 2;
+  uint64 ipdom_address = 3;
+  uint32 depth = 4;
+  bool is_exit = 5;
+}
+
+// Field 1 reserved for future common request context.
+message ListPostDominatorsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListPostDominatorsResponse {
+  repeated PostDominatorRecord post_dominators = 1;
+}
+
+// Natural loop — from decompiler structured block analysis.
+message LoopRecord {
+  uint64 function_entry = 1;
+  uint64 header_address = 2;
+  uint64 back_edge_source = 3;
+  string loop_kind = 4;
+  uint32 block_count = 5;
+  uint32 depth = 6;
+}
+
+// Field 1 reserved for future common request context.
+message ListLoopsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListLoopsResponse {
+  repeated LoopRecord loops = 1;
+}
+
+service FunctionsService {
+  rpc GetFunction(GetFunctionRequest) returns (GetFunctionResponse);
+  rpc ListFunctions(ListFunctionsRequest) returns (ListFunctionsResponse);
+  rpc RenameFunction(RenameFunctionRequest) returns (RenameFunctionResponse);
+  rpc ListBasicBlocks(ListBasicBlocksRequest) returns (ListBasicBlocksResponse);
+  rpc ListCFGEdges(ListCFGEdgesRequest) returns (ListCFGEdgesResponse);
+  rpc ListFunctionTags(ListFunctionTagsRequest) returns (ListFunctionTagsResponse);
+  rpc CreateFunctionTag(CreateFunctionTagRequest) returns (CreateFunctionTagResponse);
+  rpc DeleteFunctionTag(DeleteFunctionTagRequest) returns (DeleteFunctionTagResponse);
+  rpc ListFunctionTagMappings(ListFunctionTagMappingsRequest) returns (ListFunctionTagMappingsResponse);
+  rpc TagFunction(TagFunctionRequest) returns (TagFunctionResponse);
+  rpc UntagFunction(UntagFunctionRequest) returns (UntagFunctionResponse);
+  rpc ListSwitchTables(ListSwitchTablesRequest) returns (ListSwitchTablesResponse);
+  rpc ListDominators(ListDominatorsRequest) returns (ListDominatorsResponse);
+  rpc ListPostDominators(ListPostDominatorsRequest) returns (ListPostDominatorsResponse);
+  rpc ListLoops(ListLoopsRequest) returns (ListLoopsResponse);
+}

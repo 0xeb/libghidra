@@ -1,0 +1,13 @@
+version: v2
+
+# NOTE: buf generate is one option for codegen. The preferred method is
+# the regen.py script (tools/regen.py) which uses protoc directly and
+# handles Rust via prost-build (no protoc plugin needed for Rust).
+
+plugins:
+  - local: protoc-gen-cpp
+    out: ../cpp/generated
+  - local: protoc-gen-java
+    out: ../ghidra-extension/src/main/generated
+  - local: protoc-gen-python
+    out: ../python/src

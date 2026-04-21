@@ -1,0 +1,42 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "HealthProto";
+
+message HealthStatusRequest {}
+
+message HealthStatusResponse {
+  bool ok = 1;
+  string service_name = 2;
+  string service_version = 3;
+  string host_mode = 4;
+  uint64 program_revision = 5;
+  repeated string warnings = 6;
+}
+
+message CapabilityRequest {}
+
+message Capability {
+  string id = 1;
+  string status = 2;
+  string note = 3;
+}
+
+message CapabilityResponse {
+  repeated Capability capabilities = 1;
+}
+
+service HealthService {
+  rpc GetStatus(HealthStatusRequest) returns (HealthStatusResponse);
+  rpc GetCapabilities(CapabilityRequest) returns (CapabilityResponse);
+}

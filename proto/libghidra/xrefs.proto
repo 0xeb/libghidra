@@ -1,0 +1,43 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "XrefsProto";
+
+import "libghidra/common.proto";
+
+message XrefRecord {
+  uint64 from_address = 1;
+  uint64 to_address = 2;
+  int32 operand_index = 3;
+  string ref_type = 4;
+  bool is_primary = 5;
+  string source = 6;
+  int64 symbol_id = 7;
+  bool is_external = 8;
+  bool is_memory = 9;
+  bool is_flow = 10;
+}
+
+// Field 1 reserved for future common request context.
+message ListXrefsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListXrefsResponse {
+  repeated XrefRecord xrefs = 1;
+}
+
+service XrefsService {
+  rpc ListXrefs(ListXrefsRequest) returns (ListXrefsResponse);
+}

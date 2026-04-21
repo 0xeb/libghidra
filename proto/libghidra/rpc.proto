@@ -1,0 +1,33 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: MPL-2.0
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "RpcProto";
+
+import "google/protobuf/any.proto";
+
+message RpcRequest {
+  string method = 1;
+  google.protobuf.Any payload = 2;
+}
+
+message RpcResponse {
+  bool success = 1;
+  string error_code = 2;
+  string error_message = 3;
+  google.protobuf.Any payload = 4;
+  uint64 revision = 5;
+}
+
+service RpcService {
+  rpc Call(RpcRequest) returns (RpcResponse);
+}

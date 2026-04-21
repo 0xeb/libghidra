@@ -1,0 +1,32 @@
+[project]
+name = "libghidra"
+dynamic = ["version"]
+description = "Python client for the libghidra typed RPC layer"
+requires-python = ">=3.12"
+license = "MPL-2.0"
+authors = [{name = "Elias Bachaalany"}]
+dependencies = ["protobuf>=4.29", "requests>=2.28"]
+
+[project.optional-dependencies]
+async = ["aiohttp>=3.9"]
+cli = ["pefile>=2023.2.7", "capstone>=5.0"]
+
+[project.scripts]
+libghidra = "libghidra.tools.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/0xeb/libghidra"
+Repository = "https://github.com/0xeb/libghidra"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "libghidra._version.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+libghidra = ["*.pyd", "*.so", "*.dylib"]

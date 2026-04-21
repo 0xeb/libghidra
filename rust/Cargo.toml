@@ -1,0 +1,84 @@
+[package]
+name = "libghidra-client"
+version = "0.0.1"
+edition = "2021"
+publish = false
+license = "MPL-2.0"
+
+[lib]
+name = "libghidra"
+
+[dependencies]
+prost = "0.13"
+prost-types = "0.13"
+ureq = "3"
+thiserror = "2"
+rand = "0.9"
+
+[build-dependencies]
+prost-build = "0.13"
+protoc-bin-vendored = "3"
+
+[[example]]
+name = "quickstart"
+path = "examples/quickstart.rs"
+
+[[example]]
+name = "memory_ops"
+path = "examples/memory_ops.rs"
+
+[[example]]
+name = "disassemble"
+path = "examples/disassemble.rs"
+
+[[example]]
+name = "comments"
+path = "examples/comments.rs"
+
+[[example]]
+name = "data_items"
+path = "examples/data_items.rs"
+
+[[example]]
+name = "symbols"
+path = "examples/symbols.rs"
+
+[[example]]
+name = "type_system"
+path = "examples/type_system.rs"
+
+[[example]]
+name = "struct_builder"
+path = "examples/struct_builder.rs"
+
+[[example]]
+name = "enum_builder"
+path = "examples/enum_builder.rs"
+
+[[example]]
+name = "function_signatures"
+path = "examples/function_signatures.rs"
+
+[[example]]
+name = "cfg_analysis"
+path = "examples/cfg_analysis.rs"
+
+[[example]]
+name = "session_lifecycle"
+path = "examples/session_lifecycle.rs"
+
+[[example]]
+name = "pagination"
+path = "examples/pagination.rs"
+
+[[example]]
+name = "end_to_end"
+path = "examples/end_to_end.rs"
+
+[[example]]
+name = "function_tags"
+path = "examples/function_tags.rs"
+
+[[example]]
+name = "parse_declarations"
+path = "examples/parse_declarations.rs"
