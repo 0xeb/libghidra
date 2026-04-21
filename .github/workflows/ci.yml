@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: "3.11"
+  PYTHON_VERSION: "3.12"
   JAVA_VERSION: "21"
   GHIDRA_RELEASE_URL: "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.0.4_build/ghidra_12.0.4_PUBLIC_20260303.zip"
 
@@ -31,12 +31,15 @@ jobs:
           - name: Linux
             os: ubuntu-latest
             artifact_name: cpp-sdk-linux
+            cmake_extra: ""
           - name: macOS
             os: macos-latest
             artifact_name: cpp-sdk-macos
+            cmake_extra: "-DCMAKE_OSX_ARCHITECTURES=arm64"
           - name: Windows
             os: windows-latest
             artifact_name: cpp-sdk-windows
+            cmake_extra: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,6 +58,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release
           -DLIBGHIDRA_WITH_LOCAL=OFF
           -DLIBGHIDRA_BUILD_EXAMPLES=ON
+          ${{ matrix.cmake_extra }}
 
       - name: Build C++ SDK
         run: cmake --build build/cpp --config Release
