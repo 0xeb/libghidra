@@ -183,6 +183,129 @@ jobs:
           name: ghidra-extension-linux
           path: ghidra-extension/dist/*.zip
 
+  build-wheel-native:
+    name: Build Native Wheel (${{ matrix.id }})
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: linux-x86_64
+            os: ubuntu-latest
+            container: quay.io/pypa/manylinux_2_28_x86_64
+            cmake_extra: ""
+            wheel_tool: auditwheel
+          - id: linux-aarch64
+            os: ubuntu-24.04-arm
+            container: quay.io/pypa/manylinux_2_28_aarch64
+            cmake_extra: ""
+            wheel_tool: auditwheel
+          - id: macos-arm64
+            os: macos-latest
+            container: ""
+            cmake_extra: "-DCMAKE_OSX_ARCHITECTURES=arm64"
+            wheel_tool: delocate
+          - id: macos-x86_64
+            os: macos-13
+            container: ""
+            cmake_extra: "-DCMAKE_OSX_ARCHITECTURES=x86_64"
+            wheel_tool: delocate
+          - id: windows-x86_64
+            os: windows-latest
+            container: ""
+            cmake_extra: ""
+            wheel_tool: delvewheel
+          - id: windows-arm64
+            os: windows-11-arm
+            container: ""
+            cmake_extra: ""
+            wheel_tool: delvewheel
+    steps:
+      - name: Checkout libghidra
+        uses: actions/checkout@v4
+
+      - name: Checkout Ghidra source
+        uses: actions/checkout@v4
+        with:
+          repository: NationalSecurityAgency/ghidra
+          ref: Ghidra_12.0.4_build
+          path: _ghidra-src
+
+      - name: Use manylinux Python 3.12
+        if: startsWith(matrix.id, 'linux-')
+        shell: bash
+        run: |
+          echo "/opt/python/cp312-cp312/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Python (macOS/Windows)
+        if: ${{ !startsWith(matrix.id, 'linux-') }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configure C++ SDK with local backend
+        shell: bash
+        run: >
+          cmake -S cpp -B build/cpp
+          -DCMAKE_BUILD_TYPE=Release
+          -DLIBGHIDRA_WITH_LOCAL=ON
+          -DLIBGHIDRA_BUILD_PYTHON=ON
+          -DGHIDRA_SOURCE_DIR="${GITHUB_WORKSPACE}/_ghidra-src"
+          ${{ matrix.cmake_extra }}
+
+      - name: Build C++ SDK
+        run: cmake --build build/cpp --config Release
+
+      - name: Build wheel
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --wheel python
+
+      - name: Repair wheel (auditwheel)
+        if: matrix.wheel_tool == 'auditwheel'
+        shell: bash
+        run: |
+          python -m pip install auditwheel patchelf
+          mkdir -p python/dist-repaired
+          for whl in python/dist/*.whl; do
+            auditwheel repair "$whl" -w python/dist-repaired/
+          done
+
+      - name: Repair wheel (delocate)
+        if: matrix.wheel_tool == 'delocate'
+        shell: bash
+        run: |
+          python -m pip install delocate
+          mkdir -p python/dist-repaired
+          for whl in python/dist/*.whl; do
+            delocate-wheel -w python/dist-repaired/ "$whl"
+          done
+
+      - name: Repair wheel (delvewheel)
+        if: matrix.wheel_tool == 'delvewheel'
+        shell: bash
+        run: |
+          python -m pip install delvewheel
+          mkdir -p python/dist-repaired
+          for whl in python/dist/*.whl; do
+            delvewheel repair "$whl" -w python/dist-repaired/
+          done
+
+      - name: Smoke test repaired wheel
+        shell: bash
+        run: |
+          python -m pip install python/dist-repaired/*.whl
+          python -c "import libghidra; from libghidra.local import LocalClient; print('import ok')"
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-wheel-${{ matrix.id }}
+          path: python/dist-repaired/*.whl
+
   publish-draft-release:
     name: Publish Draft Release
     if: startsWith(github.ref, 'refs/tags/')
@@ -191,6 +314,7 @@ jobs:
       - package-python
       - package-rust
       - build-extension-linux
+      - build-wheel-native
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -220,6 +344,13 @@ jobs:
         with:
           name: ghidra-extension-linux
           path: extension-artifacts
+
+      - name: Download native wheel artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: python-wheel-*
+          path: native-wheels
+          merge-multiple: true
 
       - name: Prepare release assets
         shell: bash
@@ -251,4 +382,6 @@ jobs:
           draft: true
           prerelease: ${{ contains(github.ref_name, 'alpha') }}
           generate_release_notes: true
-          files: release/*
+          files: |
+            release/*
+            native-wheels/*.whl
