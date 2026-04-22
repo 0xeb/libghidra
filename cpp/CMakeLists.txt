@@ -3,7 +3,7 @@
 #   libghidra_client — IClient interface + models + StatusOr + HTTP backend + protobuf stubs
 #   libghidra_local  — Adds local/offline backend (decompiler engine, project reader)
 
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../VERSION" LIBGHIDRA_VERSION)
 string(STRIP "${LIBGHIDRA_VERSION}" LIBGHIDRA_VERSION)
 project(libghidra_cpp VERSION ${LIBGHIDRA_VERSION} LANGUAGES CXX C)
@@ -257,21 +257,23 @@ if(LIBGHIDRA_WITH_LOCAL)
     # PUBLIC link to libghidra_client for IClient, models, status
     target_link_libraries(libghidra_local PUBLIC libghidra_client)
 
-    # Whole-archive link propagated to consumers via INTERFACE.
-    # Static initializers (ArchitectureCapability registration) would be stripped without this.
-    if(MSVC)
-        target_link_libraries(libghidra_local INTERFACE
-            -WHOLEARCHIVE:$<TARGET_FILE:libghidra_local>
-        )
-    elseif(APPLE)
-        target_link_libraries(libghidra_local INTERFACE
-            -Wl,-force_load,$<TARGET_FILE:libghidra_local>
-        )
-    else()
-        target_link_libraries(libghidra_local INTERFACE
-            -Wl,--whole-archive $<TARGET_FILE:libghidra_local> -Wl,--no-whole-archive
-        )
-    endif()
+    # Whole-archive wrapper. libghidra_local relies on static-initialiser
+    # registration of Ghidra's ArchitectureCapability subclasses, which the
+    # linker strips under default linkage because nothing references those
+    # translation units directly. Consumers that need the registrations to
+    # survive (the Python nanobind extension, the local-backend examples)
+    # must link against this wrapper instead of libghidra_local.
+    #
+    # Using the CMake 3.24 generator expression keeps the archive referenced
+    # exactly once in the final link — the previous pattern of emitting
+    # "-Wl,--whole-archive $<TARGET_FILE:libghidra_local> -Wl,--no-whole-archive"
+    # via INTERFACE duplicated every object file on Linux because CMake's
+    # target resolution already linked libghidra_local normally.
+    add_library(libghidra_local_whole INTERFACE)
+    add_library(libghidra::local_whole ALIAS libghidra_local_whole)
+    target_link_libraries(libghidra_local_whole INTERFACE
+        $<LINK_LIBRARY:WHOLE_ARCHIVE,libghidra_local>
+    )
 
     # Threading support for DecompilerPool
     find_package(Threads REQUIRED)
