@@ -217,11 +217,10 @@ jobs:
             container: ""
             cmake_extra: ""
             wheel_tool: delvewheel
-          - id: windows-arm64
-            os: windows-11-arm
-            container: ""
-            cmake_extra: ""
-            wheel_tool: delvewheel
+          # windows-arm64 intentionally omitted: actions/setup-python@v5 does
+          # not yet ship an arm64 Python for windows-11-arm, so the native
+          # extension link fails with unresolved __imp__Py_IncRef. Re-enable
+          # once setup-python supports architecture: arm64 on that runner.
     steps:
       - name: Checkout libghidra
         uses: actions/checkout@v4

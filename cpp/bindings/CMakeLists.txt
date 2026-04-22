@@ -18,7 +18,7 @@ nanobind_add_module(_libghidra
     NB_STATIC
     python_bindings.cpp
 )
-target_link_libraries(_libghidra PRIVATE libghidra_local)
+target_link_libraries(_libghidra PRIVATE libghidra::local_whole)
 
 # ==========================================================================
 # Output location — place .pyd where Python can find it during development
