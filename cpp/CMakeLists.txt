@@ -30,6 +30,13 @@ if(LIBGHIDRA_WITH_LOCAL AND NOT DEFINED GHIDRA_SOURCE_DIR)
         "Point it at a Ghidra source tree (e.g. -DGHIDRA_SOURCE_DIR=/path/to/ghidra).")
 endif()
 
+# Normalise to forward slashes so Windows paths like "D:\a\..." don't trigger
+# CMake's invalid-character-escape parse errors when concatenated into source
+# lists (e.g. add_library("${GHIDRA_ZLIB_SRC}/adler32.c")).
+if(DEFINED GHIDRA_SOURCE_DIR)
+    file(TO_CMAKE_PATH "${GHIDRA_SOURCE_DIR}" GHIDRA_SOURCE_DIR)
+endif()
+
 # ============================================================================
 # Dependencies: protobuf + cpp-httplib (always needed for libghidra_client)
 # ============================================================================
