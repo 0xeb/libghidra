@@ -230,7 +230,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: NationalSecurityAgency/ghidra
-          ref: Ghidra_12.0.4_build
+          # Pinned to a master commit that contains all decompiler sources referenced
+          # by cpp/cmake/GhidraSources.cmake (notably bitfield.cc, which is on master
+          # but not on the Ghidra_12.0.4_build release branch).
+          ref: b211a07b51e5098648d8f571130cf93448470d6a
           path: _ghidra-src
 
       - name: Use manylinux Python 3.12
