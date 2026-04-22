@@ -236,10 +236,14 @@ jobs:
           ref: b211a07b51e5098648d8f571130cf93448470d6a
           path: _ghidra-src
 
-      - name: Use manylinux Python 3.12
+      - name: Use manylinux Python 3.12 and install libbfd
         if: startsWith(matrix.id, 'linux-')
         shell: bash
         run: |
+          # Ghidra's loadimage_bfd.cc / bfd_arch.cc / analyzesigs.cc / codedata.cc
+          # are only compiled on Linux and include bfd.h from binutils-devel,
+          # which is not preinstalled in the manylinux_2_28 image.
+          yum install -y binutils-devel
           echo "/opt/python/cp312-cp312/bin" >> "$GITHUB_PATH"
 
       - name: Setup Python (macOS/Windows)
