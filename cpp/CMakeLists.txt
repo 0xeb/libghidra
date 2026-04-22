@@ -22,6 +22,19 @@ option(LIBGHIDRA_WITH_LOCAL "Build the local (offline) backend" OFF)
 option(LIBGHIDRA_BUILD_EXAMPLES "Build examples" OFF)
 option(LIBGHIDRA_BUILD_PYTHON "Build Python native extension (nanobind, requires LOCAL)" OFF)
 
+# When building the Python nanobind extension the static libraries
+# (libghidra_client, libghidra_local) end up inside a shared module, so every
+# object they contain must be position-independent. On Linux ELF the linker
+# rejects R_X86_64_32S relocations against vtables/RTTI otherwise:
+#
+#   relocation R_X86_64_32S against symbol '_ZTVN...' can not be used when
+#   making a shared object; recompile with -fPIC
+#
+# Enable PIC globally in this configuration; it's a no-op on macOS/Windows.
+if(LIBGHIDRA_BUILD_PYTHON)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
 # GHIDRA_SOURCE_DIR: path to the Ghidra source tree.
 # Required when LIBGHIDRA_WITH_LOCAL is ON.
 if(LIBGHIDRA_WITH_LOCAL AND NOT DEFINED GHIDRA_SOURCE_DIR)
