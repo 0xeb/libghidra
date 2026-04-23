@@ -242,7 +242,7 @@ jobs:
           # Ghidra's loadimage_bfd.cc / bfd_arch.cc / analyzesigs.cc / codedata.cc
           # are only compiled on Linux and include bfd.h from binutils-devel,
           # which is not preinstalled in the manylinux_2_28 image.
-          yum install -y binutils-devel
+          yum install -y binutils-devel unzip
           echo "/opt/python/cp312-cp312/bin" >> "$GITHUB_PATH"
 
       - name: Setup Python (macOS/Windows)
@@ -250,6 +250,39 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Overlay compiled Sleigh .sla grammars from Ghidra distribution
+        shell: bash
+        run: |
+          # The git source tree only has .slaspec (Sleigh grammar source) and
+          # XML metadata under Ghidra/Processors/<proc>/data/languages/. The
+          # compiled .sla grammars are produced by Ghidra's Gradle build and
+          # ship with the release distribution ZIP. Overlay them into the
+          # source tree so embed_specs.py picks them up and bakes them into
+          # libghidra_local. Without this step the native wheels contain the
+          # decompiler engine but have no languages to decompile against, and
+          # LocalClient.OpenProgram fails at runtime.
+          set -euo pipefail
+          WORK_DIR="${RUNNER_TEMP:-/tmp}/ghidra-dist"
+          ZIP_PATH="${RUNNER_TEMP:-/tmp}/ghidra-dist.zip"
+          mkdir -p "$WORK_DIR"
+          curl -L --retry 5 --output "$ZIP_PATH" "$GHIDRA_RELEASE_URL"
+          unzip -q "$ZIP_PATH" -d "$WORK_DIR"
+          DIST_ROOT="$(find "$WORK_DIR" -maxdepth 1 -type d -name 'ghidra_*_PUBLIC*' | head -n 1)"
+          if [ -z "$DIST_ROOT" ]; then
+            echo "Failed to locate extracted Ghidra distribution root." >&2
+            exit 1
+          fi
+          SRC_ROOT="${GITHUB_WORKSPACE}/_ghidra-src"
+          count=0
+          while IFS= read -r -d '' sla; do
+            rel="${sla#${DIST_ROOT}/}"
+            dest="${SRC_ROOT}/${rel}"
+            mkdir -p "$(dirname "$dest")"
+            cp "$sla" "$dest"
+            count=$((count + 1))
+          done < <(find "${DIST_ROOT}/Ghidra/Processors" -name '*.sla' -print0)
+          echo "Overlaid ${count} .sla files from ${DIST_ROOT}"
 
       - name: Configure C++ SDK with local backend
         shell: bash
