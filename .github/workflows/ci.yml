@@ -207,11 +207,11 @@ jobs:
             container: ""
             cmake_extra: "-DCMAKE_OSX_ARCHITECTURES=arm64"
             wheel_tool: delocate
-          - id: macos-x86_64
-            os: macos-13
-            container: ""
-            cmake_extra: "-DCMAKE_OSX_ARCHITECTURES=x86_64"
-            wheel_tool: delocate
+          # macos-x86_64 omitted: macos-13 Intel runner pool is frequently
+          # saturated and leaves the matrix stuck in "queued" for hours,
+          # blocking publish-draft-release. Re-enable if Intel Mac coverage
+          # becomes important — the wheel itself builds fine when a runner
+          # is available.
           - id: windows-x86_64
             os: windows-latest
             container: ""
