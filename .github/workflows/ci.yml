@@ -267,8 +267,30 @@ jobs:
       - name: Build wheel
         shell: bash
         run: |
-          python -m pip install --upgrade pip build
+          python -m pip install --upgrade pip build wheel
           python -m build --wheel python
+
+      - name: Retag wheel with cp312-abi3 + platform
+        shell: bash
+        run: |
+          # setuptools tags the wheel as py3-none-any because it is unaware of
+          # the CMake-built nanobind module in package_data. Rewrite the tags
+          # so downstream repair tools recognise the wheel as platform-specific
+          # (otherwise delocate/delvewheel keep "any" and three of the four
+          # wheels end up with identical filenames on the release page).
+          case "${{ matrix.id }}" in
+            linux-x86_64)    PLAT=linux_x86_64 ;;
+            linux-aarch64)   PLAT=linux_aarch64 ;;
+            macos-arm64)     PLAT=macosx_11_0_arm64 ;;
+            windows-x86_64)  PLAT=win_amd64 ;;
+            *) echo "Unknown matrix id: ${{ matrix.id }}" >&2; exit 1 ;;
+          esac
+          python -m wheel tags \
+            --python-tag cp312 \
+            --abi-tag abi3 \
+            --platform-tag "$PLAT" \
+            --remove \
+            python/dist/libghidra-*.whl
 
       - name: Repair wheel (auditwheel)
         if: matrix.wheel_tool == 'auditwheel'
