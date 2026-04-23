@@ -242,7 +242,7 @@ jobs:
           # Ghidra's loadimage_bfd.cc / bfd_arch.cc / analyzesigs.cc / codedata.cc
           # are only compiled on Linux and include bfd.h from binutils-devel,
           # which is not preinstalled in the manylinux_2_28 image.
-          yum install -y binutils-devel unzip
+          yum install -y binutils-devel
           echo "/opt/python/cp312-cp312/bin" >> "$GITHUB_PATH"
 
       - name: Setup Python (macOS/Windows)
@@ -256,33 +256,45 @@ jobs:
         run: |
           # The git source tree only has .slaspec (Sleigh grammar source) and
           # XML metadata under Ghidra/Processors/<proc>/data/languages/. The
-          # compiled .sla grammars are produced by Ghidra's Gradle build and
-          # ship with the release distribution ZIP. Overlay them into the
-          # source tree so embed_specs.py picks them up and bakes them into
-          # libghidra_local. Without this step the native wheels contain the
-          # decompiler engine but have no languages to decompile against, and
-          # LocalClient.OpenProgram fails at runtime.
-          set -euo pipefail
-          WORK_DIR="${RUNNER_TEMP:-/tmp}/ghidra-dist"
-          ZIP_PATH="${RUNNER_TEMP:-/tmp}/ghidra-dist.zip"
-          mkdir -p "$WORK_DIR"
-          curl -L --retry 5 --output "$ZIP_PATH" "$GHIDRA_RELEASE_URL"
-          unzip -q "$ZIP_PATH" -d "$WORK_DIR"
-          DIST_ROOT="$(find "$WORK_DIR" -maxdepth 1 -type d -name 'ghidra_*_PUBLIC*' | head -n 1)"
-          if [ -z "$DIST_ROOT" ]; then
-            echo "Failed to locate extracted Ghidra distribution root." >&2
-            exit 1
-          fi
-          SRC_ROOT="${GITHUB_WORKSPACE}/_ghidra-src"
-          count=0
-          while IFS= read -r -d '' sla; do
-            rel="${sla#${DIST_ROOT}/}"
-            dest="${SRC_ROOT}/${rel}"
-            mkdir -p "$(dirname "$dest")"
-            cp "$sla" "$dest"
-            count=$((count + 1))
-          done < <(find "${DIST_ROOT}/Ghidra/Processors" -name '*.sla' -print0)
-          echo "Overlaid ${count} .sla files from ${DIST_ROOT}"
+          # compiled .sla grammars ship only with the release distribution ZIP.
+          # Download the ZIP, extract, and overlay the .sla files into the
+          # source tree so embed_specs.py picks them up. Written in Python so
+          # the path handling is identical on Linux, macOS, and Windows — the
+          # previous bash version mangled mixed-separator paths on Windows
+          # Git Bash and the .sla files landed outside the scanned directory,
+          # leaving win_amd64 wheels without any compiled grammars.
+          python << 'PYEOF'
+          import os, pathlib, shutil, sys, urllib.request, zipfile
+
+          runner_temp = pathlib.Path(os.environ.get('RUNNER_TEMP') or '/tmp')
+          work_dir = runner_temp / 'ghidra-dist'
+          zip_path = runner_temp / 'ghidra-dist.zip'
+          work_dir.mkdir(parents=True, exist_ok=True)
+
+          url = os.environ['GHIDRA_RELEASE_URL']
+          print(f'downloading {url}', flush=True)
+          urllib.request.urlretrieve(url, zip_path)
+
+          print(f'extracting to {work_dir}', flush=True)
+          with zipfile.ZipFile(zip_path) as z:
+              z.extractall(work_dir)
+
+          dist_roots = [p for p in work_dir.iterdir()
+                        if p.is_dir() and p.name.startswith('ghidra_') and 'PUBLIC' in p.name]
+          if not dist_roots:
+              sys.exit('Failed to find ghidra_*_PUBLIC* directory in extracted ZIP')
+          dist_root = dist_roots[0]
+          src_root = pathlib.Path(os.environ['GITHUB_WORKSPACE']) / '_ghidra-src'
+
+          count = 0
+          for sla in (dist_root / 'Ghidra' / 'Processors').rglob('*.sla'):
+              rel = sla.relative_to(dist_root)
+              dest = src_root / rel
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(sla, dest)
+              count += 1
+          print(f'Overlaid {count} .sla files into {src_root}', flush=True)
+          PYEOF
 
       - name: Configure C++ SDK with local backend
         shell: bash
