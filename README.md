@@ -85,9 +85,35 @@ The headless command must also use the Ghidra distribution root that contains `s
 ### 3. Query the API
 
 **Python** (easiest):
+
+Pre-built wheels (Python 3.12+) are attached to every [release](https://github.com/0xeb/libghidra/releases). Each native wheel bundles both the HTTP/RPC client and the offline local backend — Ghidra's Sleigh decompiler engine is compiled in and Sleigh processor specs are embedded, so no Ghidra install or Java is needed at runtime.
+
 ```bash
-pip install -e python
+# Linux x86_64 (RHEL 8+, Ubuntu 20.04+, Debian 11+, Fedora 29+)
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc1/libghidra-0.0.1-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+
+# Linux aarch64 (Raspberry Pi 4/5 on 64-bit OS, Ubuntu aarch64, Debian arm64)
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc1/libghidra-0.0.1-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
+
+# macOS Apple Silicon (M1/M2/M3/M4)
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc1/libghidra-0.0.1-cp312-abi3-macosx_15_0_arm64.whl
+
+# Windows x64
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc1/libghidra-0.0.1-cp312-abi3-win_amd64.whl
 ```
+
+No wheel for your platform (Intel Mac, Windows on Arm, etc.)? Use the pure-Python fallback `libghidra-0.0.1-py3-none-any.whl` inside `libghidra-python-v0.0.1-rc1.zip` on the release page — it gives you the HTTP/RPC client only; the local offline backend is unavailable.
+
+For contributor / editable installs from a clone:
+
+```bash
+pip install -e python                       # HTTP/RPC client only
+pip install -e "python[async]"              # adds aiohttp for AsyncGhidraClient
+pip install -e "python[cli]"                # adds pefile/capstone for CLI offline helpers
+```
+
+Building the offline local backend from source additionally needs CMake 3.24+, a C++20 compiler, and a local Ghidra source tree — see [Building the C++ SDK](#building-the-c-sdk).
+
 ```python
 import libghidra as ghidra
 
