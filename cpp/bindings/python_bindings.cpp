@@ -263,7 +263,9 @@ NB_MODULE(_libghidra, m) {
                                const std::string& project_path,
                                const std::string& project_name,
                                const std::string& language_id,
-                               const std::string& compiler_spec_id) {
+                               const std::string& compiler_spec_id,
+                               const std::string& format,
+                               uint64_t base_address) {
         OpenProgramRequest req;
         req.program_path = program_path;
         req.analyze = analyze;
@@ -272,6 +274,8 @@ NB_MODULE(_libghidra, m) {
         req.project_name = project_name;
         req.language_id = language_id;
         req.compiler_spec_id = compiler_spec_id;
+        req.format = format;
+        req.base_address = base_address;
         auto resp = unwrap(self.OpenProgram(req));
         nb::dict d;
         d["program_name"] = resp.program_name;
@@ -285,7 +289,9 @@ NB_MODULE(_libghidra, m) {
          nb::arg("project_path") = "",
          nb::arg("project_name") = "",
          nb::arg("language_id") = "",
-         nb::arg("compiler_spec_id") = "")
+         nb::arg("compiler_spec_id") = "",
+         nb::arg("format") = "",
+         nb::arg("base_address") = static_cast<uint64_t>(0))
 
       .def("close_program", [](IClient& self, int policy) {
         auto resp = unwrap(self.CloseProgram(static_cast<ShutdownPolicy>(policy)));

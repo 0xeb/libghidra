@@ -81,6 +81,7 @@ LANGUAGE_COMPILERS: dict[str, tuple[str, ...]] = {
     'HCS08:BE:16:MC9S08GB60': ('default',),
     'HCS08:BE:16:default': ('default',),
     'HCS12:BE:24:default': ('default',),
+    'Hexagon:LE:32:default': ('default',),
     'JVM:BE:32:default': ('default',),
     'Loongarch:LE:32:ilp32d': ('default',),
     'Loongarch:LE:32:ilp32f': ('default',),
