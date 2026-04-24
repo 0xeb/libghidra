@@ -10,10 +10,13 @@ Includes both sync (`requests`) and async (`aiohttp`) variants.
 pip install -e libghidra/python          # sync only
 pip install -e "libghidra/python[async]"  # sync + async
 pip install -e "libghidra/python[cli]"    # adds CLI binary helpers
+pip install -e "libghidra/python[local]"  # local ELF/PE/Mach-O detection helpers
 pip install -e "libghidra/python[async,cli]"
 ```
 
 Requires Python 3.12+ and a running LibGhidraHost instance.
+The `local` extra is only needed for offline/native workflows; HTTP-only
+installs do not pull in binary parser packages.
 
 ## Quick Start
 
@@ -88,9 +91,12 @@ If the native local backend is available, `functions` and `decompile` can run
 without a Ghidra host:
 
 ```bash
-libghidra functions --local sample.exe --arch x86:LE:64:default
+libghidra functions --local sample.exe
 libghidra decompile --local sample.exe 0x401000
 ```
+
+`LocalClient` auto-detects ELF, PE, Mach-O, and raw data inputs. You can still
+pass `language_id` explicitly on `OpenProgramRequest` for unusual targets.
 
 Use `--format json` or `--format csv` on supported commands for scripting.
 

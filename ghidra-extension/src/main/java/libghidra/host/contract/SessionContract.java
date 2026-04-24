@@ -17,7 +17,11 @@ public final class SessionContract {
 		String projectName,
 		String programPath,
 		boolean analyze,
-		boolean readOnly) {
+		boolean readOnly,
+		String languageId,
+		String compilerSpecId,
+		String format,
+		long baseAddress) {
 	}
 
 	public record OpenProgramResponse(

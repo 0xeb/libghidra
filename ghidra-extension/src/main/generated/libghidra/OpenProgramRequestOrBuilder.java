@@ -56,4 +56,46 @@ public interface OpenProgramRequestOrBuilder extends
    * @return The readOnly.
    */
   boolean getReadOnly();
+
+  /**
+   * <code>string language_id = 6;</code>
+   * @return The languageId.
+   */
+  java.lang.String getLanguageId();
+  /**
+   * <code>string language_id = 6;</code>
+   * @return The bytes for languageId.
+   */
+  com.google.protobuf.ByteString
+      getLanguageIdBytes();
+
+  /**
+   * <code>string compiler_spec_id = 7;</code>
+   * @return The compilerSpecId.
+   */
+  java.lang.String getCompilerSpecId();
+  /**
+   * <code>string compiler_spec_id = 7;</code>
+   * @return The bytes for compilerSpecId.
+   */
+  com.google.protobuf.ByteString
+      getCompilerSpecIdBytes();
+
+  /**
+   * <code>string format = 8;</code>
+   * @return The format.
+   */
+  java.lang.String getFormat();
+  /**
+   * <code>string format = 8;</code>
+   * @return The bytes for format.
+   */
+  com.google.protobuf.ByteString
+      getFormatBytes();
+
+  /**
+   * <code>uint64 base_address = 9;</code>
+   * @return The baseAddress.
+   */
+  long getBaseAddress();
 }

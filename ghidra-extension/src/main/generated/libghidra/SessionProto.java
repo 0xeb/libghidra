@@ -95,36 +95,39 @@ public final class SessionProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\027libghidra/session.proto\022\tlibghidra\032\026li" +
-      "bghidra/common.proto\"z\n\022OpenProgramReque" +
-      "st\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_name" +
-      "\030\002 \001(\t\022\024\n\014program_path\030\003 \001(\t\022\017\n\007analyze\030" +
-      "\004 \001(\010\022\021\n\tread_only\030\005 \001(\010\"k\n\023OpenProgramR" +
-      "esponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013languag" +
-      "e_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t\022\022\n\nima" +
-      "ge_base\030\005 \001(\004\"I\n\023CloseProgramRequest\0222\n\017" +
-      "shutdown_policy\030\002 \001(\0162\031.libghidra.Shutdo" +
-      "wnPolicy\"&\n\024CloseProgramResponse\022\016\n\006clos" +
-      "ed\030\001 \001(\010\"\024\n\022SaveProgramRequest\"$\n\023SavePr" +
-      "ogramResponse\022\r\n\005saved\030\001 \001(\010\"\027\n\025DiscardP" +
-      "rogramRequest\"+\n\026DiscardProgramResponse\022" +
-      "\021\n\tdiscarded\030\001 \001(\010\"\024\n\022GetRevisionRequest" +
-      "\"\'\n\023GetRevisionResponse\022\020\n\010revision\030\001 \001(" +
-      "\004\"E\n\017ShutdownRequest\0222\n\017shutdown_policy\030" +
-      "\001 \001(\0162\031.libghidra.ShutdownPolicy\"$\n\020Shut" +
-      "downResponse\022\020\n\010accepted\030\001 \001(\0102\347\003\n\016Sessi" +
-      "onService\022L\n\013OpenProgram\022\035.libghidra.Ope" +
-      "nProgramRequest\032\036.libghidra.OpenProgramR" +
-      "esponse\022O\n\014CloseProgram\022\036.libghidra.Clos" +
-      "eProgramRequest\032\037.libghidra.CloseProgram" +
-      "Response\022L\n\013SaveProgram\022\035.libghidra.Save" +
-      "ProgramRequest\032\036.libghidra.SaveProgramRe" +
-      "sponse\022U\n\016DiscardProgram\022 .libghidra.Dis" +
-      "cardProgramRequest\032!.libghidra.DiscardPr" +
-      "ogramResponse\022L\n\013GetRevision\022\035.libghidra" +
-      ".GetRevisionRequest\032\036.libghidra.GetRevis" +
-      "ionResponse\022C\n\010Shutdown\022\032.libghidra.Shut" +
-      "downRequest\032\033.libghidra.ShutdownResponse" +
-      "B\033\n\tlibghidraB\014SessionProtoP\001b\006proto3"
+      "bghidra/common.proto\"\317\001\n\022OpenProgramRequ" +
+      "est\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_nam" +
+      "e\030\002 \001(\t\022\024\n\014program_path\030\003 \001(\t\022\017\n\007analyze" +
+      "\030\004 \001(\010\022\021\n\tread_only\030\005 \001(\010\022\023\n\013language_id" +
+      "\030\006 \001(\t\022\030\n\020compiler_spec_id\030\007 \001(\t\022\016\n\006form" +
+      "at\030\010 \001(\t\022\024\n\014base_address\030\t \001(\004\"k\n\023OpenPr" +
+      "ogramResponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013l" +
+      "anguage_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t\022" +
+      "\022\n\nimage_base\030\005 \001(\004\"I\n\023CloseProgramReque" +
+      "st\0222\n\017shutdown_policy\030\002 \001(\0162\031.libghidra." +
+      "ShutdownPolicy\"&\n\024CloseProgramResponse\022\016" +
+      "\n\006closed\030\001 \001(\010\"\024\n\022SaveProgramRequest\"$\n\023" +
+      "SaveProgramResponse\022\r\n\005saved\030\001 \001(\010\"\027\n\025Di" +
+      "scardProgramRequest\"+\n\026DiscardProgramRes" +
+      "ponse\022\021\n\tdiscarded\030\001 \001(\010\"\024\n\022GetRevisionR" +
+      "equest\"\'\n\023GetRevisionResponse\022\020\n\010revisio" +
+      "n\030\001 \001(\004\"E\n\017ShutdownRequest\0222\n\017shutdown_p" +
+      "olicy\030\001 \001(\0162\031.libghidra.ShutdownPolicy\"$" +
+      "\n\020ShutdownResponse\022\020\n\010accepted\030\001 \001(\0102\347\003\n" +
+      "\016SessionService\022L\n\013OpenProgram\022\035.libghid" +
+      "ra.OpenProgramRequest\032\036.libghidra.OpenPr" +
+      "ogramResponse\022O\n\014CloseProgram\022\036.libghidr" +
+      "a.CloseProgramRequest\032\037.libghidra.CloseP" +
+      "rogramResponse\022L\n\013SaveProgram\022\035.libghidr" +
+      "a.SaveProgramRequest\032\036.libghidra.SavePro" +
+      "gramResponse\022U\n\016DiscardProgram\022 .libghid" +
+      "ra.DiscardProgramRequest\032!.libghidra.Dis" +
+      "cardProgramResponse\022L\n\013GetRevision\022\035.lib" +
+      "ghidra.GetRevisionRequest\032\036.libghidra.Ge" +
+      "tRevisionResponse\022C\n\010Shutdown\022\032.libghidr" +
+      "a.ShutdownRequest\032\033.libghidra.ShutdownRe" +
+      "sponseB\033\n\tlibghidraB\014SessionProtoP\001b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -136,7 +139,7 @@ public final class SessionProto {
     internal_static_libghidra_OpenProgramRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_OpenProgramRequest_descriptor,
-        new java.lang.String[] { "ProjectPath", "ProjectName", "ProgramPath", "Analyze", "ReadOnly", });
+        new java.lang.String[] { "ProjectPath", "ProjectName", "ProgramPath", "Analyze", "ReadOnly", "LanguageId", "CompilerSpecId", "Format", "BaseAddress", });
     internal_static_libghidra_OpenProgramResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_libghidra_OpenProgramResponse_fieldAccessorTable = new

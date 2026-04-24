@@ -10,6 +10,7 @@ dependencies = ["protobuf>=4.29", "requests>=2.28"]
 [project.optional-dependencies]
 async = ["aiohttp>=3.9"]
 cli = ["pefile>=2023.2.7", "capstone>=5.0"]
+local = ["pyelftools>=0.31", "pefile>=2023.2.7", "macholib>=1.16"]
 
 [project.scripts]
 libghidra = "libghidra.tools.cli:main"

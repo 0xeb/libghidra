@@ -14,7 +14,8 @@ public final class SessionServiceHandler {
 	public SessionContract.OpenProgramResponse openProgram(
 			SessionContract.OpenProgramRequest request) {
 		if (request == null) {
-			request = new SessionContract.OpenProgramRequest("", "", "", false, false);
+			request = new SessionContract.OpenProgramRequest(
+				"", "", "", false, false, "", "", "", 0L);
 		}
 		return runtime.openProgram(request);
 	}

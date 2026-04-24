@@ -88,7 +88,9 @@ class LocalClient final : public IClient {
     if (!request.project_path.empty()) {
       ok = pool_->loadProject(request.project_path, request.program_path);
     } else if (!request.program_path.empty()) {
-      ok = pool_->loadBinary(request.program_path, opts_.default_arch);
+      const std::string arch =
+          request.language_id.empty() ? opts_.default_arch : request.language_id;
+      ok = pool_->loadBinary(request.program_path, arch);
     } else {
       return StatusOr<OpenProgramResponse>::FromError(
           "INVALID_ARGUMENT", "program_path or project_path required");
@@ -110,7 +112,9 @@ class LocalClient final : public IClient {
     OpenProgramResponse resp;
     resp.program_name = request.program_path.empty() ? request.project_path
                                                      : request.program_path;
-    resp.language_id = opts_.default_arch;
+    resp.language_id =
+        request.language_id.empty() ? opts_.default_arch : request.language_id;
+    resp.compiler_spec = request.compiler_spec_id;
     return StatusOr<OpenProgramResponse>::FromValue(std::move(resp));
   }
 

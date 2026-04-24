@@ -110,9 +110,15 @@ For contributor / editable installs from a clone:
 pip install -e python                       # HTTP/RPC client only
 pip install -e "python[async]"              # adds aiohttp for AsyncGhidraClient
 pip install -e "python[cli]"                # adds pefile/capstone for CLI offline helpers
+pip install -e "python[local]"              # adds local ELF/PE/Mach-O detection helpers
 ```
 
 Building the offline local backend from source additionally needs CMake 3.24+, a C++20 compiler, and a local Ghidra source tree — see [Building the C++ SDK](#building-the-c-sdk).
+
+Install `libghidra[local]` when using the native local backend from Python.
+`LocalClient` auto-detects ELF, PE, Mach-O, and raw data inputs and passes the
+matching Ghidra `language_id` to the backend. Advanced users can still pass an
+explicit `language_id` on `OpenProgramRequest`.
 
 ```python
 import libghidra as ghidra
@@ -217,6 +223,7 @@ auto client = ghidra::local(opts);
 
 ghidra::OpenRequest req;
 req.program_path = "/path/to/binary.exe";
+req.language_id = "x86:LE:64:default";  // optional; Python LocalClient can auto-detect
 client->OpenProgram(req);
 
 auto decomp = client->GetDecompilation(0x140001000, 30000);

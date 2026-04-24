@@ -312,6 +312,8 @@ class AsyncGhidraClient:
         req = session_pb2.OpenProgramRequest(
             project_path=request.project_path, project_name=request.project_name,
             program_path=request.program_path, analyze=request.analyze, read_only=request.read_only,
+            language_id=request.language_id, compiler_spec_id=request.compiler_spec_id,
+            format=request.format, base_address=request.base_address,
         )
         resp = await self._call_rpc(
             "libghidra.SessionService/OpenProgram", req, session_pb2.OpenProgramResponse,

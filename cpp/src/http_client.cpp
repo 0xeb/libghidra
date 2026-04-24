@@ -659,6 +659,10 @@ StatusOr<OpenProgramResponse> HttpClient::OpenProgram(const OpenProgramRequest& 
   rpc_request.set_program_path(request.program_path);
   rpc_request.set_analyze(request.analyze);
   rpc_request.set_read_only(request.read_only);
+  rpc_request.set_language_id(request.language_id);
+  rpc_request.set_compiler_spec_id(request.compiler_spec_id);
+  rpc_request.set_format(request.format);
+  rpc_request.set_base_address(request.base_address);
 
   auto rpc = impl_->call_rpc<libghidra::OpenProgramRequest, libghidra::OpenProgramResponse>(
       "libghidra.SessionService/OpenProgram",

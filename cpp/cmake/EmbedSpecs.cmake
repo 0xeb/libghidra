@@ -8,6 +8,8 @@ set(GHIDRA_EMBED_PROCESSORS "ALL" CACHE STRING
 
 set(EMBED_SPECS_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/../embed_specs.py")
 set(EMBEDDED_SPECS_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(EMBEDDED_LANGUAGES_PY
+    "${CMAKE_CURRENT_LIST_DIR}/../../python/src/libghidra/known_languages.py")
 
 # Convert semicolon-separated CMake list to comma-separated for Python
 if(GHIDRA_EMBED_PROCESSORS STREQUAL "ALL")
@@ -21,6 +23,7 @@ endif()
 execute_process(
     COMMAND "${Python3_EXECUTABLE}" "${EMBED_SPECS_SCRIPT}"
             "${GHIDRA_SOURCE_DIR}" "${EMBEDDED_SPECS_DIR}"
+            --python-output "${EMBEDDED_LANGUAGES_PY}"
             ${_PROC_ARG}
     RESULT_VARIABLE _EMBED_RESULT
     OUTPUT_VARIABLE _EMBED_OUTPUT
