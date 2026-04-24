@@ -270,6 +270,27 @@ if(LIBGHIDRA_WITH_LOCAL)
     # PUBLIC link to libghidra_client for IClient, models, status
     target_link_libraries(libghidra_local PUBLIC libghidra_client)
 
+    # ghidra_libdecomp is an OBJECT library embedded via $<TARGET_OBJECTS:...>
+    # above. That embeds the .o files cleanly, but it does NOT propagate
+    # ghidra_libdecomp's INTERFACE link dependencies (libbfd, libiberty, libdl)
+    # to libghidra_local. Without re-stating them here, _libghidra.abi3.so
+    # ends up with undefined bfd_init / bfd_openr / bfd_close /
+    # bfd_check_format / bfd_get_section_contents / bfd_printable_name
+    # references that the dynamic loader can't resolve at runtime.
+    if(LIBGHIDRA_HAS_BFD)
+        target_link_libraries(libghidra_local PUBLIC "${LIBGHIDRA_BFD_LIB}")
+        if(LIBGHIDRA_IBERTY_LIB)
+            target_link_libraries(libghidra_local PUBLIC "${LIBGHIDRA_IBERTY_LIB}")
+        endif()
+        if(LIBGHIDRA_SFRAME_LIB)
+            target_link_libraries(libghidra_local PUBLIC "${LIBGHIDRA_SFRAME_LIB}")
+        endif()
+        if(LIBGHIDRA_ZSTD_LIB)
+            target_link_libraries(libghidra_local PUBLIC "${LIBGHIDRA_ZSTD_LIB}")
+        endif()
+        target_link_libraries(libghidra_local PUBLIC ${CMAKE_DL_LIBS})
+    endif()
+
     # Whole-archive wrapper. libghidra_local relies on static-initialiser
     # registration of Ghidra's ArchitectureCapability subclasses, which the
     # linker strips under default linkage because nothing references those
