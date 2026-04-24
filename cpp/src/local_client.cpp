@@ -99,17 +99,30 @@ class LocalClient final : public IClient {
       const std::string& fmt = request.format;
       const bool bfd_recognisable =
           (fmt == "elf" || fmt == "pe" || fmt == "mach-o");
+      // BFD is only linked on Linux (see cpp/cmake/GhidraSources.cmake). On
+      // macOS/Windows there is no BFD capability registered, so even for ELF
+      // we have to fall through to the raw_arch path with an explicit Sleigh
+      // spec id — Ghidra's findCapability will pick raw_arch there and raw_arch
+      // rejects "default" with "Architecture string does not look like
+      // sleigh id".
+#ifdef LIBGHIDRA_HAS_BFD
+      const bool use_bfd_default = bfd_recognisable;
+#else
+      const bool use_bfd_default = false;
+#endif
       std::string arch;
-      if (bfd_recognisable) {
+      if (use_bfd_default) {
+        // BFD parses the file header and self-identifies the target, so the
+        // Ghidra language_id would only confuse it (bfd_openr would interpret
+        // it as a BFD target name like "elf64-littleaarch64" and return NULL,
+        // yielding "Unable to open image file: …" on a valid ELF).
         arch = "default";
       } else {
         // For raw_arch, Ghidra parses the target as a full spec id
         // "processor:endian:size:variant:compiler". The Python layer sends
-        // language_id = "processor:endian:size:variant" and compiler_spec_id
-        // separately; we must glue them back together here or Ghidra will
-        // default compiler_spec to "default" (causing ".sla file not found"
-        // errors for languages whose default compiler is something else, e.g.
-        // x86:LE:64:default:windows on Windows PE binaries).
+        // language_id ("processor:endian:size:variant") and compiler_spec_id
+        // separately; glue them back together so Ghidra can find the right
+        // .sla (e.g. x86:LE:64:default:windows for a PE binary on Windows).
         if (request.language_id.empty()) {
           arch = opts_.default_arch;
         } else if (!request.compiler_spec_id.empty()) {
