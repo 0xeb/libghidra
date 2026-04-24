@@ -289,6 +289,11 @@ if(LIBGHIDRA_WITH_LOCAL)
             target_link_libraries(libghidra_local PUBLIC "${LIBGHIDRA_ZSTD_LIB}")
         endif()
         target_link_libraries(libghidra_local PUBLIC ${CMAKE_DL_LIBS})
+        # Also surface LIBGHIDRA_HAS_BFD to libghidra_local's own translation
+        # units (e.g. local_client.cpp), since compile definitions from the
+        # embedded ghidra_libdecomp OBJECT library don't propagate through
+        # $<TARGET_OBJECTS:> in the sources list.
+        target_compile_definitions(libghidra_local PUBLIC LIBGHIDRA_HAS_BFD=1)
     endif()
 
     # Whole-archive wrapper. libghidra_local relies on static-initialiser
