@@ -88,8 +88,24 @@ class LocalClient final : public IClient {
     if (!request.project_path.empty()) {
       ok = pool_->loadProject(request.project_path, request.program_path);
     } else if (!request.program_path.empty()) {
-      const std::string arch =
-          request.language_id.empty() ? opts_.default_arch : request.language_id;
+      // Dispatch by detected format: BFD/XML-recognised formats (elf/pe/mach-o)
+      // auto-identify their target from the file header, so we pass "default"
+      // to let ArchitectureCapability self-select. Passing a Ghidra language_id
+      // like "AARCH64:LE:64:v8A" straight through would be interpreted as a BFD
+      // target name (e.g. "elf64-littleaarch64"), which bfd_openr does not
+      // recognise — yielding "Unable to open image file: …" despite a perfectly
+      // valid ELF. For raw/unknown/empty formats, the explicit language_id is
+      // still required because raw_arch can't auto-detect.
+      const std::string& fmt = request.format;
+      const bool bfd_recognisable =
+          (fmt == "elf" || fmt == "pe" || fmt == "mach-o");
+      std::string arch;
+      if (bfd_recognisable) {
+        arch = "default";
+      } else {
+        arch = request.language_id.empty() ? opts_.default_arch
+                                           : request.language_id;
+      }
       ok = pool_->loadBinary(request.program_path, arch);
     } else {
       return StatusOr<OpenProgramResponse>::FromError(
