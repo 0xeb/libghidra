@@ -103,8 +103,20 @@ class LocalClient final : public IClient {
       if (bfd_recognisable) {
         arch = "default";
       } else {
-        arch = request.language_id.empty() ? opts_.default_arch
-                                           : request.language_id;
+        // For raw_arch, Ghidra parses the target as a full spec id
+        // "processor:endian:size:variant:compiler". The Python layer sends
+        // language_id = "processor:endian:size:variant" and compiler_spec_id
+        // separately; we must glue them back together here or Ghidra will
+        // default compiler_spec to "default" (causing ".sla file not found"
+        // errors for languages whose default compiler is something else, e.g.
+        // x86:LE:64:default:windows on Windows PE binaries).
+        if (request.language_id.empty()) {
+          arch = opts_.default_arch;
+        } else if (!request.compiler_spec_id.empty()) {
+          arch = request.language_id + ":" + request.compiler_spec_id;
+        } else {
+          arch = request.language_id;
+        }
       }
       ok = pool_->loadBinary(request.program_path, arch);
     } else {
