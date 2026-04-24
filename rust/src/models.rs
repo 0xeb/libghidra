@@ -79,6 +79,10 @@ pub struct OpenProgramRequest {
     pub program_path: String,
     pub analyze: bool,
     pub read_only: bool,
+    pub language_id: String,
+    pub compiler_spec_id: String,
+    pub format: String,
+    pub base_address: u64,
 }
 
 #[derive(Debug, Clone, Default)]
