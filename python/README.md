@@ -6,6 +6,8 @@ Includes both sync (`requests`) and async (`aiohttp`) variants.
 
 ## Install
 
+> **Just want a working wheel?** Pre-built per-platform wheels (Linux x86_64 / aarch64, macOS arm64, Windows x64) are attached to every [GitHub Release](https://github.com/0xeb/libghidra/releases). The top-level [README](../README.md#3-query-the-api) has the per-platform `pip install <release-url>` commands. The instructions below are for **editable installs from a clone** (contributors).
+
 ```bash
 pip install -e libghidra/python          # sync only
 pip install -e "libghidra/python[async]"  # sync + async
@@ -14,7 +16,9 @@ pip install -e "libghidra/python[local]"  # local ELF/PE/Mach-O detection helper
 pip install -e "libghidra/python[async,cli]"
 ```
 
-Requires Python 3.12+ and a running LibGhidraHost instance.
+Requires Python 3.12+ and a running LibGhidraHost instance (for the
+HTTP/RPC client; the `local` extra plus a built native wheel let you
+skip the host entirely).
 The `local` extra is only needed for offline/native workflows; HTTP-only
 installs do not pull in binary parser packages.
 
