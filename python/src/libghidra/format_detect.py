@@ -127,6 +127,8 @@ def detect_and_open(
         program_path=str(path),
         language_id=detected.language_id,
         compiler_spec_id=compiler,
+        format=detected.format,
+        base_address=detected.base_address or 0,
     )
     client.open_program(request)
     if compiler == detected.compiler_spec_id:

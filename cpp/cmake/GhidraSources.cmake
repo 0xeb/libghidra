@@ -154,6 +154,11 @@ endif()
 if(LIBGHIDRA_HAS_BFD)
     target_include_directories(ghidra_libdecomp PUBLIC "${LIBGHIDRA_BFD_INCLUDE}")
     target_link_libraries(ghidra_libdecomp PUBLIC "${LIBGHIDRA_BFD_LIB}")
+    # Expose to downstream C++ code so it can pick the right OpenProgram
+    # dispatch (BFD present => pass "default" for ELF/PE/Mach-O so BFD
+    # auto-detects; BFD absent => must build a full Sleigh spec id because
+    # raw_arch rejects "default").
+    target_compile_definitions(ghidra_libdecomp PUBLIC LIBGHIDRA_HAS_BFD=1)
     # libbfd.a may reference libiberty helpers (xmalloc, xstrdup, concat, ...);
     # pick it up if the distro ships it as a separate static archive.
     find_library(LIBGHIDRA_IBERTY_LIB NAMES libiberty.a iberty)

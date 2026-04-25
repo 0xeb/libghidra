@@ -145,8 +145,23 @@ def generate(
             print(f"Embedded specs up-to-date ({len(specs)} files), skipping generation.")
             return
 
+    import hashlib
     total_original = 0
     total_compressed = 0
+    # Compute a content-derived version key. Used by ghidra_cpp_init.cpp as
+    # the per-build cache subdirectory name so that pip-upgrading to a wheel
+    # whose embedded specs changed will invalidate ~/.ghidracpp/cache/sleigh
+    # entries automatically. Hashing the (rel_path, raw bytes) pairs sorted
+    # by rel_path guarantees the digest is identical iff the inputs are.
+    digest = hashlib.sha256()
+    for abs_path, rel_path in sorted(specs, key=lambda p: p[1]):
+        with open(abs_path, 'rb') as sf:
+            raw = sf.read()
+        digest.update(rel_path.encode('utf-8'))
+        digest.update(b'\0')
+        digest.update(len(raw).to_bytes(8, 'little'))
+        digest.update(raw)
+    version_key = digest.hexdigest()[:16]
 
     # --- Generate .cpp ---
     with open(cpp_path, 'w') as f:
@@ -175,6 +190,7 @@ def generate(
             f.write(f'    {{ "{rel_path}", {var_name}, {comp_size}, {orig_size} }},\n')
         f.write('};\n\n')
         f.write(f'const int g_embedded_spec_count = {len(specs)};\n\n')
+        f.write(f'const char* const g_embedded_specs_version = "{version_key}";\n\n')
         f.write('} // namespace ghidra_embedded\n')
 
     # --- Generate .h ---
@@ -190,7 +206,11 @@ def generate(
         f.write('    size_t original_size;\n')
         f.write('};\n\n')
         f.write('extern const EmbeddedSpec g_embedded_specs[];\n')
-        f.write('extern const int g_embedded_spec_count;\n\n')
+        f.write('extern const int g_embedded_spec_count;\n')
+        f.write('// 16-hex-char SHA-256 prefix of the embedded payload, content-derived.\n')
+        f.write('// ghidra_cpp_init uses this as the cache version key so that wheel\n')
+        f.write('// upgrades that change the spec contents force a fresh extraction.\n')
+        f.write('extern const char* const g_embedded_specs_version;\n\n')
         f.write('} // namespace ghidra_embedded\n')
 
     ratio = (1.0 - total_compressed / total_original) * 100 if total_original else 0

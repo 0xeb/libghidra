@@ -219,6 +219,8 @@ class LocalClient:
             project_name=request.project_name,
             language_id=request.language_id,
             compiler_spec_id=request.compiler_spec_id,
+            format=request.format,
+            base_address=request.base_address,
         )
         return OpenProgramResponse(**d)
 

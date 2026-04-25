@@ -88,8 +88,35 @@ class LocalClient final : public IClient {
     if (!request.project_path.empty()) {
       ok = pool_->loadProject(request.project_path, request.program_path);
     } else if (!request.program_path.empty()) {
-      const std::string arch =
-          request.language_id.empty() ? opts_.default_arch : request.language_id;
+      // Dispatch by detected format: BFD/XML-recognised formats (elf/pe/mach-o)
+      // auto-identify their target from the file header, so we pass "default"
+      // to let ArchitectureCapability self-select. Passing a Ghidra language_id
+      // like "AARCH64:LE:64:v8A" straight through would be interpreted as a BFD
+      // target name (e.g. "elf64-littleaarch64"), which bfd_openr does not
+      // recognise — yielding "Unable to open image file: …" despite a perfectly
+      // valid ELF. For raw/unknown/empty formats, the explicit language_id is
+      // still required because raw_arch can't auto-detect.
+      // Always pass the full Sleigh spec id ("processor:endian:size:variant:
+      // compiler") to Ghidra so the language is unambiguous. The previous
+      // "let BFD auto-detect with target=default" branch produced wrong
+      // results for non-x86 ELF binaries because Ghidra's BfdArchitecture::
+      // resolveArchitecture has a hardcoded "elf64 -> x86:LE:64:default:gcc"
+      // mapping at bfd_arch.cc:102-103, so an aarch64 ELF on a Pi would load
+      // as x86 and disassembly was nonsense.
+      //
+      // Our patched bfd_arch.cc::buildLoader now sees a colon-bearing target
+      // and passes empty BFD target so bfd_check_format auto-detects the
+      // actual file format, while archid stays at the Sleigh id we sent.
+      // For raw_arch (no BFD on macOS/Windows) the same full Sleigh id is
+      // exactly what Ghidra needs.
+      std::string arch;
+      if (request.language_id.empty()) {
+        arch = opts_.default_arch;
+      } else if (!request.compiler_spec_id.empty()) {
+        arch = request.language_id + ":" + request.compiler_spec_id;
+      } else {
+        arch = request.language_id;
+      }
       ok = pool_->loadBinary(request.program_path, arch);
     } else {
       return StatusOr<OpenProgramResponse>::FromError(

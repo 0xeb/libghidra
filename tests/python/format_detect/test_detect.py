@@ -150,4 +150,5 @@ def test_detect_and_open_passes_language_and_compiler(tmp_path):
         program_path=str(path),
         language_id="x86:LE:64:default",
         compiler_spec_id="custom",
+        format="elf",
     )

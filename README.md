@@ -90,19 +90,19 @@ Pre-built wheels (Python 3.12+) are attached to every [release](https://github.c
 
 ```bash
 # Linux x86_64 (RHEL 8+, Ubuntu 20.04+, Debian 11+, Fedora 29+)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc1/libghidra-0.0.1-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc8/libghidra-0.0.1-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 
 # Linux aarch64 (Raspberry Pi 4/5 on 64-bit OS, Ubuntu aarch64, Debian arm64)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc1/libghidra-0.0.1-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc8/libghidra-0.0.1-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
 
 # macOS Apple Silicon (M1/M2/M3/M4)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc1/libghidra-0.0.1-cp312-abi3-macosx_15_0_arm64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc8/libghidra-0.0.1-cp312-abi3-macosx_15_0_arm64.whl
 
 # Windows x64
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc1/libghidra-0.0.1-cp312-abi3-win_amd64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc8/libghidra-0.0.1-cp312-abi3-win_amd64.whl
 ```
 
-No wheel for your platform (Intel Mac, Windows on Arm, etc.)? Use the pure-Python fallback `libghidra-0.0.1-py3-none-any.whl` inside `libghidra-python-v0.0.1-rc1.zip` on the release page — it gives you the HTTP/RPC client only; the local offline backend is unavailable.
+No wheel for your platform (Intel Mac, Windows on Arm, etc.)? Use the pure-Python fallback `libghidra-0.0.1-py3-none-any.whl` inside `libghidra-python-v0.0.1-rc8.zip` on the release page — it gives you the HTTP/RPC client only; the local offline backend is unavailable.
 
 For contributor / editable installs from a clone:
 
@@ -283,6 +283,24 @@ libghidra/
   returned by the API instead of guessing display-style names.
 - The primary validation path is the live host plus headless integration coverage; more expansive
   clean-room packaging and installer coverage is still release hardening work.
+
+### Local backend (`LocalClient`) caveats
+
+- **No auto-analysis.** The standalone decompiler engine in the wheel does not run Ghidra's
+  function/symbol-discovery pass. `client.list_functions()`, `list_basic_blocks()`,
+  `list_cfg_edges()`, `list_xrefs()`, and `list_defined_strings()` will return empty until that
+  pass is wired up. For now, drive every call with explicit addresses (e.g. an entry point from
+  `readelf -h` / a PE export RVA) — `get_decompilation(addr)`, `list_instructions(start, end)`,
+  `read_bytes`, `rename_function`, and the rest of the address-driven API work as documented.
+- **No macOS x86_64 / Windows arm64 wheel** in the matrix — both fell out due to GitHub Actions
+  runner availability (macos-13 saturation) and `actions/setup-python` not yet shipping arm64
+  Python for `windows-11-arm`. Both gaps will be revisited; in the meantime users on those
+  platforms can `pip install` the pure-Python wheel from the release ZIP for the HTTP client.
+- **After upgrading the wheel, clear the spec cache once.** The native module decompresses
+  Ghidra's Sleigh data into `~/.ghidracpp/cache/sleigh/<key>/` on first use; the key is now a
+  content hash of the embedded specs (rc8+), so an upgrade picks up new data automatically.
+  Older rc wheels (rc1–rc7) hashed the host process binary's mtime instead and could leave a
+  stale cache. If you upgraded from one of those, run `rm -rf ~/.ghidracpp` once.
 
 ## Proto Contracts
 
