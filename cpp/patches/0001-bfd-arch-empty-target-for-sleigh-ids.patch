@@ -1,12 +1,6 @@
-diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc b/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc
---- a/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc
-+++ b/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc
-@@ -67,12 +67,20 @@ bool BfdArchitectureCapability::isXmlMatch(Document *doc) const
- void BfdArchitecture::buildLoader(DocumentStorage &store)
- 
- {
-   LoadImageBfd *ldr;
- 
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc	2026-04-24 20:15:08.105895800 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc	2026-04-24 20:08:08.788274100 -0700
+@@ -72,6 +72,13 @@
    collectSpecFiles(*errorstream);
    if (getTarget().find("binary")==0)
      ldr = new LoadImageBfd(getFilename(),"binary");
@@ -20,5 +14,3 @@ diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc b/Ghidra/F
    else if (getTarget().find("default")==0)
      ldr = new LoadImageBfd(getFilename(),"default");
    else
-     ldr = new LoadImageBfd(getFilename(),getTarget());
-   ldr->open();
