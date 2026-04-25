@@ -96,40 +96,26 @@ class LocalClient final : public IClient {
       // recognise — yielding "Unable to open image file: …" despite a perfectly
       // valid ELF. For raw/unknown/empty formats, the explicit language_id is
       // still required because raw_arch can't auto-detect.
-      const std::string& fmt = request.format;
-      const bool bfd_recognisable =
-          (fmt == "elf" || fmt == "pe" || fmt == "mach-o");
-      // BFD is only linked on Linux (see cpp/cmake/GhidraSources.cmake). On
-      // macOS/Windows there is no BFD capability registered, so even for ELF
-      // we have to fall through to the raw_arch path with an explicit Sleigh
-      // spec id — Ghidra's findCapability will pick raw_arch there and raw_arch
-      // rejects "default" with "Architecture string does not look like
-      // sleigh id".
-#ifdef LIBGHIDRA_HAS_BFD
-      const bool use_bfd_default = bfd_recognisable;
-#else
-      const bool use_bfd_default = false;
-#endif
+      // Always pass the full Sleigh spec id ("processor:endian:size:variant:
+      // compiler") to Ghidra so the language is unambiguous. The previous
+      // "let BFD auto-detect with target=default" branch produced wrong
+      // results for non-x86 ELF binaries because Ghidra's BfdArchitecture::
+      // resolveArchitecture has a hardcoded "elf64 -> x86:LE:64:default:gcc"
+      // mapping at bfd_arch.cc:102-103, so an aarch64 ELF on a Pi would load
+      // as x86 and disassembly was nonsense.
+      //
+      // Our patched bfd_arch.cc::buildLoader now sees a colon-bearing target
+      // and passes empty BFD target so bfd_check_format auto-detects the
+      // actual file format, while archid stays at the Sleigh id we sent.
+      // For raw_arch (no BFD on macOS/Windows) the same full Sleigh id is
+      // exactly what Ghidra needs.
       std::string arch;
-      if (use_bfd_default) {
-        // BFD parses the file header and self-identifies the target, so the
-        // Ghidra language_id would only confuse it (bfd_openr would interpret
-        // it as a BFD target name like "elf64-littleaarch64" and return NULL,
-        // yielding "Unable to open image file: …" on a valid ELF).
-        arch = "default";
+      if (request.language_id.empty()) {
+        arch = opts_.default_arch;
+      } else if (!request.compiler_spec_id.empty()) {
+        arch = request.language_id + ":" + request.compiler_spec_id;
       } else {
-        // For raw_arch, Ghidra parses the target as a full spec id
-        // "processor:endian:size:variant:compiler". The Python layer sends
-        // language_id ("processor:endian:size:variant") and compiler_spec_id
-        // separately; glue them back together so Ghidra can find the right
-        // .sla (e.g. x86:LE:64:default:windows for a PE binary on Windows).
-        if (request.language_id.empty()) {
-          arch = opts_.default_arch;
-        } else if (!request.compiler_spec_id.empty()) {
-          arch = request.language_id + ":" + request.compiler_spec_id;
-        } else {
-          arch = request.language_id;
-        }
+        arch = request.language_id;
       }
       ok = pool_->loadBinary(request.program_path, arch);
     } else {

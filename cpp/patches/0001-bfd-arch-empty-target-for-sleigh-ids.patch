@@ -1,0 +1,24 @@
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc b/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc
+@@ -67,12 +67,20 @@ bool BfdArchitectureCapability::isXmlMatch(Document *doc) const
+ void BfdArchitecture::buildLoader(DocumentStorage &store)
+ 
+ {
+   LoadImageBfd *ldr;
+ 
+   collectSpecFiles(*errorstream);
+   if (getTarget().find("binary")==0)
+     ldr = new LoadImageBfd(getFilename(),"binary");
++  else if (getTarget().find(':')!=string::npos)
++    // libghidra patch: caller supplied a Sleigh language id (e.g.
++    // "AARCH64:LE:64:v8A:default"). bfd_openr would interpret that as a
++    // BFD target name and fail. Pass empty target so bfd_check_format
++    // iterates all targets and auto-detects the actual file format from
++    // the header — Ghidra still uses the Sleigh id we were given.
++    ldr = new LoadImageBfd(getFilename(),"");
+   else if (getTarget().find("default")==0)
+     ldr = new LoadImageBfd(getFilename(),"default");
+   else
+     ldr = new LoadImageBfd(getFilename(),getTarget());
+   ldr->open();
