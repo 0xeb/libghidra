@@ -13,6 +13,13 @@ from libghidra.local import LocalClient, LocalClientOptions
 
 
 def test_detect_and_open_native_smoke():
+    """End-to-end smoke: load a real binary in LocalClient, decompile a known address.
+
+    LocalClient is address-driven (see cpp/README.md "Out of scope" section);
+    the IClient enumeration methods (list_functions, list_basic_blocks, etc.)
+    always return empty in local mode by design, so this test relies on the
+    caller pointing at an explicit code address inside the fixture.
+    """
     pytest.importorskip("libghidra._libghidra")
 
     fixture = os.environ.get("LIBGHIDRA_TEST_BINARY")
@@ -23,13 +30,15 @@ def test_detect_and_open_native_smoke():
     if not path.is_file():
         pytest.skip(f"LIBGHIDRA_TEST_BINARY does not exist: {path}")
 
+    addr_str = os.environ.get("LIBGHIDRA_TEST_ADDRESS")
+    if not addr_str:
+        pytest.skip("set LIBGHIDRA_TEST_ADDRESS=0x... to a code address in the fixture")
+    test_address = int(addr_str, 0)
+
     client = LocalClient(LocalClientOptions(default_arch="auto"))
     detected = detect_and_open(client, path)
-
-    functions = client.list_functions(limit=1).functions
     assert detected.language_id
-    assert functions
 
-    decomp = client.get_decompilation(functions[0].entry_address).decompilation
+    decomp = client.get_decompilation(test_address).decompilation
     assert decomp is not None
     assert decomp.pseudocode

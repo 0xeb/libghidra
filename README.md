@@ -286,12 +286,16 @@ libghidra/
 
 ### Local backend (`LocalClient`) caveats
 
-- **No auto-analysis.** The standalone decompiler engine in the wheel does not run Ghidra's
-  function/symbol-discovery pass. `client.list_functions()`, `list_basic_blocks()`,
-  `list_cfg_edges()`, `list_xrefs()`, and `list_defined_strings()` will return empty until that
-  pass is wired up. For now, drive every call with explicit addresses (e.g. an entry point from
-  `readelf -h` / a PE export RVA) — `get_decompilation(addr)`, `list_instructions(start, end)`,
-  `read_bytes`, `rename_function`, and the rest of the address-driven API work as documented.
+- **Enumeration methods are out of scope in local mode.** `IClient` is the shared API across
+  two backends. `HttpClient` talks to a running Ghidra instance whose analysis pass populates a
+  full function/xref/string database — `list_functions()`, `list_basic_blocks(addr)`,
+  `list_cfg_edges(addr)`, `list_xrefs(start, end)`, and `list_defined_strings()` work as you
+  would expect there. `LocalClient` wraps the standalone C++ decompiler engine, which does not
+  run an analysis pass; those same enumeration methods always return empty by design. Local
+  mode is for **address-driven** queries — `get_decompilation(addr)`,
+  `list_instructions(start, end)`, `read_bytes(addr, n)`, `rename_function(addr, name)`, and
+  the rest of the per-address API work as documented. If you need enumeration of everything in
+  the analyzed program, route through `HttpClient` against a Ghidra host.
 - **No macOS x86_64 / Windows arm64 wheel** in the matrix — both fell out due to GitHub Actions
   runner availability (macos-13 saturation) and `actions/setup-python` not yet shipping arm64
   Python for `windows-11-arm`. Both gaps will be revisited; in the meantime users on those
