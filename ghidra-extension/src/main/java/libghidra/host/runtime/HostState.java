@@ -1,5 +1,6 @@
 package libghidra.host.runtime;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import ghidra.program.model.listing.Program;
@@ -11,6 +12,7 @@ public final class HostState {
 	private volatile String currentProgramPath;
 	private volatile String hostMode;
 	private volatile long revision;
+	private volatile boolean closing;
 
 	public HostState(String initialHostMode) {
 		hostMode = normalizeHostMode(initialHostMode);
@@ -18,11 +20,23 @@ public final class HostState {
 	}
 
 	public LockScope readLock() {
-		return new LockScope(stateLock.readLock());
+		throwIfClosing();
+		LockScope scope = new LockScope(stateLock.readLock());
+		if (closing) {
+			scope.close();
+			throw hostClosingException();
+		}
+		return scope;
 	}
 
 	public LockScope writeLock() {
-		return new LockScope(stateLock.writeLock());
+		throwIfClosing();
+		LockScope scope = new LockScope(stateLock.writeLock());
+		if (closing) {
+			scope.close();
+			throw hostClosingException();
+		}
+		return scope;
 	}
 
 	public void bindProgram(Program program, String mode) {
@@ -30,22 +44,43 @@ public final class HostState {
 	}
 
 	public void bindProgram(Program program, String mode, String programPath) {
-		try (LockScope ignored = writeLock()) {
+		stateLock.writeLock().lock();
+		try {
 			currentProgram = program;
 			currentProgramPath = ManagedProgramSupport.normalizeProgramPath(programPath);
 			hostMode = normalizeHostMode(mode);
+			closing = false;
 			revision++;
+		}
+		finally {
+			stateLock.writeLock().unlock();
 		}
 	}
 
 	public void unbindProgram(Program program) {
-		try (LockScope ignored = writeLock()) {
-			if (currentProgram == null || currentProgram != program) {
-				return;
-			}
-			currentProgram = null;
-			currentProgramPath = "";
-			revision++;
+		stateLock.writeLock().lock();
+		try {
+			unbindProgramLocked(program);
+			closing = false;
+		}
+		finally {
+			stateLock.writeLock().unlock();
+		}
+	}
+
+	public boolean tryBeginUnbindProgram(Program program, long timeoutMillis) throws InterruptedException {
+		closing = true;
+		boolean acquired = stateLock.writeLock().tryLock(Math.max(0L, timeoutMillis), TimeUnit.MILLISECONDS);
+		if (!acquired) {
+			return false;
+		}
+		try {
+			unbindProgramLocked(program);
+			closing = false;
+			return true;
+		}
+		finally {
+			stateLock.writeLock().unlock();
 		}
 	}
 
@@ -65,8 +100,33 @@ public final class HostState {
 		return revision;
 	}
 
+	public boolean isClosing() {
+		return closing;
+	}
+
 	public void bumpRevision() {
 		revision++;
+	}
+
+	private void unbindProgramLocked(Program program) {
+		if (currentProgram == null || currentProgram != program) {
+			return;
+		}
+		currentProgram = null;
+		currentProgramPath = "";
+		revision++;
+	}
+
+	private void throwIfClosing() {
+		if (closing) {
+			throw hostClosingException();
+		}
+	}
+
+	private static SessionRpcException hostClosingException() {
+		return new SessionRpcException(
+			"host_closing",
+			"libghidra host is closing or switching programs; retry after the UI settles");
 	}
 
 	private static String normalizeHostMode(String mode) {

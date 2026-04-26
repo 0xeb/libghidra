@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: "3.11"
+  PYTHON_VERSION: "3.12"
   JAVA_VERSION: "21"
   GHIDRA_RELEASE_URL: "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.0.4_build/ghidra_12.0.4_PUBLIC_20260303.zip"
 
@@ -31,12 +31,15 @@ jobs:
           - name: Linux
             os: ubuntu-latest
             artifact_name: cpp-sdk-linux
+            cmake_extra: ""
           - name: macOS
             os: macos-latest
             artifact_name: cpp-sdk-macos
+            cmake_extra: "-DCMAKE_OSX_ARCHITECTURES=arm64"
           - name: Windows
             os: windows-latest
             artifact_name: cpp-sdk-windows
+            cmake_extra: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,6 +58,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release
           -DLIBGHIDRA_WITH_LOCAL=OFF
           -DLIBGHIDRA_BUILD_EXAMPLES=ON
+          ${{ matrix.cmake_extra }}
 
       - name: Build C++ SDK
         run: cmake --build build/cpp --config Release
@@ -101,8 +105,14 @@ jobs:
 
       - name: Smoke test built wheel
         run: |
-          python -m pip install python/dist/*.whl
+          WHEEL_URI="$(python - <<'PY'
+          from pathlib import Path
+          print(next(Path("python/dist").glob("*.whl")).resolve().as_uri())
+          PY
+          )"
+          python -m pip install "libghidra[local] @ ${WHEEL_URI}" pytest
           python -c "import libghidra; print(libghidra.__file__)"
+          pytest tests/python/format_detect/ -q
 
       - name: Upload Python artifact
         uses: actions/upload-artifact@v4
@@ -179,6 +189,231 @@ jobs:
           name: ghidra-extension-linux
           path: ghidra-extension/dist/*.zip
 
+  build-wheel-native:
+    name: Build Native Wheel (${{ matrix.id }})
+    # Run on tag push (the usual release path) and on manual workflow_dispatch
+    # so maintainers can cut an ad-hoc wheel build from any branch for testing
+    # (e.g. verifying that loader-related CMake changes produce wheels without
+    # undefined symbols) without creating a public tag.
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: linux-x86_64
+            os: ubuntu-latest
+            container: quay.io/pypa/manylinux_2_28_x86_64
+            cmake_extra: ""
+            wheel_tool: auditwheel
+          - id: linux-aarch64
+            os: ubuntu-24.04-arm
+            container: quay.io/pypa/manylinux_2_28_aarch64
+            cmake_extra: ""
+            wheel_tool: auditwheel
+          - id: macos-arm64
+            os: macos-latest
+            container: ""
+            cmake_extra: "-DCMAKE_OSX_ARCHITECTURES=arm64"
+            wheel_tool: delocate
+          # macos-x86_64 omitted: macos-13 Intel runner pool is frequently
+          # saturated and leaves the matrix stuck in "queued" for hours,
+          # blocking publish-draft-release. Re-enable if Intel Mac coverage
+          # becomes important — the wheel itself builds fine when a runner
+          # is available.
+          - id: windows-x86_64
+            os: windows-latest
+            container: ""
+            cmake_extra: ""
+            wheel_tool: delvewheel
+          # windows-arm64 intentionally omitted: actions/setup-python@v5 does
+          # not yet ship an arm64 Python for windows-11-arm, so the native
+          # extension link fails with unresolved __imp__Py_IncRef. Re-enable
+          # once setup-python supports architecture: arm64 on that runner.
+    steps:
+      - name: Checkout libghidra
+        uses: actions/checkout@v4
+
+      - name: Checkout Ghidra source
+        uses: actions/checkout@v4
+        with:
+          repository: NationalSecurityAgency/ghidra
+          # Pinned to a master commit that contains all decompiler sources referenced
+          # by cpp/cmake/GhidraSources.cmake (notably bitfield.cc, which is on master
+          # but not on the Ghidra_12.0.4_build release branch).
+          ref: b211a07b51e5098648d8f571130cf93448470d6a
+          path: _ghidra-src
+
+      - name: Use manylinux Python 3.12 and install libbfd
+        if: startsWith(matrix.id, 'linux-')
+        shell: bash
+        run: |
+          # Ghidra's loadimage_bfd.cc / bfd_arch.cc / analyzesigs.cc / codedata.cc
+          # are only compiled on Linux and include bfd.h from binutils-devel,
+          # which is not preinstalled in the manylinux_2_28 image.
+          yum install -y binutils-devel
+          echo "/opt/python/cp312-cp312/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Python (macOS/Windows)
+        if: ${{ !startsWith(matrix.id, 'linux-') }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply libghidra patches to Ghidra source
+        shell: bash
+        run: |
+          # bfd_arch.cc::buildLoader treats getTarget() as a BFD target name
+          # in its fall-through branch, but our LocalClient sends a Sleigh
+          # language id like "AARCH64:LE:64:v8A:default". Without the patch
+          # bfd_openr fails ("Unable to open image file") on aarch64/etc.
+          # Worse, falling back to "default" hits bfd_arch.cc:102-103 which
+          # hardcodes elf64 -> x86:LE:64:default:gcc, so non-x86 ELFs would
+          # load with the wrong Sleigh language. The patch makes buildLoader
+          # pass empty BFD target when getTarget() looks like a Sleigh id,
+          # so bfd_check_format can auto-detect the file format while Ghidra
+          # uses the explicit Sleigh id we provided.
+          set -euo pipefail
+          for p in "${GITHUB_WORKSPACE}"/cpp/patches/*.patch; do
+            echo "applying $(basename "$p")"
+            (cd "${GITHUB_WORKSPACE}/_ghidra-src" && patch -p1 < "$p")
+          done
+
+      - name: Overlay compiled Sleigh .sla grammars from Ghidra distribution
+        shell: bash
+        run: |
+          # The git source tree only has .slaspec (Sleigh grammar source) and
+          # XML metadata under Ghidra/Processors/<proc>/data/languages/. The
+          # compiled .sla grammars ship only with the release distribution ZIP.
+          # Download the ZIP, extract, and overlay the .sla files into the
+          # source tree so embed_specs.py picks them up. Written in Python so
+          # the path handling is identical on Linux, macOS, and Windows — the
+          # previous bash version mangled mixed-separator paths on Windows
+          # Git Bash and the .sla files landed outside the scanned directory,
+          # leaving win_amd64 wheels without any compiled grammars.
+          python << 'PYEOF'
+          import os, pathlib, shutil, sys, urllib.request, zipfile
+
+          runner_temp = pathlib.Path(os.environ.get('RUNNER_TEMP') or '/tmp')
+          work_dir = runner_temp / 'ghidra-dist'
+          zip_path = runner_temp / 'ghidra-dist.zip'
+          work_dir.mkdir(parents=True, exist_ok=True)
+
+          url = os.environ['GHIDRA_RELEASE_URL']
+          print(f'downloading {url}', flush=True)
+          urllib.request.urlretrieve(url, zip_path)
+
+          print(f'extracting to {work_dir}', flush=True)
+          with zipfile.ZipFile(zip_path) as z:
+              z.extractall(work_dir)
+
+          dist_roots = [p for p in work_dir.iterdir()
+                        if p.is_dir() and p.name.startswith('ghidra_') and 'PUBLIC' in p.name]
+          if not dist_roots:
+              sys.exit('Failed to find ghidra_*_PUBLIC* directory in extracted ZIP')
+          dist_root = dist_roots[0]
+          src_root = pathlib.Path(os.environ['GITHUB_WORKSPACE']) / '_ghidra-src'
+
+          count = 0
+          for sla in (dist_root / 'Ghidra' / 'Processors').rglob('*.sla'):
+              rel = sla.relative_to(dist_root)
+              dest = src_root / rel
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(sla, dest)
+              count += 1
+          print(f'Overlaid {count} .sla files into {src_root}', flush=True)
+          PYEOF
+
+      - name: Configure C++ SDK with local backend
+        shell: bash
+        run: >
+          cmake -S cpp -B build/cpp
+          -DCMAKE_BUILD_TYPE=Release
+          -DLIBGHIDRA_WITH_LOCAL=ON
+          -DLIBGHIDRA_BUILD_PYTHON=ON
+          -DGHIDRA_SOURCE_DIR="${GITHUB_WORKSPACE}/_ghidra-src"
+          ${{ matrix.cmake_extra }}
+
+      - name: Build C++ SDK
+        run: cmake --build build/cpp --config Release
+
+      - name: Build wheel
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip build wheel
+          python -m build --wheel python
+
+      - name: Retag wheel with cp312-abi3 + platform
+        shell: bash
+        run: |
+          # setuptools tags the wheel as py3-none-any because it is unaware of
+          # the CMake-built nanobind module in package_data. Rewrite the tags
+          # so downstream repair tools recognise the wheel as platform-specific
+          # (otherwise delocate/delvewheel keep "any" and three of the four
+          # wheels end up with identical filenames on the release page).
+          case "${{ matrix.id }}" in
+            linux-x86_64)    PLAT=linux_x86_64 ;;
+            linux-aarch64)   PLAT=linux_aarch64 ;;
+            macos-arm64)     PLAT=macosx_11_0_arm64 ;;
+            windows-x86_64)  PLAT=win_amd64 ;;
+            *) echo "Unknown matrix id: ${{ matrix.id }}" >&2; exit 1 ;;
+          esac
+          python -m wheel tags \
+            --python-tag cp312 \
+            --abi-tag abi3 \
+            --platform-tag "$PLAT" \
+            --remove \
+            python/dist/libghidra-*.whl
+
+      - name: Repair wheel (auditwheel)
+        if: matrix.wheel_tool == 'auditwheel'
+        shell: bash
+        run: |
+          python -m pip install auditwheel patchelf
+          mkdir -p python/dist-repaired
+          for whl in python/dist/*.whl; do
+            auditwheel repair "$whl" -w python/dist-repaired/
+          done
+
+      - name: Repair wheel (delocate)
+        if: matrix.wheel_tool == 'delocate'
+        shell: bash
+        run: |
+          python -m pip install delocate
+          mkdir -p python/dist-repaired
+          for whl in python/dist/*.whl; do
+            delocate-wheel -w python/dist-repaired/ "$whl"
+          done
+
+      - name: Repair wheel (delvewheel)
+        if: matrix.wheel_tool == 'delvewheel'
+        shell: bash
+        run: |
+          python -m pip install delvewheel
+          mkdir -p python/dist-repaired
+          for whl in python/dist/*.whl; do
+            delvewheel repair "$whl" -w python/dist-repaired/
+          done
+
+      - name: Smoke test repaired wheel
+        shell: bash
+        run: |
+          WHEEL_URI="$(python - <<'PY'
+          from pathlib import Path
+          print(next(Path("python/dist-repaired").glob("*.whl")).resolve().as_uri())
+          PY
+          )"
+          python -m pip install "libghidra[local] @ ${WHEEL_URI}" pytest
+          python -c "import libghidra; from libghidra.local import LocalClient; print('import ok')"
+          pytest tests/python/format_detect/ -q
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-wheel-${{ matrix.id }}
+          path: python/dist-repaired/*.whl
+
   publish-draft-release:
     name: Publish Draft Release
     if: startsWith(github.ref, 'refs/tags/')
@@ -187,6 +422,7 @@ jobs:
       - package-python
       - package-rust
       - build-extension-linux
+      - build-wheel-native
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -216,6 +452,13 @@ jobs:
         with:
           name: ghidra-extension-linux
           path: extension-artifacts
+
+      - name: Download native wheel artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: python-wheel-*
+          path: native-wheels
+          merge-multiple: true
 
       - name: Prepare release assets
         shell: bash
@@ -247,4 +490,6 @@ jobs:
           draft: true
           prerelease: ${{ contains(github.ref_name, 'alpha') }}
           generate_release_notes: true
-          files: release/*
+          files: |
+            release/*
+            native-wheels/*.whl

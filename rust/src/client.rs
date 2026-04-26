@@ -224,6 +224,10 @@ impl GhidraClient {
             program_path: request.program_path.clone(),
             analyze: request.analyze,
             read_only: request.read_only,
+            language_id: request.language_id.clone(),
+            compiler_spec_id: request.compiler_spec_id.clone(),
+            format: request.format.clone(),
+            base_address: request.base_address,
         };
         let resp: pb::OpenProgramResponse = self.call_rpc(
             "libghidra.SessionService/OpenProgram",

@@ -75,6 +75,7 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 
 	private static final int STATUS_PROBE_CONNECT_TIMEOUT_MS = 1000;
 	private static final int STATUS_PROBE_READ_TIMEOUT_MS = 2000;
+	private static final long PROGRAM_DEACTIVATE_UNBIND_TIMEOUT_MS = 100L;
 
 	private final Object stateLock = new Object();
 	private final RuntimeBundle runtimes = new RuntimeBundle("gui");
@@ -125,7 +126,13 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 	@Override
 	protected void programDeactivated(Program program) {
 		super.programDeactivated(program);
-		runtimes.session().unbindProgram(program);
+		if (!tryUnbindProgramForDeactivation(program)) {
+			Thread cleanupThread = new Thread(() -> {
+				runtimes.session().unbindProgram(program);
+			}, "libghidra-gui-program-unbind");
+			cleanupThread.setDaemon(true);
+			cleanupThread.start();
+		}
 		synchronized (stateLock) {
 			updateActionStateLocked();
 		}
@@ -135,6 +142,25 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 	public void dispose() {
 		stopServerInternal();
 		super.dispose();
+	}
+
+	private boolean tryUnbindProgramForDeactivation(Program program) {
+		try {
+			boolean unbound = runtimes.session().tryBeginUnbindProgram(
+				program,
+				PROGRAM_DEACTIVATE_UNBIND_TIMEOUT_MS);
+			if (!unbound) {
+				Msg.warn(
+					this,
+					"Deferring libghidra GUI program unbind because RPC readers are still active");
+			}
+			return unbound;
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			Msg.warn(this, "Interrupted while starting libghidra GUI program unbind", e);
+			return false;
+		}
 	}
 
 	private void createActions() {

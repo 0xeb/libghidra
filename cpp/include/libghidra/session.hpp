@@ -18,6 +18,10 @@ struct OpenProgramRequest {
   std::string program_path;
   bool analyze = false;
   bool read_only = false;
+  std::string language_id;
+  std::string compiler_spec_id;
+  std::string format;
+  std::uint64_t base_address = 0;
 };
 
 class ISessionClient {

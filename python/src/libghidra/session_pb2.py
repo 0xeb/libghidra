@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from libghidra import common_pb2 as libghidra_dot_common__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17libghidra/session.proto\x12\tlibghidra\x1a\x16libghidra/common.proto\"z\n\x12OpenProgramRequest\x12\x14\n\x0cproject_path\x18\x01 \x01(\t\x12\x14\n\x0cproject_name\x18\x02 \x01(\t\x12\x14\n\x0cprogram_path\x18\x03 \x01(\t\x12\x0f\n\x07\x61nalyze\x18\x04 \x01(\x08\x12\x11\n\tread_only\x18\x05 \x01(\x08\"k\n\x13OpenProgramResponse\x12\x14\n\x0cprogram_name\x18\x02 \x01(\t\x12\x13\n\x0blanguage_id\x18\x03 \x01(\t\x12\x15\n\rcompiler_spec\x18\x04 \x01(\t\x12\x12\n\nimage_base\x18\x05 \x01(\x04\"I\n\x13\x43loseProgramRequest\x12\x32\n\x0fshutdown_policy\x18\x02 \x01(\x0e\x32\x19.libghidra.ShutdownPolicy\"&\n\x14\x43loseProgramResponse\x12\x0e\n\x06\x63losed\x18\x01 \x01(\x08\"\x14\n\x12SaveProgramRequest\"$\n\x13SaveProgramResponse\x12\r\n\x05saved\x18\x01 \x01(\x08\"\x17\n\x15\x44iscardProgramRequest\"+\n\x16\x44iscardProgramResponse\x12\x11\n\tdiscarded\x18\x01 \x01(\x08\"\x14\n\x12GetRevisionRequest\"\'\n\x13GetRevisionResponse\x12\x10\n\x08revision\x18\x01 \x01(\x04\"E\n\x0fShutdownRequest\x12\x32\n\x0fshutdown_policy\x18\x01 \x01(\x0e\x32\x19.libghidra.ShutdownPolicy\"$\n\x10ShutdownResponse\x12\x10\n\x08\x61\x63\x63\x65pted\x18\x01 \x01(\x08\x32\xe7\x03\n\x0eSessionService\x12L\n\x0bOpenProgram\x12\x1d.libghidra.OpenProgramRequest\x1a\x1e.libghidra.OpenProgramResponse\x12O\n\x0c\x43loseProgram\x12\x1e.libghidra.CloseProgramRequest\x1a\x1f.libghidra.CloseProgramResponse\x12L\n\x0bSaveProgram\x12\x1d.libghidra.SaveProgramRequest\x1a\x1e.libghidra.SaveProgramResponse\x12U\n\x0e\x44iscardProgram\x12 .libghidra.DiscardProgramRequest\x1a!.libghidra.DiscardProgramResponse\x12L\n\x0bGetRevision\x12\x1d.libghidra.GetRevisionRequest\x1a\x1e.libghidra.GetRevisionResponse\x12\x43\n\x08Shutdown\x12\x1a.libghidra.ShutdownRequest\x1a\x1b.libghidra.ShutdownResponseB\x1b\n\tlibghidraB\x0cSessionProtoP\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17libghidra/session.proto\x12\tlibghidra\x1a\x16libghidra/common.proto\"\xcf\x01\n\x12OpenProgramRequest\x12\x14\n\x0cproject_path\x18\x01 \x01(\t\x12\x14\n\x0cproject_name\x18\x02 \x01(\t\x12\x14\n\x0cprogram_path\x18\x03 \x01(\t\x12\x0f\n\x07\x61nalyze\x18\x04 \x01(\x08\x12\x11\n\tread_only\x18\x05 \x01(\x08\x12\x13\n\x0blanguage_id\x18\x06 \x01(\t\x12\x18\n\x10\x63ompiler_spec_id\x18\x07 \x01(\t\x12\x0e\n\x06\x66ormat\x18\x08 \x01(\t\x12\x14\n\x0c\x62\x61se_address\x18\t \x01(\x04\"k\n\x13OpenProgramResponse\x12\x14\n\x0cprogram_name\x18\x02 \x01(\t\x12\x13\n\x0blanguage_id\x18\x03 \x01(\t\x12\x15\n\rcompiler_spec\x18\x04 \x01(\t\x12\x12\n\nimage_base\x18\x05 \x01(\x04\"I\n\x13\x43loseProgramRequest\x12\x32\n\x0fshutdown_policy\x18\x02 \x01(\x0e\x32\x19.libghidra.ShutdownPolicy\"&\n\x14\x43loseProgramResponse\x12\x0e\n\x06\x63losed\x18\x01 \x01(\x08\"\x14\n\x12SaveProgramRequest\"$\n\x13SaveProgramResponse\x12\r\n\x05saved\x18\x01 \x01(\x08\"\x17\n\x15\x44iscardProgramRequest\"+\n\x16\x44iscardProgramResponse\x12\x11\n\tdiscarded\x18\x01 \x01(\x08\"\x14\n\x12GetRevisionRequest\"\'\n\x13GetRevisionResponse\x12\x10\n\x08revision\x18\x01 \x01(\x04\"E\n\x0fShutdownRequest\x12\x32\n\x0fshutdown_policy\x18\x01 \x01(\x0e\x32\x19.libghidra.ShutdownPolicy\"$\n\x10ShutdownResponse\x12\x10\n\x08\x61\x63\x63\x65pted\x18\x01 \x01(\x08\x32\xe7\x03\n\x0eSessionService\x12L\n\x0bOpenProgram\x12\x1d.libghidra.OpenProgramRequest\x1a\x1e.libghidra.OpenProgramResponse\x12O\n\x0c\x43loseProgram\x12\x1e.libghidra.CloseProgramRequest\x1a\x1f.libghidra.CloseProgramResponse\x12L\n\x0bSaveProgram\x12\x1d.libghidra.SaveProgramRequest\x1a\x1e.libghidra.SaveProgramResponse\x12U\n\x0e\x44iscardProgram\x12 .libghidra.DiscardProgramRequest\x1a!.libghidra.DiscardProgramResponse\x12L\n\x0bGetRevision\x12\x1d.libghidra.GetRevisionRequest\x1a\x1e.libghidra.GetRevisionResponse\x12\x43\n\x08Shutdown\x12\x1a.libghidra.ShutdownRequest\x1a\x1b.libghidra.ShutdownResponseB\x1b\n\tlibghidraB\x0cSessionProtoP\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,30 +33,30 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'libghidra.session_pb2', _gl
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n\tlibghidraB\014SessionProtoP\001'
-  _globals['_OPENPROGRAMREQUEST']._serialized_start=62
-  _globals['_OPENPROGRAMREQUEST']._serialized_end=184
-  _globals['_OPENPROGRAMRESPONSE']._serialized_start=186
-  _globals['_OPENPROGRAMRESPONSE']._serialized_end=293
-  _globals['_CLOSEPROGRAMREQUEST']._serialized_start=295
-  _globals['_CLOSEPROGRAMREQUEST']._serialized_end=368
-  _globals['_CLOSEPROGRAMRESPONSE']._serialized_start=370
-  _globals['_CLOSEPROGRAMRESPONSE']._serialized_end=408
-  _globals['_SAVEPROGRAMREQUEST']._serialized_start=410
-  _globals['_SAVEPROGRAMREQUEST']._serialized_end=430
-  _globals['_SAVEPROGRAMRESPONSE']._serialized_start=432
-  _globals['_SAVEPROGRAMRESPONSE']._serialized_end=468
-  _globals['_DISCARDPROGRAMREQUEST']._serialized_start=470
-  _globals['_DISCARDPROGRAMREQUEST']._serialized_end=493
-  _globals['_DISCARDPROGRAMRESPONSE']._serialized_start=495
-  _globals['_DISCARDPROGRAMRESPONSE']._serialized_end=538
-  _globals['_GETREVISIONREQUEST']._serialized_start=540
-  _globals['_GETREVISIONREQUEST']._serialized_end=560
-  _globals['_GETREVISIONRESPONSE']._serialized_start=562
-  _globals['_GETREVISIONRESPONSE']._serialized_end=601
-  _globals['_SHUTDOWNREQUEST']._serialized_start=603
-  _globals['_SHUTDOWNREQUEST']._serialized_end=672
-  _globals['_SHUTDOWNRESPONSE']._serialized_start=674
-  _globals['_SHUTDOWNRESPONSE']._serialized_end=710
-  _globals['_SESSIONSERVICE']._serialized_start=713
-  _globals['_SESSIONSERVICE']._serialized_end=1200
+  _globals['_OPENPROGRAMREQUEST']._serialized_start=63
+  _globals['_OPENPROGRAMREQUEST']._serialized_end=270
+  _globals['_OPENPROGRAMRESPONSE']._serialized_start=272
+  _globals['_OPENPROGRAMRESPONSE']._serialized_end=379
+  _globals['_CLOSEPROGRAMREQUEST']._serialized_start=381
+  _globals['_CLOSEPROGRAMREQUEST']._serialized_end=454
+  _globals['_CLOSEPROGRAMRESPONSE']._serialized_start=456
+  _globals['_CLOSEPROGRAMRESPONSE']._serialized_end=494
+  _globals['_SAVEPROGRAMREQUEST']._serialized_start=496
+  _globals['_SAVEPROGRAMREQUEST']._serialized_end=516
+  _globals['_SAVEPROGRAMRESPONSE']._serialized_start=518
+  _globals['_SAVEPROGRAMRESPONSE']._serialized_end=554
+  _globals['_DISCARDPROGRAMREQUEST']._serialized_start=556
+  _globals['_DISCARDPROGRAMREQUEST']._serialized_end=579
+  _globals['_DISCARDPROGRAMRESPONSE']._serialized_start=581
+  _globals['_DISCARDPROGRAMRESPONSE']._serialized_end=624
+  _globals['_GETREVISIONREQUEST']._serialized_start=626
+  _globals['_GETREVISIONREQUEST']._serialized_end=646
+  _globals['_GETREVISIONRESPONSE']._serialized_start=648
+  _globals['_GETREVISIONRESPONSE']._serialized_end=687
+  _globals['_SHUTDOWNREQUEST']._serialized_start=689
+  _globals['_SHUTDOWNREQUEST']._serialized_end=758
+  _globals['_SHUTDOWNRESPONSE']._serialized_start=760
+  _globals['_SHUTDOWNRESPONSE']._serialized_end=796
+  _globals['_SESSIONSERVICE']._serialized_start=799
+  _globals['_SESSIONSERVICE']._serialized_end=1286
 # @@protoc_insertion_point(module_scope)

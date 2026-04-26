@@ -8,6 +8,18 @@ LocalClient implements the shared `IClient` surface backed by Ghidra's C++ decom
 
 All methods return `StatusOr<T>` -- check `.ok()`, then access `.value`.
 
+### Out of scope: program-wide enumeration
+
+`IClient` is the shared API for both `HttpClient` (talks to a running Ghidra instance) and
+`LocalClient` (this header — standalone C++ decompiler). Methods that *enumerate everything in
+the analyzed program* — `ListFunctions`, `ListBasicBlocks`, `ListCfgEdges`, `ListXrefs`,
+`ListDefinedStrings` — only have meaningful semantics on top of Ghidra's analysis pass, which
+runs in the Java side of the live host. The standalone decompiler does not run an analysis
+pass, so those calls always return empty results in local mode by design. Drive `LocalClient`
+with **explicit addresses** (`GetDecompilation(addr)`, `ListInstructions(start, end)`,
+`ReadBytes(addr, n)`, `RenameFunction(addr, name)`); if you need program-wide enumeration,
+route the call through `HttpClient` against a Ghidra host.
+
 ## Quick Start
 
 ```cpp

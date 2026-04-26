@@ -30,6 +30,9 @@ private static final long serialVersionUID = 0L;
     projectPath_ = "";
     projectName_ = "";
     programPath_ = "";
+    languageId_ = "";
+    compilerSpecId_ = "";
+    format_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -184,6 +187,134 @@ private static final long serialVersionUID = 0L;
     return readOnly_;
   }
 
+  public static final int LANGUAGE_ID_FIELD_NUMBER = 6;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object languageId_ = "";
+  /**
+   * <code>string language_id = 6;</code>
+   * @return The languageId.
+   */
+  @java.lang.Override
+  public java.lang.String getLanguageId() {
+    java.lang.Object ref = languageId_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      languageId_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string language_id = 6;</code>
+   * @return The bytes for languageId.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getLanguageIdBytes() {
+    java.lang.Object ref = languageId_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      languageId_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int COMPILER_SPEC_ID_FIELD_NUMBER = 7;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object compilerSpecId_ = "";
+  /**
+   * <code>string compiler_spec_id = 7;</code>
+   * @return The compilerSpecId.
+   */
+  @java.lang.Override
+  public java.lang.String getCompilerSpecId() {
+    java.lang.Object ref = compilerSpecId_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      compilerSpecId_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string compiler_spec_id = 7;</code>
+   * @return The bytes for compilerSpecId.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getCompilerSpecIdBytes() {
+    java.lang.Object ref = compilerSpecId_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      compilerSpecId_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int FORMAT_FIELD_NUMBER = 8;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object format_ = "";
+  /**
+   * <code>string format = 8;</code>
+   * @return The format.
+   */
+  @java.lang.Override
+  public java.lang.String getFormat() {
+    java.lang.Object ref = format_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      format_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string format = 8;</code>
+   * @return The bytes for format.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getFormatBytes() {
+    java.lang.Object ref = format_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      format_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int BASE_ADDRESS_FIELD_NUMBER = 9;
+  private long baseAddress_ = 0L;
+  /**
+   * <code>uint64 base_address = 9;</code>
+   * @return The baseAddress.
+   */
+  @java.lang.Override
+  public long getBaseAddress() {
+    return baseAddress_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -213,6 +344,18 @@ private static final long serialVersionUID = 0L;
     if (readOnly_ != false) {
       output.writeBool(5, readOnly_);
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(languageId_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 6, languageId_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(compilerSpecId_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 7, compilerSpecId_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(format_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 8, format_);
+    }
+    if (baseAddress_ != 0L) {
+      output.writeUInt64(9, baseAddress_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -239,6 +382,19 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(5, readOnly_);
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(languageId_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(6, languageId_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(compilerSpecId_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(7, compilerSpecId_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(format_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(8, format_);
+    }
+    if (baseAddress_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(9, baseAddress_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -264,6 +420,14 @@ private static final long serialVersionUID = 0L;
         != other.getAnalyze()) return false;
     if (getReadOnly()
         != other.getReadOnly()) return false;
+    if (!getLanguageId()
+        .equals(other.getLanguageId())) return false;
+    if (!getCompilerSpecId()
+        .equals(other.getCompilerSpecId())) return false;
+    if (!getFormat()
+        .equals(other.getFormat())) return false;
+    if (getBaseAddress()
+        != other.getBaseAddress()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -287,6 +451,15 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + READ_ONLY_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getReadOnly());
+    hash = (37 * hash) + LANGUAGE_ID_FIELD_NUMBER;
+    hash = (53 * hash) + getLanguageId().hashCode();
+    hash = (37 * hash) + COMPILER_SPEC_ID_FIELD_NUMBER;
+    hash = (53 * hash) + getCompilerSpecId().hashCode();
+    hash = (37 * hash) + FORMAT_FIELD_NUMBER;
+    hash = (53 * hash) + getFormat().hashCode();
+    hash = (37 * hash) + BASE_ADDRESS_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getBaseAddress());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -423,6 +596,10 @@ private static final long serialVersionUID = 0L;
       programPath_ = "";
       analyze_ = false;
       readOnly_ = false;
+      languageId_ = "";
+      compilerSpecId_ = "";
+      format_ = "";
+      baseAddress_ = 0L;
       return this;
     }
 
@@ -471,6 +648,18 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000010) != 0)) {
         result.readOnly_ = readOnly_;
       }
+      if (((from_bitField0_ & 0x00000020) != 0)) {
+        result.languageId_ = languageId_;
+      }
+      if (((from_bitField0_ & 0x00000040) != 0)) {
+        result.compilerSpecId_ = compilerSpecId_;
+      }
+      if (((from_bitField0_ & 0x00000080) != 0)) {
+        result.format_ = format_;
+      }
+      if (((from_bitField0_ & 0x00000100) != 0)) {
+        result.baseAddress_ = baseAddress_;
+      }
     }
 
     @java.lang.Override
@@ -505,6 +694,24 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getReadOnly() != false) {
         setReadOnly(other.getReadOnly());
+      }
+      if (!other.getLanguageId().isEmpty()) {
+        languageId_ = other.languageId_;
+        bitField0_ |= 0x00000020;
+        onChanged();
+      }
+      if (!other.getCompilerSpecId().isEmpty()) {
+        compilerSpecId_ = other.compilerSpecId_;
+        bitField0_ |= 0x00000040;
+        onChanged();
+      }
+      if (!other.getFormat().isEmpty()) {
+        format_ = other.format_;
+        bitField0_ |= 0x00000080;
+        onChanged();
+      }
+      if (other.getBaseAddress() != 0L) {
+        setBaseAddress(other.getBaseAddress());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -557,6 +764,26 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000010;
               break;
             } // case 40
+            case 50: {
+              languageId_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 50
+            case 58: {
+              compilerSpecId_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000040;
+              break;
+            } // case 58
+            case 66: {
+              format_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000080;
+              break;
+            } // case 66
+            case 72: {
+              baseAddress_ = input.readUInt64();
+              bitField0_ |= 0x00000100;
+              break;
+            } // case 72
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -850,6 +1077,254 @@ private static final long serialVersionUID = 0L;
     public Builder clearReadOnly() {
       bitField0_ = (bitField0_ & ~0x00000010);
       readOnly_ = false;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object languageId_ = "";
+    /**
+     * <code>string language_id = 6;</code>
+     * @return The languageId.
+     */
+    public java.lang.String getLanguageId() {
+      java.lang.Object ref = languageId_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        languageId_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string language_id = 6;</code>
+     * @return The bytes for languageId.
+     */
+    public com.google.protobuf.ByteString
+        getLanguageIdBytes() {
+      java.lang.Object ref = languageId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        languageId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string language_id = 6;</code>
+     * @param value The languageId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setLanguageId(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      languageId_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string language_id = 6;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearLanguageId() {
+      languageId_ = getDefaultInstance().getLanguageId();
+      bitField0_ = (bitField0_ & ~0x00000020);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string language_id = 6;</code>
+     * @param value The bytes for languageId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setLanguageIdBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      languageId_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object compilerSpecId_ = "";
+    /**
+     * <code>string compiler_spec_id = 7;</code>
+     * @return The compilerSpecId.
+     */
+    public java.lang.String getCompilerSpecId() {
+      java.lang.Object ref = compilerSpecId_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        compilerSpecId_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string compiler_spec_id = 7;</code>
+     * @return The bytes for compilerSpecId.
+     */
+    public com.google.protobuf.ByteString
+        getCompilerSpecIdBytes() {
+      java.lang.Object ref = compilerSpecId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        compilerSpecId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string compiler_spec_id = 7;</code>
+     * @param value The compilerSpecId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCompilerSpecId(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      compilerSpecId_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string compiler_spec_id = 7;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCompilerSpecId() {
+      compilerSpecId_ = getDefaultInstance().getCompilerSpecId();
+      bitField0_ = (bitField0_ & ~0x00000040);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string compiler_spec_id = 7;</code>
+     * @param value The bytes for compilerSpecId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCompilerSpecIdBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      compilerSpecId_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object format_ = "";
+    /**
+     * <code>string format = 8;</code>
+     * @return The format.
+     */
+    public java.lang.String getFormat() {
+      java.lang.Object ref = format_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        format_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string format = 8;</code>
+     * @return The bytes for format.
+     */
+    public com.google.protobuf.ByteString
+        getFormatBytes() {
+      java.lang.Object ref = format_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        format_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string format = 8;</code>
+     * @param value The format to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFormat(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      format_ = value;
+      bitField0_ |= 0x00000080;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string format = 8;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFormat() {
+      format_ = getDefaultInstance().getFormat();
+      bitField0_ = (bitField0_ & ~0x00000080);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string format = 8;</code>
+     * @param value The bytes for format to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFormatBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      format_ = value;
+      bitField0_ |= 0x00000080;
+      onChanged();
+      return this;
+    }
+
+    private long baseAddress_ ;
+    /**
+     * <code>uint64 base_address = 9;</code>
+     * @return The baseAddress.
+     */
+    @java.lang.Override
+    public long getBaseAddress() {
+      return baseAddress_;
+    }
+    /**
+     * <code>uint64 base_address = 9;</code>
+     * @param value The baseAddress to set.
+     * @return This builder for chaining.
+     */
+    public Builder setBaseAddress(long value) {
+
+      baseAddress_ = value;
+      bitField0_ |= 0x00000100;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>uint64 base_address = 9;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearBaseAddress() {
+      bitField0_ = (bitField0_ & ~0x00000100);
+      baseAddress_ = 0L;
       onChanged();
       return this;
     }

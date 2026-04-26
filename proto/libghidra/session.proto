@@ -21,6 +21,10 @@ message OpenProgramRequest {
   string program_path = 3;
   bool analyze = 4;
   bool read_only = 5;
+  string language_id = 6;
+  string compiler_spec_id = 7;
+  string format = 8;
+  uint64 base_address = 9;
 }
 
 message OpenProgramResponse {
