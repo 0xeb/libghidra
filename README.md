@@ -4,6 +4,23 @@ Typed API for Ghidra program databases. Query functions, types, memory, decompil
 
 Current release: `0.0.1` alpha. The API is usable, but still evolving.
 
+## Install with an AI agent (recommended)
+
+The fastest way to stand up libghidra end-to-end is to point an AI
+coding agent (Claude Code, Cursor, Codex, Aider, etc.) at the bundled
+installer prompt:
+
+> [`install-prompt.md`](install-prompt.md)
+
+It is a self-contained runbook with explicit verification gates at
+every step — preflight checks, Ghidra install, host extension install,
+Python wheel install, and a first live decompilation. Hand it to your
+agent and let it drive the install; intervene only if a gate reports a
+failure.
+
+If you would rather drive the install yourself, see **Get Running**
+below.
+
 ## Get Running
 
 ### Quickstart
