@@ -2,7 +2,7 @@
 
 Typed API for Ghidra program databases. Query functions, types, memory, decompiler output, and more from C++, Python, or Rust -- without touching Java.
 
-Current release: `0.0.1` alpha. The API is usable, but still evolving.
+Current release: `0.0.2` alpha. The API is usable, but still evolving.
 
 ## Install with an AI agent (recommended)
 
