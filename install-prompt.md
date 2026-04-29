@@ -119,16 +119,16 @@ illustrative — use whatever the latest release tag is):
 
 ```bash
 # Linux x86_64
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc8/libghidra-0.0.1-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.2/libghidra-0.0.2-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 
 # Linux aarch64
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc8/libghidra-0.0.1-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.2/libghidra-0.0.2-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
 
 # macOS Apple Silicon
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc8/libghidra-0.0.1-cp312-abi3-macosx_15_0_arm64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.2/libghidra-0.0.2-cp312-abi3-macosx_15_0_arm64.whl
 
 # Windows x64
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.1-rc8/libghidra-0.0.1-cp312-abi3-win_amd64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.2/libghidra-0.0.2-cp312-abi3-win_amd64.whl
 ```
 
 If your platform has no native wheel (Intel Mac, Windows-on-ARM, etc.),
@@ -136,7 +136,7 @@ use the pure-Python fallback inside the `libghidra-python-*.zip` on
 the same release page:
 
 ```bash
-pip install libghidra-0.0.1-py3-none-any.whl   # HTTP client only
+pip install libghidra-0.0.2-py3-none-any.whl   # HTTP client only
 ```
 
 **Gate**:
@@ -145,7 +145,7 @@ python -c "import libghidra; print(libghidra.__version__)"
 libghidra --help | head -3
 ```
 
-The first command prints the version (e.g. `0.0.1`). The second
+The first command prints the version (e.g. `0.0.2`). The second
 shows the bundled CLI (`status`, `functions`, `decompile`, …).
 
 If `import libghidra` fails: confirm Python ≥ 3.12 (`python --version`),
