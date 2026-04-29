@@ -14,7 +14,8 @@ public final class SessionServiceHandler {
 	public SessionContract.OpenProgramResponse openProgram(
 			SessionContract.OpenProgramRequest request) {
 		if (request == null) {
-			request = new SessionContract.OpenProgramRequest("", "", "", false, false);
+			request = new SessionContract.OpenProgramRequest(
+				"", "", "", false, false, "", "", "", 0L);
 		}
 		return runtime.openProgram(request);
 	}
@@ -56,6 +57,43 @@ public final class SessionServiceHandler {
 		if (request == null) {
 			request = new SessionContract.ShutdownRequest(SessionContract.ShutdownPolicy.UNSPECIFIED);
 		}
+		// Test-only wedge hook: when LIBGHIDRA_DEBUG_WEDGE_MS is set, sleep
+		// before delegating to the real shutdown path. This lets the
+		// close-timeout regression test under tests/ghidrasql/private/
+		// drive a deterministic Java-side wedge without depending on
+		// Ghidra parser quirks. Inert when the env var is unset (no cost
+		// on the production path beyond a single getenv() check).
+		applyDebugWedge();
 		return runtime.shutdown(request);
+	}
+
+	/**
+	 * Honours the {@code LIBGHIDRA_DEBUG_WEDGE_MS} env var by sleeping for
+	 * the specified number of milliseconds before returning. Used only by
+	 * regression tests that need to drive a deterministic shutdown wedge.
+	 *
+	 * Package-visible so tests can call it directly if needed.
+	 */
+	static void applyDebugWedge() {
+		final String raw = System.getenv("LIBGHIDRA_DEBUG_WEDGE_MS");
+		if (raw == null || raw.isEmpty()) {
+			return;
+		}
+		final long ms;
+		try {
+			ms = Long.parseLong(raw);
+		}
+		catch (NumberFormatException ignored) {
+			return;
+		}
+		if (ms <= 0) {
+			return;
+		}
+		try {
+			Thread.sleep(ms);
+		}
+		catch (InterruptedException ignored) {
+			Thread.currentThread().interrupt();
+		}
 	}
 }

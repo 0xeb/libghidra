@@ -84,6 +84,10 @@ class OpenProgramRequest:
     program_path: str = ""
     analyze: bool = False
     read_only: bool = False
+    language_id: str = ""
+    compiler_spec_id: str = ""
+    format: str = ""
+    base_address: int = 0
 
 
 @dataclass

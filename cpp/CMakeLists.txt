@@ -3,7 +3,7 @@
 #   libghidra_client — IClient interface + models + StatusOr + HTTP backend + protobuf stubs
 #   libghidra_local  — Adds local/offline backend (decompiler engine, project reader)
 
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../VERSION" LIBGHIDRA_VERSION)
 string(STRIP "${LIBGHIDRA_VERSION}" LIBGHIDRA_VERSION)
 project(libghidra_cpp VERSION ${LIBGHIDRA_VERSION} LANGUAGES CXX C)
@@ -22,12 +22,32 @@ option(LIBGHIDRA_WITH_LOCAL "Build the local (offline) backend" OFF)
 option(LIBGHIDRA_BUILD_EXAMPLES "Build examples" OFF)
 option(LIBGHIDRA_BUILD_PYTHON "Build Python native extension (nanobind, requires LOCAL)" OFF)
 
+# When building the Python nanobind extension the static libraries
+# (libghidra_client, libghidra_local) end up inside a shared module, so every
+# object they contain must be position-independent. On Linux ELF the linker
+# rejects R_X86_64_32S relocations against vtables/RTTI otherwise:
+#
+#   relocation R_X86_64_32S against symbol '_ZTVN...' can not be used when
+#   making a shared object; recompile with -fPIC
+#
+# Enable PIC globally in this configuration; it's a no-op on macOS/Windows.
+if(LIBGHIDRA_BUILD_PYTHON)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
 # GHIDRA_SOURCE_DIR: path to the Ghidra source tree.
 # Required when LIBGHIDRA_WITH_LOCAL is ON.
 if(LIBGHIDRA_WITH_LOCAL AND NOT DEFINED GHIDRA_SOURCE_DIR)
     message(FATAL_ERROR
         "GHIDRA_SOURCE_DIR must be set when LIBGHIDRA_WITH_LOCAL is ON.\n"
         "Point it at a Ghidra source tree (e.g. -DGHIDRA_SOURCE_DIR=/path/to/ghidra).")
+endif()
+
+# Normalise to forward slashes so Windows paths like "D:\a\..." don't trigger
+# CMake's invalid-character-escape parse errors when concatenated into source
+# lists (e.g. add_library("${GHIDRA_ZLIB_SRC}/adler32.c")).
+if(DEFINED GHIDRA_SOURCE_DIR)
+    file(TO_CMAKE_PATH "${GHIDRA_SOURCE_DIR}" GHIDRA_SOURCE_DIR)
 endif()
 
 # ============================================================================
@@ -72,6 +92,26 @@ FetchContent_Declare(
     GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(protobuf)
+
+# Protobuf v29.3 ships abseil-cpp 20240722.0, whose AbseilConfigureCopts.cmake
+# misdetects the arch on macOS Apple Silicon and pins -msse4.1/-maes onto the
+# random_internal_randen_hwaes* targets, which clang rejects when targeting
+# arm64. Strip those x86-only flags so the targets build (the sources have
+# preprocessor guards that cleanly fall back without HW AES).
+if(APPLE)
+    foreach(_libghidra_absl_target
+        random_internal_randen_hwaes
+        random_internal_randen_hwaes_impl
+    )
+        if(TARGET ${_libghidra_absl_target})
+            get_target_property(_libghidra_hwaes_opts ${_libghidra_absl_target} COMPILE_OPTIONS)
+            if(_libghidra_hwaes_opts)
+                list(REMOVE_ITEM _libghidra_hwaes_opts "-msse4.1" "-maes" "-mssse3" "-msse4.2")
+                set_property(TARGET ${_libghidra_absl_target} PROPERTY COMPILE_OPTIONS ${_libghidra_hwaes_opts})
+            endif()
+        endif()
+    endforeach()
+endif()
 
 # ============================================================================
 # Auto-regenerate C++ protobuf stubs when .proto files change
@@ -230,21 +270,49 @@ if(LIBGHIDRA_WITH_LOCAL)
     # PUBLIC link to libghidra_client for IClient, models, status
     target_link_libraries(libghidra_local PUBLIC libghidra_client)
 
-    # Whole-archive link propagated to consumers via INTERFACE.
-    # Static initializers (ArchitectureCapability registration) would be stripped without this.
-    if(MSVC)
-        target_link_libraries(libghidra_local INTERFACE
-            -WHOLEARCHIVE:$<TARGET_FILE:libghidra_local>
-        )
-    elseif(APPLE)
-        target_link_libraries(libghidra_local INTERFACE
-            -Wl,-force_load,$<TARGET_FILE:libghidra_local>
-        )
-    else()
-        target_link_libraries(libghidra_local INTERFACE
-            -Wl,--whole-archive $<TARGET_FILE:libghidra_local> -Wl,--no-whole-archive
-        )
+    # ghidra_libdecomp is an OBJECT library embedded via $<TARGET_OBJECTS:...>
+    # above. That embeds the .o files cleanly, but it does NOT propagate
+    # ghidra_libdecomp's INTERFACE link dependencies (libbfd, libiberty, libdl)
+    # to libghidra_local. Without re-stating them here, _libghidra.abi3.so
+    # ends up with undefined bfd_init / bfd_openr / bfd_close /
+    # bfd_check_format / bfd_get_section_contents / bfd_printable_name
+    # references that the dynamic loader can't resolve at runtime.
+    if(LIBGHIDRA_HAS_BFD)
+        target_link_libraries(libghidra_local PUBLIC "${LIBGHIDRA_BFD_LIB}")
+        if(LIBGHIDRA_IBERTY_LIB)
+            target_link_libraries(libghidra_local PUBLIC "${LIBGHIDRA_IBERTY_LIB}")
+        endif()
+        if(LIBGHIDRA_SFRAME_LIB)
+            target_link_libraries(libghidra_local PUBLIC "${LIBGHIDRA_SFRAME_LIB}")
+        endif()
+        if(LIBGHIDRA_ZSTD_LIB)
+            target_link_libraries(libghidra_local PUBLIC "${LIBGHIDRA_ZSTD_LIB}")
+        endif()
+        target_link_libraries(libghidra_local PUBLIC ${CMAKE_DL_LIBS})
+        # Also surface LIBGHIDRA_HAS_BFD to libghidra_local's own translation
+        # units (e.g. local_client.cpp), since compile definitions from the
+        # embedded ghidra_libdecomp OBJECT library don't propagate through
+        # $<TARGET_OBJECTS:> in the sources list.
+        target_compile_definitions(libghidra_local PUBLIC LIBGHIDRA_HAS_BFD=1)
     endif()
+
+    # Whole-archive wrapper. libghidra_local relies on static-initialiser
+    # registration of Ghidra's ArchitectureCapability subclasses, which the
+    # linker strips under default linkage because nothing references those
+    # translation units directly. Consumers that need the registrations to
+    # survive (the Python nanobind extension, the local-backend examples)
+    # must link against this wrapper instead of libghidra_local.
+    #
+    # Using the CMake 3.24 generator expression keeps the archive referenced
+    # exactly once in the final link — the previous pattern of emitting
+    # "-Wl,--whole-archive $<TARGET_FILE:libghidra_local> -Wl,--no-whole-archive"
+    # via INTERFACE duplicated every object file on Linux because CMake's
+    # target resolution already linked libghidra_local normally.
+    add_library(libghidra_local_whole INTERFACE)
+    add_library(libghidra::local_whole ALIAS libghidra_local_whole)
+    target_link_libraries(libghidra_local_whole INTERFACE
+        $<LINK_LIBRARY:WHOLE_ARCHIVE,libghidra_local>
+    )
 
     # Threading support for DecompilerPool
     find_package(Threads REQUIRED)

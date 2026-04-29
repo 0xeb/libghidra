@@ -42,9 +42,35 @@ set(GHIDRA_EXTRA
     callgraph rulecompile testfunction unify
 )
 
-# BFD-dependent files: only include on Linux where libbfd is available
+# BFD-dependent files: only include on Linux when libbfd is actually discoverable.
+# Previously we unconditionally added bfd_arch / loadimage_bfd / analyzesigs /
+# codedata on Linux, compiled them into ghidra_libdecomp, and then linked the
+# final nanobind module as a shared object WITHOUT linking libbfd. Because
+# Linux shared libraries tolerate undefined symbols at link time, this
+# produced wheels whose _libghidra.abi3.so has undefined bfd_init / bfd_openr
+# / bfd_close / bfd_check_format / bfd_get_section_contents / bfd_printable_name
+# references — import sometimes succeeds under RTLD_LAZY, but the moment
+# ArchitectureCapability::findCapability tries the BFD path it blows up.
+# Now we only include these files when both bfd.h and libbfd.a (or .so) are
+# discoverable, and we actually link against libbfd.
+set(LIBGHIDRA_HAS_BFD FALSE)
 if(NOT MSVC AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    list(APPEND GHIDRA_EXTRA bfd_arch loadimage_bfd analyzesigs codedata)
+    find_path(LIBGHIDRA_BFD_INCLUDE NAMES bfd.h)
+    # Prefer libbfd.a — libbfd has an unstable ABI, static linking makes the
+    # wheel self-contained and immune to binutils version skew on end-user
+    # machines.
+    find_library(LIBGHIDRA_BFD_LIB NAMES libbfd.a bfd)
+    if(LIBGHIDRA_BFD_LIB AND LIBGHIDRA_BFD_INCLUDE)
+        message(STATUS "libghidra: BFD-backed ELF loader enabled (lib=${LIBGHIDRA_BFD_LIB})")
+        list(APPEND GHIDRA_EXTRA bfd_arch loadimage_bfd analyzesigs codedata)
+        set(LIBGHIDRA_HAS_BFD TRUE)
+    else()
+        message(WARNING
+            "libghidra: libbfd not found; the BFD-backed ELF auto-loader is disabled. "
+            "Install binutils-devel (RHEL/Fedora/AlmaLinux) or binutils-dev (Debian/Ubuntu) "
+            "to enable automatic loading of ELF binaries; otherwise callers must use "
+            "raw_arch or loadimage_xml with an explicit language_id.")
+    endif()
 endif()
 
 # Embedded zlib C sources
@@ -117,4 +143,37 @@ else()
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_compile_definitions(ghidra_libdecomp PRIVATE LINUX _LINUX)
     endif()
+endif()
+
+# Link against libbfd (and friends) so the BFD-backed ELF loader compiled
+# into ghidra_libdecomp has its bfd_* symbols resolved at build time instead
+# of deferred to load/call time. Whole-archive propagation of libghidra_local
+# then carries the BFD capability registration through to the wheel, and
+# _libghidra.abi3.so ends up with no undefined bfd_* symbols — the wheel is
+# genuinely self-contained on Linux with no libbfd on the host.
+if(LIBGHIDRA_HAS_BFD)
+    target_include_directories(ghidra_libdecomp PUBLIC "${LIBGHIDRA_BFD_INCLUDE}")
+    target_link_libraries(ghidra_libdecomp PUBLIC "${LIBGHIDRA_BFD_LIB}")
+    # Expose to downstream C++ code so it can pick the right OpenProgram
+    # dispatch (BFD present => pass "default" for ELF/PE/Mach-O so BFD
+    # auto-detects; BFD absent => must build a full Sleigh spec id because
+    # raw_arch rejects "default").
+    target_compile_definitions(ghidra_libdecomp PUBLIC LIBGHIDRA_HAS_BFD=1)
+    # libbfd.a may reference libiberty helpers (xmalloc, xstrdup, concat, ...);
+    # pick it up if the distro ships it as a separate static archive.
+    find_library(LIBGHIDRA_IBERTY_LIB NAMES libiberty.a iberty)
+    if(LIBGHIDRA_IBERTY_LIB)
+        target_link_libraries(ghidra_libdecomp PUBLIC "${LIBGHIDRA_IBERTY_LIB}")
+    endif()
+    # Newer binutils also splits out sframe/zstd; link if present, noop otherwise.
+    find_library(LIBGHIDRA_SFRAME_LIB NAMES libsframe.a sframe)
+    if(LIBGHIDRA_SFRAME_LIB)
+        target_link_libraries(ghidra_libdecomp PUBLIC "${LIBGHIDRA_SFRAME_LIB}")
+    endif()
+    find_library(LIBGHIDRA_ZSTD_LIB NAMES libzstd.a zstd)
+    if(LIBGHIDRA_ZSTD_LIB)
+        target_link_libraries(ghidra_libdecomp PUBLIC "${LIBGHIDRA_ZSTD_LIB}")
+    endif()
+    # libbfd uses dlopen for format plugins; make sure libdl is linked.
+    target_link_libraries(ghidra_libdecomp PUBLIC ${CMAKE_DL_LIBS})
 endif()

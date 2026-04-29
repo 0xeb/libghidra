@@ -327,6 +327,10 @@ class GhidraClient:
             program_path=request.program_path,
             analyze=request.analyze,
             read_only=request.read_only,
+            language_id=request.language_id,
+            compiler_spec_id=request.compiler_spec_id,
+            format=request.format,
+            base_address=request.base_address,
         )
         resp = self._call_rpc(
             "libghidra.SessionService/OpenProgram",

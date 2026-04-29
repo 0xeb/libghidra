@@ -4,16 +4,28 @@ Python client for the libghidra typed RPC layer. Communicates with a
 running LibGhidraHost extension via binary protobuf over `POST /rpc`.
 Includes both sync (`requests`) and async (`aiohttp`) variants.
 
+> **Looking for the Rust client?** The companion crate at
+> [`rust/`](../rust/) ships the same dual-mode story (`live` + `local`)
+> in one package. `cargo add libghidra` is the Rust equivalent of `pip
+> install libghidra`. See [`rust/README.md`](../rust/README.md).
+
 ## Install
+
+> **Just want a working wheel?** Pre-built per-platform wheels (Linux x86_64 / aarch64, macOS arm64, Windows x64) are attached to every [GitHub Release](https://github.com/0xeb/libghidra/releases). The top-level [README](../README.md#3-query-the-api) has the per-platform `pip install <release-url>` commands. The instructions below are for **editable installs from a clone** (contributors).
 
 ```bash
 pip install -e libghidra/python          # sync only
 pip install -e "libghidra/python[async]"  # sync + async
 pip install -e "libghidra/python[cli]"    # adds CLI binary helpers
+pip install -e "libghidra/python[local]"  # local ELF/PE/Mach-O detection helpers
 pip install -e "libghidra/python[async,cli]"
 ```
 
-Requires Python 3.12+ and a running LibGhidraHost instance.
+Requires Python 3.12+ and a running LibGhidraHost instance (for the
+HTTP/RPC client; the `local` extra plus a built native wheel let you
+skip the host entirely).
+The `local` extra is only needed for offline/native workflows; HTTP-only
+installs do not pull in binary parser packages.
 
 ## Quick Start
 
@@ -88,9 +100,12 @@ If the native local backend is available, `functions` and `decompile` can run
 without a Ghidra host:
 
 ```bash
-libghidra functions --local sample.exe --arch x86:LE:64:default
+libghidra functions --local sample.exe
 libghidra decompile --local sample.exe 0x401000
 ```
+
+`LocalClient` auto-detects ELF, PE, Mach-O, and raw data inputs. You can still
+pass `language_id` explicitly on `OpenProgramRequest` for unusual targets.
 
 Use `--format json` or `--format csv` on supported commands for scripting.
 

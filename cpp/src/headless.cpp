@@ -41,10 +41,33 @@ static constexpr const char* READY_BANNER = "LIBGHIDRA_HEADLESS_READY";
 
 #ifdef _WIN32
 
+// Wraps a process plus a Job Object on Windows so the whole process tree
+// (cmd.exe → analyzeHeadless.bat → java.exe) can be killed atomically.
+// TerminateProcess only kills the immediate process; without a Job, the
+// java.exe child outlives a `cmd /c` parent kill and keeps holding the
+// HTTP socket and project lock files, defeating force-kill.
 class ProcessHandle {
  public:
-  ProcessHandle() = default;
-  ~ProcessHandle() { close_handles(); }
+  ProcessHandle() {
+    job_ = CreateJobObjectW(nullptr, nullptr);
+    if (job_) {
+      JOBOBJECT_EXTENDED_LIMIT_INFORMATION info{};
+      info.BasicLimitInformation.LimitFlags =
+          JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+      SetInformationJobObject(job_, JobObjectExtendedLimitInformation,
+                              &info, sizeof(info));
+    }
+  }
+  ~ProcessHandle() {
+    close_handles();
+    if (job_) {
+      // Closing the job handle with KILL_ON_JOB_CLOSE causes the OS to
+      // terminate every process still in the job. Belt-and-suspenders
+      // safety net for the case where wait()/terminate() didn't run.
+      CloseHandle(job_);
+      job_ = nullptr;
+    }
+  }
 
   ProcessHandle(const ProcessHandle&) = delete;
   ProcessHandle& operator=(const ProcessHandle&) = delete;
@@ -59,11 +82,29 @@ class ProcessHandle {
 
     // CreateProcess needs a mutable buffer
     cmd_buf_ = cmd_line;
+    // CREATE_SUSPENDED so we can attach to the job before any child
+    // processes are spawned. CREATE_BREAKAWAY_FROM_JOB defends against
+    // inheritance of an outer job that disallows nested jobs (rare in
+    // practice but cheap).
+    DWORD flags = CREATE_NO_WINDOW | CREATE_SUSPENDED |
+                  CREATE_BREAKAWAY_FROM_JOB;
     BOOL ok = CreateProcessA(
         nullptr, cmd_buf_.data(), nullptr, nullptr,
         TRUE,  // inherit handles
-        CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi_);
-    if (!ok) return false;
+        flags, nullptr, nullptr, &si, &pi_);
+    if (!ok) {
+      // Some environments (Windows Containers, certain Job-controlled
+      // sessions) reject CREATE_BREAKAWAY_FROM_JOB. Retry without it.
+      flags = CREATE_NO_WINDOW | CREATE_SUSPENDED;
+      ok = CreateProcessA(
+          nullptr, cmd_buf_.data(), nullptr, nullptr,
+          TRUE, flags, nullptr, nullptr, &si, &pi_);
+      if (!ok) return false;
+    }
+    if (job_) {
+      AssignProcessToJobObject(job_, pi_.hProcess);
+    }
+    ResumeThread(pi_.hThread);
     alive_ = true;
     return true;
   }
@@ -83,7 +124,15 @@ class ProcessHandle {
 
   void terminate() {
     if (alive_) {
-      TerminateProcess(pi_.hProcess, 1);
+      // TerminateJobObject kills every process in the job (cmd.exe,
+      // analyzeHeadless.bat, java.exe, conhost.exe). TerminateProcess
+      // by itself only kills the immediate child and would leave the
+      // java.exe descendant alive, defeating the bounded close().
+      if (job_) {
+        TerminateJobObject(job_, 1);
+      } else {
+        TerminateProcess(pi_.hProcess, 1);
+      }
       wait(10000);
     }
   }
@@ -95,6 +144,7 @@ class ProcessHandle {
   }
 
   PROCESS_INFORMATION pi_{};
+  HANDLE job_ = nullptr;
   std::string cmd_buf_;
   int exit_code_ = 0;
   bool alive_ = false;
@@ -256,30 +306,80 @@ int HeadlessClient::wait() {
   return impl_->proc->wait();
 }
 
-int HeadlessClient::close(bool save) {
+int HeadlessClient::close(bool save, std::chrono::milliseconds timeout) {
   if (impl_->detached) return 0;
 
-  // Shut down the host
-  impl_->client->Shutdown(save ? ShutdownPolicy::kSave
-                               : ShutdownPolicy::kDiscard);
+  // The previous implementation blocked here on two unbounded waits:
+  //   (1) client->Shutdown(...) — blocks up to read_timeout (5 min default)
+  //       if Java doesn't ack;
+  //   (2) the output-drain loop — blocks until the child closes stdout.
+  // If Java was wedged on a stuck decompiler/parser, both waits stalled
+  // and the wrapper hung indefinitely with the process tree intact (this
+  // matches the symptom in the pain-points report Issue 6).
+  //
+  // The fix runs both in detached worker threads. The main thread waits
+  // for the child up to `timeout`; if the child hasn't exited by then it
+  // is force-killed. Killing the child closes both the HTTP socket
+  // (unblocking the Shutdown thread) and the output pipe (unblocking the
+  // drain thread), so we can join them cleanly afterwards.
 
-  // Drain output
+  auto deadline = std::chrono::steady_clock::now() + timeout;
+
+  // Worker 1: drain pipe output until the pipe closes (i.e. child exits).
+  std::thread drain_thread;
   if (impl_->pipe) {
-    std::string line;
-    while (impl_->pipe->read_line(line)) {
-      if (!line.empty() && impl_->on_output) impl_->on_output(line);
-    }
-    impl_->pipe.reset();
+    drain_thread = std::thread(
+        [reader = impl_->pipe.get(), on_output = impl_->on_output] {
+          std::string line;
+          while (reader->read_line(line)) {
+            if (!line.empty() && on_output) on_output(line);
+          }
+        });
   }
 
-  int code = impl_->proc->wait(60000);
-  if (impl_->proc->alive()) impl_->proc->terminate();
+  // Worker 2: send the Shutdown RPC. May block on a wedged host; force-kill
+  // below will close the socket and unblock it.
+  std::thread shutdown_thread(
+      [client = impl_->client.get(), save] {
+        try {
+          client->Shutdown(save ? ShutdownPolicy::kSave
+                                : ShutdownPolicy::kDiscard);
+        } catch (...) {
+          // RPC may legitimately fail (timeout, connection reset on
+          // force-kill); not our concern here.
+        }
+      });
+
+  // Wait for the child to exit on its own up to the remaining budget.
+  auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(
+      deadline - std::chrono::steady_clock::now()).count();
+  if (remaining < 1) remaining = 1;
+  int code = impl_->proc->wait(static_cast<unsigned long>(remaining));
+
+  bool force_killed = false;
+  if (impl_->proc->alive()) {
+    impl_->proc->terminate();
+    force_killed = true;
+    if (impl_->on_output) {
+      impl_->on_output(
+          "[libghidra] headless host did not exit within " +
+          std::to_string(timeout.count()) + "ms; force-killed");
+    }
+  }
+
+  // Both worker threads should now unblock: the drain via pipe EOF, the
+  // Shutdown RPC via socket close. Join them before tearing down impl_
+  // so the workers don't see freed memory.
+  if (drain_thread.joinable()) drain_thread.join();
+  if (shutdown_thread.joinable()) shutdown_thread.join();
+
+  impl_->pipe.reset();
 
   if (impl_->owns_project) {
     std::error_code ec;
     fs::remove_all(impl_->project_dir, ec);
   }
-  return code;
+  return force_killed ? -2 : code;
 }
 
 // ---------------------------------------------------------------------------

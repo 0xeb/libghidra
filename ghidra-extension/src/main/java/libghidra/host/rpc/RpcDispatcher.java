@@ -282,7 +282,11 @@ public final class RpcDispatcher {
 				protoRequest.getProjectName(),
 				protoRequest.getProgramPath(),
 				protoRequest.getAnalyze(),
-				protoRequest.getReadOnly()));
+				protoRequest.getReadOnly(),
+				protoRequest.getLanguageId(),
+				protoRequest.getCompilerSpecId(),
+				protoRequest.getFormat(),
+				protoRequest.getBaseAddress()));
 		libghidra.OpenProgramResponse proto = libghidra.OpenProgramResponse.newBuilder()
 			.setProgramName(nullable(response != null ? response.programName() : null))
 			.setLanguageId(nullable(response != null ? response.languageId() : null))

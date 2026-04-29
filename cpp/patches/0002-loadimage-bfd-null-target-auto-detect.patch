@@ -1,0 +1,19 @@
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage_bfd.cc	2026-04-24 20:49:16.432538100 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage_bfd.cc	2026-04-24 20:49:03.792305200 -0700
+@@ -75,7 +75,15 @@
+ 
+ {
+   if (thebfd != (bfd *)0) throw LowlevelError("BFD library did not initialize");
+-  thebfd = bfd_openr(filename.c_str(),target.c_str());
++  // libghidra patch: an empty target name should mean "let BFD auto-detect the
++  // file format". libbfd's bfd_openr treats "" as a literal target name lookup
++  // (which fails, returning NULL) but treats nullptr as the host's default
++  // target — which then lets bfd_check_format iterate every registered target
++  // and pick the right one from the file header. Without this, our BFD-side
++  // patch in bfd_arch.cc that passes "" for caller-supplied Sleigh ids would
++  // always fail with "Unable to open image file".
++  thebfd = bfd_openr(filename.c_str(),
++                     target.empty() ? (const char *)nullptr : target.c_str());
+   if (thebfd == (bfd *)0) {
+     string errmsg="Unable to open image file: ";
+     errmsg += filename;

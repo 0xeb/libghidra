@@ -12,11 +12,10 @@ Requires the _native extension module built from cpp/bindings/.
 
 from __future__ import annotations
 
-import struct
 from dataclasses import dataclass
-from typing import Optional
 
 from .errors import ErrorCode, GhidraError
+from .format_detect import UnsupportedFormatError, detect
 from .models import (
     BasicBlockRecord,
     Capability,
@@ -73,111 +72,12 @@ class LocalClientOptions:
     pool_size: int = 1
 
 
-# ---------------------------------------------------------------------------
-# Architecture auto-detection (pure stdlib, no optional deps)
-# ---------------------------------------------------------------------------
-
-# PE Machine → Sleigh language ID
-_PE_MACHINE_MAP = {
-    0x14c:  "x86:LE:32:default",
-    0x8664: "x86:LE:64:default",
-    0xaa64: "AARCH64:LE:64:v8A",
-    0x1c0:  "ARM:LE:32:v8",
-    0x1c4:  "ARM:LE:32:v8",      # Thumb
-}
-
-# ELF e_machine → (base_lang, bits_from_class)
-#   bits_from_class=True means 32/64 comes from EI_CLASS, not hardcoded
-_ELF_MACHINE_MAP = {
-    3:   ("x86",     True),    # EM_386
-    62:  ("x86",     True),    # EM_X86_64
-    40:  ("ARM",     False),   # EM_ARM (always 32)
-    183: ("AARCH64", False),   # EM_AARCH64 (always 64)
-    8:   ("MIPS",    True),    # EM_MIPS
-    20:  ("PowerPC", True),    # EM_PPC
-    243: ("RISCV",   True),    # EM_RISCV
-}
-
-_ELF_SLEIGH = {
-    ("x86",     32, "LE"): "x86:LE:32:default",
-    ("x86",     64, "LE"): "x86:LE:64:default",
-    ("ARM",     32, "LE"): "ARM:LE:32:v8",
-    ("ARM",     32, "BE"): "ARM:BE:32:v8",
-    ("AARCH64", 64, "LE"): "AARCH64:LE:64:v8A",
-    ("AARCH64", 64, "BE"): "AARCH64:BE:64:v8A",
-    ("MIPS",    32, "BE"): "MIPS:BE:32:default",
-    ("MIPS",    32, "LE"): "MIPS:LE:32:default",
-    ("MIPS",    64, "BE"): "MIPS:BE:64:default",
-    ("MIPS",    64, "LE"): "MIPS:LE:64:default",
-    ("PowerPC", 32, "BE"): "PowerPC:BE:32:default",
-    ("PowerPC", 64, "BE"): "PowerPC:BE:64:default",
-    ("RISCV",   32, "LE"): "RISCV:LE:32:default",
-    ("RISCV",   64, "LE"): "RISCV:LE:64:default",
-}
-
-# Mach-O cputype → Sleigh language ID
-_MACHO_CPU_MAP = {
-    7:          "x86:LE:32:default",       # CPU_TYPE_X86
-    0x01000007: "x86:LE:64:default",       # CPU_TYPE_X86_64
-    12:         "ARM:LE:32:v8",            # CPU_TYPE_ARM
-    0x0100000c: "AARCH64:LE:64:v8A",      # CPU_TYPE_ARM64
-}
-
-
 def detect_arch(filepath: str) -> str | None:
-    """Detect Sleigh language ID from binary file headers.
-
-    Supports PE, ELF, and Mach-O formats. Uses pure stdlib (struct module).
-    Returns None if the format is unrecognized.
-    """
+    """Compatibility wrapper returning only the detected Sleigh language ID."""
     try:
-        with open(filepath, "rb") as f:
-            magic = f.read(4)
-            if len(magic) < 4:
-                return None
-
-            # --- PE ---
-            if magic[:2] == b"MZ":
-                f.seek(0x3C)
-                pe_off_bytes = f.read(4)
-                if len(pe_off_bytes) < 4:
-                    return None
-                pe_offset = struct.unpack_from("<I", pe_off_bytes)[0]
-                f.seek(pe_offset)
-                pe_sig = f.read(4)
-                if pe_sig != b"PE\x00\x00":
-                    return None
-                machine = struct.unpack_from("<H", f.read(2))[0]
-                return _PE_MACHINE_MAP.get(machine)
-
-            # --- ELF ---
-            if magic == b"\x7fELF":
-                ei_class = f.read(1)[0]  # 1=32-bit, 2=64-bit
-                ei_data = f.read(1)[0]   # 1=LE, 2=BE
-                bits = 32 if ei_class == 1 else 64
-                endian = "LE" if ei_data == 1 else "BE"
-                bo = "<" if ei_data == 1 else ">"
-                f.seek(18)  # e_machine offset is the same for ELF32/ELF64
-                e_machine = struct.unpack_from(f"{bo}H", f.read(2))[0]
-                entry = _ELF_MACHINE_MAP.get(e_machine)
-                if entry is None:
-                    return None
-                base_lang, uses_class_bits = entry
-                if not uses_class_bits:
-                    # Fixed bitness (ARM=32, AARCH64=64)
-                    bits = 32 if base_lang == "ARM" else 64
-                return _ELF_SLEIGH.get((base_lang, bits, endian))
-
-            # --- Mach-O ---
-            macho_le = magic in (b"\xfe\xed\xfa\xce", b"\xfe\xed\xfa\xcf")
-            macho_be = magic in (b"\xce\xfa\xed\xfe", b"\xcf\xfa\xed\xfe")
-            if macho_le or macho_be:
-                bo = ">" if macho_le else "<"
-                cputype = struct.unpack_from(f"{bo}I", f.read(4))[0]
-                return _MACHO_CPU_MAP.get(cputype)
-
-    except (OSError, struct.error):
-        pass
+        return detect(filepath).language_id
+    except (OSError, UnsupportedFormatError):
+        return None
     return None
 
 
@@ -304,15 +204,11 @@ class LocalClient:
             request = OpenProgramRequest(program_path=request)
 
         # Auto-detect architecture from binary headers when needed
-        if self._auto_detect and request.program_path:
-            arch = detect_arch(request.program_path)
-            if arch:
-                self._client = _native.create_local_client(
-                    ghidra_root=self._opts.ghidra_root,
-                    state_path=self._opts.state_path,
-                    default_arch=arch,
-                    pool_size=self._opts.pool_size,
-                )
+        if self._auto_detect and request.program_path and not request.language_id:
+            detected = detect(request.program_path)
+            request.language_id = detected.language_id
+            if not request.compiler_spec_id:
+                request.compiler_spec_id = detected.compiler_spec_id
 
         d = self._call(
             self._client.open_program,
@@ -321,6 +217,10 @@ class LocalClient:
             read_only=request.read_only,
             project_path=request.project_path,
             project_name=request.project_name,
+            language_id=request.language_id,
+            compiler_spec_id=request.compiler_spec_id,
+            format=request.format,
+            base_address=request.base_address,
         )
         return OpenProgramResponse(**d)
 

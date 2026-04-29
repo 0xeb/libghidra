@@ -13,6 +13,7 @@ import argparse
 import os
 import sys
 import zlib
+import xml.etree.ElementTree as ET
 
 
 SPEC_EXTENSIONS = {'.sla', '.pspec', '.cspec', '.ldefs'}
@@ -56,6 +57,53 @@ def collect_spec_files(ghidra_src: str, processors: list[str] | None) -> list[tu
     return results
 
 
+def collect_language_index(specs: list[tuple[str, str]]) -> dict[str, tuple[str, ...]]:
+    """Build a language -> compiler IDs index from collected .ldefs files."""
+    languages = {}
+    for abs_path, rel_path in specs:
+        if not rel_path.lower().endswith('.ldefs'):
+            continue
+        try:
+            tree = ET.parse(abs_path)
+        except ET.ParseError as e:
+            print(f"WARNING: failed to parse {rel_path}: {e}", file=sys.stderr)
+            continue
+        for lang in tree.getroot().findall('language'):
+            lang_id = lang.attrib.get('id')
+            if not lang_id:
+                continue
+            compilers = sorted({
+                c.attrib.get('id', '')
+                for c in lang.findall('compiler')
+                if c.attrib.get('id')
+            })
+            languages[lang_id] = tuple(compilers)
+    return languages
+
+
+def write_python_language_index(languages: dict[str, tuple[str, ...]], output_path: str):
+    """Write libghidra.known_languages as a small importable Python module."""
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write('# Copyright (c) 2024-2026 Elias Bachaalany\n')
+        f.write('# SPDX-License-Identifier: MPL-2.0\n')
+        f.write('#\n')
+        f.write('# This Source Code Form is subject to the terms of the Mozilla Public\n')
+        f.write('# License, v. 2.0. If a copy of the MPL was not distributed with this\n')
+        f.write('# file, You can obtain one at https://mozilla.org/MPL/2.0/.\n\n')
+        f.write('"""Known Ghidra language and compiler IDs embedded with libghidra."""\n\n')
+        f.write('from __future__ import annotations\n\n')
+        f.write('# Generated from Ghidra processor *.ldefs files by cpp/embed_specs.py.\n')
+        f.write('LANGUAGE_COMPILERS: dict[str, tuple[str, ...]] = {\n')
+        for lang_id in sorted(languages):
+            compilers = ', '.join(repr(c) for c in languages[lang_id])
+            if compilers:
+                compilers += ','
+            f.write(f'    {lang_id!r}: ({compilers}),\n')
+        f.write('}\n\n')
+        f.write('LANGUAGE_IDS: frozenset[str] = frozenset(LANGUAGE_COMPILERS)\n')
+
+
 def format_byte_array(data: bytes, line_width: int = 16) -> str:
     """Format raw bytes as a C initializer list."""
     lines = []
@@ -66,31 +114,80 @@ def format_byte_array(data: bytes, line_width: int = 16) -> str:
     return '\n'.join(lines)
 
 
-def generate(ghidra_src: str, output_dir: str, processors: list[str] | None):
+def generate(
+    ghidra_src: str,
+    output_dir: str,
+    processors: list[str] | None,
+    python_output: str | None = None,
+):
     specs = collect_spec_files(ghidra_src, processors)
     if not specs:
         print("WARNING: No spec files found!", file=sys.stderr)
+    language_index = collect_language_index(specs)
 
     os.makedirs(output_dir, exist_ok=True)
 
     cpp_path = os.path.join(output_dir, 'embedded_specs.cpp')
     h_path = os.path.join(output_dir, 'embedded_specs.h')
+    fp_path = os.path.join(output_dir, 'embedded_specs.fingerprint')
 
-    # --- Staleness check: skip regeneration if outputs are newer than all inputs ---
-    if os.path.isfile(cpp_path) and os.path.isfile(h_path):
-        output_mtime = min(os.path.getmtime(cpp_path), os.path.getmtime(h_path))
-        script_mtime = os.path.getmtime(__file__)
-        newest_input = script_mtime
-        for abs_path, _ in specs:
-            t = os.path.getmtime(abs_path)
-            if t > newest_input:
-                newest_input = t
-        if newest_input < output_mtime:
-            print(f"Embedded specs up-to-date ({len(specs)} files), skipping generation.")
-            return
+    # Fingerprint the input SET (sorted rel_path + file size). Catches the
+    # case where compiled .sla grammars are overlaid into the source tree
+    # from a Ghidra release ZIP — rsync/cp preserve the ZIP's original
+    # mtimes, so a pure mtime check sees newest_input < output_mtime and
+    # treats the cache as fresh, even though 133 new .sla files just
+    # appeared in the input set. The fingerprint changes whenever any
+    # input is added, removed, or resized.
+    import hashlib as _hashlib
+    fp_hasher = _hashlib.sha256()
+    for abs_path, rel_path in sorted(specs, key=lambda item: item[1]):
+        fp_hasher.update(rel_path.encode('utf-8'))
+        fp_hasher.update(b'\0')
+        fp_hasher.update(str(os.path.getsize(abs_path)).encode('ascii'))
+        fp_hasher.update(b'\n')
+    current_fp = fp_hasher.hexdigest()
 
+    # --- Staleness check: skip regeneration if outputs match ---
+    if (
+        os.path.isfile(cpp_path)
+        and os.path.isfile(h_path)
+        and os.path.isfile(fp_path)
+    ):
+        try:
+            cached_fp = open(fp_path).read().strip()
+        except OSError:
+            cached_fp = ''
+        if cached_fp == current_fp:
+            output_mtime = min(os.path.getmtime(cpp_path), os.path.getmtime(h_path))
+            script_mtime = os.path.getmtime(__file__)
+            newest_input = script_mtime
+            for abs_path, _ in specs:
+                t = os.path.getmtime(abs_path)
+                if t > newest_input:
+                    newest_input = t
+            if newest_input < output_mtime:
+                if python_output:
+                    write_python_language_index(language_index, python_output)
+                print(f"Embedded specs up-to-date ({len(specs)} files), skipping generation.")
+                return
+
+    import hashlib
     total_original = 0
     total_compressed = 0
+    # Compute a content-derived version key. Used by ghidra_cpp_init.cpp as
+    # the per-build cache subdirectory name so that pip-upgrading to a wheel
+    # whose embedded specs changed will invalidate ~/.ghidracpp/cache/sleigh
+    # entries automatically. Hashing the (rel_path, raw bytes) pairs sorted
+    # by rel_path guarantees the digest is identical iff the inputs are.
+    digest = hashlib.sha256()
+    for abs_path, rel_path in sorted(specs, key=lambda p: p[1]):
+        with open(abs_path, 'rb') as sf:
+            raw = sf.read()
+        digest.update(rel_path.encode('utf-8'))
+        digest.update(b'\0')
+        digest.update(len(raw).to_bytes(8, 'little'))
+        digest.update(raw)
+    version_key = digest.hexdigest()[:16]
 
     # --- Generate .cpp ---
     with open(cpp_path, 'w') as f:
@@ -119,6 +216,7 @@ def generate(ghidra_src: str, output_dir: str, processors: list[str] | None):
             f.write(f'    {{ "{rel_path}", {var_name}, {comp_size}, {orig_size} }},\n')
         f.write('};\n\n')
         f.write(f'const int g_embedded_spec_count = {len(specs)};\n\n')
+        f.write(f'const char* const g_embedded_specs_version = "{version_key}";\n\n')
         f.write('} // namespace ghidra_embedded\n')
 
     # --- Generate .h ---
@@ -134,15 +232,31 @@ def generate(ghidra_src: str, output_dir: str, processors: list[str] | None):
         f.write('    size_t original_size;\n')
         f.write('};\n\n')
         f.write('extern const EmbeddedSpec g_embedded_specs[];\n')
-        f.write('extern const int g_embedded_spec_count;\n\n')
+        f.write('extern const int g_embedded_spec_count;\n')
+        f.write('// 16-hex-char SHA-256 prefix of the embedded payload, content-derived.\n')
+        f.write('// ghidra_cpp_init uses this as the cache version key so that wheel\n')
+        f.write('// upgrades that change the spec contents force a fresh extraction.\n')
+        f.write('extern const char* const g_embedded_specs_version;\n\n')
         f.write('} // namespace ghidra_embedded\n')
+
+    # Persist the input-set fingerprint so the next run knows whether to
+    # skip regeneration. Without this, adding a new .sla file with an
+    # older mtime (rsync from a Ghidra release ZIP) silently leaves the
+    # cached output untouched even though the input set changed.
+    with open(fp_path, 'w') as f:
+        f.write(current_fp)
 
     ratio = (1.0 - total_compressed / total_original) * 100 if total_original else 0
     print(f"Generated {len(specs)} embedded specs")
+    print(f"  Languages:  {len(language_index):,}")
     print(f"  Original:   {total_original:,} bytes")
     print(f"  Compressed: {total_compressed:,} bytes ({ratio:.1f}% reduction)")
     print(f"  {cpp_path}")
     print(f"  {h_path}")
+    print(f"  {fp_path}")
+    if python_output:
+        write_python_language_index(language_index, python_output)
+        print(f"  {python_output}")
 
 
 def main():
@@ -151,13 +265,15 @@ def main():
     parser.add_argument('output_dir', help='Directory for generated files')
     parser.add_argument('--processors', default=None,
                         help='Comma-separated processor names to include (default: all)')
+    parser.add_argument('--python-output', default=None,
+                        help='Optional path for generated libghidra/known_languages.py')
     args = parser.parse_args()
 
     procs = None
     if args.processors and args.processors.upper() != 'ALL':
         procs = [p.strip() for p in args.processors.split(',') if p.strip()]
 
-    generate(args.ghidra_source_dir, args.output_dir, procs)
+    generate(args.ghidra_source_dir, args.output_dir, procs, args.python_output)
 
 
 if __name__ == '__main__':

@@ -82,7 +82,18 @@ class HeadlessClient {
   int wait();
 
   /// Shut down the host, wait, and clean up.
-  int close(bool save = true);
+  ///
+  /// The Shutdown RPC and the output-pipe drain are issued in detached
+  /// worker threads so a wedged Java host can't block close() indefinitely.
+  /// If the child process has not exited within `timeout`, it is
+  /// force-killed via TerminateProcess / SIGTERM. A force-kill is reported
+  /// as exit code -2 (distinguishable from a clean -1 timeout).
+  ///
+  /// Default timeout is 60 seconds, which is long enough for a healthy
+  /// save+exit on a normal program. Pass a smaller value for tests or a
+  /// larger value when expecting very long save flushes.
+  int close(bool save = true,
+            std::chrono::milliseconds timeout = std::chrono::seconds(60));
 
  private:
   friend HeadlessClient LaunchHeadless(HeadlessOptions);

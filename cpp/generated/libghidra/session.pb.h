@@ -1211,6 +1211,10 @@ class OpenProgramRequest final : public ::google::protobuf::Message
     kProjectPathFieldNumber = 1,
     kProjectNameFieldNumber = 2,
     kProgramPathFieldNumber = 3,
+    kLanguageIdFieldNumber = 6,
+    kCompilerSpecIdFieldNumber = 7,
+    kFormatFieldNumber = 8,
+    kBaseAddressFieldNumber = 9,
     kAnalyzeFieldNumber = 4,
     kReadOnlyFieldNumber = 5,
   };
@@ -1262,6 +1266,64 @@ class OpenProgramRequest final : public ::google::protobuf::Message
   std::string* _internal_mutable_program_path();
 
   public:
+  // string language_id = 6;
+  void clear_language_id() ;
+  const std::string& language_id() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_language_id(Arg_&& arg, Args_... args);
+  std::string* mutable_language_id();
+  PROTOBUF_NODISCARD std::string* release_language_id();
+  void set_allocated_language_id(std::string* value);
+
+  private:
+  const std::string& _internal_language_id() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_language_id(
+      const std::string& value);
+  std::string* _internal_mutable_language_id();
+
+  public:
+  // string compiler_spec_id = 7;
+  void clear_compiler_spec_id() ;
+  const std::string& compiler_spec_id() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_compiler_spec_id(Arg_&& arg, Args_... args);
+  std::string* mutable_compiler_spec_id();
+  PROTOBUF_NODISCARD std::string* release_compiler_spec_id();
+  void set_allocated_compiler_spec_id(std::string* value);
+
+  private:
+  const std::string& _internal_compiler_spec_id() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_compiler_spec_id(
+      const std::string& value);
+  std::string* _internal_mutable_compiler_spec_id();
+
+  public:
+  // string format = 8;
+  void clear_format() ;
+  const std::string& format() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_format(Arg_&& arg, Args_... args);
+  std::string* mutable_format();
+  PROTOBUF_NODISCARD std::string* release_format();
+  void set_allocated_format(std::string* value);
+
+  private:
+  const std::string& _internal_format() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_format(
+      const std::string& value);
+  std::string* _internal_mutable_format();
+
+  public:
+  // uint64 base_address = 9;
+  void clear_base_address() ;
+  ::uint64_t base_address() const;
+  void set_base_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_base_address() const;
+  void _internal_set_base_address(::uint64_t value);
+
+  public:
   // bool analyze = 4;
   void clear_analyze() ;
   bool analyze() const;
@@ -1287,8 +1349,8 @@ class OpenProgramRequest final : public ::google::protobuf::Message
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 5, 0,
-      73, 2>
+      4, 9, 0,
+      114, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -1308,6 +1370,10 @@ class OpenProgramRequest final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr project_path_;
     ::google::protobuf::internal::ArenaStringPtr project_name_;
     ::google::protobuf::internal::ArenaStringPtr program_path_;
+    ::google::protobuf::internal::ArenaStringPtr language_id_;
+    ::google::protobuf::internal::ArenaStringPtr compiler_spec_id_;
+    ::google::protobuf::internal::ArenaStringPtr format_;
+    ::uint64_t base_address_;
     bool analyze_;
     bool read_only_;
     ::google::protobuf::internal::CachedSize _cached_size_;
@@ -2569,6 +2635,172 @@ inline bool OpenProgramRequest::_internal_read_only() const {
 inline void OpenProgramRequest::_internal_set_read_only(bool value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.read_only_ = value;
+}
+
+// string language_id = 6;
+inline void OpenProgramRequest::clear_language_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.language_id_.ClearToEmpty();
+}
+inline const std::string& OpenProgramRequest::language_id() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.OpenProgramRequest.language_id)
+  return _internal_language_id();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void OpenProgramRequest::set_language_id(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.language_id_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.OpenProgramRequest.language_id)
+}
+inline std::string* OpenProgramRequest::mutable_language_id() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_language_id();
+  // @@protoc_insertion_point(field_mutable:libghidra.OpenProgramRequest.language_id)
+  return _s;
+}
+inline const std::string& OpenProgramRequest::_internal_language_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.language_id_.Get();
+}
+inline void OpenProgramRequest::_internal_set_language_id(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.language_id_.Set(value, GetArena());
+}
+inline std::string* OpenProgramRequest::_internal_mutable_language_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.language_id_.Mutable( GetArena());
+}
+inline std::string* OpenProgramRequest::release_language_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.OpenProgramRequest.language_id)
+  return _impl_.language_id_.Release();
+}
+inline void OpenProgramRequest::set_allocated_language_id(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.language_id_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.language_id_.IsDefault()) {
+    _impl_.language_id_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.OpenProgramRequest.language_id)
+}
+
+// string compiler_spec_id = 7;
+inline void OpenProgramRequest::clear_compiler_spec_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.compiler_spec_id_.ClearToEmpty();
+}
+inline const std::string& OpenProgramRequest::compiler_spec_id() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.OpenProgramRequest.compiler_spec_id)
+  return _internal_compiler_spec_id();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void OpenProgramRequest::set_compiler_spec_id(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.compiler_spec_id_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.OpenProgramRequest.compiler_spec_id)
+}
+inline std::string* OpenProgramRequest::mutable_compiler_spec_id() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_compiler_spec_id();
+  // @@protoc_insertion_point(field_mutable:libghidra.OpenProgramRequest.compiler_spec_id)
+  return _s;
+}
+inline const std::string& OpenProgramRequest::_internal_compiler_spec_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.compiler_spec_id_.Get();
+}
+inline void OpenProgramRequest::_internal_set_compiler_spec_id(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.compiler_spec_id_.Set(value, GetArena());
+}
+inline std::string* OpenProgramRequest::_internal_mutable_compiler_spec_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.compiler_spec_id_.Mutable( GetArena());
+}
+inline std::string* OpenProgramRequest::release_compiler_spec_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.OpenProgramRequest.compiler_spec_id)
+  return _impl_.compiler_spec_id_.Release();
+}
+inline void OpenProgramRequest::set_allocated_compiler_spec_id(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.compiler_spec_id_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.compiler_spec_id_.IsDefault()) {
+    _impl_.compiler_spec_id_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.OpenProgramRequest.compiler_spec_id)
+}
+
+// string format = 8;
+inline void OpenProgramRequest::clear_format() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.format_.ClearToEmpty();
+}
+inline const std::string& OpenProgramRequest::format() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.OpenProgramRequest.format)
+  return _internal_format();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void OpenProgramRequest::set_format(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.format_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.OpenProgramRequest.format)
+}
+inline std::string* OpenProgramRequest::mutable_format() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_format();
+  // @@protoc_insertion_point(field_mutable:libghidra.OpenProgramRequest.format)
+  return _s;
+}
+inline const std::string& OpenProgramRequest::_internal_format() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.format_.Get();
+}
+inline void OpenProgramRequest::_internal_set_format(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.format_.Set(value, GetArena());
+}
+inline std::string* OpenProgramRequest::_internal_mutable_format() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.format_.Mutable( GetArena());
+}
+inline std::string* OpenProgramRequest::release_format() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.OpenProgramRequest.format)
+  return _impl_.format_.Release();
+}
+inline void OpenProgramRequest::set_allocated_format(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.format_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.format_.IsDefault()) {
+    _impl_.format_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.OpenProgramRequest.format)
+}
+
+// uint64 base_address = 9;
+inline void OpenProgramRequest::clear_base_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.base_address_ = ::uint64_t{0u};
+}
+inline ::uint64_t OpenProgramRequest::base_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.OpenProgramRequest.base_address)
+  return _internal_base_address();
+}
+inline void OpenProgramRequest::set_base_address(::uint64_t value) {
+  _internal_set_base_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.OpenProgramRequest.base_address)
+}
+inline ::uint64_t OpenProgramRequest::_internal_base_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.base_address_;
+}
+inline void OpenProgramRequest::_internal_set_base_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.base_address_ = value;
 }
 
 // -------------------------------------------------------------------

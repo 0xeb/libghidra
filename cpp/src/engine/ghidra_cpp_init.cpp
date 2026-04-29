@@ -117,40 +117,20 @@ std::string getUserCacheDir() {
 }
 
 // ---------------------------------------------------------------------------
-// Version key: hex of the exe/dll modification time.
-// If the consumer rebuilds (picking up new embedded specs), the key changes
-// and the next run gets a fresh cache automatically.
+// Version key: 16-hex-char SHA-256 prefix of the embedded-specs payload,
+// computed at build time by embed_specs.py and emitted into embedded_specs.cpp
+// as g_embedded_specs_version. Hashing the payload (not /proc/self/exe or
+// GetModuleFileNameA(NULL,...)) means the cache invalidates iff the *embedded
+// content* actually changed — pip-upgrading to a wheel with the same specs
+// reuses the cache, while a rebuild that picks up updated Sleigh data forces
+// a fresh extraction. Previously this hashed python.exe's mtime (because
+// GetModuleFileNameA(NULL, ...) returns the host process path on Windows),
+// which never changed across libghidra wheel upgrades and led to stale spec
+// caches.
 // ---------------------------------------------------------------------------
 
 std::string getVersionKey() {
-#ifdef _WIN32
-    char exe_path[MAX_PATH + 1];
-    DWORD len = GetModuleFileNameA(NULL, exe_path, sizeof(exe_path));
-    if (len == 0 || len >= sizeof(exe_path))
-        return "unknown";
-    WIN32_FILE_ATTRIBUTE_DATA attr;
-    if (!GetFileAttributesExA(exe_path, GetFileExInfoStandard, &attr))
-        return "unknown";
-    // Combine high and low parts of last-write time into a single 64-bit hex
-    unsigned long long ft =
-        ((unsigned long long)attr.ftLastWriteTime.dwHighDateTime << 32) |
-        attr.ftLastWriteTime.dwLowDateTime;
-    char buf[32];
-    snprintf(buf, sizeof(buf), "%016llx", ft);
-    return buf;
-#else
-    char exe_path[4096];
-    ssize_t n = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
-    if (n <= 0)
-        return "unknown";
-    exe_path[n] = '\0';
-    struct stat st;
-    if (stat(exe_path, &st) != 0)
-        return "unknown";
-    char buf[32];
-    snprintf(buf, sizeof(buf), "%016lx", (unsigned long)st.st_mtime);
-    return buf;
-#endif
+    return std::string(g_embedded_specs_version);
 }
 
 // ---------------------------------------------------------------------------

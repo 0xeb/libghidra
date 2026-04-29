@@ -15,8 +15,13 @@ public final class HealthRuntime extends RuntimeSupport implements HealthOperati
 	public HealthContract.HealthStatusResponse getHealthStatus(
 			HealthContract.HealthStatusRequest request) {
 		List<String> warnings = new ArrayList<>();
-		boolean ok = currentProgram() != null;
-		if (!ok) {
+		boolean closing = state.isClosing();
+		boolean hasProgram = currentProgram() != null;
+		boolean ok = hasProgram && !closing;
+		if (closing) {
+			warnings.add("host is closing or switching programs");
+		}
+		else if (!hasProgram) {
 			warnings.add("no active program bound");
 		}
 		else {

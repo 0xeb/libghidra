@@ -90,6 +90,11 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		state.unbindProgram(program);
 	}
 
+	public boolean tryBeginUnbindProgram(Program program, long timeoutMillis)
+			throws InterruptedException {
+		return state.tryBeginUnbindProgram(program, timeoutMillis);
+	}
+
 	public void releaseOwnedProgram() {
 		try (LockScope ignored = writeLock()) {
 			releaseOwnedProgramLocked();

@@ -1,23 +1,78 @@
 [package]
-name = "libghidra-client"
-version = "0.0.1"
+name = "libghidra"
+version = "0.0.2"
 edition = "2021"
+# Distribution model mirrors the Python wheel: not published to crates.io;
+# users add a git dep or `cargo binstall` from the GitHub Releases page.
+# See `[package.metadata.binstall]` below for the release URL template.
 publish = false
 license = "MPL-2.0"
+description = "Ghidra decompiler client: live (HTTP/RPC) and local (offline, embedded engine) backends"
+repository = "https://github.com/0xeb/libghidra"
+homepage = "https://github.com/0xeb/libghidra"
+readme = "README.md"
+keywords = ["ghidra", "decompiler", "reverse-engineering", "disassembly"]
+categories = ["api-bindings", "development-tools"]
+
+# cargo-binstall metadata: when users `cargo binstall libghidra`, look for
+# a prebuilt local-mode archive on the GitHub Release for this version.
+# The archive contains the C++ engine static libs + headers; the user's
+# build.rs picks it up via LIBGHIDRA_PREBUILT_DIR (set automatically by
+# the binstall hook when extracted). Releases-only distribution — the
+# crate is intentionally NOT published to crates.io (mirrors Python wheel).
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/libghidra-local-{ version }-{ target }.{ archive-format }"
+pkg-fmt = "tgz"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-fmt = "zip"
+[package.metadata.binstall.overrides.aarch64-pc-windows-msvc]
+pkg-fmt = "zip"
 
 [lib]
 name = "libghidra"
 
+# ---------------------------------------------------------------------------
+# Features
+#
+#   live  (default) — HTTP/RPC backend that talks to a running Ghidra Desktop
+#                     with the libghidra extension installed (or to a headless
+#                     instance launched via `launch_headless`).
+#   local           — Offline backend: links the C++ libghidra engine + its
+#                     embedded Sleigh specs via a cxx FFI bridge. No Ghidra
+#                     install required at runtime. Pulls in a C++ build (or
+#                     a prebuilt archive when one is available for the target).
+#   all             — both `live` and `local`.
+#
+# `cargo add libghidra`                          → live only
+# `cargo add libghidra --features local`         → live + local
+# `cargo add libghidra --no-default-features --features local` → local only
+# ---------------------------------------------------------------------------
+[features]
+default = ["live"]
+live = []
+local = ["dep:cxx", "dep:serde", "dep:serde_json"]
+all = ["live", "local"]
+
 [dependencies]
+# Live (HTTP) backend
 prost = "0.13"
 prost-types = "0.13"
 ureq = "3"
 thiserror = "2"
 rand = "0.9"
 
+# Local (offline) backend — pulled in by the `local` feature only.
+cxx = { version = "1", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+serde_json = { version = "1", optional = true }
+
 [build-dependencies]
 prost-build = "0.13"
 protoc-bin-vendored = "3"
+# cxx-build is always present as a build-dep but only invoked when the
+# `local` feature is enabled (build.rs checks CARGO_FEATURE_LOCAL).
+cxx-build = "1"
 
 [[example]]
 name = "quickstart"
