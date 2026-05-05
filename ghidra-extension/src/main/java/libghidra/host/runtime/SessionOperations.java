@@ -4,6 +4,15 @@ import libghidra.host.contract.SessionContract;
 
 public interface SessionOperations {
 
+	SessionContract.OpenProjectResponse openProject(SessionContract.OpenProjectRequest request);
+
+	SessionContract.CloseProjectResponse closeProject(SessionContract.CloseProjectRequest request);
+
+	SessionContract.ListProjectFilesResponse listProjectFiles(
+		SessionContract.ListProjectFilesRequest request);
+
+	SessionContract.ImportProgramResponse importProgram(SessionContract.ImportProgramRequest request);
+
 	SessionContract.OpenProgramResponse openProgram(SessionContract.OpenProgramRequest request);
 
 	SessionContract.CloseProgramResponse closeProgram(SessionContract.CloseProgramRequest request);

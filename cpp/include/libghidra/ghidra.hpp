@@ -53,6 +53,9 @@ inline HeadlessClient launch_headless(HeadlessOptions opts) {
 using ConnectOptions = libghidra::client::HttpClientOptions;
 using LocalOptions = libghidra::client::LocalClientOptions;
 using OpenRequest = libghidra::client::OpenProgramRequest;
+using OpenProjectRequest = libghidra::client::OpenProjectRequest;
+using ListProjectFilesRequest = libghidra::client::ListProjectFilesRequest;
+using ImportProgramRequest = libghidra::client::ImportProgramRequest;
 
 // --- Enums ---
 using ShutdownPolicy = libghidra::client::ShutdownPolicy;
@@ -69,6 +72,7 @@ using Xref = libghidra::client::XrefRecord;
 using Type = libghidra::client::TypeRecord;
 using Comment = libghidra::client::CommentRecord;
 using MemoryBlock = libghidra::client::MemoryBlockRecord;
+using ProjectFile = libghidra::client::ProjectFile;
 using BasicBlock = libghidra::client::BasicBlockRecord;
 using CFGEdge = libghidra::client::CFGEdgeRecord;
 using DataItem = libghidra::client::DataItemRecord;

@@ -4,11 +4,18 @@
 //   -postScript LibGhidraHeadlessServer.java bind=127.0.0.1 port=18080 shutdown=save
 //   -postScript LibGhidraHeadlessServer.java --bind 127.0.0.1 --port 18080 --auth token --shutdown discard --max_runtime_ms 600000
 //   -postScript LibGhidraHeadlessServer.java --bind 127.0.0.1 --port 18080 --bind_attempts 10 --bind_retry_initial_ms 100 --bind_retry_max_ms 1000
+//   -postScript LibGhidraHeadlessServer.java --initial_program /loader.elf --program_paths /loader.elf;/payload.elf
 //
 // @category libghidra
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import ghidra.app.util.importer.ProgramLoader;
+import ghidra.app.util.opinion.LoadResults;
+import ghidra.app.util.opinion.Loaded;
 import ghidra.app.script.GhidraScript;
 import ghidra.framework.model.DomainFile;
 import ghidra.framework.model.Project;
@@ -45,9 +52,6 @@ public class LibGhidraHeadlessServer extends GhidraScript {
 			bindRetryInitialMs,
 			HeadlessScriptArgs.parseLong(args.get("bind_retry_max_ms"), 1000L));
 		long startedAt = System.currentTimeMillis();
-		String programPath = HeadlessScriptArgs.valueOrDefault(
-			args.get("program_path"),
-			ManagedProgramSupport.inferProgramPath(ambientProgram));
 		Project project = state != null ? state.getProject() : null;
 		ProjectData projectData = project != null ? project.getProjectData() : null;
 		if (projectData == null) {
@@ -59,11 +63,34 @@ public class LibGhidraHeadlessServer extends GhidraScript {
 		String projectName = projectData.getProjectLocator() != null
 				? projectData.getProjectLocator().getName()
 				: "";
-		DomainFile programFile = projectData.getFile(programPath);
+		List<String> importedPrograms = importStartupBinaries(
+			project,
+			combinedList(args, "binary_paths", "binary_path", "LIBGHIDRA_BINARY_PATHS"));
+		List<String> declaredPrograms =
+			combinedList(args, "program_paths", "program_path", "LIBGHIDRA_PROGRAM_PATHS");
+		declaredPrograms.addAll(importedPrograms);
+		for (String declaredProgram : declaredPrograms) {
+			String normalized = ManagedProgramSupport.normalizeProgramPath(declaredProgram);
+			if (!normalized.isBlank() && projectData.getFile(normalized) == null) {
+				throw new IllegalArgumentException("program not found in project: " + normalized);
+			}
+		}
+		String initialProgram = HeadlessScriptArgs.valueOrDefault(
+			args.get("initial_program"),
+			System.getenv("LIBGHIDRA_INITIAL_PROGRAM"));
+		String programPath = HeadlessScriptArgs.valueOrDefault(
+			initialProgram,
+			HeadlessScriptArgs.valueOrDefault(
+				args.get("program_path"),
+				!declaredPrograms.isEmpty()
+						? declaredPrograms.get(0)
+						: ManagedProgramSupport.inferProgramPath(ambientProgram)));
+		String normalizedProgramPath = ManagedProgramSupport.normalizeProgramPath(programPath);
+		DomainFile programFile = projectData.getFile(normalizedProgramPath);
 		if (programFile == null &&
 			ambientProgram.getDomainFile() != null &&
 			ManagedProgramSupport.inferProgramPath(ambientProgram).equals(
-				ManagedProgramSupport.normalizeProgramPath(programPath))) {
+				normalizedProgramPath)) {
 			programFile = ambientProgram.getDomainFile();
 		}
 		Program program = ManagedProgramSupport.openDomainFile(
@@ -77,13 +104,13 @@ public class LibGhidraHeadlessServer extends GhidraScript {
 
 		LibGhidraHeadlessHost host =
 			new LibGhidraHeadlessHost(
-				projectData,
+				project,
 				this,
 				monitor,
 				projectPath,
 				projectName,
 				program,
-				programPath,
+				normalizedProgramPath,
 				bind,
 				port,
 				auth,
@@ -118,5 +145,43 @@ public class LibGhidraHeadlessServer extends GhidraScript {
 			println("LIBGHIDRA_HEADLESS_LIFECYCLE shutdown_policy=" + host.getShutdownPolicyName());
 			println("LIBGHIDRA_HEADLESS_EXIT");
 		}
+	}
+
+	private List<String> combinedList(
+			Map<String, String> args,
+			String pluralKey,
+			String singularKey,
+			String envKey) {
+		List<String> out = new ArrayList<>();
+		out.addAll(HeadlessScriptArgs.listValue(args, pluralKey, envKey));
+		out.addAll(HeadlessScriptArgs.listValue(args, singularKey, null));
+		return out;
+	}
+
+	private List<String> importStartupBinaries(Project project, List<String> binaryPaths) throws Exception {
+		List<String> imported = new ArrayList<>();
+		for (String binaryPath : binaryPaths) {
+			File source = new File(binaryPath);
+			if (!source.isFile()) {
+				throw new IllegalArgumentException("startup binary not found: " + binaryPath);
+			}
+			try (LoadResults<Program> results = ProgramLoader.builder()
+					.source(source)
+					.project(project)
+					.monitor(monitor)
+					.load()) {
+				for (Loaded<Program> loaded : results) {
+					Program loadedProgram = loaded.getDomainObject(this);
+					try {
+						DomainFile saved = loaded.save(monitor);
+						imported.add(ManagedProgramSupport.normalizeProgramPath(saved.getPathname()));
+					}
+					finally {
+						loadedProgram.release(this);
+					}
+				}
+			}
+		}
+		return imported;
 	}
 }

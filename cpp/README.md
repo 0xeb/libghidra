@@ -85,6 +85,16 @@ Common error codes:
 
 ## Session
 
+Live `HttpClient`/headless sessions also expose project lifecycle helpers:
+`OpenProject`, `CloseProject`, `ListProjectFiles`, and `ImportProgram`.
+Those methods are intentionally `NOT_SUPPORTED` by `LocalClient`, because the
+offline backend loads one program database rather than a full Ghidra project.
+
+For live project workflows, list or import project programs first, then switch
+the active program with `CloseProgram(ShutdownPolicy::kSave)` followed by
+`OpenProgram({.project_path = ..., .project_name = ..., .program_path = "/domain/path"})`.
+See `examples/list_project_files.cpp` and `examples/switch_active_program.cpp`.
+
 ### OpenProgram
 
 ```cpp
@@ -141,11 +151,12 @@ Discards all unsaved mutations since last save.
 StatusOr<RevisionResponse> GetRevision()
 ```
 
-Returns current revision counter. Increments on each mutation (rename, type creation, etc.).
+Returns native freshness metadata for the current Ghidra program. `modification_number` is Ghidra's own `Program.getModificationNumber()` value, while `program_id` and path/file metadata disambiguate program switches.
 
 ```cpp
 auto rev = client->GetRevision();
-uint64_t n = rev.value->revision;  // e.g. 0, 1, 2, ...
+uint64_t id = rev.value->program_id;
+uint64_t n = rev.value->modification_number;
 ```
 
 ### GetStatus
@@ -161,7 +172,7 @@ auto s = client->GetStatus();
 // s.value->service_name     -- "libghidra-local"
 // s.value->service_version  -- version string
 // s.value->host_mode        -- "local"
-// s.value->program_revision -- current revision
+// s.value->modification_number -- native Ghidra modification number
 ```
 
 ### GetCapabilities

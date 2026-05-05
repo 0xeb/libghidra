@@ -232,7 +232,6 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			try {
 				Address address = toAddress(program, request.address());
 				program.getListing().setComment(address, type, request.text());
-				bumpRevision();
 				commit = true;
 				return new ListingContract.SetCommentResponse(true, "", "");
 			}
@@ -279,7 +278,6 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 							Long.toHexString(request.address()));
 				}
 				program.getListing().setComment(address, type, null);
-				bumpRevision();
 				commit = true;
 				return new ListingContract.DeleteCommentResponse(true, "", "");
 			}
@@ -327,7 +325,6 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				else {
 					symbolTable.createLabel(address, newName, SourceType.USER_DEFINED);
 				}
-				bumpRevision();
 				commit = true;
 				return new ListingContract.RenameDataItemResponse(true, newName);
 			}
@@ -359,7 +356,6 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					return new ListingContract.DeleteDataItemResponse(false);
 				}
 				listing.clearCodeUnits(address, data.getMaxAddress(), false);
-				bumpRevision();
 				commit = true;
 				return new ListingContract.DeleteDataItemResponse(true);
 			}
@@ -539,7 +535,6 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					type,
 					category,
 					request.comment() != null ? request.comment() : "");
-				bumpRevision();
 				commit = true;
 				return new ListingContract.AddBookmarkResponse(true);
 			}
@@ -579,7 +574,6 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					return new ListingContract.DeleteBookmarkResponse(false);
 				}
 				manager.removeBookmark(bookmark);
-				bumpRevision();
 				commit = true;
 				return new ListingContract.DeleteBookmarkResponse(true);
 			}
@@ -700,7 +694,6 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				row.condition = nullableString(request.condition());
 				row.group = nullableString(request.group()).trim();
 				BreakpointBookmarkStore.upsert(manager, address, row);
-				bumpRevision();
 				commit = true;
 				return new ListingContract.AddBreakpointResponse(true);
 			}
@@ -832,7 +825,6 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				}
 				boolean removed = BreakpointBookmarkStore.removeAt(manager, address);
 				if (removed) {
-					bumpRevision();
 					commit = true;
 				}
 				return new ListingContract.DeleteBreakpointResponse(removed);
@@ -943,7 +935,6 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				return false;
 			}
 			BreakpointBookmarkStore.upsert(manager, address, row);
-			bumpRevision();
 			commit = true;
 			return true;
 		}

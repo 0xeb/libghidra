@@ -52,10 +52,10 @@ public interface HealthStatusResponseOrBuilder extends
       getHostModeBytes();
 
   /**
-   * <code>uint64 program_revision = 5;</code>
-   * @return The programRevision.
+   * <code>uint64 modification_number = 5;</code>
+   * @return The modificationNumber.
    */
-  long getProgramRevision();
+  long getModificationNumber();
 
   /**
    * <code>repeated string warnings = 6;</code>

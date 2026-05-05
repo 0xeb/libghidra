@@ -3,6 +3,7 @@ package libghidra.host.runtime;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Program;
 
 public final class HostState {
@@ -11,12 +12,10 @@ public final class HostState {
 	private volatile Program currentProgram;
 	private volatile String currentProgramPath;
 	private volatile String hostMode;
-	private volatile long revision;
 	private volatile boolean closing;
 
 	public HostState(String initialHostMode) {
 		hostMode = normalizeHostMode(initialHostMode);
-		revision = 1L;
 	}
 
 	public LockScope readLock() {
@@ -50,7 +49,6 @@ public final class HostState {
 			currentProgramPath = ManagedProgramSupport.normalizeProgramPath(programPath);
 			hostMode = normalizeHostMode(mode);
 			closing = false;
-			revision++;
 		}
 		finally {
 			stateLock.writeLock().unlock();
@@ -96,16 +94,37 @@ public final class HostState {
 		return currentProgramPath != null ? currentProgramPath : "";
 	}
 
-	public long getRevision() {
-		return revision;
+	public long getProgramId() {
+		Program program = currentProgram;
+		return program != null ? program.getUniqueProgramID() : 0L;
+	}
+
+	public long getModificationNumber() {
+		Program program = currentProgram;
+		return program != null ? program.getModificationNumber() : 0L;
+	}
+
+	public String getFileId() {
+		DomainFile file = currentDomainFile();
+		if (file == null) {
+			return "";
+		}
+		String id = file.getFileID();
+		return id != null ? id : "";
+	}
+
+	public int getFileVersion() {
+		DomainFile file = currentDomainFile();
+		return file != null ? file.getVersion() : 0;
+	}
+
+	public long getFileLastModifiedTime() {
+		DomainFile file = currentDomainFile();
+		return file != null ? file.getLastModifiedTime() : 0L;
 	}
 
 	public boolean isClosing() {
 		return closing;
-	}
-
-	public void bumpRevision() {
-		revision++;
 	}
 
 	private void unbindProgramLocked(Program program) {
@@ -114,7 +133,14 @@ public final class HostState {
 		}
 		currentProgram = null;
 		currentProgramPath = "";
-		revision++;
+	}
+
+	private DomainFile currentDomainFile() {
+		Program program = currentProgram;
+		if (program != null) {
+			return program.getDomainFile();
+		}
+		return null;
 	}
 
 	private void throwIfClosing() {

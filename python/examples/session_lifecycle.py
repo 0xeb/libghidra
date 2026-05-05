@@ -32,7 +32,7 @@ def main() -> None:
 
     print(f"  Service:  {status.service_name} v{status.service_version}")
     print(f"  Mode:     {status.host_mode}")
-    print(f"  Revision: {status.program_revision}")
+    print(f"  Revision: {status.modification_number}")
     print(f"  OK:       {status.ok}")
     if status.warnings:
         for w in status.warnings:
@@ -52,7 +52,7 @@ def main() -> None:
     print("\n--- Current revision ---")
     try:
         rev_resp = client.get_revision()
-        rev_before = rev_resp.revision
+        rev_before = rev_resp.modification_number
         print(f"  Revision: {rev_before}")
     except ghidra.GhidraError as e:
         print(f"GetRevision failed: {e}", file=sys.stderr)
@@ -87,7 +87,7 @@ def main() -> None:
     print("\n--- Revision after mutation ---")
     try:
         rev_resp = client.get_revision()
-        rev_after = rev_resp.revision
+        rev_after = rev_resp.modification_number
         print(f"  Revision before: {rev_before}")
         print(f"  Revision after:  {rev_after}")
         print(f"  Changed: {rev_after != rev_before}")

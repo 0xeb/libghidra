@@ -89,10 +89,10 @@ Check host health and program state.
 ```python
 status = client.get_status()
 print(f"{status.service_name} v{status.service_version}")
-print(f"Mode: {status.host_mode}, revision: {status.program_revision}")
+print(f"Mode: {status.host_mode}, modification: {status.modification_number}")
 ```
 
-**Returns:** `HealthStatus` with fields `ok: bool`, `service_name: str`, `service_version: str`, `host_mode: str`, `program_revision: int`, `warnings: list[str]`.
+**Returns:** `HealthStatus` with fields `ok: bool`, `service_name: str`, `service_version: str`, `host_mode: str`, `modification_number: int`, `warnings: list[str]`.
 
 ### `get_capabilities() -> list[Capability]`
 
@@ -157,11 +157,11 @@ assert resp.discarded
 
 ### `get_revision() -> RevisionResponse`
 
-Get the current program revision number. Increments on each mutation.
+Get native freshness metadata for the current Ghidra program.
 
 ```python
 rev = client.get_revision()
-print(f"Revision: {rev.revision}")
+print(f"Program: {rev.program_id}, modification: {rev.modification_number}")
 ```
 
 ### `shutdown(policy=ShutdownPolicy.UNSPECIFIED) -> ShutdownResponse`

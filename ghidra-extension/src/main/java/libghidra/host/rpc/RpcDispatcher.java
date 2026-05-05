@@ -41,6 +41,14 @@ public final class RpcDispatcher {
 					return healthGetStatus(request);
 				case "libghidra.HealthService/GetCapabilities":
 					return healthGetCapabilities(request);
+				case "libghidra.SessionService/OpenProject":
+					return sessionOpenProject(request);
+				case "libghidra.SessionService/CloseProject":
+					return sessionCloseProject(request);
+				case "libghidra.SessionService/ListProjectFiles":
+					return sessionListProjectFiles(request);
+				case "libghidra.SessionService/ImportProgram":
+					return sessionImportProgram(request);
 				case "libghidra.SessionService/OpenProgram":
 					return sessionOpenProgram(request);
 				case "libghidra.SessionService/CloseProgram":
@@ -243,10 +251,10 @@ public final class RpcDispatcher {
 			.setServiceName(nullable(response != null ? response.serviceName() : null))
 			.setServiceVersion(nullable(response != null ? response.serviceVersion() : null))
 			.setHostMode(nullable(response != null ? response.hostMode() : null))
-			.setProgramRevision(response != null ? response.programRevision() : 0L)
+			.setModificationNumber(response != null ? response.modificationNumber() : 0L)
 			.addAllWarnings(copyStrings(response != null ? response.warnings() : null))
 			.build();
-		return ok(proto, proto.getProgramRevision());
+		return ok(proto, proto.getModificationNumber());
 	}
 
 	private libghidra.RpcResponse healthGetCapabilities(libghidra.RpcRequest request)
@@ -267,6 +275,97 @@ public final class RpcDispatcher {
 					.setNote(nullable(cap.note()))
 					.build());
 			}
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private libghidra.RpcResponse sessionOpenProject(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.OpenProjectRequest protoRequest = unpackPayload(request,
+			libghidra.OpenProjectRequest.class,
+			libghidra.OpenProjectRequest.getDefaultInstance());
+		SessionContract.OpenProjectResponse response = callbacks.openProject(
+			new SessionContract.OpenProjectRequest(
+				protoRequest.getProjectPath(),
+				protoRequest.getProjectName(),
+				protoRequest.getCreate(),
+				protoRequest.getReadOnly()));
+		libghidra.OpenProjectResponse proto = libghidra.OpenProjectResponse.newBuilder()
+			.setProjectPath(nullable(response != null ? response.projectPath() : null))
+			.setProjectName(nullable(response != null ? response.projectName() : null))
+			.setCreated(response != null && response.created())
+			.build();
+		return ok(proto, 0L);
+	}
+
+	private libghidra.RpcResponse sessionCloseProject(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.CloseProjectRequest protoRequest = unpackPayload(request,
+			libghidra.CloseProjectRequest.class,
+			libghidra.CloseProjectRequest.getDefaultInstance());
+		SessionContract.CloseProjectResponse response = callbacks.closeProject(
+			new SessionContract.CloseProjectRequest(
+				toPolicy(protoRequest.getShutdownPolicy())));
+		libghidra.CloseProjectResponse proto = libghidra.CloseProjectResponse.newBuilder()
+			.setClosed(response != null && response.closed())
+			.build();
+		return ok(proto, 0L);
+	}
+
+	private libghidra.RpcResponse sessionListProjectFiles(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.ListProjectFilesRequest protoRequest = unpackPayload(request,
+			libghidra.ListProjectFilesRequest.class,
+			libghidra.ListProjectFilesRequest.getDefaultInstance());
+		SessionContract.ListProjectFilesResponse response = callbacks.listProjectFiles(
+			new SessionContract.ListProjectFilesRequest(
+				protoRequest.getIncludeFolders(),
+				protoRequest.getProgramsOnly()));
+		libghidra.ListProjectFilesResponse.Builder out =
+			libghidra.ListProjectFilesResponse.newBuilder();
+		if (response != null && response.files() != null) {
+			for (SessionContract.ProjectFile file : response.files()) {
+				if (file == null) {
+					continue;
+				}
+				out.addFiles(libghidra.ProjectFile.newBuilder()
+					.setPath(nullable(file.path()))
+					.setName(nullable(file.name()))
+					.setFolderPath(nullable(file.folderPath()))
+					.setContentType(nullable(file.contentType()))
+					.setDomainObjectClass(nullable(file.domainObjectClass()))
+					.setIsFolder(file.isFolder())
+					.setIsProgram(file.isProgram())
+					.build());
+			}
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private libghidra.RpcResponse sessionImportProgram(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.ImportProgramRequest protoRequest = unpackPayload(request,
+			libghidra.ImportProgramRequest.class,
+			libghidra.ImportProgramRequest.getDefaultInstance());
+		List<SessionContract.LoaderArg> loaderArgs = new ArrayList<>();
+		for (libghidra.LoaderArg arg : protoRequest.getLoaderArgsList()) {
+			loaderArgs.add(new SessionContract.LoaderArg(arg.getName(), arg.getValue()));
+		}
+		SessionContract.ImportProgramResponse response = callbacks.importProgram(
+			new SessionContract.ImportProgramRequest(
+				protoRequest.getSourcePath(),
+				protoRequest.getProjectFolderPath(),
+				protoRequest.getProgramName(),
+				protoRequest.getOverwrite(),
+				protoRequest.getAnalyze(),
+				protoRequest.getLanguageId(),
+				protoRequest.getCompilerSpecId(),
+				protoRequest.getLoaderClass(),
+				loaderArgs));
+		libghidra.ImportProgramResponse.Builder out = libghidra.ImportProgramResponse.newBuilder()
+			.setPrimaryProgramPath(nullable(response != null ? response.primaryProgramPath() : null));
+		if (response != null && response.programPaths() != null) {
+			out.addAllProgramPaths(copyStrings(response.programPaths()));
 		}
 		return ok(out.build(), 0L);
 	}
@@ -343,11 +442,16 @@ public final class RpcDispatcher {
 			libghidra.GetRevisionRequest.getDefaultInstance());
 		SessionContract.GetRevisionResponse response = callbacks.getRevision(
 			new SessionContract.GetRevisionRequest());
-		long revision = response != null ? response.revision() : 0L;
+		long modificationNumber = response != null ? response.modificationNumber() : 0L;
 		libghidra.GetRevisionResponse proto = libghidra.GetRevisionResponse.newBuilder()
-			.setRevision(revision)
+			.setProgramId(response != null ? response.programId() : 0L)
+			.setModificationNumber(modificationNumber)
+			.setProgramPath(nullable(response != null ? response.programPath() : null))
+			.setFileId(nullable(response != null ? response.fileId() : null))
+			.setFileVersion(response != null ? response.fileVersion() : 0)
+			.setFileLastModifiedTime(response != null ? response.fileLastModifiedTime() : 0L)
 			.build();
-		return ok(proto, revision);
+		return ok(proto, modificationNumber);
 	}
 
 	private libghidra.RpcResponse sessionShutdown(libghidra.RpcRequest request)

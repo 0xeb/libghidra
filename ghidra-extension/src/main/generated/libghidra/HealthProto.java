@@ -27,27 +27,27 @@ public final class HealthProto {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_HealthStatusRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_HealthStatusRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_HealthStatusResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_HealthStatusResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_CapabilityRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_CapabilityRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_Capability_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_Capability_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_CapabilityResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_CapabilityResponse_fieldAccessorTable;
 
@@ -60,20 +60,20 @@ public final class HealthProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\026libghidra/health.proto\022\tlibghidra\"\025\n\023H" +
-      "ealthStatusRequest\"\220\001\n\024HealthStatusRespo" +
+      "ealthStatusRequest\"\223\001\n\024HealthStatusRespo" +
       "nse\022\n\n\002ok\030\001 \001(\010\022\024\n\014service_name\030\002 \001(\t\022\027\n" +
       "\017service_version\030\003 \001(\t\022\021\n\thost_mode\030\004 \001(" +
-      "\t\022\030\n\020program_revision\030\005 \001(\004\022\020\n\010warnings\030" +
-      "\006 \003(\t\"\023\n\021CapabilityRequest\"6\n\nCapability" +
-      "\022\n\n\002id\030\001 \001(\t\022\016\n\006status\030\002 \001(\t\022\014\n\004note\030\003 \001" +
-      "(\t\"A\n\022CapabilityResponse\022+\n\014capabilities" +
-      "\030\001 \003(\0132\025.libghidra.Capability2\255\001\n\rHealth" +
-      "Service\022L\n\tGetStatus\022\036.libghidra.HealthS" +
-      "tatusRequest\032\037.libghidra.HealthStatusRes" +
-      "ponse\022N\n\017GetCapabilities\022\034.libghidra.Cap" +
-      "abilityRequest\032\035.libghidra.CapabilityRes" +
-      "ponseB\032\n\tlibghidraB\013HealthProtoP\001b\006proto" +
-      "3"
+      "\t\022\033\n\023modification_number\030\005 \001(\004\022\020\n\010warnin" +
+      "gs\030\006 \003(\t\"\023\n\021CapabilityRequest\"6\n\nCapabil" +
+      "ity\022\n\n\002id\030\001 \001(\t\022\016\n\006status\030\002 \001(\t\022\014\n\004note\030" +
+      "\003 \001(\t\"A\n\022CapabilityResponse\022+\n\014capabilit" +
+      "ies\030\001 \003(\0132\025.libghidra.Capability2\255\001\n\rHea" +
+      "lthService\022L\n\tGetStatus\022\036.libghidra.Heal" +
+      "thStatusRequest\032\037.libghidra.HealthStatus" +
+      "Response\022N\n\017GetCapabilities\022\034.libghidra." +
+      "CapabilityRequest\032\035.libghidra.Capability" +
+      "ResponseB\032\n\tlibghidraB\013HealthProtoP\001b\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -90,7 +90,7 @@ public final class HealthProto {
     internal_static_libghidra_HealthStatusResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_HealthStatusResponse_descriptor,
-        new java.lang.String[] { "Ok", "ServiceName", "ServiceVersion", "HostMode", "ProgramRevision", "Warnings", });
+        new java.lang.String[] { "Ok", "ServiceName", "ServiceVersion", "HostMode", "ModificationNumber", "Warnings", });
     internal_static_libghidra_CapabilityRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_libghidra_CapabilityRequest_fieldAccessorTable = new

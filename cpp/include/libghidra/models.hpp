@@ -41,7 +41,7 @@ struct HealthStatus {
   std::string service_name;
   std::string service_version;
   std::string host_mode;
-  std::uint64_t program_revision = 0;
+  std::uint64_t modification_number = 0;
   std::vector<std::string> warnings;
 };
 
@@ -50,6 +50,35 @@ struct OpenProgramResponse {
   std::string language_id;
   std::string compiler_spec;
   std::uint64_t image_base = 0;
+};
+
+struct OpenProjectResponse {
+  std::string project_path;
+  std::string project_name;
+  bool created = false;
+};
+
+struct CloseProjectResponse {
+  bool closed = false;
+};
+
+struct ProjectFile {
+  std::string path;
+  std::string name;
+  std::string folder_path;
+  std::string content_type;
+  std::string domain_object_class;
+  bool is_folder = false;
+  bool is_program = false;
+};
+
+struct ListProjectFilesResponse {
+  std::vector<ProjectFile> files;
+};
+
+struct ImportProgramResponse {
+  std::vector<std::string> program_paths;
+  std::string primary_program_path;
 };
 
 struct CloseProgramResponse {
@@ -65,7 +94,12 @@ struct DiscardProgramResponse {
 };
 
 struct RevisionResponse {
-  std::uint64_t revision = 0;
+  std::uint64_t program_id = 0;
+  std::uint64_t modification_number = 0;
+  std::string program_path;
+  std::string file_id;
+  std::int32_t file_version = 0;
+  std::int64_t file_last_modified_time = 0;
 };
 
 struct ShutdownResponse {

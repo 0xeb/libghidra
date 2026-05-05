@@ -50,7 +50,14 @@ from .models import (
     DominatorRecord as Dominator,
     PostDominatorRecord as PostDominator,
     LoopRecord as Loop,
+    ImportProgramRequest,
+    ImportProgramResponse,
+    ListProjectFilesRequest,
+    ListProjectFilesResponse,
     OpenProgramRequest as OpenRequest,
+    OpenProjectRequest,
+    OpenProjectResponse,
+    ProjectFile,
 )
 
 
@@ -134,6 +141,13 @@ __all__ = [
     "Dominator",
     "PostDominator",
     "Loop",
+    "ImportProgramRequest",
+    "ImportProgramResponse",
+    "ListProjectFilesRequest",
+    "ListProjectFilesResponse",
     "DecompileTokenKind",
     "OpenRequest",
+    "OpenProjectRequest",
+    "OpenProjectResponse",
+    "ProjectFile",
 ]

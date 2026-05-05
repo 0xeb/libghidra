@@ -201,7 +201,7 @@ impl GhidraClient {
             service_name: resp.service_name,
             service_version: resp.service_version,
             host_mode: resp.host_mode,
-            program_revision: resp.program_revision,
+            modification_number: resp.modification_number,
             warnings: resp.warnings,
         })
     }
@@ -216,6 +216,87 @@ impl GhidraClient {
     }
 
     // -- Session --------------------------------------------------------------
+
+    pub fn open_project(&self, request: &OpenProjectRequest) -> Result<OpenProjectResponse> {
+        let req = pb::OpenProjectRequest {
+            project_path: request.project_path.clone(),
+            project_name: request.project_name.clone(),
+            create: request.create,
+            read_only: request.read_only,
+        };
+        let resp: pb::OpenProjectResponse = self.call_rpc(
+            "libghidra.SessionService/OpenProject",
+            &req,
+            "libghidra.OpenProjectRequest",
+        )?;
+        Ok(OpenProjectResponse {
+            project_path: resp.project_path,
+            project_name: resp.project_name,
+            created: resp.created,
+        })
+    }
+
+    pub fn close_project(&self, policy: ShutdownPolicy) -> Result<CloseProjectResponse> {
+        let req = pb::CloseProjectRequest {
+            shutdown_policy: i32::from(policy),
+        };
+        let resp: pb::CloseProjectResponse = self.call_rpc(
+            "libghidra.SessionService/CloseProject",
+            &req,
+            "libghidra.CloseProjectRequest",
+        )?;
+        Ok(CloseProjectResponse {
+            closed: resp.closed,
+        })
+    }
+
+    pub fn list_project_files(
+        &self,
+        request: &ListProjectFilesRequest,
+    ) -> Result<ListProjectFilesResponse> {
+        let req = pb::ListProjectFilesRequest {
+            include_folders: request.include_folders,
+            programs_only: request.programs_only,
+        };
+        let resp: pb::ListProjectFilesResponse = self.call_rpc(
+            "libghidra.SessionService/ListProjectFiles",
+            &req,
+            "libghidra.ListProjectFilesRequest",
+        )?;
+        Ok(ListProjectFilesResponse {
+            files: resp.files.into_iter().map(Into::into).collect(),
+        })
+    }
+
+    pub fn import_program(&self, request: &ImportProgramRequest) -> Result<ImportProgramResponse> {
+        let req = pb::ImportProgramRequest {
+            source_path: request.source_path.clone(),
+            project_folder_path: request.project_folder_path.clone(),
+            program_name: request.program_name.clone(),
+            overwrite: request.overwrite,
+            analyze: request.analyze,
+            language_id: request.language_id.clone(),
+            compiler_spec_id: request.compiler_spec_id.clone(),
+            loader_class: request.loader_class.clone(),
+            loader_args: request
+                .loader_args
+                .iter()
+                .map(|arg| pb::LoaderArg {
+                    name: arg.name.clone(),
+                    value: arg.value.clone(),
+                })
+                .collect(),
+        };
+        let resp: pb::ImportProgramResponse = self.call_rpc(
+            "libghidra.SessionService/ImportProgram",
+            &req,
+            "libghidra.ImportProgramRequest",
+        )?;
+        Ok(ImportProgramResponse {
+            program_paths: resp.program_paths,
+            primary_program_path: resp.primary_program_path,
+        })
+    }
 
     pub fn open_program(&self, request: &OpenProgramRequest) -> Result<OpenProgramResponse> {
         let req = pb::OpenProgramRequest {
@@ -287,7 +368,12 @@ impl GhidraClient {
             "libghidra.GetRevisionRequest",
         )?;
         Ok(RevisionResponse {
-            revision: resp.revision,
+            program_id: resp.program_id,
+            modification_number: resp.modification_number,
+            program_path: resp.program_path,
+            file_id: resp.file_id,
+            file_version: resp.file_version,
+            file_last_modified_time: resp.file_last_modified_time,
         })
     }
 

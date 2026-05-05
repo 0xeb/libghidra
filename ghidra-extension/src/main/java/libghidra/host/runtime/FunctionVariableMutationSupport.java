@@ -7,9 +7,13 @@ import ghidra.app.decompiler.DecompileResults;
 import ghidra.program.model.data.DataType;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
+import ghidra.program.model.listing.VariableStorage;
 import ghidra.program.model.pcode.HighFunction;
 import ghidra.program.model.pcode.HighFunctionDBUtil;
 import ghidra.program.model.pcode.HighSymbol;
+import ghidra.program.model.pcode.HighVariable;
+import ghidra.program.model.pcode.PcodeException;
+import ghidra.program.model.pcode.Varnode;
 import ghidra.program.model.symbol.SourceType;
 import ghidra.util.Msg;
 import ghidra.util.exception.DuplicateNameException;
@@ -19,6 +23,69 @@ import ghidra.util.task.TaskMonitor;
 final class FunctionVariableMutationSupport {
 
 	private FunctionVariableMutationSupport() {
+	}
+
+	private static HighSymbol splitMergedHighVariable(HighSymbol symbol) throws PcodeException {
+		if (symbol == null) {
+			return null;
+		}
+		HighVariable highVariable = symbol.getHighVariable();
+		if (highVariable == null) {
+			return symbol;
+		}
+		Varnode exactSpot = chooseExactVarnode(symbol, highVariable);
+		if (exactSpot == null) {
+			return symbol;
+		}
+		HighVariable exactHigh = exactSpot.getHigh();
+		if (exactHigh == null) {
+			exactHigh = highVariable;
+		}
+		HighVariable split = symbol.getHighFunction().splitOutMergeGroup(exactHigh, exactSpot);
+		return split != null && split.getSymbol() != null ? split.getSymbol() : symbol;
+	}
+
+	private static Varnode chooseExactVarnode(HighSymbol symbol, HighVariable highVariable) {
+		VariableStorage storage = symbol.getStorage();
+		Varnode storageVarnode = null;
+		if (storage != null &&
+				!storage.isBadStorage() &&
+				!storage.isUnassignedStorage() &&
+				!storage.isVoidStorage()) {
+			storageVarnode = storage.getFirstVarnode();
+		}
+		if (storageVarnode != null) {
+			for (Varnode instance : highVariable.getInstances()) {
+				if (instance != null &&
+						instance.getSize() == storageVarnode.getSize() &&
+						instance.getAddress().equals(storageVarnode.getAddress())) {
+					return instance;
+				}
+			}
+		}
+		return highVariable.getRepresentative();
+	}
+
+	static boolean hasUsableMutationStorage(VariableStorage storage) {
+		return storage != null &&
+			!storage.isBadStorage() &&
+			!storage.isUnassignedStorage() &&
+			!storage.isVoidStorage();
+	}
+
+	private static void requireUsableMutationStorage(HighSymbol symbol, String localId)
+			throws InvalidInputException {
+		requireUsableMutationStorage(symbol != null ? symbol.getStorage() : null, localId);
+	}
+
+	static void requireUsableMutationStorage(VariableStorage storage, String localId)
+			throws InvalidInputException {
+		if (hasUsableMutationStorage(storage)) {
+			return;
+		}
+		String id = localId == null || localId.isBlank() ? "<unknown>" : localId;
+		throw new InvalidInputException(
+			"local '" + id + "' has no concrete storage; decompiler local mutation was not applied");
 	}
 
 	static boolean decompileAndRenameHighVariable(
@@ -48,23 +115,11 @@ final class FunctionVariableMutationSupport {
 			while (iter.hasNext()) {
 				HighSymbol sym = iter.next();
 				if (FunctionSupport.matchesLocalId(function, sym, localId)) {
-					if (sym.getStorage().isStackStorage()) {
-						// For stack variables, use the StackFrame API directly.
-						// updateDBVariable + addLocalVariable can silently fail for stack locals
-						// in some cases; the stack frame API is the authoritative path for
-						// stack variable creation/rename.
-						int stackOffset = (int) sym.getStorage().getStackOffset();
-						ghidra.program.model.listing.Variable existing =
-							function.getStackFrame().getVariableContaining(stackOffset);
-						if (existing != null) {
-							existing.setName(newName, SourceType.USER_DEFINED);
-						} else {
-							function.getStackFrame().createVariable(newName, stackOffset,
-								sym.getDataType(), SourceType.USER_DEFINED);
-						}
-					} else {
-						HighFunctionDBUtil.updateDBVariable(sym, newName, null, SourceType.USER_DEFINED);
+					if (!sym.isNameLocked()) {
+						sym = splitMergedHighVariable(sym);
 					}
+					requireUsableMutationStorage(sym, localId);
+					HighFunctionDBUtil.updateDBVariable(sym, newName, null, SourceType.USER_DEFINED);
 					return true;
 				}
 			}
@@ -112,19 +167,9 @@ final class FunctionVariableMutationSupport {
 			while (iter.hasNext()) {
 				HighSymbol sym = iter.next();
 				if (FunctionSupport.matchesLocalId(function, sym, localId)) {
-					if (sym.getStorage().isStackStorage()) {
-						int stackOffset = (int) sym.getStorage().getStackOffset();
-						ghidra.program.model.listing.Variable existing =
-							function.getStackFrame().getVariableContaining(stackOffset);
-						if (existing != null) {
-							existing.setDataType(dataType, SourceType.USER_DEFINED);
-						} else {
-							function.getStackFrame().createVariable(sym.getName(), stackOffset,
-								dataType, SourceType.USER_DEFINED);
-						}
-					} else {
-						HighFunctionDBUtil.updateDBVariable(sym, null, dataType, SourceType.USER_DEFINED);
-					}
+					sym = splitMergedHighVariable(sym);
+					requireUsableMutationStorage(sym, localId);
+					HighFunctionDBUtil.updateDBVariable(sym, null, dataType, SourceType.USER_DEFINED);
 					return dataType.getPathName();
 				}
 			}

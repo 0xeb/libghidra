@@ -68,8 +68,75 @@ pub struct HealthStatus {
     pub service_name: String,
     pub service_version: String,
     pub host_mode: String,
-    pub program_revision: u64,
+    pub modification_number: u64,
     pub warnings: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct OpenProjectRequest {
+    pub project_path: String,
+    pub project_name: String,
+    pub create: bool,
+    pub read_only: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct OpenProjectResponse {
+    pub project_path: String,
+    pub project_name: String,
+    pub created: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CloseProjectResponse {
+    pub closed: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ProjectFile {
+    pub path: String,
+    pub name: String,
+    pub folder_path: String,
+    pub content_type: String,
+    pub domain_object_class: String,
+    pub is_folder: bool,
+    pub is_program: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ListProjectFilesRequest {
+    pub include_folders: bool,
+    pub programs_only: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ListProjectFilesResponse {
+    pub files: Vec<ProjectFile>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct LoaderArg {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ImportProgramRequest {
+    pub source_path: String,
+    pub project_folder_path: String,
+    pub program_name: String,
+    pub overwrite: bool,
+    pub analyze: bool,
+    pub language_id: String,
+    pub compiler_spec_id: String,
+    pub loader_class: String,
+    pub loader_args: Vec<LoaderArg>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ImportProgramResponse {
+    pub program_paths: Vec<String>,
+    pub primary_program_path: String,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -110,7 +177,12 @@ pub struct DiscardProgramResponse {
 
 #[derive(Debug, Clone, Default)]
 pub struct RevisionResponse {
-    pub revision: u64,
+    pub program_id: u64,
+    pub modification_number: u64,
+    pub program_path: String,
+    pub file_id: String,
+    pub file_version: i32,
+    pub file_last_modified_time: i64,
 }
 
 #[derive(Debug, Clone, Default)]

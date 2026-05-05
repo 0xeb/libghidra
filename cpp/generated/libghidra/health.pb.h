@@ -231,7 +231,7 @@ class HealthStatusResponse final : public ::google::protobuf::Message
     kServiceNameFieldNumber = 2,
     kServiceVersionFieldNumber = 3,
     kHostModeFieldNumber = 4,
-    kProgramRevisionFieldNumber = 5,
+    kModificationNumberFieldNumber = 5,
     kOkFieldNumber = 1,
   };
   // repeated string warnings = 6;
@@ -304,14 +304,14 @@ class HealthStatusResponse final : public ::google::protobuf::Message
   std::string* _internal_mutable_host_mode();
 
   public:
-  // uint64 program_revision = 5;
-  void clear_program_revision() ;
-  ::uint64_t program_revision() const;
-  void set_program_revision(::uint64_t value);
+  // uint64 modification_number = 5;
+  void clear_modification_number() ;
+  ::uint64_t modification_number() const;
+  void set_modification_number(::uint64_t value);
 
   private:
-  ::uint64_t _internal_program_revision() const;
-  void _internal_set_program_revision(::uint64_t value);
+  ::uint64_t _internal_modification_number() const;
+  void _internal_set_modification_number(::uint64_t value);
 
   public:
   // bool ok = 1;
@@ -351,7 +351,7 @@ class HealthStatusResponse final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr service_name_;
     ::google::protobuf::internal::ArenaStringPtr service_version_;
     ::google::protobuf::internal::ArenaStringPtr host_mode_;
-    ::uint64_t program_revision_;
+    ::uint64_t modification_number_;
     bool ok_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
@@ -1265,26 +1265,26 @@ inline void HealthStatusResponse::set_allocated_host_mode(std::string* value) {
   // @@protoc_insertion_point(field_set_allocated:libghidra.HealthStatusResponse.host_mode)
 }
 
-// uint64 program_revision = 5;
-inline void HealthStatusResponse::clear_program_revision() {
+// uint64 modification_number = 5;
+inline void HealthStatusResponse::clear_modification_number() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.program_revision_ = ::uint64_t{0u};
+  _impl_.modification_number_ = ::uint64_t{0u};
 }
-inline ::uint64_t HealthStatusResponse::program_revision() const {
-  // @@protoc_insertion_point(field_get:libghidra.HealthStatusResponse.program_revision)
-  return _internal_program_revision();
+inline ::uint64_t HealthStatusResponse::modification_number() const {
+  // @@protoc_insertion_point(field_get:libghidra.HealthStatusResponse.modification_number)
+  return _internal_modification_number();
 }
-inline void HealthStatusResponse::set_program_revision(::uint64_t value) {
-  _internal_set_program_revision(value);
-  // @@protoc_insertion_point(field_set:libghidra.HealthStatusResponse.program_revision)
+inline void HealthStatusResponse::set_modification_number(::uint64_t value) {
+  _internal_set_modification_number(value);
+  // @@protoc_insertion_point(field_set:libghidra.HealthStatusResponse.modification_number)
 }
-inline ::uint64_t HealthStatusResponse::_internal_program_revision() const {
+inline ::uint64_t HealthStatusResponse::_internal_modification_number() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.program_revision_;
+  return _impl_.modification_number_;
 }
-inline void HealthStatusResponse::_internal_set_program_revision(::uint64_t value) {
+inline void HealthStatusResponse::_internal_set_modification_number(::uint64_t value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.program_revision_ = value;
+  _impl_.modification_number_ = value;
 }
 
 // repeated string warnings = 6;

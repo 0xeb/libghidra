@@ -1,6 +1,6 @@
 [package]
 name = "libghidra"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
 # Distribution model mirrors the Python wheel: not published to crates.io;
 # users add a git dep or `cargo binstall` from the GitHub Releases page.

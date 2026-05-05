@@ -60,6 +60,38 @@ print(dec.decompilation.pseudocode)
 client.close_program()
 ```
 
+## Project Files
+
+Live/headless hosts expose Ghidra project contents separately from the active
+program. A project can contain many programs, while the normal query/mutation
+methods operate on exactly one active program.
+
+```python
+import libghidra as ghidra
+
+with ghidra.launch_headless(ghidra.HeadlessOptions(
+    ghidra_dir="C:/ghidra_dist/ghidra_12.1_DEV",
+    project_dir="C:/work/projects",
+    project_name="firmware",
+    binary="C:/samples/loader.elf",
+    binaries=["C:/samples/payload.elf"],
+    initial_program="/loader.elf",
+)) as host:
+    files = host.list_project_files(ghidra.ListProjectFilesRequest(programs_only=True))
+    for item in files.files:
+        print(item.path)
+
+    host.close_program(ghidra.ShutdownPolicy.SAVE)
+    host.open_program(ghidra.OpenRequest(
+        project_path="C:/work/projects",
+        project_name="firmware",
+        program_path="/payload.elf",
+    ))
+```
+
+Use absolute Ghidra domain paths (`/folder/name`) for project programs. See
+[`examples/project_files.py`](examples/project_files.py) for a runnable version.
+
 ## Async Usage
 
 ```python
@@ -140,6 +172,7 @@ See [`examples/`](examples/) for the full set of Python scripts.
 | [`function_signatures.py`](examples/function_signatures.py) | Signatures, parameter mutation, prototype override |
 | [`cfg_analysis.py`](examples/cfg_analysis.py) | Basic blocks and CFG edges |
 | [`session_lifecycle.py`](examples/session_lifecycle.py) | Status, capabilities, revision, save/discard |
+| [`project_files.py`](examples/project_files.py) | List project programs and switch active program |
 | [`async_explore.py`](examples/async_explore.py) | AsyncGhidraClient with `asyncio` |
 | [`decompile_tokens.py`](examples/decompile_tokens.py) | Pseudocode token records and local metadata |
 | [`end_to_end.py`](examples/end_to_end.py) | Launch headless Ghidra, analyze, enumerate functions/blocks/decompilation, save, shutdown |
@@ -157,7 +190,7 @@ host operations but does not expose every newer helper method yet.
 | Area | Methods |
 |------|---------|
 | Health | `get_status`, `get_capabilities` |
-| Session | `open_program`, `close_program`, `save_program`, `discard_program`, `get_revision`, `shutdown` |
+| Session | `open_project`, `close_project`, `list_project_files`, `import_program`, `open_program`, `close_program`, `save_program`, `discard_program`, `get_revision`, `shutdown` |
 | Memory | `read_bytes`, `write_bytes`, `patch_bytes_batch`, `list_memory_blocks` |
 | Functions | `get_function`, `list_functions`, `rename_function`, `list_basic_blocks`, `list_cfg_edges`, `list_switch_tables`, `list_dominators`, `list_post_dominators`, `list_loops`, `list_function_tags`, `create_function_tag`, `delete_function_tag`, `list_function_tag_mappings`, `tag_function`, `untag_function` |
 | Symbols | `get_symbol`, `list_symbols`, `rename_symbol`, `delete_symbol` |

@@ -73,8 +73,75 @@ class HealthStatus:
     service_name: str = ""
     service_version: str = ""
     host_mode: str = ""
-    program_revision: int = 0
+    modification_number: int = 0
     warnings: list[str] = field(default_factory=list)
+
+
+@dataclass
+class OpenProjectRequest:
+    project_path: str = ""
+    project_name: str = ""
+    create: bool = False
+    read_only: bool = False
+
+
+@dataclass
+class OpenProjectResponse:
+    project_path: str = ""
+    project_name: str = ""
+    created: bool = False
+
+
+@dataclass
+class CloseProjectResponse:
+    closed: bool = False
+
+
+@dataclass
+class ProjectFile:
+    path: str = ""
+    name: str = ""
+    folder_path: str = ""
+    content_type: str = ""
+    domain_object_class: str = ""
+    is_folder: bool = False
+    is_program: bool = False
+
+
+@dataclass
+class ListProjectFilesRequest:
+    include_folders: bool = False
+    programs_only: bool = False
+
+
+@dataclass
+class ListProjectFilesResponse:
+    files: list[ProjectFile] = field(default_factory=list)
+
+
+@dataclass
+class LoaderArg:
+    name: str = ""
+    value: str = ""
+
+
+@dataclass
+class ImportProgramRequest:
+    source_path: str = ""
+    project_folder_path: str = ""
+    program_name: str = ""
+    overwrite: bool = False
+    analyze: bool = False
+    language_id: str = ""
+    compiler_spec_id: str = ""
+    loader_class: str = ""
+    loader_args: list[LoaderArg] = field(default_factory=list)
+
+
+@dataclass
+class ImportProgramResponse:
+    program_paths: list[str] = field(default_factory=list)
+    primary_program_path: str = ""
 
 
 @dataclass
@@ -115,7 +182,12 @@ class DiscardProgramResponse:
 
 @dataclass
 class RevisionResponse:
-    revision: int = 0
+    program_id: int = 0
+    modification_number: int = 0
+    program_path: str = ""
+    file_id: str = ""
+    file_version: int = 0
+    file_last_modified_time: int = 0
 
 
 @dataclass

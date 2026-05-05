@@ -155,7 +155,6 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 						"function not found at 0x" + Long.toHexString(request.address()));
 				}
 				function.setName(newName, SourceType.USER_DEFINED);
-				bumpRevision();
 				commit = true;
 				return new FunctionsContract.RenameFunctionResponse(
 					true,
@@ -339,7 +338,6 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 					return new FunctionsContract.CreateFunctionTagResponse(false);
 				}
 				mgr.createFunctionTag(request.name(), request.comment() != null ? request.comment() : "");
-				bumpRevision();
 				return new FunctionsContract.CreateFunctionTagResponse(true);
 			}
 			finally {
@@ -364,7 +362,6 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 					return new FunctionsContract.DeleteFunctionTagResponse(false);
 				}
 				tag.delete();
-				bumpRevision();
 				return new FunctionsContract.DeleteFunctionTagResponse(true);
 			}
 			finally {
@@ -420,7 +417,6 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 					tag = mgr.createFunctionTag(request.tagName(), "");
 				}
 				func.addTag(tag.getName());
-				bumpRevision();
 				return new FunctionsContract.TagFunctionResponse(true);
 			}
 			finally {
@@ -445,7 +441,6 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 					return new FunctionsContract.UntagFunctionResponse(false);
 				}
 				func.removeTag(request.tagName());
-				bumpRevision();
 				return new FunctionsContract.UntagFunctionResponse(true);
 			}
 			finally {

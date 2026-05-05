@@ -32,7 +32,7 @@ public final class HealthRuntime extends RuntimeSupport implements HealthOperati
 			"libghidra-host",
 			"0.1.0-dev",
 			hostMode(),
-			revision(),
+			modificationNumber(),
 			warnings);
 	}
 
@@ -46,7 +46,7 @@ public final class HealthRuntime extends RuntimeSupport implements HealthOperati
 			capabilities.add(new HealthContract.Capability(
 				"health.status",
 				"ready",
-				"Service liveness and revision"));
+				"Service liveness and native modification number"));
 			capabilities.add(new HealthContract.Capability(
 				"host.shared_state",
 				"ready",

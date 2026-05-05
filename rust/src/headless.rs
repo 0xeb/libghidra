@@ -35,8 +35,12 @@ fn clean_canonicalize(p: &str) -> std::io::Result<PathBuf> {
 pub struct HeadlessOptions {
     pub ghidra_dir: String,
     pub binary: String,
-    /// Reopen an existing program (mutually exclusive with `binary`).
+    pub binaries: Vec<String>,
+    /// Reopen an existing program.
     pub program: String,
+    pub programs: Vec<String>,
+    /// Active project program for the live RPC host.
+    pub initial_program: String,
     pub port: u16,
     /// Bind address for the headless server.
     pub bind: String,
@@ -63,7 +67,10 @@ impl Default for HeadlessOptions {
         Self {
             ghidra_dir: String::new(),
             binary: String::new(),
+            binaries: Vec::new(),
             program: String::new(),
+            programs: Vec::new(),
+            initial_program: String::new(),
             port: 18080,
             bind: "127.0.0.1".to_string(),
             project_dir: String::new(),
@@ -239,6 +246,10 @@ fn infer_imported_program_name(binary: &Path) -> Result<String, Error> {
         })
 }
 
+fn strip_project_leading_slash(path: &str) -> String {
+    path.trim_start_matches(&['/', '\\'][..]).to_string()
+}
+
 fn run_import_stage(
     launcher: &Path,
     project_dir: &Path,
@@ -349,32 +360,34 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
         )
     })?;
 
-    // Validate: need either binary or program
-    let has_binary = !opts.binary.is_empty();
-    let has_program = !opts.program.is_empty();
-    if !has_binary && !has_program {
-        return Err(Error::new(
-            ErrorCode::ConfigError,
-            "HeadlessOptions: either binary or program must be set".to_string(),
-        ));
+    let mut binary_inputs = Vec::new();
+    if !opts.binary.is_empty() {
+        binary_inputs.push(opts.binary.clone());
     }
-    if has_binary && has_program {
+    binary_inputs.extend(opts.binaries.iter().cloned());
+
+    let mut program_inputs = Vec::new();
+    if !opts.program.is_empty() {
+        program_inputs.push(opts.program.clone());
+    }
+    program_inputs.extend(opts.programs.iter().cloned());
+
+    if binary_inputs.is_empty() && program_inputs.is_empty() && opts.initial_program.is_empty() {
         return Err(Error::new(
             ErrorCode::ConfigError,
-            "HeadlessOptions: binary and program are mutually exclusive".to_string(),
+            "HeadlessOptions: binary, program, binaries, programs, or initial_program must be set"
+                .to_string(),
         ));
     }
 
-    let binary = if has_binary {
-        Some(clean_canonicalize(&opts.binary).map_err(|e| {
-            Error::new(
-                ErrorCode::NotFound,
-                format!("Binary not found: {}: {e}", opts.binary),
-            )
-        })?)
-    } else {
-        None
-    };
+    let binaries = binary_inputs
+        .iter()
+        .map(|path| {
+            clean_canonicalize(path).map_err(|e| {
+                Error::new(ErrorCode::NotFound, format!("Binary not found: {path}: {e}"))
+            })
+        })
+        .collect::<Result<Vec<_>, _>>()?;
 
     let launcher = find_launcher(&ghidra_dir)?;
     let script_dir = if opts.script_dir.is_empty() {
@@ -399,8 +412,8 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
         )
     })?;
 
-    let mut managed_program = opts.program.clone();
-    if let Some(ref bin) = binary {
+    let mut imported_programs = Vec::new();
+    for bin in &binaries {
         match run_import_stage(
             &launcher,
             &project_dir,
@@ -411,7 +424,7 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
             opts.startup_timeout.max(opts.read_timeout),
             opts.on_output.as_ref(),
         ) {
-            Ok(program_name) => managed_program = program_name,
+            Ok(program_name) => imported_programs.push(program_name),
             Err(e) => {
                 if owns_project_dir {
                     let _ = std::fs::remove_dir_all(&project_dir);
@@ -421,10 +434,21 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
         }
     }
 
+    let managed_program = if !opts.initial_program.is_empty() {
+        opts.initial_program.clone()
+    } else if let Some(program) = program_inputs.first() {
+        program.clone()
+    } else {
+        imported_programs.first().cloned().unwrap_or_default()
+    };
+    let process_program = strip_project_leading_slash(&managed_program);
+    let mut declared_programs = program_inputs.clone();
+    declared_programs.extend(imported_programs.iter().cloned());
+
     // Build command
     let mut cmd = Command::new(&launcher);
     let _ = cmd.arg(&project_dir).arg(&opts.project_name);
-    let _ = cmd.arg("-process").arg(&managed_program).arg("-noanalysis");
+    let _ = cmd.arg("-process").arg(&process_program).arg("-noanalysis");
 
     let _ = cmd
         .arg("-scriptPath")
@@ -434,6 +458,12 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
         .arg(format!("bind={}", opts.bind))
         .arg(format!("port={}", opts.port))
         .arg(format!("shutdown={}", opts.shutdown));
+    if !opts.initial_program.is_empty() {
+        let _ = cmd.arg(format!("initial_program={}", opts.initial_program));
+    }
+    if !declared_programs.is_empty() {
+        let _ = cmd.arg(format!("program_paths={}", declared_programs.join(";")));
+    }
     if !opts.auth_token.is_empty() {
         let _ = cmd.arg(format!("auth={}", opts.auth_token));
     }

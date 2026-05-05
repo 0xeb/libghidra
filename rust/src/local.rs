@@ -160,7 +160,10 @@ impl LocalClient {
 
     pub fn get_revision(&self) -> Result<RevisionResponse> {
         let revision = self.handle.get_revision().map_err(map_cxx_err)?;
-        Ok(RevisionResponse { revision })
+        Ok(RevisionResponse {
+            modification_number: revision,
+            ..RevisionResponse::default()
+        })
     }
 
     // -- Functions -------------------------------------------------------
@@ -507,7 +510,7 @@ fn decode_health(v: &Value) -> HealthStatus {
         service_name: take_str(v, "service_name"),
         service_version: take_str(v, "service_version"),
         host_mode: take_str(v, "host_mode"),
-        program_revision: v["program_revision"].as_u64().unwrap_or(0),
+        modification_number: v["modification_number"].as_u64().unwrap_or(0),
         warnings: v["warnings"]
             .as_array()
             .map(|arr| {

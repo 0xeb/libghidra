@@ -53,7 +53,7 @@ static bool verify_connection(ghidra::Client& c) {
   }
   printf("Connected to %s v%s (mode: %s, revision: %" PRIu64 ")\n",
          st.value->service_name.c_str(), st.value->service_version.c_str(),
-         st.value->host_mode.c_str(), st.value->program_revision);
+         st.value->host_mode.c_str(), st.value->modification_number);
   return true;
 }
 

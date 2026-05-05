@@ -49,6 +49,20 @@ impl From<i32> for models::CommentKind {
 
 // -- Record conversions (proto → model) --------------------------------------
 
+impl From<pb::ProjectFile> for models::ProjectFile {
+    fn from(r: pb::ProjectFile) -> Self {
+        Self {
+            path: r.path,
+            name: r.name,
+            folder_path: r.folder_path,
+            content_type: r.content_type,
+            domain_object_class: r.domain_object_class,
+            is_folder: r.is_folder,
+            is_program: r.is_program,
+        }
+    }
+}
+
 impl From<pb::FunctionRecord> for models::FunctionRecord {
     fn from(r: pb::FunctionRecord) -> Self {
         Self {

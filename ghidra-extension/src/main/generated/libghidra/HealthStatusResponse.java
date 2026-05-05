@@ -71,7 +71,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
+      com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       serviceName_ = s;
@@ -87,7 +87,7 @@ private static final long serialVersionUID = 0L;
       getServiceNameBytes() {
     java.lang.Object ref = serviceName_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
+      com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       serviceName_ = b;
@@ -110,7 +110,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
+      com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       serviceVersion_ = s;
@@ -126,7 +126,7 @@ private static final long serialVersionUID = 0L;
       getServiceVersionBytes() {
     java.lang.Object ref = serviceVersion_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
+      com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       serviceVersion_ = b;
@@ -149,7 +149,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
+      com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       hostMode_ = s;
@@ -165,7 +165,7 @@ private static final long serialVersionUID = 0L;
       getHostModeBytes() {
     java.lang.Object ref = hostMode_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
+      com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       hostMode_ = b;
@@ -175,15 +175,15 @@ private static final long serialVersionUID = 0L;
     }
   }
 
-  public static final int PROGRAM_REVISION_FIELD_NUMBER = 5;
-  private long programRevision_ = 0L;
+  public static final int MODIFICATION_NUMBER_FIELD_NUMBER = 5;
+  private long modificationNumber_ = 0L;
   /**
-   * <code>uint64 program_revision = 5;</code>
-   * @return The programRevision.
+   * <code>uint64 modification_number = 5;</code>
+   * @return The modificationNumber.
    */
   @java.lang.Override
-  public long getProgramRevision() {
-    return programRevision_;
+  public long getModificationNumber() {
+    return modificationNumber_;
   }
 
   public static final int WARNINGS_FIELD_NUMBER = 6;
@@ -249,8 +249,8 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(hostMode_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 4, hostMode_);
     }
-    if (programRevision_ != 0L) {
-      output.writeUInt64(5, programRevision_);
+    if (modificationNumber_ != 0L) {
+      output.writeUInt64(5, modificationNumber_);
     }
     for (int i = 0; i < warnings_.size(); i++) {
       com.google.protobuf.GeneratedMessage.writeString(output, 6, warnings_.getRaw(i));
@@ -277,9 +277,9 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(hostMode_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(4, hostMode_);
     }
-    if (programRevision_ != 0L) {
+    if (modificationNumber_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
-        .computeUInt64Size(5, programRevision_);
+        .computeUInt64Size(5, modificationNumber_);
     }
     {
       int dataSize = 0;
@@ -312,8 +312,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getServiceVersion())) return false;
     if (!getHostMode()
         .equals(other.getHostMode())) return false;
-    if (getProgramRevision()
-        != other.getProgramRevision()) return false;
+    if (getModificationNumber()
+        != other.getModificationNumber()) return false;
     if (!getWarningsList()
         .equals(other.getWarningsList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
@@ -336,9 +336,9 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getServiceVersion().hashCode();
     hash = (37 * hash) + HOST_MODE_FIELD_NUMBER;
     hash = (53 * hash) + getHostMode().hashCode();
-    hash = (37 * hash) + PROGRAM_REVISION_FIELD_NUMBER;
+    hash = (37 * hash) + MODIFICATION_NUMBER_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-        getProgramRevision());
+        getModificationNumber());
     if (getWarningsCount() > 0) {
       hash = (37 * hash) + WARNINGS_FIELD_NUMBER;
       hash = (53 * hash) + getWarningsList().hashCode();
@@ -478,7 +478,7 @@ private static final long serialVersionUID = 0L;
       serviceName_ = "";
       serviceVersion_ = "";
       hostMode_ = "";
-      programRevision_ = 0L;
+      modificationNumber_ = 0L;
       warnings_ =
           com.google.protobuf.LazyStringArrayList.emptyList();
       return this;
@@ -527,7 +527,7 @@ private static final long serialVersionUID = 0L;
         result.hostMode_ = hostMode_;
       }
       if (((from_bitField0_ & 0x00000010) != 0)) {
-        result.programRevision_ = programRevision_;
+        result.modificationNumber_ = modificationNumber_;
       }
       if (((from_bitField0_ & 0x00000020) != 0)) {
         warnings_.makeImmutable();
@@ -565,8 +565,8 @@ private static final long serialVersionUID = 0L;
         bitField0_ |= 0x00000008;
         onChanged();
       }
-      if (other.getProgramRevision() != 0L) {
-        setProgramRevision(other.getProgramRevision());
+      if (other.getModificationNumber() != 0L) {
+        setModificationNumber(other.getModificationNumber());
       }
       if (!other.warnings_.isEmpty()) {
         if (warnings_.isEmpty()) {
@@ -625,7 +625,7 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 34
             case 40: {
-              programRevision_ = input.readUInt64();
+              modificationNumber_ = input.readUInt64();
               bitField0_ |= 0x00000010;
               break;
             } // case 40
@@ -709,7 +709,7 @@ private static final long serialVersionUID = 0L;
         getServiceNameBytes() {
       java.lang.Object ref = serviceName_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         serviceName_ = b;
@@ -781,7 +781,7 @@ private static final long serialVersionUID = 0L;
         getServiceVersionBytes() {
       java.lang.Object ref = serviceVersion_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         serviceVersion_ = b;
@@ -853,7 +853,7 @@ private static final long serialVersionUID = 0L;
         getHostModeBytes() {
       java.lang.Object ref = hostMode_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         hostMode_ = b;
@@ -900,34 +900,34 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private long programRevision_ ;
+    private long modificationNumber_ ;
     /**
-     * <code>uint64 program_revision = 5;</code>
-     * @return The programRevision.
+     * <code>uint64 modification_number = 5;</code>
+     * @return The modificationNumber.
      */
     @java.lang.Override
-    public long getProgramRevision() {
-      return programRevision_;
+    public long getModificationNumber() {
+      return modificationNumber_;
     }
     /**
-     * <code>uint64 program_revision = 5;</code>
-     * @param value The programRevision to set.
+     * <code>uint64 modification_number = 5;</code>
+     * @param value The modificationNumber to set.
      * @return This builder for chaining.
      */
-    public Builder setProgramRevision(long value) {
+    public Builder setModificationNumber(long value) {
 
-      programRevision_ = value;
+      modificationNumber_ = value;
       bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>uint64 program_revision = 5;</code>
+     * <code>uint64 modification_number = 5;</code>
      * @return This builder for chaining.
      */
-    public Builder clearProgramRevision() {
+    public Builder clearModificationNumber() {
       bitField0_ = (bitField0_ & ~0x00000010);
-      programRevision_ = 0L;
+      modificationNumber_ = 0L;
       onChanged();
       return this;
     }

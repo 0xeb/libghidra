@@ -625,7 +625,7 @@ StatusOr<HealthStatus> HttpClient::GetStatus() {
   out.service_name = rpc.value->service_name();
   out.service_version = rpc.value->service_version();
   out.host_mode = rpc.value->host_mode();
-  out.program_revision = rpc.value->program_revision();
+  out.modification_number = rpc.value->modification_number();
   out.warnings.reserve(static_cast<std::size_t>(rpc.value->warnings_size()));
   for (const auto& warning : rpc.value->warnings()) {
     out.warnings.push_back(warning);
@@ -650,6 +650,99 @@ StatusOr<std::vector<Capability>> HttpClient::GetCapabilities() {
     out.push_back(std::move(row));
   }
   return StatusOr<std::vector<Capability>>::FromValue(std::move(out));
+}
+
+StatusOr<OpenProjectResponse> HttpClient::OpenProject(const OpenProjectRequest& request) {
+  libghidra::OpenProjectRequest rpc_request;
+  rpc_request.set_project_path(request.project_path);
+  rpc_request.set_project_name(request.project_name);
+  rpc_request.set_create(request.create);
+  rpc_request.set_read_only(request.read_only);
+
+  auto rpc = impl_->call_rpc<libghidra::OpenProjectRequest, libghidra::OpenProjectResponse>(
+      "libghidra.SessionService/OpenProject",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<OpenProjectResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  OpenProjectResponse out;
+  out.project_path = rpc.value->project_path();
+  out.project_name = rpc.value->project_name();
+  out.created = rpc.value->created();
+  return StatusOr<OpenProjectResponse>::FromValue(std::move(out));
+}
+
+StatusOr<CloseProjectResponse> HttpClient::CloseProject(ShutdownPolicy policy) {
+  libghidra::CloseProjectRequest rpc_request;
+  rpc_request.set_shutdown_policy(to_proto_shutdown_policy(policy));
+  auto rpc = impl_->call_rpc<libghidra::CloseProjectRequest, libghidra::CloseProjectResponse>(
+      "libghidra.SessionService/CloseProject",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<CloseProjectResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  CloseProjectResponse out;
+  out.closed = rpc.value->closed();
+  return StatusOr<CloseProjectResponse>::FromValue(out);
+}
+
+StatusOr<ListProjectFilesResponse> HttpClient::ListProjectFiles(
+    const ListProjectFilesRequest& request) {
+  libghidra::ListProjectFilesRequest rpc_request;
+  rpc_request.set_include_folders(request.include_folders);
+  rpc_request.set_programs_only(request.programs_only);
+  auto rpc =
+      impl_->call_rpc<libghidra::ListProjectFilesRequest, libghidra::ListProjectFilesResponse>(
+          "libghidra.SessionService/ListProjectFiles",
+          rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListProjectFilesResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListProjectFilesResponse out;
+  out.files.reserve(static_cast<std::size_t>(rpc.value->files_size()));
+  for (const auto& row : rpc.value->files()) {
+    ProjectFile file;
+    file.path = row.path();
+    file.name = row.name();
+    file.folder_path = row.folder_path();
+    file.content_type = row.content_type();
+    file.domain_object_class = row.domain_object_class();
+    file.is_folder = row.is_folder();
+    file.is_program = row.is_program();
+    out.files.push_back(std::move(file));
+  }
+  return StatusOr<ListProjectFilesResponse>::FromValue(std::move(out));
+}
+
+StatusOr<ImportProgramResponse> HttpClient::ImportProgram(
+    const ImportProgramRequest& request) {
+  libghidra::ImportProgramRequest rpc_request;
+  rpc_request.set_source_path(request.source_path);
+  rpc_request.set_project_folder_path(request.project_folder_path);
+  rpc_request.set_program_name(request.program_name);
+  rpc_request.set_overwrite(request.overwrite);
+  rpc_request.set_analyze(request.analyze);
+  rpc_request.set_language_id(request.language_id);
+  rpc_request.set_compiler_spec_id(request.compiler_spec_id);
+  rpc_request.set_loader_class(request.loader_class);
+  for (const auto& arg : request.loader_args) {
+    auto* proto_arg = rpc_request.add_loader_args();
+    proto_arg->set_name(arg.name);
+    proto_arg->set_value(arg.value);
+  }
+  auto rpc = impl_->call_rpc<libghidra::ImportProgramRequest, libghidra::ImportProgramResponse>(
+      "libghidra.SessionService/ImportProgram",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ImportProgramResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ImportProgramResponse out;
+  out.primary_program_path = rpc.value->primary_program_path();
+  out.program_paths.reserve(static_cast<std::size_t>(rpc.value->program_paths_size()));
+  for (const auto& path : rpc.value->program_paths()) {
+    out.program_paths.push_back(path);
+  }
+  return StatusOr<ImportProgramResponse>::FromValue(std::move(out));
 }
 
 StatusOr<OpenProgramResponse> HttpClient::OpenProgram(const OpenProgramRequest& request) {
@@ -730,7 +823,12 @@ StatusOr<RevisionResponse> HttpClient::GetRevision() {
     return StatusOr<RevisionResponse>::FromError(rpc.status.code, rpc.status.message);
   }
   RevisionResponse out;
-  out.revision = rpc.value->revision();
+  out.program_id = rpc.value->program_id();
+  out.modification_number = rpc.value->modification_number();
+  out.program_path = rpc.value->program_path();
+  out.file_id = rpc.value->file_id();
+  out.file_version = rpc.value->file_version();
+  out.file_last_modified_time = rpc.value->file_last_modified_time();
   return StatusOr<RevisionResponse>::FromValue(out);
 }
 

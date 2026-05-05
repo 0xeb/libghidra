@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import ghidra.framework.model.ProjectData;
+import ghidra.framework.model.Project;
 import ghidra.program.model.listing.Program;
 import ghidra.util.task.TaskMonitor;
 import libghidra.host.contract.FunctionsContract;
@@ -87,7 +87,7 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 	}
 
 	public LibGhidraHeadlessHost(
-			ProjectData projectData,
+			Project project,
 			Object programConsumer,
 			TaskMonitor taskMonitor,
 			String projectPath,
@@ -99,7 +99,7 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			String authToken,
 			ShutdownPolicy shutdownPolicy) {
 		this(
-			createManagedRuntimeBundle(projectData, programConsumer, taskMonitor, projectPath, projectName),
+			createManagedRuntimeBundle(project, programConsumer, taskMonitor, projectPath, projectName),
 			bindAddress,
 			listenPort,
 			authToken,
@@ -224,6 +224,30 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			public libghidra.host.contract.HealthContract.CapabilityResponse capabilities(
 					libghidra.host.contract.HealthContract.CapabilityRequest request) {
 				return healthHandler.getCapabilities(request);
+			}
+
+			@Override
+			public SessionContract.OpenProjectResponse openProject(
+					SessionContract.OpenProjectRequest request) {
+				return sessionHandler.openProject(request);
+			}
+
+			@Override
+			public SessionContract.CloseProjectResponse closeProject(
+					SessionContract.CloseProjectRequest request) {
+				return sessionHandler.closeProject(request);
+			}
+
+			@Override
+			public SessionContract.ListProjectFilesResponse listProjectFiles(
+					SessionContract.ListProjectFilesRequest request) {
+				return sessionHandler.listProjectFiles(request);
+			}
+
+			@Override
+			public SessionContract.ImportProgramResponse importProgram(
+					SessionContract.ImportProgramRequest request) {
+				return sessionHandler.importProgram(request);
 			}
 
 			@Override
@@ -789,7 +813,7 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 	}
 
 	private static RuntimeBundle createManagedRuntimeBundle(
-			ProjectData projectData,
+			Project project,
 			Object programConsumer,
 			TaskMonitor taskMonitor,
 			String projectPath,
@@ -797,7 +821,7 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 		HostState state = new HostState("headless");
 		SessionRuntime session = SessionRuntime.forManagedHeadless(
 			state,
-			projectData,
+			project,
 			programConsumer,
 			taskMonitor,
 			projectPath,

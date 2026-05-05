@@ -244,6 +244,30 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						}
 
 						@Override
+						public SessionContract.OpenProjectResponse openProject(
+								SessionContract.OpenProjectRequest request) {
+							return sessionHandler.openProject(request);
+						}
+
+						@Override
+						public SessionContract.CloseProjectResponse closeProject(
+								SessionContract.CloseProjectRequest request) {
+							return sessionHandler.closeProject(request);
+						}
+
+						@Override
+						public SessionContract.ListProjectFilesResponse listProjectFiles(
+								SessionContract.ListProjectFilesRequest request) {
+							return sessionHandler.listProjectFiles(request);
+						}
+
+						@Override
+						public SessionContract.ImportProgramResponse importProgram(
+								SessionContract.ImportProgramRequest request) {
+							return sessionHandler.importProgram(request);
+						}
+
+						@Override
 						public SessionContract.OpenProgramResponse openProgram(
 								SessionContract.OpenProgramRequest request) {
 							return sessionHandler.openProgram(request);
@@ -1012,7 +1036,7 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 		}
 		message.append('\n');
 		message.append("Host mode: ").append(health.getHostMode()).append('\n');
-		message.append("Program revision: ").append(health.getProgramRevision());
+		message.append("Modification number: ").append(health.getModificationNumber());
 		if (health.getWarningsCount() > 0) {
 			message.append('\n');
 			message.append("Warnings:");

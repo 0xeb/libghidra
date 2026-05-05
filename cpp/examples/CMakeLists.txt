@@ -49,6 +49,22 @@ else()
     target_compile_options(api_parse_declarations PRIVATE -O2 -Wall)
 endif()
 
+add_executable(api_list_project_files list_project_files.cpp)
+target_link_libraries(api_list_project_files PRIVATE libghidra::client)
+if(MSVC)
+    target_compile_options(api_list_project_files PRIVATE /EHsc /W3 /O2)
+else()
+    target_compile_options(api_list_project_files PRIVATE -O2 -Wall)
+endif()
+
+add_executable(api_switch_active_program switch_active_program.cpp)
+target_link_libraries(api_switch_active_program PRIVATE libghidra::client)
+if(MSVC)
+    target_compile_options(api_switch_active_program PRIVATE /EHsc /W3 /O2)
+else()
+    target_compile_options(api_switch_active_program PRIVATE -O2 -Wall)
+endif()
+
 # -- Local backend examples (require libghidra_local) --
 if(TARGET libghidra_local)
     function(add_local_example EXAMPLE_NAME)

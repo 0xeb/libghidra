@@ -36,6 +36,11 @@ public final class LibGhidraHttpServer {
 	public interface Callbacks {
 		HealthContract.HealthStatusResponse healthStatus(HealthContract.HealthStatusRequest request);
 		HealthContract.CapabilityResponse capabilities(HealthContract.CapabilityRequest request);
+		SessionContract.OpenProjectResponse openProject(SessionContract.OpenProjectRequest request);
+		SessionContract.CloseProjectResponse closeProject(SessionContract.CloseProjectRequest request);
+		SessionContract.ListProjectFilesResponse listProjectFiles(
+			SessionContract.ListProjectFilesRequest request);
+		SessionContract.ImportProgramResponse importProgram(SessionContract.ImportProgramRequest request);
 		SessionContract.OpenProgramResponse openProgram(SessionContract.OpenProgramRequest request);
 		SessionContract.CloseProgramResponse closeProgram(SessionContract.CloseProgramRequest request);
 		SessionContract.SaveProgramResponse saveProgram(SessionContract.SaveProgramRequest request);
@@ -313,6 +318,10 @@ public final class LibGhidraHttpServer {
 			"Method names currently implemented over /rpc:\n" +
 			"- libghidra.HealthService/GetStatus\n" +
 			"- libghidra.HealthService/GetCapabilities\n" +
+			"- libghidra.SessionService/OpenProject\n" +
+			"- libghidra.SessionService/CloseProject\n" +
+			"- libghidra.SessionService/ListProjectFiles\n" +
+			"- libghidra.SessionService/ImportProgram\n" +
 			"- libghidra.SessionService/OpenProgram\n" +
 			"- libghidra.SessionService/CloseProgram\n" +
 			"- libghidra.SessionService/SaveProgram\n" +

@@ -20,7 +20,7 @@ message HealthStatusResponse {
   string service_name = 2;
   string service_version = 3;
   string host_mode = 4;
-  uint64 program_revision = 5;
+  uint64 modification_number = 5;
   repeated string warnings = 6;
 }
 

@@ -28,7 +28,7 @@ fn main() {
     );
     println!("  mode:     {}", status.host_mode);
     println!("  ok:       {}", status.ok);
-    println!("  revision: {}", status.program_revision);
+    println!("  revision: {}", status.modification_number);
     if !status.warnings.is_empty() {
         println!("  warnings: {:?}", status.warnings);
     }
@@ -53,7 +53,7 @@ fn main() {
         eprintln!("get_revision failed: {e}");
         std::process::exit(1);
     });
-    println!("\nRevision before mutation: {}", rev_before.revision);
+    println!("\nRevision before mutation: {}", rev_before.modification_number);
 
     // 4. Make a mutation: rename the first function
     let funcs = client
@@ -90,11 +90,11 @@ fn main() {
         eprintln!("get_revision (after) failed: {e}");
         std::process::exit(1);
     });
-    println!("\nRevision after mutation: {}", rev_after.revision);
-    if rev_after.revision > rev_before.revision {
+    println!("\nRevision after mutation: {}", rev_after.modification_number);
+    if rev_after.modification_number > rev_before.modification_number {
         println!(
             "Revision advanced by {}",
-            rev_after.revision - rev_before.revision
+            rev_after.modification_number - rev_before.modification_number
         );
     } else {
         println!("Warning: revision did not advance");
@@ -134,5 +134,5 @@ fn main() {
         eprintln!("get_revision (final) failed: {e}");
         std::process::exit(1);
     });
-    println!("\nFinal revision: {}", rev_final.revision);
+    println!("\nFinal revision: {}", rev_final.modification_number);
 }

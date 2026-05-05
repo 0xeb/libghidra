@@ -320,7 +320,7 @@ static void encode(Json& j, const HealthStatus& r) {
     .field("service_name", r.service_name)
     .field("service_version", r.service_version)
     .field("host_mode", r.host_mode)
-    .field("program_revision", r.program_revision)
+    .field("modification_number", r.modification_number)
     .key("warnings").begin_arr();
   for (const auto& w : r.warnings) j.str(w);
   j.end_arr().end_obj();
@@ -424,7 +424,7 @@ bool LocalClientHandle::discard_program() const {
 }
 
 uint64_t LocalClientHandle::get_revision() const {
-  return unwrap(impl_->GetRevision()).revision;
+  return unwrap(impl_->GetRevision()).modification_number;
 }
 
 // --- Functions --------------------------------------------------------------

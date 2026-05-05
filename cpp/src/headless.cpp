@@ -415,6 +415,23 @@ static std::string infer_imported_program_name(const fs::path& binary) {
   return name;
 }
 
+static std::string strip_project_leading_slash(std::string path) {
+  while (!path.empty() && (path.front() == '/' || path.front() == '\\')) {
+    path.erase(path.begin());
+  }
+  return path;
+}
+
+static std::string join_script_list(const std::vector<std::string>& values) {
+  std::string out;
+  for (const auto& value : values) {
+    if (value.empty()) continue;
+    if (!out.empty()) out += ';';
+    out += value;
+  }
+  return out;
+}
+
 #ifdef _WIN32
 static std::string build_command_line(const std::vector<std::string>& args) {
   std::string cmd_line;
@@ -508,19 +525,30 @@ static std::string run_import_stage(
 HeadlessClient LaunchHeadless(HeadlessOptions opts) {
   auto ghidra_dir = fs::absolute(opts.ghidra_dir);
 
-  // Validate: need either binary or program
-  bool has_binary = !opts.binary.empty();
-  bool has_program = !opts.program.empty();
-  if (!has_binary && !has_program)
-    throw std::runtime_error("HeadlessOptions: either binary or program must be set");
-  if (has_binary && has_program)
-    throw std::runtime_error("HeadlessOptions: binary and program are mutually exclusive");
+  std::vector<std::string> binary_inputs;
+  if (!opts.binary.empty()) binary_inputs.push_back(opts.binary);
+  binary_inputs.insert(binary_inputs.end(), opts.binaries.begin(),
+                       opts.binaries.end());
 
-  fs::path binary;
-  if (has_binary) {
-    binary = fs::absolute(opts.binary);
+  std::vector<std::string> program_inputs;
+  if (!opts.program.empty()) program_inputs.push_back(opts.program);
+  program_inputs.insert(program_inputs.end(), opts.programs.begin(),
+                        opts.programs.end());
+
+  if (binary_inputs.empty() && program_inputs.empty() &&
+      opts.initial_program.empty()) {
+    throw std::runtime_error(
+        "HeadlessOptions: binary, program, binaries, programs, or "
+        "initial_program must be set");
+  }
+
+  std::vector<fs::path> binaries;
+  binaries.reserve(binary_inputs.size());
+  for (const auto& input : binary_inputs) {
+    auto binary = fs::absolute(input);
     if (!fs::exists(binary))
       throw std::runtime_error("Binary not found: " + binary.string());
+    binaries.push_back(std::move(binary));
   }
 
   auto launcher = find_launcher(ghidra_dir);
@@ -534,12 +562,12 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
                    : fs::path(opts.project_dir);
   fs::create_directories(project_dir);
 
-  std::string managed_program = opts.program;
-  if (has_binary) {
+  std::vector<std::string> imported_programs;
+  for (const auto& binary : binaries) {
     try {
-      managed_program =
+      imported_programs.push_back(
           run_import_stage(launcher, project_dir, opts.project_name, binary,
-                           opts.overwrite, opts.analyze, opts.on_output);
+                           opts.overwrite, opts.analyze, opts.on_output));
     } catch (...) {
       if (owns_project) {
         std::error_code ec;
@@ -549,6 +577,20 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
     }
   }
 
+  std::string managed_program;
+  if (!opts.initial_program.empty()) {
+    managed_program = opts.initial_program;
+  } else if (!program_inputs.empty()) {
+    managed_program = program_inputs.front();
+  } else if (!imported_programs.empty()) {
+    managed_program = imported_programs.front();
+  }
+  const std::string process_program = strip_project_leading_slash(managed_program);
+
+  std::vector<std::string> declared_programs = program_inputs;
+  declared_programs.insert(declared_programs.end(), imported_programs.begin(),
+                           imported_programs.end());
+
   // Build argument list
   std::vector<std::string> args = {
       launcher.string(),
@@ -556,7 +598,7 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
       opts.project_name,
   };
   args.push_back("-process");
-  args.push_back(managed_program);
+  args.push_back(process_program);
   args.push_back("-noanalysis");
 
   // Pass-through args for analyzeHeadless (from '--' separator).
@@ -570,6 +612,11 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
   args.push_back("bind=" + opts.bind);
   args.push_back("port=" + std::to_string(opts.port));
   args.push_back("shutdown=" + opts.shutdown);
+  if (!opts.initial_program.empty())
+    args.push_back("initial_program=" + opts.initial_program);
+  const std::string program_list = join_script_list(declared_programs);
+  if (!program_list.empty())
+    args.push_back("program_paths=" + program_list);
   if (!opts.auth_token.empty())
     args.push_back("auth=" + opts.auth_token);
   if (opts.max_runtime_seconds > 0)

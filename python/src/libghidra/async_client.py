@@ -294,7 +294,7 @@ class AsyncGhidraClient:
         return HealthStatus(
             ok=resp.ok, service_name=resp.service_name,
             service_version=resp.service_version, host_mode=resp.host_mode,
-            program_revision=resp.program_revision, warnings=list(resp.warnings),
+            modification_number=resp.modification_number, warnings=list(resp.warnings),
         )
 
     async def get_capabilities(self) -> list[Capability]:
@@ -349,7 +349,14 @@ class AsyncGhidraClient:
         resp = await self._call_rpc(
             "libghidra.SessionService/GetRevision", req, session_pb2.GetRevisionResponse,
         )
-        return RevisionResponse(revision=resp.revision)
+        return RevisionResponse(
+            program_id=resp.program_id,
+            modification_number=resp.modification_number,
+            program_path=resp.program_path,
+            file_id=resp.file_id,
+            file_version=resp.file_version,
+            file_last_modified_time=resp.file_last_modified_time,
+        )
 
     async def shutdown(self, policy: ShutdownPolicy = ShutdownPolicy.UNSPECIFIED) -> ShutdownResponse:
         req = session_pb2.ShutdownRequest(shutdown_policy=int(policy))

@@ -48,7 +48,7 @@ def run(args: argparse.Namespace) -> int:
         ("Service", status.service_name),
         ("Version", status.service_version),
         ("Host Mode", status.host_mode),
-        ("Revision", status.program_revision),
+        ("Modification Number", status.modification_number),
     ]
     if status.warnings:
         for i, w in enumerate(status.warnings):

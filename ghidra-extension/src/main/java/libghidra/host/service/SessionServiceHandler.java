@@ -11,6 +11,40 @@ public final class SessionServiceHandler {
 		this.runtime = runtime;
 	}
 
+	public SessionContract.OpenProjectResponse openProject(
+			SessionContract.OpenProjectRequest request) {
+		if (request == null) {
+			request = new SessionContract.OpenProjectRequest("", "", false, false);
+		}
+		return runtime.openProject(request);
+	}
+
+	public SessionContract.CloseProjectResponse closeProject(
+			SessionContract.CloseProjectRequest request) {
+		if (request == null) {
+			request = new SessionContract.CloseProjectRequest(
+				SessionContract.ShutdownPolicy.UNSPECIFIED);
+		}
+		return runtime.closeProject(request);
+	}
+
+	public SessionContract.ListProjectFilesResponse listProjectFiles(
+			SessionContract.ListProjectFilesRequest request) {
+		if (request == null) {
+			request = new SessionContract.ListProjectFilesRequest(false, false);
+		}
+		return runtime.listProjectFiles(request);
+	}
+
+	public SessionContract.ImportProgramResponse importProgram(
+			SessionContract.ImportProgramRequest request) {
+		if (request == null) {
+			request = new SessionContract.ImportProgramRequest(
+				"", "", "", false, false, "", "", "", java.util.List.of());
+		}
+		return runtime.importProgram(request);
+	}
+
 	public SessionContract.OpenProgramResponse openProgram(
 			SessionContract.OpenProgramRequest request) {
 		if (request == null) {

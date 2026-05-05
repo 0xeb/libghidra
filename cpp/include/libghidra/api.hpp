@@ -51,6 +51,23 @@ class IClient : public IHealthClient,
 
   // -- ISessionClient defaults -----------------------------------------------
 
+  StatusOr<OpenProjectResponse> OpenProject(const OpenProjectRequest&) override {
+    return StatusOr<OpenProjectResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<CloseProjectResponse> CloseProject(ShutdownPolicy) override {
+    return StatusOr<CloseProjectResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<ListProjectFilesResponse> ListProjectFiles(
+      const ListProjectFilesRequest&) override {
+    return StatusOr<ListProjectFilesResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<ImportProgramResponse> ImportProgram(const ImportProgramRequest&) override {
+    return StatusOr<ImportProgramResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
   StatusOr<OpenProgramResponse> OpenProgram(const OpenProgramRequest&) override {
     return StatusOr<OpenProgramResponse>::FromError(
         "NOT_SUPPORTED", "not implemented by this backend");

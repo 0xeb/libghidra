@@ -120,7 +120,6 @@ public final class SymbolsRuntime extends RuntimeSupport implements SymbolsOpera
 				else {
 					symbol.setName(newName, SourceType.USER_DEFINED);
 				}
-				bumpRevision();
 				commit = true;
 				return new SymbolsContract.RenameSymbolResponse(true, nullableString(symbol.getName()));
 			}
@@ -164,7 +163,6 @@ public final class SymbolsRuntime extends RuntimeSupport implements SymbolsOpera
 				if (deletedCount <= 0) {
 					return new SymbolsContract.DeleteSymbolResponse(false, 0);
 				}
-				bumpRevision();
 				commit = true;
 				return new SymbolsContract.DeleteSymbolResponse(true, deletedCount);
 			}

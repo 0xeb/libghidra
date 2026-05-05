@@ -104,7 +104,7 @@ let status = client.get_status()?;
 println!("{} v{} (mode: {})", status.service_name, status.service_version, status.host_mode);
 ```
 
-**Returns:** `HealthStatus { ok, service_name, service_version, host_mode, program_revision, warnings }`.
+**Returns:** `HealthStatus { ok, service_name, service_version, host_mode, modification_number, warnings }`.
 
 ### `fn get_capabilities(&self) -> Result<Vec<Capability>>`
 
@@ -159,7 +159,7 @@ client.discard_program()?;
 
 ```rust
 let rev = client.get_revision()?;
-println!("Revision: {}", rev.revision);
+println!("Program: {}, modification: {}", rev.program_id, rev.modification_number);
 ```
 
 ### `fn shutdown(&self, policy: ShutdownPolicy) -> Result<ShutdownResponse>`

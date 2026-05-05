@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16libghidra/health.proto\x12\tlibghidra\"\x15\n\x13HealthStatusRequest\"\x90\x01\n\x14HealthStatusResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\x12\x14\n\x0cservice_name\x18\x02 \x01(\t\x12\x17\n\x0fservice_version\x18\x03 \x01(\t\x12\x11\n\thost_mode\x18\x04 \x01(\t\x12\x18\n\x10program_revision\x18\x05 \x01(\x04\x12\x10\n\x08warnings\x18\x06 \x03(\t\"\x13\n\x11\x43\x61pabilityRequest\"6\n\nCapability\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\x12\x0c\n\x04note\x18\x03 \x01(\t\"A\n\x12\x43\x61pabilityResponse\x12+\n\x0c\x63\x61pabilities\x18\x01 \x03(\x0b\x32\x15.libghidra.Capability2\xad\x01\n\rHealthService\x12L\n\tGetStatus\x12\x1e.libghidra.HealthStatusRequest\x1a\x1f.libghidra.HealthStatusResponse\x12N\n\x0fGetCapabilities\x12\x1c.libghidra.CapabilityRequest\x1a\x1d.libghidra.CapabilityResponseB\x1a\n\tlibghidraB\x0bHealthProtoP\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16libghidra/health.proto\x12\tlibghidra\"\x15\n\x13HealthStatusRequest\"\x93\x01\n\x14HealthStatusResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\x12\x14\n\x0cservice_name\x18\x02 \x01(\t\x12\x17\n\x0fservice_version\x18\x03 \x01(\t\x12\x11\n\thost_mode\x18\x04 \x01(\t\x12\x1b\n\x13modification_number\x18\x05 \x01(\x04\x12\x10\n\x08warnings\x18\x06 \x03(\t\"\x13\n\x11\x43\x61pabilityRequest\"6\n\nCapability\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\x12\x0c\n\x04note\x18\x03 \x01(\t\"A\n\x12\x43\x61pabilityResponse\x12+\n\x0c\x63\x61pabilities\x18\x01 \x03(\x0b\x32\x15.libghidra.Capability2\xad\x01\n\rHealthService\x12L\n\tGetStatus\x12\x1e.libghidra.HealthStatusRequest\x1a\x1f.libghidra.HealthStatusResponse\x12N\n\x0fGetCapabilities\x12\x1c.libghidra.CapabilityRequest\x1a\x1d.libghidra.CapabilityResponseB\x1a\n\tlibghidraB\x0bHealthProtoP\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,13 +35,13 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_HEALTHSTATUSREQUEST']._serialized_start=37
   _globals['_HEALTHSTATUSREQUEST']._serialized_end=58
   _globals['_HEALTHSTATUSRESPONSE']._serialized_start=61
-  _globals['_HEALTHSTATUSRESPONSE']._serialized_end=205
-  _globals['_CAPABILITYREQUEST']._serialized_start=207
-  _globals['_CAPABILITYREQUEST']._serialized_end=226
-  _globals['_CAPABILITY']._serialized_start=228
-  _globals['_CAPABILITY']._serialized_end=282
-  _globals['_CAPABILITYRESPONSE']._serialized_start=284
-  _globals['_CAPABILITYRESPONSE']._serialized_end=349
-  _globals['_HEALTHSERVICE']._serialized_start=352
-  _globals['_HEALTHSERVICE']._serialized_end=525
+  _globals['_HEALTHSTATUSRESPONSE']._serialized_end=208
+  _globals['_CAPABILITYREQUEST']._serialized_start=210
+  _globals['_CAPABILITYREQUEST']._serialized_end=229
+  _globals['_CAPABILITY']._serialized_start=231
+  _globals['_CAPABILITY']._serialized_end=285
+  _globals['_CAPABILITYRESPONSE']._serialized_start=287
+  _globals['_CAPABILITYRESPONSE']._serialized_end=352
+  _globals['_HEALTHSERVICE']._serialized_start=355
+  _globals['_HEALTHSERVICE']._serialized_end=528
 # @@protoc_insertion_point(module_scope)

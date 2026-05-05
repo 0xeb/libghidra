@@ -55,7 +55,7 @@ class LocalClient final : public IClient {
     hs.service_name = "local-decompiler";
     hs.service_version = "1.0.0";
     hs.host_mode = "local";
-    hs.program_revision = revision_;
+    hs.modification_number = revision_;
     return StatusOr<HealthStatus>::FromValue(std::move(hs));
   }
 
@@ -191,7 +191,7 @@ class LocalClient final : public IClient {
 
   StatusOr<RevisionResponse> GetRevision() override {
     RevisionResponse resp;
-    resp.revision = revision_;
+    resp.modification_number = revision_;
     return StatusOr<RevisionResponse>::FromValue(std::move(resp));
   }
 

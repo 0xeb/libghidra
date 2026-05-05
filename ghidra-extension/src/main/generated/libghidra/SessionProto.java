@@ -27,62 +27,112 @@ public final class SessionProto {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_OpenProgramRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_OpenProgramRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_OpenProgramResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_OpenProgramResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_OpenProjectRequest_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_OpenProjectRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_OpenProjectResponse_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_OpenProjectResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_CloseProjectRequest_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_CloseProjectRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_CloseProjectResponse_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_CloseProjectResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ProjectFile_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ProjectFile_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListProjectFilesRequest_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListProjectFilesRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListProjectFilesResponse_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListProjectFilesResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_LoaderArg_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_LoaderArg_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ImportProgramRequest_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ImportProgramRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ImportProgramResponse_descriptor;
+  static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ImportProgramResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_CloseProgramRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_CloseProgramRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_CloseProgramResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_CloseProgramResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_SaveProgramRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_SaveProgramRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_SaveProgramResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_SaveProgramResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_DiscardProgramRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_DiscardProgramRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_DiscardProgramResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_DiscardProgramResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_GetRevisionRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_GetRevisionRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_GetRevisionResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_GetRevisionResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_ShutdownRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_ShutdownRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_ShutdownResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_ShutdownResponse_fieldAccessorTable;
 
@@ -103,31 +153,66 @@ public final class SessionProto {
       "at\030\010 \001(\t\022\024\n\014base_address\030\t \001(\004\"k\n\023OpenPr" +
       "ogramResponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013l" +
       "anguage_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t\022" +
-      "\022\n\nimage_base\030\005 \001(\004\"I\n\023CloseProgramReque" +
-      "st\0222\n\017shutdown_policy\030\002 \001(\0162\031.libghidra." +
-      "ShutdownPolicy\"&\n\024CloseProgramResponse\022\016" +
-      "\n\006closed\030\001 \001(\010\"\024\n\022SaveProgramRequest\"$\n\023" +
-      "SaveProgramResponse\022\r\n\005saved\030\001 \001(\010\"\027\n\025Di" +
-      "scardProgramRequest\"+\n\026DiscardProgramRes" +
-      "ponse\022\021\n\tdiscarded\030\001 \001(\010\"\024\n\022GetRevisionR" +
-      "equest\"\'\n\023GetRevisionResponse\022\020\n\010revisio" +
-      "n\030\001 \001(\004\"E\n\017ShutdownRequest\0222\n\017shutdown_p" +
-      "olicy\030\001 \001(\0162\031.libghidra.ShutdownPolicy\"$" +
-      "\n\020ShutdownResponse\022\020\n\010accepted\030\001 \001(\0102\347\003\n" +
-      "\016SessionService\022L\n\013OpenProgram\022\035.libghid" +
-      "ra.OpenProgramRequest\032\036.libghidra.OpenPr" +
-      "ogramResponse\022O\n\014CloseProgram\022\036.libghidr" +
-      "a.CloseProgramRequest\032\037.libghidra.CloseP" +
-      "rogramResponse\022L\n\013SaveProgram\022\035.libghidr" +
-      "a.SaveProgramRequest\032\036.libghidra.SavePro" +
-      "gramResponse\022U\n\016DiscardProgram\022 .libghid" +
-      "ra.DiscardProgramRequest\032!.libghidra.Dis" +
-      "cardProgramResponse\022L\n\013GetRevision\022\035.lib" +
-      "ghidra.GetRevisionRequest\032\036.libghidra.Ge" +
-      "tRevisionResponse\022C\n\010Shutdown\022\032.libghidr" +
-      "a.ShutdownRequest\032\033.libghidra.ShutdownRe" +
-      "sponseB\033\n\tlibghidraB\014SessionProtoP\001b\006pro" +
-      "to3"
+      "\022\n\nimage_base\030\005 \001(\004\"c\n\022OpenProjectReques" +
+      "t\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_name\030" +
+      "\002 \001(\t\022\016\n\006create\030\003 \001(\010\022\021\n\tread_only\030\004 \001(\010" +
+      "\"R\n\023OpenProjectResponse\022\024\n\014project_path\030" +
+      "\001 \001(\t\022\024\n\014project_name\030\002 \001(\t\022\017\n\007created\030\003" +
+      " \001(\010\"I\n\023CloseProjectRequest\0222\n\017shutdown_" +
+      "policy\030\001 \001(\0162\031.libghidra.ShutdownPolicy\"" +
+      "&\n\024CloseProjectResponse\022\016\n\006closed\030\001 \001(\010\"" +
+      "\230\001\n\013ProjectFile\022\014\n\004path\030\001 \001(\t\022\014\n\004name\030\002 " +
+      "\001(\t\022\023\n\013folder_path\030\003 \001(\t\022\024\n\014content_type" +
+      "\030\004 \001(\t\022\033\n\023domain_object_class\030\005 \001(\t\022\021\n\ti" +
+      "s_folder\030\006 \001(\010\022\022\n\nis_program\030\007 \001(\010\"I\n\027Li" +
+      "stProjectFilesRequest\022\027\n\017include_folders" +
+      "\030\001 \001(\010\022\025\n\rprograms_only\030\002 \001(\010\"A\n\030ListPro" +
+      "jectFilesResponse\022%\n\005files\030\001 \003(\0132\026.libgh" +
+      "idra.ProjectFile\"(\n\tLoaderArg\022\014\n\004name\030\001 " +
+      "\001(\t\022\r\n\005value\030\002 \001(\t\"\362\001\n\024ImportProgramRequ" +
+      "est\022\023\n\013source_path\030\001 \001(\t\022\033\n\023project_fold" +
+      "er_path\030\002 \001(\t\022\024\n\014program_name\030\003 \001(\t\022\021\n\to" +
+      "verwrite\030\004 \001(\010\022\017\n\007analyze\030\005 \001(\010\022\023\n\013langu" +
+      "age_id\030\006 \001(\t\022\030\n\020compiler_spec_id\030\007 \001(\t\022\024" +
+      "\n\014loader_class\030\010 \001(\t\022)\n\013loader_args\030\t \003(" +
+      "\0132\024.libghidra.LoaderArg\"L\n\025ImportProgram" +
+      "Response\022\025\n\rprogram_paths\030\001 \003(\t\022\034\n\024prima" +
+      "ry_program_path\030\002 \001(\t\"I\n\023CloseProgramReq" +
+      "uest\0222\n\017shutdown_policy\030\002 \001(\0162\031.libghidr" +
+      "a.ShutdownPolicy\"&\n\024CloseProgramResponse" +
+      "\022\016\n\006closed\030\001 \001(\010\"\024\n\022SaveProgramRequest\"$" +
+      "\n\023SaveProgramResponse\022\r\n\005saved\030\001 \001(\010\"\027\n\025" +
+      "DiscardProgramRequest\"+\n\026DiscardProgramR" +
+      "esponse\022\021\n\tdiscarded\030\001 \001(\010\"\024\n\022GetRevisio" +
+      "nRequest\"\244\001\n\023GetRevisionResponse\022\022\n\nprog" +
+      "ram_id\030\001 \001(\004\022\033\n\023modification_number\030\002 \001(" +
+      "\004\022\024\n\014program_path\030\003 \001(\t\022\017\n\007file_id\030\004 \001(\t" +
+      "\022\024\n\014file_version\030\005 \001(\005\022\037\n\027file_last_modi" +
+      "fied_time\030\006 \001(\003\"E\n\017ShutdownRequest\0222\n\017sh" +
+      "utdown_policy\030\001 \001(\0162\031.libghidra.Shutdown" +
+      "Policy\"$\n\020ShutdownResponse\022\020\n\010accepted\030\001" +
+      " \001(\0102\267\006\n\016SessionService\022L\n\013OpenProject\022\035" +
+      ".libghidra.OpenProjectRequest\032\036.libghidr" +
+      "a.OpenProjectResponse\022O\n\014CloseProject\022\036." +
+      "libghidra.CloseProjectRequest\032\037.libghidr" +
+      "a.CloseProjectResponse\022[\n\020ListProjectFil" +
+      "es\022\".libghidra.ListProjectFilesRequest\032#" +
+      ".libghidra.ListProjectFilesResponse\022R\n\rI" +
+      "mportProgram\022\037.libghidra.ImportProgramRe" +
+      "quest\032 .libghidra.ImportProgramResponse\022" +
+      "L\n\013OpenProgram\022\035.libghidra.OpenProgramRe" +
+      "quest\032\036.libghidra.OpenProgramResponse\022O\n" +
+      "\014CloseProgram\022\036.libghidra.CloseProgramRe" +
+      "quest\032\037.libghidra.CloseProgramResponse\022L" +
+      "\n\013SaveProgram\022\035.libghidra.SaveProgramReq" +
+      "uest\032\036.libghidra.SaveProgramResponse\022U\n\016" +
+      "DiscardProgram\022 .libghidra.DiscardProgra" +
+      "mRequest\032!.libghidra.DiscardProgramRespo" +
+      "nse\022L\n\013GetRevision\022\035.libghidra.GetRevisi" +
+      "onRequest\032\036.libghidra.GetRevisionRespons" +
+      "e\022C\n\010Shutdown\022\032.libghidra.ShutdownReques" +
+      "t\032\033.libghidra.ShutdownResponseB\033\n\tlibghi" +
+      "draB\014SessionProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -146,62 +231,122 @@ public final class SessionProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_OpenProgramResponse_descriptor,
         new java.lang.String[] { "ProgramName", "LanguageId", "CompilerSpec", "ImageBase", });
-    internal_static_libghidra_CloseProgramRequest_descriptor =
+    internal_static_libghidra_OpenProjectRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
+    internal_static_libghidra_OpenProjectRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_OpenProjectRequest_descriptor,
+        new java.lang.String[] { "ProjectPath", "ProjectName", "Create", "ReadOnly", });
+    internal_static_libghidra_OpenProjectResponse_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_libghidra_OpenProjectResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_OpenProjectResponse_descriptor,
+        new java.lang.String[] { "ProjectPath", "ProjectName", "Created", });
+    internal_static_libghidra_CloseProjectRequest_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_libghidra_CloseProjectRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_CloseProjectRequest_descriptor,
+        new java.lang.String[] { "ShutdownPolicy", });
+    internal_static_libghidra_CloseProjectResponse_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_libghidra_CloseProjectResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_CloseProjectResponse_descriptor,
+        new java.lang.String[] { "Closed", });
+    internal_static_libghidra_ProjectFile_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_libghidra_ProjectFile_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ProjectFile_descriptor,
+        new java.lang.String[] { "Path", "Name", "FolderPath", "ContentType", "DomainObjectClass", "IsFolder", "IsProgram", });
+    internal_static_libghidra_ListProjectFilesRequest_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_libghidra_ListProjectFilesRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListProjectFilesRequest_descriptor,
+        new java.lang.String[] { "IncludeFolders", "ProgramsOnly", });
+    internal_static_libghidra_ListProjectFilesResponse_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_libghidra_ListProjectFilesResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListProjectFilesResponse_descriptor,
+        new java.lang.String[] { "Files", });
+    internal_static_libghidra_LoaderArg_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_libghidra_LoaderArg_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_LoaderArg_descriptor,
+        new java.lang.String[] { "Name", "Value", });
+    internal_static_libghidra_ImportProgramRequest_descriptor =
+      getDescriptor().getMessageTypes().get(10);
+    internal_static_libghidra_ImportProgramRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ImportProgramRequest_descriptor,
+        new java.lang.String[] { "SourcePath", "ProjectFolderPath", "ProgramName", "Overwrite", "Analyze", "LanguageId", "CompilerSpecId", "LoaderClass", "LoaderArgs", });
+    internal_static_libghidra_ImportProgramResponse_descriptor =
+      getDescriptor().getMessageTypes().get(11);
+    internal_static_libghidra_ImportProgramResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ImportProgramResponse_descriptor,
+        new java.lang.String[] { "ProgramPaths", "PrimaryProgramPath", });
+    internal_static_libghidra_CloseProgramRequest_descriptor =
+      getDescriptor().getMessageTypes().get(12);
     internal_static_libghidra_CloseProgramRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_CloseProgramRequest_descriptor,
         new java.lang.String[] { "ShutdownPolicy", });
     internal_static_libghidra_CloseProgramResponse_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_libghidra_CloseProgramResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_CloseProgramResponse_descriptor,
         new java.lang.String[] { "Closed", });
     internal_static_libghidra_SaveProgramRequest_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_libghidra_SaveProgramRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SaveProgramRequest_descriptor,
         new java.lang.String[] { });
     internal_static_libghidra_SaveProgramResponse_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_libghidra_SaveProgramResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SaveProgramResponse_descriptor,
         new java.lang.String[] { "Saved", });
     internal_static_libghidra_DiscardProgramRequest_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_libghidra_DiscardProgramRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DiscardProgramRequest_descriptor,
         new java.lang.String[] { });
     internal_static_libghidra_DiscardProgramResponse_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_libghidra_DiscardProgramResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DiscardProgramResponse_descriptor,
         new java.lang.String[] { "Discarded", });
     internal_static_libghidra_GetRevisionRequest_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_libghidra_GetRevisionRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_GetRevisionRequest_descriptor,
         new java.lang.String[] { });
     internal_static_libghidra_GetRevisionResponse_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_libghidra_GetRevisionResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_GetRevisionResponse_descriptor,
-        new java.lang.String[] { "Revision", });
+        new java.lang.String[] { "ProgramId", "ModificationNumber", "ProgramPath", "FileId", "FileVersion", "FileLastModifiedTime", });
     internal_static_libghidra_ShutdownRequest_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_libghidra_ShutdownRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ShutdownRequest_descriptor,
         new java.lang.String[] { "ShutdownPolicy", });
     internal_static_libghidra_ShutdownResponse_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_libghidra_ShutdownResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ShutdownResponse_descriptor,

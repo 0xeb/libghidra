@@ -110,12 +110,16 @@ from .models import (
     ListXrefsResponse,
     LoopRecord,
     MemoryBlockRecord,
+    CloseProjectResponse,
     OpenProgramRequest,
     OpenProgramResponse,
+    OpenProjectRequest,
+    OpenProjectResponse,
     ParameterRecord,
     PostDominatorRecord,
     ParseDeclarationsResponse,
     PatchBytesBatchResponse,
+    ProjectFile,
     ReadBytesResponse,
     RenameFunctionParameterResponse,
     RenameFunctionResponse,
@@ -153,7 +157,12 @@ from .models import (
     UntagFunctionResponse,
     WriteBytesResponse,
     XrefRecord,
+    ImportProgramRequest,
+    ImportProgramResponse,
+    ListProjectFilesRequest,
+    ListProjectFilesResponse,
     CloseProgramResponse,
+    LoaderArg,
     RenameFunctionLocalResponse,
 )
 
@@ -300,7 +309,7 @@ class GhidraClient:
             service_name=resp.service_name,
             service_version=resp.service_version,
             host_mode=resp.host_mode,
-            program_revision=resp.program_revision,
+            modification_number=resp.modification_number,
             warnings=list(resp.warnings),
         )
 
@@ -319,6 +328,89 @@ class GhidraClient:
     # =========================================================================
     # Session
     # =========================================================================
+
+    def open_project(self, request: OpenProjectRequest) -> OpenProjectResponse:
+        req = session_pb2.OpenProjectRequest(
+            project_path=request.project_path,
+            project_name=request.project_name,
+            create=request.create,
+            read_only=request.read_only,
+        )
+        resp = self._call_rpc(
+            "libghidra.SessionService/OpenProject",
+            req,
+            session_pb2.OpenProjectResponse,
+        )
+        return OpenProjectResponse(
+            project_path=resp.project_path,
+            project_name=resp.project_name,
+            created=resp.created,
+        )
+
+    def close_project(self, policy: ShutdownPolicy = ShutdownPolicy.UNSPECIFIED) -> CloseProjectResponse:
+        req = session_pb2.CloseProjectRequest(
+            shutdown_policy=int(policy),
+        )
+        resp = self._call_rpc(
+            "libghidra.SessionService/CloseProject",
+            req,
+            session_pb2.CloseProjectResponse,
+        )
+        return CloseProjectResponse(closed=resp.closed)
+
+    def list_project_files(
+        self,
+        request: ListProjectFilesRequest | None = None,
+    ) -> ListProjectFilesResponse:
+        request = request or ListProjectFilesRequest()
+        req = session_pb2.ListProjectFilesRequest(
+            include_folders=request.include_folders,
+            programs_only=request.programs_only,
+        )
+        resp = self._call_rpc(
+            "libghidra.SessionService/ListProjectFiles",
+            req,
+            session_pb2.ListProjectFilesResponse,
+        )
+        return ListProjectFilesResponse(
+            files=[
+                ProjectFile(
+                    path=f.path,
+                    name=f.name,
+                    folder_path=f.folder_path,
+                    content_type=f.content_type,
+                    domain_object_class=f.domain_object_class,
+                    is_folder=f.is_folder,
+                    is_program=f.is_program,
+                )
+                for f in resp.files
+            ],
+        )
+
+    def import_program(self, request: ImportProgramRequest) -> ImportProgramResponse:
+        req = session_pb2.ImportProgramRequest(
+            source_path=request.source_path,
+            project_folder_path=request.project_folder_path,
+            program_name=request.program_name,
+            overwrite=request.overwrite,
+            analyze=request.analyze,
+            language_id=request.language_id,
+            compiler_spec_id=request.compiler_spec_id,
+            loader_class=request.loader_class,
+            loader_args=[
+                session_pb2.LoaderArg(name=arg.name, value=arg.value)
+                for arg in request.loader_args
+            ],
+        )
+        resp = self._call_rpc(
+            "libghidra.SessionService/ImportProgram",
+            req,
+            session_pb2.ImportProgramResponse,
+        )
+        return ImportProgramResponse(
+            program_paths=list(resp.program_paths),
+            primary_program_path=resp.primary_program_path,
+        )
 
     def open_program(self, request: OpenProgramRequest) -> OpenProgramResponse:
         req = session_pb2.OpenProgramRequest(
@@ -380,7 +472,14 @@ class GhidraClient:
             req,
             session_pb2.GetRevisionResponse,
         )
-        return RevisionResponse(revision=resp.revision)
+        return RevisionResponse(
+            program_id=resp.program_id,
+            modification_number=resp.modification_number,
+            program_path=resp.program_path,
+            file_id=resp.file_id,
+            file_version=resp.file_version,
+            file_last_modified_time=resp.file_last_modified_time,
+        )
 
     def shutdown(self, policy: ShutdownPolicy = ShutdownPolicy.UNSPECIFIED) -> ShutdownResponse:
         req = session_pb2.ShutdownRequest(shutdown_policy=int(policy))

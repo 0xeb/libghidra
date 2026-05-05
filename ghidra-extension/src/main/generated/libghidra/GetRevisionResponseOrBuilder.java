@@ -10,8 +10,50 @@ public interface GetRevisionResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>uint64 revision = 1;</code>
-   * @return The revision.
+   * <code>uint64 program_id = 1;</code>
+   * @return The programId.
    */
-  long getRevision();
+  long getProgramId();
+
+  /**
+   * <code>uint64 modification_number = 2;</code>
+   * @return The modificationNumber.
+   */
+  long getModificationNumber();
+
+  /**
+   * <code>string program_path = 3;</code>
+   * @return The programPath.
+   */
+  java.lang.String getProgramPath();
+  /**
+   * <code>string program_path = 3;</code>
+   * @return The bytes for programPath.
+   */
+  com.google.protobuf.ByteString
+      getProgramPathBytes();
+
+  /**
+   * <code>string file_id = 4;</code>
+   * @return The fileId.
+   */
+  java.lang.String getFileId();
+  /**
+   * <code>string file_id = 4;</code>
+   * @return The bytes for fileId.
+   */
+  com.google.protobuf.ByteString
+      getFileIdBytes();
+
+  /**
+   * <code>int32 file_version = 5;</code>
+   * @return The fileVersion.
+   */
+  int getFileVersion();
+
+  /**
+   * <code>int64 file_last_modified_time = 6;</code>
+   * @return The fileLastModifiedTime.
+   */
+  long getFileLastModifiedTime();
 }

@@ -37,12 +37,24 @@ abstract class RuntimeSupport {
 		return state.getCurrentProgramPath();
 	}
 
-	protected final long revision() {
-		return state.getRevision();
+	protected final long programId() {
+		return state.getProgramId();
 	}
 
-	protected final void bumpRevision() {
-		state.bumpRevision();
+	protected final long modificationNumber() {
+		return state.getModificationNumber();
+	}
+
+	protected final String fileId() {
+		return state.getFileId();
+	}
+
+	protected final int fileVersion() {
+		return state.getFileVersion();
+	}
+
+	protected final long fileLastModifiedTime() {
+		return state.getFileLastModifiedTime();
 	}
 
 	protected static String nullableString(String text) {

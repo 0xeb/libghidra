@@ -10,6 +10,7 @@ from collections import deque
 import shutil
 import subprocess
 import tempfile
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -26,7 +27,10 @@ class HeadlessOptions:
 
     ghidra_dir: str = ""
     binary: str = ""
-    program: str = ""                 # reopen existing (mutually exclusive with binary)
+    binaries: List[str] = field(default_factory=list)
+    program: str = ""                 # reopen existing program
+    programs: List[str] = field(default_factory=list)
+    initial_program: str = ""         # active program for the live RPC host
     port: int = 18080
     bind: str = "127.0.0.1"          # bind address for the headless server
     project_dir: str = ""
@@ -53,13 +57,15 @@ class HeadlessClient:
     def __init__(self, client: GhidraClient, proc: subprocess.Popen,
                  project_dir: Path, owns_project_dir: bool,
                  base_url: str,
-                 on_output: Optional[Callable[[str], None]] = None):
+                 on_output: Optional[Callable[[str], None]] = None,
+                 output_thread: Optional[threading.Thread] = None):
         self._client = client
         self._proc = proc
         self._project_dir = project_dir
         self._owns_project_dir = owns_project_dir
         self._base_url = base_url
         self._on_output = on_output
+        self._output_thread = output_thread
 
     @property
     def client(self) -> GhidraClient:
@@ -87,6 +93,9 @@ class HeadlessClient:
 
     def close(self, save: bool = True) -> int:
         """Shut down the Ghidra host and wait for the process to exit."""
+        if self._proc is None:
+            return 0
+
         from .models import ShutdownPolicy
         try:
             policy = ShutdownPolicy.SAVE if save else ShutdownPolicy.DISCARD
@@ -94,8 +103,8 @@ class HeadlessClient:
         except Exception:
             pass
 
-        # Drain remaining output
-        if self._proc.stdout:
+        # Keep draining synchronously only for older callers without a drainer.
+        if self._proc.stdout and self._output_thread is None:
             for line in self._proc.stdout:
                 line = line.strip()
                 if line and self._on_output:
@@ -108,6 +117,8 @@ class HeadlessClient:
             self._proc.wait(timeout=10)
 
         exit_code = self._proc.returncode
+        if self._output_thread is not None:
+            self._output_thread.join(timeout=5)
 
         if self._owns_project_dir:
             shutil.rmtree(self._project_dir, ignore_errors=True)
@@ -143,8 +154,43 @@ def _find_script_dir(ghidra_dir: Path) -> Path:
     return d
 
 
+def _emit_output_line(line: str, on_output: Optional[Callable[[str], None]]) -> None:
+    line = line.strip()
+    if line and on_output:
+        on_output(line)
+
+
+def _start_output_drain(
+        proc: subprocess.Popen,
+        on_output: Optional[Callable[[str], None]] = None) -> Optional[threading.Thread]:
+    if proc.stdout is None:
+        return None
+
+    def drain() -> None:
+        try:
+            for line in proc.stdout:
+                _emit_output_line(line, on_output)
+        except Exception:
+            pass
+
+    thread = threading.Thread(
+        target=drain,
+        name="libghidra-headless-output",
+        daemon=True)
+    thread.start()
+    return thread
+
+
 def _infer_imported_program_name(binary: Path) -> str:
     return binary.name
+
+
+def _strip_project_leading_slash(path: str) -> str:
+    return path.lstrip("/\\")
+
+
+def _join_script_list(values: list[str]) -> str:
+    return ";".join(value for value in values if value)
 
 
 def _stream_process_output(
@@ -223,16 +269,23 @@ def launch_headless(opts: HeadlessOptions) -> HeadlessClient:
     """
     ghidra_dir = Path(opts.ghidra_dir).resolve()
 
-    # Validate: need either binary or program
-    has_binary = bool(opts.binary)
-    has_program = bool(opts.program)
-    if not has_binary and not has_program:
-        raise ValueError("HeadlessOptions: either binary or program must be set")
-    if has_binary and has_program:
-        raise ValueError("HeadlessOptions: binary and program are mutually exclusive")
+    binary_inputs = []
+    if opts.binary:
+        binary_inputs.append(opts.binary)
+    binary_inputs.extend(opts.binaries)
 
-    if has_binary:
-        binary = Path(opts.binary).resolve()
+    program_inputs = []
+    if opts.program:
+        program_inputs.append(opts.program)
+    program_inputs.extend(opts.programs)
+
+    if not binary_inputs and not program_inputs and not opts.initial_program:
+        raise ValueError(
+            "HeadlessOptions: binary, program, binaries, programs, or "
+            "initial_program must be set")
+
+    binaries = [Path(p).resolve() for p in binary_inputs]
+    for binary in binaries:
         if not binary.exists():
             raise FileNotFoundError(f"Binary not found: {binary}")
 
@@ -249,12 +302,12 @@ def launch_headless(opts: HeadlessOptions) -> HeadlessClient:
 
     on_output = opts.on_output
 
-    managed_program = opts.program
-    if has_binary:
+    imported_programs = []
+    for binary in binaries:
         try:
             # analyzeHeadless only persists imported programs after the import run exits.
             # Start the live RPC server on the saved project program, not the import-phase object.
-            managed_program = _run_import_stage(
+            imported_programs.append(_run_import_stage(
                 launcher,
                 project_dir,
                 opts.project_name,
@@ -263,11 +316,19 @@ def launch_headless(opts: HeadlessOptions) -> HeadlessClient:
                 opts.analyze,
                 max(opts.startup_timeout, opts.read_timeout),
                 on_output,
-            )
+            ))
         except BaseException:
             if owns_project_dir:
                 shutil.rmtree(project_dir, ignore_errors=True)
             raise
+
+    managed_program = (
+        opts.initial_program
+        or (program_inputs[0] if program_inputs else "")
+        or (imported_programs[0] if imported_programs else "")
+    )
+    process_program = _strip_project_leading_slash(managed_program)
+    declared_programs = [*program_inputs, *imported_programs]
 
     # Build analyzeHeadless command
     cmd = [
@@ -275,7 +336,7 @@ def launch_headless(opts: HeadlessOptions) -> HeadlessClient:
         str(project_dir), opts.project_name,
     ]
 
-    cmd += ["-process", managed_program]
+    cmd += ["-process", process_program]
     cmd.append("-noanalysis")
 
     cmd += [
@@ -285,6 +346,11 @@ def launch_headless(opts: HeadlessOptions) -> HeadlessClient:
         f"port={opts.port}",
         f"shutdown={opts.shutdown}",
     ]
+    if opts.initial_program:
+        cmd.append(f"initial_program={opts.initial_program}")
+    program_list = _join_script_list(declared_programs)
+    if program_list:
+        cmd.append(f"program_paths={program_list}")
     if opts.auth_token:
         cmd.append(f"auth={opts.auth_token}")
     if opts.max_runtime_seconds > 0:
@@ -309,9 +375,7 @@ def launch_headless(opts: HeadlessOptions) -> HeadlessClient:
             if not line:
                 time.sleep(0.1)
                 continue
-            line = line.strip()
-            if line and on_output:
-                on_output(line)
+            _emit_output_line(line, on_output)
             if READY_BANNER in line:
                 for part in line.split():
                     if part.startswith("port="):
@@ -340,5 +404,6 @@ def launch_headless(opts: HeadlessOptions) -> HeadlessClient:
         client_opts.auth_token = opts.auth_token
     client = GhidraClient(client_opts)
 
+    output_thread = _start_output_drain(proc, on_output)
     return HeadlessClient(client, proc, project_dir, owns_project_dir,
-                          base_url, on_output)
+                          base_url, on_output, output_thread)

@@ -24,10 +24,44 @@ struct OpenProgramRequest {
   std::uint64_t base_address = 0;
 };
 
+struct OpenProjectRequest {
+  std::string project_path;
+  std::string project_name;
+  bool create = false;
+  bool read_only = false;
+};
+
+struct ListProjectFilesRequest {
+  bool include_folders = false;
+  bool programs_only = false;
+};
+
+struct LoaderArg {
+  std::string name;
+  std::string value;
+};
+
+struct ImportProgramRequest {
+  std::string source_path;
+  std::string project_folder_path;
+  std::string program_name;
+  bool overwrite = false;
+  bool analyze = false;
+  std::string language_id;
+  std::string compiler_spec_id;
+  std::string loader_class;
+  std::vector<LoaderArg> loader_args;
+};
+
 class ISessionClient {
  public:
   virtual ~ISessionClient() = default;
 
+  virtual StatusOr<OpenProjectResponse> OpenProject(const OpenProjectRequest& request) = 0;
+  virtual StatusOr<CloseProjectResponse> CloseProject(ShutdownPolicy policy) = 0;
+  virtual StatusOr<ListProjectFilesResponse> ListProjectFiles(
+      const ListProjectFilesRequest& request) = 0;
+  virtual StatusOr<ImportProgramResponse> ImportProgram(const ImportProgramRequest& request) = 0;
   virtual StatusOr<OpenProgramResponse> OpenProgram(const OpenProgramRequest& request) = 0;
   virtual StatusOr<CloseProgramResponse> CloseProgram(ShutdownPolicy policy) = 0;
   virtual StatusOr<SaveProgramResponse> SaveProgram() = 0;

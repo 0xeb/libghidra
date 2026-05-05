@@ -22,7 +22,10 @@ namespace libghidra::client {
 struct HeadlessOptions {
   std::string ghidra_dir;       // Path to Ghidra distribution
   std::string binary;           // Path to binary to import (empty if using program)
-  std::string program;          // Reopen existing program (mutually exclusive with binary)
+  std::vector<std::string> binaries;  // Additional binaries to import
+  std::string program;          // Reopen existing program
+  std::vector<std::string> programs;  // Additional existing programs
+  std::string initial_program;  // Active project program for the live RPC host
   int port = 18080;
   std::string bind = "127.0.0.1";  // Bind address for the headless server
   std::string project_dir;     // Empty = temp dir (auto-cleaned)

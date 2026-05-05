@@ -1,12 +1,24 @@
 package libghidra.host.runtime;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import generic.stl.Pair;
+import ghidra.app.util.importer.ProgramLoader;
+import ghidra.app.util.opinion.LoadResults;
+import ghidra.app.util.opinion.Loaded;
+import ghidra.base.project.GhidraProject;
 import ghidra.framework.model.DomainFile;
+import ghidra.framework.model.DomainFolder;
+import ghidra.framework.model.Project;
 import ghidra.framework.model.ProjectData;
+import ghidra.framework.model.ProjectLocator;
 import ghidra.framework.model.TransactionInfo;
+import ghidra.framework.project.DefaultProjectManager;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
 import ghidra.util.exception.CancelledException;
@@ -22,24 +34,28 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 	}
 
 	private final ControlMode controlMode;
-	private final ProjectData projectData;
+	private final LibGhidraProjectManager projectManager;
+	private Project project;
+	private ProjectData projectData;
 	private final Object programConsumer;
 	private final TaskMonitor taskMonitor;
-	private final String managedProjectPath;
-	private final String managedProjectName;
+	private String managedProjectPath;
+	private String managedProjectName;
 	private final Map<String, DomainFile> knownProgramFiles = new HashMap<>();
 
 	private SessionRuntime(
 			HostState state,
 			ControlMode controlMode,
-			ProjectData projectData,
+			Project project,
 			Object programConsumer,
 			TaskMonitor taskMonitor,
 			String managedProjectPath,
 			String managedProjectName) {
 		super(state);
 		this.controlMode = controlMode;
-		this.projectData = projectData;
+		this.projectManager = new LibGhidraProjectManager();
+		this.project = project;
+		this.projectData = project != null ? project.getProjectData() : null;
 		this.programConsumer = programConsumer;
 		this.taskMonitor = taskMonitor != null ? taskMonitor : TaskMonitor.DUMMY;
 		this.managedProjectPath = ManagedProgramSupport.normalizeProjectPath(managedProjectPath);
@@ -56,7 +72,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 
 	public static SessionRuntime forManagedHeadless(
 			HostState state,
-			ProjectData projectData,
+			Project project,
 			Object programConsumer,
 			TaskMonitor taskMonitor,
 			String managedProjectPath,
@@ -64,7 +80,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		return new SessionRuntime(
 			state,
 			ControlMode.MANAGED_HEADLESS,
-			projectData,
+			project,
 			programConsumer,
 			taskMonitor,
 			managedProjectPath,
@@ -102,6 +118,149 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 	}
 
 	@Override
+	public SessionContract.OpenProjectResponse openProject(SessionContract.OpenProjectRequest request) {
+		try (LockScope ignored = writeLock()) {
+			requireManagedProjectLifecycle("open_project()");
+			SessionContract.OpenProjectRequest safeRequest = request != null
+					? request
+					: new SessionContract.OpenProjectRequest("", "", false, false);
+			if (safeRequest.readOnly()) {
+				throw new SessionRpcException(
+					"NOT_SUPPORTED",
+					"read-only project open is not supported by this host");
+			}
+			String projectPath = safeRequest.projectPath() != null ? safeRequest.projectPath().trim() : "";
+			String projectName = safeRequest.projectName() != null ? safeRequest.projectName().trim() : "";
+			if (projectPath.isBlank() || projectName.isBlank()) {
+				throw new SessionRpcException(
+					"invalid_argument",
+					"project_path and project_name are required");
+			}
+			String normalizedPath = ManagedProgramSupport.normalizeProjectPath(projectPath);
+			if (project != null && normalizedPath.equals(managedProjectPath) &&
+				projectName.equals(managedProjectName)) {
+				return new SessionContract.OpenProjectResponse(
+					managedProjectPath,
+					managedProjectName,
+					false);
+			}
+			if (currentProgram() != null) {
+				throw new SessionRpcException(
+					"conflict",
+					"close the current program before opening another project on this host");
+			}
+			closeProjectOnlyLocked();
+			try {
+				ProjectLocator locator = new ProjectLocator(projectPath, projectName);
+				Project opened = safeRequest.create()
+						? projectManager.createProject(locator, null, false)
+						: projectManager.openProject(locator, false, false);
+				if (opened == null) {
+					throw new IOException("failed to open project: " + projectPath + "/" + projectName);
+				}
+				adoptProjectLocked(opened);
+				return new SessionContract.OpenProjectResponse(
+					managedProjectPath,
+					managedProjectName,
+					safeRequest.create());
+			}
+			catch (Exception e) {
+				throw toSessionException("open_project", e);
+			}
+		}
+	}
+
+	@Override
+	public SessionContract.CloseProjectResponse closeProject(SessionContract.CloseProjectRequest request) {
+		try (LockScope ignored = writeLock()) {
+			requireManagedProjectLifecycle("close_project()");
+			SessionContract.ShutdownPolicy policy = request != null
+					? request.shutdownPolicy()
+					: SessionContract.ShutdownPolicy.UNSPECIFIED;
+			if (currentProgram() != null && !closeManagedProgramLocked(policy)) {
+				return new SessionContract.CloseProjectResponse(false);
+			}
+			boolean closed = closeProjectOnlyLocked();
+			return new SessionContract.CloseProjectResponse(closed);
+		}
+	}
+
+	@Override
+	public SessionContract.ListProjectFilesResponse listProjectFiles(
+			SessionContract.ListProjectFilesRequest request) {
+		try (LockScope ignored = readLock()) {
+			ProjectData data = requireProjectDataLocked();
+			SessionContract.ListProjectFilesRequest safeRequest = request != null
+					? request
+					: new SessionContract.ListProjectFilesRequest(false, false);
+			List<SessionContract.ProjectFile> files = new ArrayList<>();
+			if (safeRequest.includeFolders() && !safeRequest.programsOnly()) {
+				collectFolders(data.getRootFolder(), files);
+			}
+			for (DomainFile file : data) {
+				SessionContract.ProjectFile mapped = toProjectFile(file);
+				if (safeRequest.programsOnly() && !mapped.isProgram()) {
+					continue;
+				}
+				files.add(mapped);
+			}
+			files.sort((a, b) -> a.path().compareToIgnoreCase(b.path()));
+			return new SessionContract.ListProjectFilesResponse(files);
+		}
+	}
+
+	@Override
+	public SessionContract.ImportProgramResponse importProgram(
+			SessionContract.ImportProgramRequest request) {
+		try (LockScope ignored = writeLock()) {
+			requireManagedProjectLifecycle("import_program()");
+			Project targetProject = requireProjectLocked();
+			SessionContract.ImportProgramRequest safeRequest = request != null
+					? request
+					: new SessionContract.ImportProgramRequest(
+						"", "", "", false, false, "", "", "", List.of());
+			String sourcePath = safeRequest.sourcePath() != null ? safeRequest.sourcePath().trim() : "";
+			if (sourcePath.isBlank()) {
+				throw new SessionRpcException("invalid_argument", "source_path is required");
+			}
+			File source = new File(sourcePath);
+			if (!source.isFile()) {
+				throw new SessionRpcException("not_found", "source binary not found: " + sourcePath);
+			}
+			String folderPath = normalizeProjectFolderPath(safeRequest.projectFolderPath());
+			try {
+				if (safeRequest.overwrite()) {
+					deleteExistingImportTargetLocked(safeRequest, source, folderPath);
+				}
+				try (LoadResults<Program> results = buildProgramLoader(targetProject, safeRequest, source, folderPath)
+					.load()) {
+					List<String> paths = new ArrayList<>();
+					for (Loaded<Program> loaded : results) {
+						Program loadedProgram = loaded.getDomainObject(programConsumer);
+						try {
+							if (safeRequest.analyze()) {
+								GhidraProject.analyze(loadedProgram);
+							}
+							DomainFile saved = loaded.save(taskMonitor);
+							String path = ManagedProgramSupport.normalizeProgramPath(saved.getPathname());
+							paths.add(path);
+							knownProgramFiles.put(path, saved);
+						}
+						finally {
+							loadedProgram.release(programConsumer);
+						}
+					}
+					String primary = paths.isEmpty() ? "" : paths.get(0);
+					return new SessionContract.ImportProgramResponse(paths, primary);
+				}
+			}
+			catch (Exception e) {
+				throw toSessionException("import_program", e);
+			}
+		}
+	}
+
+	@Override
 	public SessionContract.OpenProgramResponse openProgram(SessionContract.OpenProgramRequest request) {
 		try (LockScope ignored = writeLock()) {
 			return switch (controlMode) {
@@ -129,9 +288,6 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 						"close_program() is not supported for an attached GUI host");
 				case FIXED_HEADLESS -> {
 					boolean ok = applyShutdownPolicyLocked(policy);
-					if (ok) {
-						bumpRevision();
-					}
 					yield new SessionContract.CloseProgramResponse(ok);
 				}
 				case MANAGED_HEADLESS -> new SessionContract.CloseProgramResponse(
@@ -157,7 +313,13 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 
 	@Override
 	public SessionContract.GetRevisionResponse getRevision(SessionContract.GetRevisionRequest request) {
-		return new SessionContract.GetRevisionResponse(revision());
+		return new SessionContract.GetRevisionResponse(
+			programId(),
+			modificationNumber(),
+			currentProgramPath(),
+			fileId(),
+			fileVersion(),
+			fileLastModifiedTime());
 	}
 
 	@Override
@@ -167,9 +329,6 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 					? request.shutdownPolicy()
 					: SessionContract.ShutdownPolicy.UNSPECIFIED;
 			boolean ok = applyShutdownPolicyLocked(policy);
-			if (ok) {
-				bumpRevision();
-			}
 			return new SessionContract.ShutdownResponse(ok);
 		}
 	}
@@ -205,6 +364,9 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 				"NOT_SUPPORTED",
 				"managed headless hosts only operate on their configured project");
 		}
+		if (projectData == null) {
+			throw new SessionRpcException("not_found", "no project is open on this host");
+		}
 		String requestedProgramPath = request != null
 				? ManagedProgramSupport.normalizeProgramPath(request.programPath())
 				: "";
@@ -214,16 +376,14 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		}
 		if (current != null) {
 			if (currentProgramPath().equals(requestedProgramPath)) {
-				throw new SessionRpcException(
-					"conflict",
-					"program is already open on this host: " + requestedProgramPath);
+				return describeCurrentProgram(current);
 			}
 			throw new SessionRpcException(
 				"conflict",
 				"close the current program before opening another one on this host");
 		}
 		try {
-			DomainFile file = projectData != null ? projectData.getFile(requestedProgramPath) : null;
+			DomainFile file = projectData.getFile(requestedProgramPath);
 			if (file == null) {
 				file = knownProgramFiles.get(requestedProgramPath);
 			}
@@ -259,7 +419,6 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			return false;
 		}
 		releaseOwnedProgramLocked();
-		bumpRevision();
 		return true;
 	}
 
@@ -278,6 +437,184 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		catch (RuntimeException e) {
 			Msg.warn(this, "program release failed: " + e.getMessage(), e);
 		}
+	}
+
+	private void requireManagedProjectLifecycle(String operation) {
+		if (controlMode != ControlMode.MANAGED_HEADLESS) {
+			throw new SessionRpcException(
+				"NOT_SUPPORTED",
+				operation + " is only supported for managed headless hosts");
+		}
+	}
+
+	private Project requireProjectLocked() {
+		if (project == null || projectData == null) {
+			throw new SessionRpcException("not_found", "no project is open on this host");
+		}
+		return project;
+	}
+
+	private ProjectData requireProjectDataLocked() {
+		return requireProjectLocked().getProjectData();
+	}
+
+	private void adoptProjectLocked(Project opened) {
+		project = opened;
+		projectData = opened.getProjectData();
+		ProjectLocator locator = projectData.getProjectLocator();
+		managedProjectPath = locator != null
+				? ManagedProgramSupport.normalizeProjectPath(locator.getLocation())
+				: "";
+		managedProjectName = locator != null ? locator.getName() : "";
+		knownProgramFiles.clear();
+	}
+
+	private boolean closeProjectOnlyLocked() {
+		if (project == null) {
+			projectData = null;
+			managedProjectPath = "";
+			managedProjectName = "";
+			knownProgramFiles.clear();
+			return false;
+		}
+		try {
+			project.close();
+			project = null;
+			projectData = null;
+			managedProjectPath = "";
+			managedProjectName = "";
+			knownProgramFiles.clear();
+			return true;
+		}
+		catch (RuntimeException e) {
+			throw new SessionRpcException("internal_error", e.getMessage());
+		}
+	}
+
+	private void collectFolders(DomainFolder folder, List<SessionContract.ProjectFile> out) {
+		if (folder == null) {
+			return;
+		}
+		if (!"/".equals(folder.getPathname())) {
+			out.add(new SessionContract.ProjectFile(
+				ManagedProgramSupport.normalizeProgramPath(folder.getPathname()),
+				folder.getName(),
+				folder.getParent() != null ? folder.getParent().getPathname() : "",
+				"folder",
+				"",
+				true,
+				false));
+		}
+		for (DomainFolder child : folder.getFolders()) {
+			collectFolders(child, out);
+		}
+	}
+
+	private SessionContract.ProjectFile toProjectFile(DomainFile file) {
+		Class<?> clazz = file.getDomainObjectClass();
+		boolean isProgram = clazz != null && Program.class.isAssignableFrom(clazz);
+		String path = ManagedProgramSupport.normalizeProgramPath(file.getPathname());
+		int slash = path.lastIndexOf('/');
+		String folderPath = slash > 0 ? path.substring(0, slash) : "/";
+		return new SessionContract.ProjectFile(
+			path,
+			file.getName(),
+			folderPath,
+			file.getContentType(),
+			clazz != null ? clazz.getName() : "",
+			false,
+			isProgram);
+	}
+
+	private ProgramLoader.Builder buildProgramLoader(
+			Project targetProject,
+			SessionContract.ImportProgramRequest request,
+			File source,
+			String folderPath) throws Exception {
+		ProgramLoader.Builder builder = ProgramLoader.builder()
+			.source(source)
+			.project(targetProject)
+			.projectFolderPath(folderPath)
+			.monitor(taskMonitor);
+		if (request.programName() != null && !request.programName().isBlank()) {
+			builder.name(request.programName().trim());
+		}
+		if (request.languageId() != null && !request.languageId().isBlank()) {
+			builder.language(request.languageId().trim());
+		}
+		if (request.compilerSpecId() != null && !request.compilerSpecId().isBlank()) {
+			builder.compiler(request.compilerSpecId().trim());
+		}
+		if (request.loaderClass() != null && !request.loaderClass().isBlank()) {
+			applyLoaderClass(builder, request.loaderClass().trim());
+		}
+		List<Pair<String, String>> args = new ArrayList<>();
+		if (request.loaderArgs() != null) {
+			for (SessionContract.LoaderArg arg : request.loaderArgs()) {
+				if (arg == null || arg.name() == null || arg.name().isBlank()) {
+					continue;
+				}
+				args.add(new Pair<>(arg.name(), arg.value() != null ? arg.value() : ""));
+			}
+		}
+		if (!args.isEmpty()) {
+			builder.loaderArgs(args);
+		}
+		return builder;
+	}
+
+	private void applyLoaderClass(ProgramLoader.Builder builder, String loaderClass) throws Exception {
+		try {
+			builder.loaders(loaderClass);
+		}
+		catch (Exception e) {
+			int dot = loaderClass.lastIndexOf('.');
+			if (dot <= 0 || dot == loaderClass.length() - 1) {
+				throw e;
+			}
+			builder.loaders(loaderClass.substring(dot + 1));
+		}
+	}
+
+	private void deleteExistingImportTargetLocked(
+			SessionContract.ImportProgramRequest request,
+			File source,
+			String folderPath) throws IOException {
+		String name = request.programName() != null && !request.programName().isBlank()
+				? request.programName().trim()
+				: source.getName();
+		String targetPath = ManagedProgramSupport.normalizeProgramPath(folderPath + "/" + name);
+		if (targetPath.equals(currentProgramPath())) {
+			throw new SessionRpcException(
+				"conflict",
+				"close the current program before overwriting it: " + targetPath);
+		}
+		DomainFile existing = projectData != null ? projectData.getFile(targetPath) : null;
+		if (existing != null) {
+			existing.delete();
+			knownProgramFiles.remove(targetPath);
+		}
+	}
+
+	private static String normalizeProjectFolderPath(String folderPath) {
+		String normalized = ManagedProgramSupport.normalizeProgramPath(folderPath);
+		if (normalized.isBlank()) {
+			return "/";
+		}
+		while (normalized.length() > 1 && normalized.endsWith("/")) {
+			normalized = normalized.substring(0, normalized.length() - 1);
+		}
+		return normalized;
+	}
+
+	private SessionRpcException toSessionException(String operation, Exception e) {
+		if (e instanceof SessionRpcException session) {
+			return session;
+		}
+		String message = e.getMessage();
+		return new SessionRpcException(
+			"internal_error",
+			operation + " failed: " + (message != null && !message.isBlank() ? message : e.toString()));
 	}
 
 	private boolean matchesManagedProject(SessionContract.OpenProgramRequest request) {
@@ -397,7 +734,6 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		}
 		try {
 			program.save("libghidra save", TaskMonitor.DUMMY);
-			bumpRevision();
 			return true;
 		}
 		catch (IOException | CancelledException e) {
@@ -426,11 +762,13 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 					break;
 				}
 			}
-			bumpRevision();
 			return true;
 		}
 		catch (IOException e) {
 			return false;
 		}
+	}
+
+	private static final class LibGhidraProjectManager extends DefaultProjectManager {
 	}
 }

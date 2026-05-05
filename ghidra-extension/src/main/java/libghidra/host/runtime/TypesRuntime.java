@@ -439,7 +439,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 						"apply_error",
 						"function prototype was not applied");
 				}
-				bumpRevision();
 				commit = true;
 				return new TypesContract.SetFunctionSignatureResponse(
 					true,
@@ -501,7 +500,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 							Long.toHexString(request.address()));
 				}
 				parameter.setName(newName, SourceType.USER_DEFINED);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.RenameFunctionParameterResponse(
 					true,
@@ -565,7 +563,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 						"unable to resolve writable data type '" + requestedType + "'");
 				}
 				parameter.setDataType(parsed, SourceType.USER_DEFINED);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.SetFunctionParameterTypeResponse(
 					true,
@@ -608,10 +605,21 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 			int tx = program.startTransaction("libghidra rename function local");
 			boolean commit = false;
 			try {
+				if (localId.startsWith("local:")) {
+					boolean renamed = FunctionVariableMutationSupport.decompileAndRenameHighVariable(
+						program,
+						request.address(),
+						localId,
+						newName);
+					if (renamed) {
+						commit = true;
+						return new TypesContract.RenameFunctionLocalResponse(
+							true, localId, newName, "", "");
+					}
+				}
 				Variable variable = FunctionSupport.resolveFunctionVariable(program, request.address(), localId);
 				if (variable != null) {
 					variable.setName(newName, SourceType.USER_DEFINED);
-					bumpRevision();
 					commit = true;
 					return new TypesContract.RenameFunctionLocalResponse(
 						true,
@@ -620,24 +628,25 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 						"",
 						"");
 				}
-				boolean renamed = FunctionVariableMutationSupport.decompileAndRenameHighVariable(
-					program,
-					request.address(),
-					localId,
-					newName);
-				if (!renamed) {
-					return new TypesContract.RenameFunctionLocalResponse(
-						false,
+				if (!localId.startsWith("local:")) {
+					boolean renamed = FunctionVariableMutationSupport.decompileAndRenameHighVariable(
+						program,
+						request.address(),
 						localId,
-						"",
-						"not_found",
-						"local '" + localId + "' not found for function 0x" +
-							Long.toHexString(request.address()));
+						newName);
+					if (renamed) {
+						commit = true;
+						return new TypesContract.RenameFunctionLocalResponse(
+							true, localId, newName, "", "");
+					}
 				}
-				bumpRevision();
-				commit = true;
 				return new TypesContract.RenameFunctionLocalResponse(
-					true, localId, newName, "", "");
+					false,
+					localId,
+					"",
+					"not_found",
+					"local '" + localId + "' not found for function 0x" +
+						Long.toHexString(request.address()));
 			}
 			catch (InvalidInputException | DuplicateNameException | IllegalArgumentException e) {
 				Msg.error(this, "renameFunctionLocal failed: " + e.getMessage(), e);
@@ -685,10 +694,27 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 						"unknown_type",
 						"unable to resolve writable data type '" + requestedType + "'");
 				}
+				if (localId.startsWith("local:")) {
+					String appliedType = FunctionVariableMutationSupport.decompileAndRetypeHighVariable(
+						program,
+						request.address(),
+						localId,
+						parsed);
+					if (appliedType != null) {
+						commit = true;
+						return new TypesContract.SetFunctionLocalTypeResponse(
+							true, localId, appliedType, "", "");
+					}
+				}
 				Variable variable = FunctionSupport.resolveFunctionVariable(program, request.address(), localId);
 				if (variable != null) {
+					String existingName = variable.getName();
 					variable.setDataType(parsed, SourceType.USER_DEFINED);
-					bumpRevision();
+					if (existingName != null &&
+							!existingName.isBlank() &&
+							!existingName.equals(variable.getName())) {
+						variable.setName(existingName, SourceType.USER_DEFINED);
+					}
 					commit = true;
 					return new TypesContract.SetFunctionLocalTypeResponse(
 						true,
@@ -697,24 +723,25 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 						"",
 						"");
 				}
-				String appliedType = FunctionVariableMutationSupport.decompileAndRetypeHighVariable(
-					program,
-					request.address(),
-					localId,
-					parsed);
-				if (appliedType == null) {
-					return new TypesContract.SetFunctionLocalTypeResponse(
-						false,
+				if (!localId.startsWith("local:")) {
+					String appliedType = FunctionVariableMutationSupport.decompileAndRetypeHighVariable(
+						program,
+						request.address(),
 						localId,
-						"",
-						"not_found",
-						"local '" + localId + "' not found for function 0x" +
-							Long.toHexString(request.address()));
+						parsed);
+					if (appliedType != null) {
+						commit = true;
+						return new TypesContract.SetFunctionLocalTypeResponse(
+							true, localId, appliedType, "", "");
+					}
 				}
-				bumpRevision();
-				commit = true;
 				return new TypesContract.SetFunctionLocalTypeResponse(
-					true, localId, appliedType, "", "");
+					false,
+					localId,
+					"",
+					"not_found",
+					"local '" + localId + "' not found for function 0x" +
+						Long.toHexString(request.address()));
 			}
 			catch (InvalidInputException | DuplicateNameException | IllegalArgumentException e) {
 				Msg.error(this, "setFunctionLocalType failed: " + e.getMessage(), e);
@@ -769,7 +796,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				}
 				listing.clearCodeUnits(address, clearEnd, false);
 				listing.createData(address, parsed);
-				bumpRevision();
 				commit = true;
 				Data reapplied = listing.getDataAt(address);
 				String appliedPath = reapplied != null && reapplied.getDataType() != null
@@ -827,7 +853,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				dtm.addDataType(
 					dataType,
 					ghidra.program.model.data.DataTypeConflictHandler.DEFAULT_HANDLER);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.CreateTypeResponse(true);
 			}
@@ -857,7 +882,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					return new TypesContract.DeleteTypeResponse(false);
 				}
 				dtm.remove(dataType);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.DeleteTypeResponse(true);
 			}
@@ -890,7 +914,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				}
 				String newName = request.newName().trim();
 				dataType.setName(newName);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.RenameTypeResponse(true, newName);
 			}
@@ -930,7 +953,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				dtm.addDataType(
 					alias,
 					ghidra.program.model.data.DataTypeConflictHandler.DEFAULT_HANDLER);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.CreateTypeAliasResponse(true);
 			}
@@ -961,7 +983,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					return new TypesContract.DeleteTypeAliasResponse(false);
 				}
 				dtm.remove(dataType);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.DeleteTypeAliasResponse(true);
 			}
@@ -1008,7 +1029,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 						target,
 						dtm);
 				dtm.replaceDataType(dataType, replacement, true);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.SetTypeAliasTargetResponse(true);
 			}
@@ -1047,7 +1067,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				dtm.addDataType(
 					enumType,
 					ghidra.program.model.data.DataTypeConflictHandler.DEFAULT_HANDLER);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.CreateTypeEnumResponse(true);
 			}
@@ -1078,7 +1097,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					return new TypesContract.DeleteTypeEnumResponse(false);
 				}
 				dtm.remove(dataType);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.DeleteTypeEnumResponse(true);
 			}
@@ -1118,7 +1136,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					}
 				}
 				enumType.add(nextName, request.value());
-				bumpRevision();
 				commit = true;
 				return new TypesContract.AddTypeEnumMemberResponse(true);
 			}
@@ -1156,7 +1173,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					return new TypesContract.DeleteTypeEnumMemberResponse(false);
 				}
 				enumType.remove(memberName);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.DeleteTypeEnumMemberResponse(true);
 			}
@@ -1203,7 +1219,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				long value = enumType.getValue(oldName);
 				enumType.remove(oldName);
 				enumType.add(nextName, value);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.RenameTypeEnumMemberResponse(true);
 			}
@@ -1246,7 +1261,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				}
 				enumType.remove(memberName);
 				enumType.add(memberName, request.value());
-				bumpRevision();
 				commit = true;
 				return new TypesContract.SetTypeEnumMemberValueResponse(true);
 			}
@@ -1294,7 +1308,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					memberLen,
 					request.name().trim(),
 					null);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.AddTypeMemberResponse(true);
 			}
@@ -1332,7 +1345,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					return new TypesContract.DeleteTypeMemberResponse(false);
 				}
 				composite.delete(index);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.DeleteTypeMemberResponse(true);
 			}
@@ -1371,7 +1383,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					return new TypesContract.RenameTypeMemberResponse(false);
 				}
 				composite.getComponent(index).setFieldName(request.newName().trim());
-				bumpRevision();
 				commit = true;
 				return new TypesContract.RenameTypeMemberResponse(true);
 			}
@@ -1434,7 +1445,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					composite.delete(index);
 					composite.insert(index, parsed, nextLen, fieldName, comment);
 				}
-				bumpRevision();
 				commit = true;
 				return new TypesContract.SetTypeMemberTypeResponse(true);
 			}
@@ -1484,7 +1494,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					composite.delete(index);
 					composite.insert(index, memberDt, nextLen, fieldName, nextComment);
 				}
-				bumpRevision();
 				commit = true;
 				return new TypesContract.SetTypeMemberCommentResponse(true);
 			}
@@ -1525,7 +1534,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				long value = enumType.getValue(memberName);
 				enumType.remove(memberName);
 				enumType.add(memberName, value, nextComment);
-				bumpRevision();
 				commit = true;
 				return new TypesContract.SetTypeEnumMemberCommentResponse(true);
 			}
@@ -1581,7 +1589,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 
 			int created = afterTypes.size() - beforeCount;
 			try (LockScope ignored = writeLock()) {
-				bumpRevision();
 			}
 			return new TypesContract.ParseDeclarationsResponse(
 				Math.max(0, created),

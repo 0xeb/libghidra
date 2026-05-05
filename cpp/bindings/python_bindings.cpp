@@ -210,7 +210,7 @@ static nb::dict to_dict(const HealthStatus& r) {
   d["service_name"] = r.service_name;
   d["service_version"] = r.service_version;
   d["host_mode"] = r.host_mode;
-  d["program_revision"] = r.program_revision;
+  d["modification_number"] = r.modification_number;
   // Convert warnings vector manually since nb::dict assignment from vector
   // needs an explicit nb::list
   nb::list warns;
@@ -307,7 +307,7 @@ NB_MODULE(_libghidra, m) {
       })
 
       .def("get_revision", [](IClient& self) {
-        return unwrap(self.GetRevision()).revision;
+        return unwrap(self.GetRevision()).modification_number;
       })
 
       // --- Functions ---

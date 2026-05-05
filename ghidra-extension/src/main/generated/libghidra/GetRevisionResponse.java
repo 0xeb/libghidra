@@ -27,6 +27,8 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private GetRevisionResponse() {
+    programPath_ = "";
+    fileId_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -42,15 +44,126 @@ private static final long serialVersionUID = 0L;
             libghidra.GetRevisionResponse.class, libghidra.GetRevisionResponse.Builder.class);
   }
 
-  public static final int REVISION_FIELD_NUMBER = 1;
-  private long revision_ = 0L;
+  public static final int PROGRAM_ID_FIELD_NUMBER = 1;
+  private long programId_ = 0L;
   /**
-   * <code>uint64 revision = 1;</code>
-   * @return The revision.
+   * <code>uint64 program_id = 1;</code>
+   * @return The programId.
    */
   @java.lang.Override
-  public long getRevision() {
-    return revision_;
+  public long getProgramId() {
+    return programId_;
+  }
+
+  public static final int MODIFICATION_NUMBER_FIELD_NUMBER = 2;
+  private long modificationNumber_ = 0L;
+  /**
+   * <code>uint64 modification_number = 2;</code>
+   * @return The modificationNumber.
+   */
+  @java.lang.Override
+  public long getModificationNumber() {
+    return modificationNumber_;
+  }
+
+  public static final int PROGRAM_PATH_FIELD_NUMBER = 3;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object programPath_ = "";
+  /**
+   * <code>string program_path = 3;</code>
+   * @return The programPath.
+   */
+  @java.lang.Override
+  public java.lang.String getProgramPath() {
+    java.lang.Object ref = programPath_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs =
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      programPath_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string program_path = 3;</code>
+   * @return The bytes for programPath.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getProgramPathBytes() {
+    java.lang.Object ref = programPath_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b =
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      programPath_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int FILE_ID_FIELD_NUMBER = 4;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object fileId_ = "";
+  /**
+   * <code>string file_id = 4;</code>
+   * @return The fileId.
+   */
+  @java.lang.Override
+  public java.lang.String getFileId() {
+    java.lang.Object ref = fileId_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs =
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      fileId_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string file_id = 4;</code>
+   * @return The bytes for fileId.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getFileIdBytes() {
+    java.lang.Object ref = fileId_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b =
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      fileId_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int FILE_VERSION_FIELD_NUMBER = 5;
+  private int fileVersion_ = 0;
+  /**
+   * <code>int32 file_version = 5;</code>
+   * @return The fileVersion.
+   */
+  @java.lang.Override
+  public int getFileVersion() {
+    return fileVersion_;
+  }
+
+  public static final int FILE_LAST_MODIFIED_TIME_FIELD_NUMBER = 6;
+  private long fileLastModifiedTime_ = 0L;
+  /**
+   * <code>int64 file_last_modified_time = 6;</code>
+   * @return The fileLastModifiedTime.
+   */
+  @java.lang.Override
+  public long getFileLastModifiedTime() {
+    return fileLastModifiedTime_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -67,8 +180,23 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (revision_ != 0L) {
-      output.writeUInt64(1, revision_);
+    if (programId_ != 0L) {
+      output.writeUInt64(1, programId_);
+    }
+    if (modificationNumber_ != 0L) {
+      output.writeUInt64(2, modificationNumber_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(programPath_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 3, programPath_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(fileId_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 4, fileId_);
+    }
+    if (fileVersion_ != 0) {
+      output.writeInt32(5, fileVersion_);
+    }
+    if (fileLastModifiedTime_ != 0L) {
+      output.writeInt64(6, fileLastModifiedTime_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -79,9 +207,27 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (revision_ != 0L) {
+    if (programId_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
-        .computeUInt64Size(1, revision_);
+        .computeUInt64Size(1, programId_);
+    }
+    if (modificationNumber_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(2, modificationNumber_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(programPath_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(3, programPath_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(fileId_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(4, fileId_);
+    }
+    if (fileVersion_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(5, fileVersion_);
+    }
+    if (fileLastModifiedTime_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(6, fileLastModifiedTime_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -98,8 +244,18 @@ private static final long serialVersionUID = 0L;
     }
     libghidra.GetRevisionResponse other = (libghidra.GetRevisionResponse) obj;
 
-    if (getRevision()
-        != other.getRevision()) return false;
+    if (getProgramId()
+        != other.getProgramId()) return false;
+    if (getModificationNumber()
+        != other.getModificationNumber()) return false;
+    if (!getProgramPath()
+        .equals(other.getProgramPath())) return false;
+    if (!getFileId()
+        .equals(other.getFileId())) return false;
+    if (getFileVersion()
+        != other.getFileVersion()) return false;
+    if (getFileLastModifiedTime()
+        != other.getFileLastModifiedTime()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -111,9 +267,21 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + REVISION_FIELD_NUMBER;
+    hash = (37 * hash) + PROGRAM_ID_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-        getRevision());
+        getProgramId());
+    hash = (37 * hash) + MODIFICATION_NUMBER_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getModificationNumber());
+    hash = (37 * hash) + PROGRAM_PATH_FIELD_NUMBER;
+    hash = (53 * hash) + getProgramPath().hashCode();
+    hash = (37 * hash) + FILE_ID_FIELD_NUMBER;
+    hash = (53 * hash) + getFileId().hashCode();
+    hash = (37 * hash) + FILE_VERSION_FIELD_NUMBER;
+    hash = (53 * hash) + getFileVersion();
+    hash = (37 * hash) + FILE_LAST_MODIFIED_TIME_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getFileLastModifiedTime());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -245,7 +413,12 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      revision_ = 0L;
+      programId_ = 0L;
+      modificationNumber_ = 0L;
+      programPath_ = "";
+      fileId_ = "";
+      fileVersion_ = 0;
+      fileLastModifiedTime_ = 0L;
       return this;
     }
 
@@ -280,7 +453,22 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(libghidra.GetRevisionResponse result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.revision_ = revision_;
+        result.programId_ = programId_;
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.modificationNumber_ = modificationNumber_;
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.programPath_ = programPath_;
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.fileId_ = fileId_;
+      }
+      if (((from_bitField0_ & 0x00000010) != 0)) {
+        result.fileVersion_ = fileVersion_;
+      }
+      if (((from_bitField0_ & 0x00000020) != 0)) {
+        result.fileLastModifiedTime_ = fileLastModifiedTime_;
       }
     }
 
@@ -296,8 +484,27 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(libghidra.GetRevisionResponse other) {
       if (other == libghidra.GetRevisionResponse.getDefaultInstance()) return this;
-      if (other.getRevision() != 0L) {
-        setRevision(other.getRevision());
+      if (other.getProgramId() != 0L) {
+        setProgramId(other.getProgramId());
+      }
+      if (other.getModificationNumber() != 0L) {
+        setModificationNumber(other.getModificationNumber());
+      }
+      if (!other.getProgramPath().isEmpty()) {
+        programPath_ = other.programPath_;
+        bitField0_ |= 0x00000004;
+        onChanged();
+      }
+      if (!other.getFileId().isEmpty()) {
+        fileId_ = other.fileId_;
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
+      if (other.getFileVersion() != 0) {
+        setFileVersion(other.getFileVersion());
+      }
+      if (other.getFileLastModifiedTime() != 0L) {
+        setFileLastModifiedTime(other.getFileLastModifiedTime());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -326,10 +533,35 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 8: {
-              revision_ = input.readUInt64();
+              programId_ = input.readUInt64();
               bitField0_ |= 0x00000001;
               break;
             } // case 8
+            case 16: {
+              modificationNumber_ = input.readUInt64();
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 16
+            case 26: {
+              programPath_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 26
+            case 34: {
+              fileId_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 34
+            case 40: {
+              fileVersion_ = input.readInt32();
+              bitField0_ |= 0x00000010;
+              break;
+            } // case 40
+            case 48: {
+              fileLastModifiedTime_ = input.readInt64();
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 48
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -347,34 +579,274 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private long revision_ ;
+    private long programId_ ;
     /**
-     * <code>uint64 revision = 1;</code>
-     * @return The revision.
+     * <code>uint64 program_id = 1;</code>
+     * @return The programId.
      */
     @java.lang.Override
-    public long getRevision() {
-      return revision_;
+    public long getProgramId() {
+      return programId_;
     }
     /**
-     * <code>uint64 revision = 1;</code>
-     * @param value The revision to set.
+     * <code>uint64 program_id = 1;</code>
+     * @param value The programId to set.
      * @return This builder for chaining.
      */
-    public Builder setRevision(long value) {
+    public Builder setProgramId(long value) {
 
-      revision_ = value;
+      programId_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>uint64 revision = 1;</code>
+     * <code>uint64 program_id = 1;</code>
      * @return This builder for chaining.
      */
-    public Builder clearRevision() {
+    public Builder clearProgramId() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      revision_ = 0L;
+      programId_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private long modificationNumber_ ;
+    /**
+     * <code>uint64 modification_number = 2;</code>
+     * @return The modificationNumber.
+     */
+    @java.lang.Override
+    public long getModificationNumber() {
+      return modificationNumber_;
+    }
+    /**
+     * <code>uint64 modification_number = 2;</code>
+     * @param value The modificationNumber to set.
+     * @return This builder for chaining.
+     */
+    public Builder setModificationNumber(long value) {
+
+      modificationNumber_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>uint64 modification_number = 2;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearModificationNumber() {
+      bitField0_ = (bitField0_ & ~0x00000002);
+      modificationNumber_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object programPath_ = "";
+    /**
+     * <code>string program_path = 3;</code>
+     * @return The programPath.
+     */
+    public java.lang.String getProgramPath() {
+      java.lang.Object ref = programPath_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        programPath_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string program_path = 3;</code>
+     * @return The bytes for programPath.
+     */
+    public com.google.protobuf.ByteString
+        getProgramPathBytes() {
+      java.lang.Object ref = programPath_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        programPath_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string program_path = 3;</code>
+     * @param value The programPath to set.
+     * @return This builder for chaining.
+     */
+    public Builder setProgramPath(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      programPath_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string program_path = 3;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearProgramPath() {
+      programPath_ = getDefaultInstance().getProgramPath();
+      bitField0_ = (bitField0_ & ~0x00000004);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string program_path = 3;</code>
+     * @param value The bytes for programPath to set.
+     * @return This builder for chaining.
+     */
+    public Builder setProgramPathBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      programPath_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object fileId_ = "";
+    /**
+     * <code>string file_id = 4;</code>
+     * @return The fileId.
+     */
+    public java.lang.String getFileId() {
+      java.lang.Object ref = fileId_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        fileId_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string file_id = 4;</code>
+     * @return The bytes for fileId.
+     */
+    public com.google.protobuf.ByteString
+        getFileIdBytes() {
+      java.lang.Object ref = fileId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        fileId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string file_id = 4;</code>
+     * @param value The fileId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFileId(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      fileId_ = value;
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string file_id = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFileId() {
+      fileId_ = getDefaultInstance().getFileId();
+      bitField0_ = (bitField0_ & ~0x00000008);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string file_id = 4;</code>
+     * @param value The bytes for fileId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFileIdBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      fileId_ = value;
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+
+    private int fileVersion_ ;
+    /**
+     * <code>int32 file_version = 5;</code>
+     * @return The fileVersion.
+     */
+    @java.lang.Override
+    public int getFileVersion() {
+      return fileVersion_;
+    }
+    /**
+     * <code>int32 file_version = 5;</code>
+     * @param value The fileVersion to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFileVersion(int value) {
+
+      fileVersion_ = value;
+      bitField0_ |= 0x00000010;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 file_version = 5;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFileVersion() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      fileVersion_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private long fileLastModifiedTime_ ;
+    /**
+     * <code>int64 file_last_modified_time = 6;</code>
+     * @return The fileLastModifiedTime.
+     */
+    @java.lang.Override
+    public long getFileLastModifiedTime() {
+      return fileLastModifiedTime_;
+    }
+    /**
+     * <code>int64 file_last_modified_time = 6;</code>
+     * @param value The fileLastModifiedTime to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFileLastModifiedTime(long value) {
+
+      fileLastModifiedTime_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int64 file_last_modified_time = 6;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFileLastModifiedTime() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      fileLastModifiedTime_ = 0L;
       onChanged();
       return this;
     }

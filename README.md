@@ -2,7 +2,7 @@
 
 Typed API for Ghidra program databases. Query functions, types, memory, decompiler output, and more from C++, Python, or Rust -- without touching Java.
 
-Current release: `0.0.2` alpha. The API is usable, but still evolving.
+Current release: `0.0.3` alpha. The API is usable, but still evolving.
 
 ## Install with an AI agent (recommended)
 
@@ -99,6 +99,42 @@ C:\ghidra_dist\ghidra_12.1_DEV\ghidraRun.bat
 
 The headless command must also use the Ghidra distribution root that contains `support/analyzeHeadless`.
 
+### Project files and active-program switching
+
+A Ghidra project may contain many domain files and many programs, but a
+libghidra host intentionally has one active `Program` at a time. Use the
+project RPCs to list or import project contents, then switch the active program
+with an explicit close/open sequence:
+
+```python
+import libghidra as ghidra
+
+with ghidra.launch_headless(ghidra.HeadlessOptions(
+    ghidra_dir="C:/ghidra_dist/ghidra_12.1_DEV",
+    project_dir="C:/work/projects",
+    project_name="firmware",
+    binary="C:/samples/loader.elf",
+    binaries=["C:/samples/payload.elf"],
+    initial_program="/loader.elf",
+    shutdown="save",
+)) as host:
+    files = host.list_project_files(ghidra.ListProjectFilesRequest(programs_only=True))
+    for item in files.files:
+        print(item.path)
+
+    host.close_program(ghidra.ShutdownPolicy.SAVE)
+    host.open_program(ghidra.OpenRequest(
+        project_path="C:/work/projects",
+        project_name="firmware",
+        program_path="/payload.elf",
+    ))
+```
+
+`OpenProgramRequest.program_path` is a Ghidra domain path such as
+`/payload.elf` or `/firmware/payload.elf` when `project_path` and
+`project_name` are set. Existing program-scoped APIs such as functions, memory,
+types, decompiler, and comments always read or mutate the active program only.
+
 ### 3. Query the API
 
 **Python** (easiest):
@@ -107,19 +143,19 @@ Pre-built wheels (Python 3.12+) are attached to every [release](https://github.c
 
 ```bash
 # Linux x86_64 (RHEL 8+, Ubuntu 20.04+, Debian 11+, Fedora 29+)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.2/libghidra-0.0.2-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.3/libghidra-0.0.3-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 
 # Linux aarch64 (Raspberry Pi 4/5 on 64-bit OS, Ubuntu aarch64, Debian arm64)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.2/libghidra-0.0.2-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.3/libghidra-0.0.3-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
 
 # macOS Apple Silicon (M1/M2/M3/M4)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.2/libghidra-0.0.2-cp312-abi3-macosx_15_0_arm64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.3/libghidra-0.0.3-cp312-abi3-macosx_15_0_arm64.whl
 
 # Windows x64
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.2/libghidra-0.0.2-cp312-abi3-win_amd64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.3/libghidra-0.0.3-cp312-abi3-win_amd64.whl
 ```
 
-No wheel for your platform (Intel Mac, Windows on Arm, etc.)? Use the pure-Python fallback `libghidra-0.0.2-py3-none-any.whl` inside `libghidra-python-v0.0.2.zip` on the release page — it gives you the HTTP/RPC client only; the local offline backend is unavailable.
+No wheel for your platform (Intel Mac, Windows on Arm, etc.)? Use the pure-Python fallback `libghidra-0.0.3-py3-none-any.whl` inside `libghidra-python-v0.0.3.zip` on the release page — it gives you the HTTP/RPC client only; the local offline backend is unavailable.
 
 For contributor / editable installs from a clone:
 
@@ -229,9 +265,8 @@ To also build the offline local backend:
 
 ```bash
 # 1) Apply libghidra's patches to Ghidra's C++ decompiler source. CI does
-#    this automatically before every release build; if you skip it, ELF
-#    binaries on non-x86 architectures (aarch64, ARM, RISC-V, …) will load
-#    as x86 and disassemble as nonsense.
+#    this automatically before every release build; if you skip it, some
+#    local/offline loads will fail or mis-detect architecture metadata.
 cd /path/to/ghidra-source
 for p in /path/to/libghidra/cpp/patches/*.patch; do patch -p1 < "$p"; done
 cd -

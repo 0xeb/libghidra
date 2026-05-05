@@ -212,7 +212,12 @@ fn build_local_bridge() {
     // Allow users to inject extra search paths (e.g. for Homebrew protobuf
     // on macOS) without hand-editing build.rs. Colon-separated.
     if let Ok(extra) = std::env::var("LIBGHIDRA_EXTRA_LIB_PATHS") {
-        for p in extra.split(':').filter(|s| !s.is_empty()) {
+        let separator = if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("windows") {
+            ';'
+        } else {
+            ':'
+        };
+        for p in extra.split(separator).filter(|s| !s.is_empty()) {
             println!("cargo:rustc-link-search=native={}", p);
         }
     }
@@ -237,75 +242,87 @@ fn build_local_bridge() {
     // static initializers, and libbfd-using objects (loadimage_bfd,
     // bfd_arch, etc.) are otherwise dropped because the cxx bridge
     // doesn't directly reference their symbols.
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+
     if let Some(lib_dir_str) = lib_dir.as_deref() {
-        let abs = |stem: &str| format!("{}/lib{}.a", lib_dir_str, stem);
-
-        // cargo:rustc-link-arg=ARG places ARG at the END of the cc command,
-        // AFTER the rustc-link-lib dylibs. With ld's default --as-needed
-        // behaviour, libm/libstdc++ would be dropped (no unresolved symbols
-        // by the time they're scanned) and only the static archives that
-        // come after them surface refs to sqrt etc., yielding "DSO missing
-        // from command line". Wrap the whole static-archive group in
-        // --push-state/--no-as-needed plus a redundant -lm/-lstdc++ so
-        // those DSOs stay alive long enough to satisfy the archives.
-        println!("cargo:rustc-link-arg=-Wl,--push-state");
-        println!("cargo:rustc-link-arg=-Wl,--no-as-needed");
-
-        // Whole-archive: pull in every .o so static initializers and the
-        // loader code survive the linker's --gc-sections.
-        if std::path::Path::new(&abs("libghidra_local")).exists() {
-            println!("cargo:rustc-link-arg=-Wl,--whole-archive");
-            println!("cargo:rustc-link-arg=-Wl,{}", abs("libghidra_local"));
-            println!("cargo:rustc-link-arg=-Wl,--no-whole-archive");
-        }
-
-        // Other libghidra archives + bundled libbfd/libiberty/etc. as
-        // explicit `-Wl,/abs/path/to/lib.a` so they're not silently dropped.
-        for stem in &["libghidra_client", "bfd", "iberty", "sframe", "zstd"] {
-            let path = abs(stem);
-            if std::path::Path::new(&path).exists() {
-                println!("cargo:rustc-link-arg=-Wl,{}", path);
+        if target_os == "windows" {
+            let lib_dir_path = std::path::Path::new(lib_dir_str);
+            if lib_dir_path.join("libghidra_local.lib").exists() {
+                println!("cargo:rustc-link-lib=static:+whole-archive=libghidra_local");
             }
-        }
-
-        // Re-list dynamic deps after the static archives so their unresolved
-        // symbols actually find homes — the earlier -l<name> before the
-        // archives get dropped by --as-needed since at that point nothing
-        // refers to them yet. Specifically:
-        //   sqrt           (libghidra_local::float.cc)         -> libm
-        //   __stack_chk_*  (libbfd built with -fstack-protector)-> libc
-        //   __aarch64_*    (libgcc atomic builtins)             -> libgcc_s
-        //   compress*      (libbfd compressed-section handling) -> libz
-        for lib in &["m", "c", "gcc_s", "z"] {
-            println!("cargo:rustc-link-arg=-l{}", lib);
-        }
-
-        // glibc ≥ 2.36 (Debian bookworm+, Ubuntu 24.04+, Fedora 36+) moved
-        // __stack_chk_guard from libc.so.6 to ld-linux.so (the ELF
-        // interpreter). When a source-built libiberty.a / libbfd.a was
-        // compiled with -fstack-protector-strong, the linker errors with
-        // "DSO missing from command line" unless ld-linux.so is on the
-        // command line explicitly. Emit it here. Harmless on older glibc
-        // (manylinux 2.28 ≈ glibc 2.28) where the symbol is still in libc.
-        // Only attempt when build host is Linux — readelf+/proc/self/exe is
-        // Linux-only.
-        if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("linux") {
-            if let Some(interp) = elf_interpreter() {
-                println!("cargo:rustc-link-arg={}", interp);
+            if lib_dir_path.join("libghidra_client.lib").exists() {
+                println!("cargo:rustc-link-lib=static=libghidra_client");
             }
-        }
+        } else {
+            let abs = |stem: &str| format!("{}/lib{}.a", lib_dir_str, stem);
 
-        println!("cargo:rustc-link-arg=-Wl,--pop-state");
+            // cargo:rustc-link-arg=ARG places ARG at the END of the cc command,
+            // AFTER the rustc-link-lib dylibs. With ld's default --as-needed
+            // behaviour, libm/libstdc++ would be dropped (no unresolved symbols
+            // by the time they're scanned) and only the static archives that
+            // come after them surface refs to sqrt etc., yielding "DSO missing
+            // from command line". Wrap the whole static-archive group in
+            // --push-state/--no-as-needed plus a redundant -lm/-lstdc++ so
+            // those DSOs stay alive long enough to satisfy the archives.
+            println!("cargo:rustc-link-arg=-Wl,--push-state");
+            println!("cargo:rustc-link-arg=-Wl,--no-as-needed");
 
-        // libbfd ≥ 2.38 references libzstd for ELF section decompression.
-        // Outside --no-as-needed so ld drops -lzstd cleanly when bfd was
-        // built without zstd support (manylinux_2_28's bfd ~2.30 does not
-        // reference it). libzstd.so is universally available on Linux
-        // distros shipping our prebuilt archive; on the rare host without
-        // it, the user gets a clear "cannot find -lzstd" — solvable by
-        // installing libzstd-dev / zstd-devel.
-        if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("linux") {
-            println!("cargo:rustc-link-arg=-lzstd");
+            // Whole-archive: pull in every .o so static initializers and the
+            // loader code survive the linker's --gc-sections.
+            if std::path::Path::new(&abs("libghidra_local")).exists() {
+                println!("cargo:rustc-link-arg=-Wl,--whole-archive");
+                println!("cargo:rustc-link-arg=-Wl,{}", abs("libghidra_local"));
+                println!("cargo:rustc-link-arg=-Wl,--no-whole-archive");
+            }
+
+            // Other libghidra archives + bundled libbfd/libiberty/etc. as
+            // explicit `-Wl,/abs/path/to/lib.a` so they're not silently dropped.
+            for stem in &["libghidra_client", "bfd", "iberty", "sframe", "zstd"] {
+                let path = abs(stem);
+                if std::path::Path::new(&path).exists() {
+                    println!("cargo:rustc-link-arg=-Wl,{}", path);
+                }
+            }
+
+            // Re-list dynamic deps after the static archives so their unresolved
+            // symbols actually find homes — the earlier -l<name> before the
+            // archives get dropped by --as-needed since at that point nothing
+            // refers to them yet. Specifically:
+            //   sqrt           (libghidra_local::float.cc)         -> libm
+            //   __stack_chk_*  (libbfd built with -fstack-protector)-> libc
+            //   __aarch64_*    (libgcc atomic builtins)             -> libgcc_s
+            //   compress*      (libbfd compressed-section handling) -> libz
+            for lib in &["m", "c", "gcc_s", "z"] {
+                println!("cargo:rustc-link-arg=-l{}", lib);
+            }
+
+            // glibc ≥ 2.36 (Debian bookworm+, Ubuntu 24.04+, Fedora 36+) moved
+            // __stack_chk_guard from libc.so.6 to ld-linux.so (the ELF
+            // interpreter). When a source-built libiberty.a / libbfd.a was
+            // compiled with -fstack-protector-strong, the linker errors with
+            // "DSO missing from command line" unless ld-linux.so is on the
+            // command line explicitly. Emit it here. Harmless on older glibc
+            // (manylinux 2.28 ≈ glibc 2.28) where the symbol is still in libc.
+            // Only attempt when build host is Linux — readelf+/proc/self/exe is
+            // Linux-only.
+            if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("linux") {
+                if let Some(interp) = elf_interpreter() {
+                    println!("cargo:rustc-link-arg={}", interp);
+                }
+            }
+
+            println!("cargo:rustc-link-arg=-Wl,--pop-state");
+
+            // libbfd ≥ 2.38 references libzstd for ELF section decompression.
+            // Outside --no-as-needed so ld drops -lzstd cleanly when bfd was
+            // built without zstd support (manylinux_2_28's bfd ~2.30 does not
+            // reference it). libzstd.so is universally available on Linux
+            // distros shipping our prebuilt archive; on the rare host without
+            // it, the user gets a clear "cannot find -lzstd" — solvable by
+            // installing libzstd-dev / zstd-devel.
+            if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("linux") {
+                println!("cargo:rustc-link-arg=-lzstd");
+            }
         }
     } else {
         // No prebuilt-dir: fall back to rustc-link-lib so a hand-built SDK
@@ -314,14 +331,43 @@ fn build_local_bridge() {
         println!("cargo:rustc-link-lib=static=libghidra_client");
     }
 
+    if let Ok(link_libs) = std::env::var("LIBGHIDRA_LINK_LIBS") {
+        for item in link_libs
+            .split(|c| c == ',' || c == ';')
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+        {
+            if target_os == "windows" && item.to_ascii_lowercase().ends_with(".lib") {
+                let path = std::path::Path::new(item);
+                if let Some(parent) = path.parent() {
+                    if !parent.as_os_str().is_empty() {
+                        println!("cargo:rustc-link-search=native={}", parent.display());
+                    }
+                }
+                if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
+                    println!("cargo:rustc-link-lib=static={}", stem);
+                }
+            } else if target_os == "windows" {
+                println!("cargo:rustc-link-lib=dylib={}", item);
+            } else {
+                println!("cargo:rustc-link-lib={}", item);
+            }
+        }
+    }
+
     // Dynamic deps still go through rustc-link-lib (search-path-aware).
     // Order matters with --as-needed: libs that satisfy unresolved symbols
     // from the static archives above must come first. libm is listed early
     // because libghidra_local.a's float.cc references sqrt; libstdc++
     // pulls libm.so.6 implicitly but ld errors out with "DSO missing from
     // command line" unless we also list it explicitly.
-    let dylibs = std::env::var("LIBGHIDRA_LINK_DYLIBS")
-        .unwrap_or_else(|_| "m,protobuf-lite,z".to_string());
+    let default_dylibs = if target_os == "windows" {
+        ""
+    } else {
+        "m,protobuf-lite,z"
+    };
+    let dylibs =
+        std::env::var("LIBGHIDRA_LINK_DYLIBS").unwrap_or_else(|_| default_dylibs.to_string());
     for lib in dylibs.split(',').map(str::trim).filter(|s| !s.is_empty()) {
         println!("cargo:rustc-link-lib=dylib={}", lib);
     }
@@ -330,7 +376,6 @@ fn build_local_bridge() {
     // Platform-specific runtime deps (libbfd / libiberty are handled above
     // via the explicit -Wl,/abs/path/to/lib.a route when the prebuilt
     // archive bundles them; otherwise we fall back to system libbfd here).
-    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
     let bundled_bfd = lib_dir
         .as_deref()
         .map(|d| std::path::Path::new(&format!("{}/libbfd.a", d)).exists())

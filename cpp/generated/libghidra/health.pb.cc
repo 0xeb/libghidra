@@ -38,7 +38,7 @@ inline constexpr HealthStatusResponse::Impl_::Impl_(
         host_mode_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
-        program_revision_{::uint64_t{0u}},
+        modification_number_{::uint64_t{0u}},
         ok_{false},
         _cached_size_{0} {}
 
@@ -183,7 +183,7 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::libghidra::HealthStatusResponse, _impl_.service_name_),
         PROTOBUF_FIELD_OFFSET(::libghidra::HealthStatusResponse, _impl_.service_version_),
         PROTOBUF_FIELD_OFFSET(::libghidra::HealthStatusResponse, _impl_.host_mode_),
-        PROTOBUF_FIELD_OFFSET(::libghidra::HealthStatusResponse, _impl_.program_revision_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::HealthStatusResponse, _impl_.modification_number_),
         PROTOBUF_FIELD_OFFSET(::libghidra::HealthStatusResponse, _impl_.warnings_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::CapabilityRequest, _internal_metadata_),
@@ -233,26 +233,26 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_libghidra_2fhealth_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
     "\n\026libghidra/health.proto\022\tlibghidra\"\025\n\023H"
-    "ealthStatusRequest\"\220\001\n\024HealthStatusRespo"
+    "ealthStatusRequest\"\223\001\n\024HealthStatusRespo"
     "nse\022\n\n\002ok\030\001 \001(\010\022\024\n\014service_name\030\002 \001(\t\022\027\n"
     "\017service_version\030\003 \001(\t\022\021\n\thost_mode\030\004 \001("
-    "\t\022\030\n\020program_revision\030\005 \001(\004\022\020\n\010warnings\030"
-    "\006 \003(\t\"\023\n\021CapabilityRequest\"6\n\nCapability"
-    "\022\n\n\002id\030\001 \001(\t\022\016\n\006status\030\002 \001(\t\022\014\n\004note\030\003 \001"
-    "(\t\"A\n\022CapabilityResponse\022+\n\014capabilities"
-    "\030\001 \003(\0132\025.libghidra.Capability2\255\001\n\rHealth"
-    "Service\022L\n\tGetStatus\022\036.libghidra.HealthS"
-    "tatusRequest\032\037.libghidra.HealthStatusRes"
-    "ponse\022N\n\017GetCapabilities\022\034.libghidra.Cap"
-    "abilityRequest\032\035.libghidra.CapabilityRes"
-    "ponseB\032\n\tlibghidraB\013HealthProtoP\001b\006proto"
-    "3"
+    "\t\022\033\n\023modification_number\030\005 \001(\004\022\020\n\010warnin"
+    "gs\030\006 \003(\t\"\023\n\021CapabilityRequest\"6\n\nCapabil"
+    "ity\022\n\n\002id\030\001 \001(\t\022\016\n\006status\030\002 \001(\t\022\014\n\004note\030"
+    "\003 \001(\t\"A\n\022CapabilityResponse\022+\n\014capabilit"
+    "ies\030\001 \003(\0132\025.libghidra.Capability2\255\001\n\rHea"
+    "lthService\022L\n\tGetStatus\022\036.libghidra.Heal"
+    "thStatusRequest\032\037.libghidra.HealthStatus"
+    "Response\022N\n\017GetCapabilities\022\034.libghidra."
+    "CapabilityRequest\032\035.libghidra.Capability"
+    "ResponseB\032\n\tlibghidraB\013HealthProtoP\001b\006pr"
+    "oto3"
 };
 static ::absl::once_flag descriptor_table_libghidra_2fhealth_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fhealth_2eproto = {
     false,
     false,
-    561,
+    564,
     descriptor_table_protodef_libghidra_2fhealth_2eproto,
     "libghidra/health.proto",
     &descriptor_table_libghidra_2fhealth_2eproto_once,
@@ -407,11 +407,11 @@ HealthStatusResponse::HealthStatusResponse(
       from._internal_metadata_);
   new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
   ::memcpy(reinterpret_cast<char *>(&_impl_) +
-               offsetof(Impl_, program_revision_),
+               offsetof(Impl_, modification_number_),
            reinterpret_cast<const char *>(&from._impl_) +
-               offsetof(Impl_, program_revision_),
+               offsetof(Impl_, modification_number_),
            offsetof(Impl_, ok_) -
-               offsetof(Impl_, program_revision_) +
+               offsetof(Impl_, modification_number_) +
                sizeof(Impl_::ok_));
 
   // @@protoc_insertion_point(copy_constructor:libghidra.HealthStatusResponse)
@@ -428,10 +428,10 @@ inline PROTOBUF_NDEBUG_INLINE HealthStatusResponse::Impl_::Impl_(
 inline void HealthStatusResponse::SharedCtor(::_pb::Arena* arena) {
   new (&_impl_) Impl_(internal_visibility(), arena);
   ::memset(reinterpret_cast<char *>(&_impl_) +
-               offsetof(Impl_, program_revision_),
+               offsetof(Impl_, modification_number_),
            0,
            offsetof(Impl_, ok_) -
-               offsetof(Impl_, program_revision_) +
+               offsetof(Impl_, modification_number_) +
                sizeof(Impl_::ok_));
 }
 HealthStatusResponse::~HealthStatusResponse() {
@@ -527,9 +527,9 @@ const ::_pbi::TcParseTable<3, 6, 0, 83, 2> HealthStatusResponse::_table_ = {
     // string host_mode = 4;
     {::_pbi::TcParser::FastUS1,
      {34, 63, 0, PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.host_mode_)}},
-    // uint64 program_revision = 5;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(HealthStatusResponse, _impl_.program_revision_), 63>(),
-     {40, 63, 0, PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.program_revision_)}},
+    // uint64 modification_number = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(HealthStatusResponse, _impl_.modification_number_), 63>(),
+     {40, 63, 0, PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.modification_number_)}},
     // repeated string warnings = 6;
     {::_pbi::TcParser::FastUR1,
      {50, 63, 0, PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.warnings_)}},
@@ -549,8 +549,8 @@ const ::_pbi::TcParseTable<3, 6, 0, 83, 2> HealthStatusResponse::_table_ = {
     // string host_mode = 4;
     {PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.host_mode_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
-    // uint64 program_revision = 5;
-    {PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.program_revision_), 0, 0,
+    // uint64 modification_number = 5;
+    {PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.modification_number_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
     // repeated string warnings = 6;
     {PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.warnings_), 0, 0,
@@ -578,9 +578,9 @@ PROTOBUF_NOINLINE void HealthStatusResponse::Clear() {
   _impl_.service_name_.ClearToEmpty();
   _impl_.service_version_.ClearToEmpty();
   _impl_.host_mode_.ClearToEmpty();
-  ::memset(&_impl_.program_revision_, 0, static_cast<::size_t>(
+  ::memset(&_impl_.modification_number_, 0, static_cast<::size_t>(
       reinterpret_cast<char*>(&_impl_.ok_) -
-      reinterpret_cast<char*>(&_impl_.program_revision_)) + sizeof(_impl_.ok_));
+      reinterpret_cast<char*>(&_impl_.modification_number_)) + sizeof(_impl_.ok_));
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
@@ -630,11 +630,11 @@ PROTOBUF_NOINLINE void HealthStatusResponse::Clear() {
             target = stream->WriteStringMaybeAliased(4, _s, target);
           }
 
-          // uint64 program_revision = 5;
-          if (this_._internal_program_revision() != 0) {
+          // uint64 modification_number = 5;
+          if (this_._internal_modification_number() != 0) {
             target = stream->EnsureSpace(target);
             target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
-                5, this_._internal_program_revision(), target);
+                5, this_._internal_modification_number(), target);
           }
 
           // repeated string warnings = 6;
@@ -696,10 +696,10 @@ PROTOBUF_NOINLINE void HealthStatusResponse::Clear() {
               total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
                                               this_._internal_host_mode());
             }
-            // uint64 program_revision = 5;
-            if (this_._internal_program_revision() != 0) {
+            // uint64 modification_number = 5;
+            if (this_._internal_modification_number() != 0) {
               total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
-                  this_._internal_program_revision());
+                  this_._internal_modification_number());
             }
             // bool ok = 1;
             if (this_._internal_ok() != 0) {
@@ -728,8 +728,8 @@ void HealthStatusResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, co
   if (!from._internal_host_mode().empty()) {
     _this->_internal_set_host_mode(from._internal_host_mode());
   }
-  if (from._internal_program_revision() != 0) {
-    _this->_impl_.program_revision_ = from._impl_.program_revision_;
+  if (from._internal_modification_number() != 0) {
+    _this->_impl_.modification_number_ = from._impl_.modification_number_;
   }
   if (from._internal_ok() != 0) {
     _this->_impl_.ok_ = from._impl_.ok_;
@@ -757,9 +757,9 @@ void HealthStatusResponse::InternalSwap(HealthStatusResponse* PROTOBUF_RESTRICT 
   ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.ok_)
       + sizeof(HealthStatusResponse::_impl_.ok_)
-      - PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.program_revision_)>(
-          reinterpret_cast<char*>(&_impl_.program_revision_),
-          reinterpret_cast<char*>(&other->_impl_.program_revision_));
+      - PROTOBUF_FIELD_OFFSET(HealthStatusResponse, _impl_.modification_number_)>(
+          reinterpret_cast<char*>(&_impl_.modification_number_),
+          reinterpret_cast<char*>(&other->_impl_.modification_number_));
 }
 
 ::google::protobuf::Metadata HealthStatusResponse::GetMetadata() const {

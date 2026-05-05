@@ -51,9 +51,8 @@ The `local` feature pulls in the cxx FFI bridge into
    target, point `build.rs` at a libghidra C++ SDK:
    ```
    # 1. Apply libghidra's patches to your Ghidra source tree. Skipping
-   #    this is the #1 footgun: the unpatched Ghidra mis-detects every
-   #    non-x86 ELF as x86, so aarch64 / ARM / RISC-V binaries load as
-   #    nonsense.
+   #    this is the #1 footgun: some local/offline loads will fail or
+   #    mis-detect architecture metadata.
    cd <path/to/ghidra>
    for p in <path/to/libghidra>/cpp/patches/*.patch; do patch -p1 < "$p"; done
 
@@ -155,6 +154,35 @@ let funcs = client.list_functions(0, u64::MAX, 10, 0)?;
 for f in &funcs.functions {
     println!("0x{:x}  {}", f.entry_address, f.name);
 }
+# Ok::<(), libghidra::Error>(())
+```
+
+### Project files and switching
+
+Live/headless sessions can enumerate and import Ghidra project programs while
+keeping one active program per host. List project programs, close the current
+program, then open the next Ghidra domain path:
+
+```rust
+use libghidra::{
+    ListProjectFilesRequest, OpenProgramRequest, ShutdownPolicy,
+};
+
+let files = client.list_project_files(ListProjectFilesRequest {
+    programs_only: true,
+    ..Default::default()
+})?;
+for file in &files.files {
+    println!("{}", file.path);
+}
+
+client.close_program(ShutdownPolicy::Save)?;
+client.open_program(OpenProgramRequest {
+    project_path: "C:/work/projects".into(),
+    project_name: "firmware".into(),
+    program_path: "/payload.elf".into(),
+    ..Default::default()
+})?;
 # Ok::<(), libghidra::Error>(())
 ```
 

@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
   // --- GetRevision ---
   auto rev1 = client->GetRevision();
   if (rev1.ok()) {
-    std::cout << "\nRevision: " << rev1.value->revision << "\n";
+    std::cout << "\nRevision: " << rev1.value->modification_number << "\n";
   }
 
   // --- Make a mutation, check revision increments ---
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 
   auto rev2 = client->GetRevision();
   if (rev2.ok()) {
-    std::cout << "Revision after mutation: " << rev2.value->revision << "\n";
+    std::cout << "Revision after mutation: " << rev2.value->modification_number << "\n";
   }
 
   // --- Save state ---
@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
   if (open2.ok()) {
     auto rev3 = client2->GetRevision();
     if (rev3.ok()) {
-      std::cout << "Restored revision: " << rev3.value->revision << "\n";
+      std::cout << "Restored revision: " << rev3.value->modification_number << "\n";
     }
   }
 

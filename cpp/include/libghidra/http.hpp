@@ -42,6 +42,11 @@ class HttpClient final : public IClient {
   StatusOr<HealthStatus> GetStatus() override;
   StatusOr<std::vector<Capability>> GetCapabilities() override;
 
+  StatusOr<OpenProjectResponse> OpenProject(const OpenProjectRequest& request) override;
+  StatusOr<CloseProjectResponse> CloseProject(ShutdownPolicy policy) override;
+  StatusOr<ListProjectFilesResponse> ListProjectFiles(
+      const ListProjectFilesRequest& request) override;
+  StatusOr<ImportProgramResponse> ImportProgram(const ImportProgramRequest& request) override;
   StatusOr<OpenProgramResponse> OpenProgram(const OpenProgramRequest& request) override;
   StatusOr<CloseProgramResponse> CloseProgram(ShutdownPolicy policy) override;
   StatusOr<SaveProgramResponse> SaveProgram() override;

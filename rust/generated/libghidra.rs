@@ -546,7 +546,7 @@ pub struct HealthStatusResponse {
     #[prost(string, tag = "4")]
     pub host_mode: ::prost::alloc::string::String,
     #[prost(uint64, tag = "5")]
-    pub program_revision: u64,
+    pub modification_number: u64,
     #[prost(string, repeated, tag = "6")]
     pub warnings: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
@@ -1074,6 +1074,14 @@ pub struct OpenProgramRequest {
     pub analyze: bool,
     #[prost(bool, tag = "5")]
     pub read_only: bool,
+    #[prost(string, tag = "6")]
+    pub language_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub compiler_spec_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "8")]
+    pub format: ::prost::alloc::string::String,
+    #[prost(uint64, tag = "9")]
+    pub base_address: u64,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OpenProgramResponse {
@@ -1085,6 +1093,100 @@ pub struct OpenProgramResponse {
     pub compiler_spec: ::prost::alloc::string::String,
     #[prost(uint64, tag = "5")]
     pub image_base: u64,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OpenProjectRequest {
+    #[prost(string, tag = "1")]
+    pub project_path: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub project_name: ::prost::alloc::string::String,
+    #[prost(bool, tag = "3")]
+    pub create: bool,
+    #[prost(bool, tag = "4")]
+    pub read_only: bool,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OpenProjectResponse {
+    #[prost(string, tag = "1")]
+    pub project_path: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub project_name: ::prost::alloc::string::String,
+    #[prost(bool, tag = "3")]
+    pub created: bool,
+}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct CloseProjectRequest {
+    #[prost(enumeration = "ShutdownPolicy", tag = "1")]
+    pub shutdown_policy: i32,
+}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct CloseProjectResponse {
+    #[prost(bool, tag = "1")]
+    pub closed: bool,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ProjectFile {
+    #[prost(string, tag = "1")]
+    pub path: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub folder_path: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub content_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "5")]
+    pub domain_object_class: ::prost::alloc::string::String,
+    #[prost(bool, tag = "6")]
+    pub is_folder: bool,
+    #[prost(bool, tag = "7")]
+    pub is_program: bool,
+}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct ListProjectFilesRequest {
+    #[prost(bool, tag = "1")]
+    pub include_folders: bool,
+    #[prost(bool, tag = "2")]
+    pub programs_only: bool,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListProjectFilesResponse {
+    #[prost(message, repeated, tag = "1")]
+    pub files: ::prost::alloc::vec::Vec<ProjectFile>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LoaderArg {
+    #[prost(string, tag = "1")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub value: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ImportProgramRequest {
+    #[prost(string, tag = "1")]
+    pub source_path: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub project_folder_path: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub program_name: ::prost::alloc::string::String,
+    #[prost(bool, tag = "4")]
+    pub overwrite: bool,
+    #[prost(bool, tag = "5")]
+    pub analyze: bool,
+    #[prost(string, tag = "6")]
+    pub language_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub compiler_spec_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "8")]
+    pub loader_class: ::prost::alloc::string::String,
+    #[prost(message, repeated, tag = "9")]
+    pub loader_args: ::prost::alloc::vec::Vec<LoaderArg>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ImportProgramResponse {
+    #[prost(string, repeated, tag = "1")]
+    pub program_paths: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, tag = "2")]
+    pub primary_program_path: ::prost::alloc::string::String,
 }
 /// Field 1 reserved for future common request context.
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
@@ -1113,10 +1215,20 @@ pub struct DiscardProgramResponse {
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct GetRevisionRequest {}
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetRevisionResponse {
     #[prost(uint64, tag = "1")]
-    pub revision: u64,
+    pub program_id: u64,
+    #[prost(uint64, tag = "2")]
+    pub modification_number: u64,
+    #[prost(string, tag = "3")]
+    pub program_path: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub file_id: ::prost::alloc::string::String,
+    #[prost(int32, tag = "5")]
+    pub file_version: i32,
+    #[prost(int64, tag = "6")]
+    pub file_last_modified_time: i64,
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct ShutdownRequest {

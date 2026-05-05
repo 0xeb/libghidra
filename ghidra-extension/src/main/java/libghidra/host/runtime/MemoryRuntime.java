@@ -56,7 +56,6 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 			try {
 				Address address = toAddress(program, request.address());
 				writeBytesForceWritable(program, address, request.data());
-				bumpRevision();
 				commit = true;
 				return new MemoryContract.WriteBytesResponse(request.data().length);
 			}
@@ -94,7 +93,6 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 					patchCount++;
 					bytesWritten += patch.data().length;
 				}
-				bumpRevision();
 				commit = true;
 				return new MemoryContract.PatchBytesBatchResponse(patchCount, bytesWritten);
 			}

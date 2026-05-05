@@ -235,7 +235,7 @@ class LocalClient:
 
     def get_revision(self) -> RevisionResponse:
         rev = self._call(self._client.get_revision)
-        return RevisionResponse(revision=rev)
+        return RevisionResponse(modification_number=rev)
 
     # --- Functions ---
 

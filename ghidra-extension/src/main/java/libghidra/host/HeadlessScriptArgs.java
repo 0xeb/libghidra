@@ -1,6 +1,8 @@
 package libghidra.host;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class HeadlessScriptArgs {
@@ -69,6 +71,31 @@ public final class HeadlessScriptArgs {
 			return fallback;
 		}
 		return value;
+	}
+
+	public static List<String> splitList(String value) {
+		List<String> out = new ArrayList<>();
+		if (value == null || value.isBlank()) {
+			return out;
+		}
+		for (String item : value.split("[;,]")) {
+			String trimmed = item.trim();
+			if (!trimmed.isEmpty()) {
+				out.add(trimmed);
+			}
+		}
+		return out;
+	}
+
+	public static List<String> listValue(Map<String, String> args, String key, String envKey) {
+		List<String> out = new ArrayList<>();
+		if (envKey != null && !envKey.isBlank()) {
+			out.addAll(splitList(System.getenv(envKey)));
+		}
+		if (args != null && key != null && !key.isBlank()) {
+			out.addAll(splitList(args.get(key)));
+		}
+		return out;
 	}
 
 	public static int parseInt(String value, int fallback) {

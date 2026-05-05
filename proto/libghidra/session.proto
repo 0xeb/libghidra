@@ -34,6 +34,68 @@ message OpenProgramResponse {
   uint64 image_base = 5;
 }
 
+message OpenProjectRequest {
+  string project_path = 1;
+  string project_name = 2;
+  bool create = 3;
+  bool read_only = 4;
+}
+
+message OpenProjectResponse {
+  string project_path = 1;
+  string project_name = 2;
+  bool created = 3;
+}
+
+message CloseProjectRequest {
+  ShutdownPolicy shutdown_policy = 1;
+}
+
+message CloseProjectResponse {
+  bool closed = 1;
+}
+
+message ProjectFile {
+  string path = 1;
+  string name = 2;
+  string folder_path = 3;
+  string content_type = 4;
+  string domain_object_class = 5;
+  bool is_folder = 6;
+  bool is_program = 7;
+}
+
+message ListProjectFilesRequest {
+  bool include_folders = 1;
+  bool programs_only = 2;
+}
+
+message ListProjectFilesResponse {
+  repeated ProjectFile files = 1;
+}
+
+message LoaderArg {
+  string name = 1;
+  string value = 2;
+}
+
+message ImportProgramRequest {
+  string source_path = 1;
+  string project_folder_path = 2;
+  string program_name = 3;
+  bool overwrite = 4;
+  bool analyze = 5;
+  string language_id = 6;
+  string compiler_spec_id = 7;
+  string loader_class = 8;
+  repeated LoaderArg loader_args = 9;
+}
+
+message ImportProgramResponse {
+  repeated string program_paths = 1;
+  string primary_program_path = 2;
+}
+
 // Field 1 reserved for future common request context.
 message CloseProgramRequest {
   ShutdownPolicy shutdown_policy = 2;
@@ -58,7 +120,12 @@ message DiscardProgramResponse {
 message GetRevisionRequest {}
 
 message GetRevisionResponse {
-  uint64 revision = 1;
+  uint64 program_id = 1;
+  uint64 modification_number = 2;
+  string program_path = 3;
+  string file_id = 4;
+  int32 file_version = 5;
+  int64 file_last_modified_time = 6;
 }
 
 message ShutdownRequest {
@@ -70,6 +137,10 @@ message ShutdownResponse {
 }
 
 service SessionService {
+  rpc OpenProject(OpenProjectRequest) returns (OpenProjectResponse);
+  rpc CloseProject(CloseProjectRequest) returns (CloseProjectResponse);
+  rpc ListProjectFiles(ListProjectFilesRequest) returns (ListProjectFilesResponse);
+  rpc ImportProgram(ImportProgramRequest) returns (ImportProgramResponse);
   rpc OpenProgram(OpenProgramRequest) returns (OpenProgramResponse);
   rpc CloseProgram(CloseProgramRequest) returns (CloseProgramResponse);
   rpc SaveProgram(SaveProgramRequest) returns (SaveProgramResponse);

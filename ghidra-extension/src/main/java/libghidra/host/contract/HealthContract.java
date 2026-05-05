@@ -21,7 +21,7 @@ public final class HealthContract {
 		String serviceName,
 		String serviceVersion,
 		String hostMode,
-		long programRevision,
+		long modificationNumber,
 		List<String> warnings) {
 	}
 

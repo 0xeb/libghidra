@@ -263,16 +263,10 @@ jobs:
       - name: Apply libghidra patches to Ghidra source
         shell: bash
         run: |
-          # bfd_arch.cc::buildLoader treats getTarget() as a BFD target name
-          # in its fall-through branch, but our LocalClient sends a Sleigh
-          # language id like "AARCH64:LE:64:v8A:default". Without the patch
-          # bfd_openr fails ("Unable to open image file") on aarch64/etc.
-          # Worse, falling back to "default" hits bfd_arch.cc:102-103 which
-          # hardcodes elf64 -> x86:LE:64:default:gcc, so non-x86 ELFs would
-          # load with the wrong Sleigh language. The patch makes buildLoader
-          # pass empty BFD target when getTarget() looks like a Sleigh id,
-          # so bfd_check_format can auto-detect the file format while Ghidra
-          # uses the explicit Sleigh id we provided.
+          # These patches make Ghidra's native decompiler source behave with
+          # libghidra's local/offline backend. They cover BFD target selection
+          # for explicit Sleigh language ids and local spec-load tolerance for
+          # callotherfixup entries that reference unavailable userops.
           set -euo pipefail
           for p in "${GITHUB_WORKSPACE}"/cpp/patches/*.patch; do
             echo "applying $(basename "$p")"
