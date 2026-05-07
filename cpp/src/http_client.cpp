@@ -944,7 +944,6 @@ StatusOr<GetFunctionResponse> HttpClient::GetFunction(std::uint64_t address) {
     return StatusOr<GetFunctionResponse>::FromError(rpc.status.code, rpc.status.message);
   }
   GetFunctionResponse out;
-  bool needs_list_fallback = false;
   if (rpc.value->has_function()) {
     auto mapped = from_proto_function_record(rpc.value->function());
     const bool looks_default =
@@ -959,31 +958,6 @@ StatusOr<GetFunctionResponse> HttpClient::GetFunction(std::uint64_t address) {
         mapped.parameter_count == 0;
     if (!looks_default) {
       out.function = std::move(mapped);
-      needs_list_fallback = out.function->name.empty();
-    } else {
-      needs_list_fallback = true;
-    }
-  }
-  if (!rpc.value->has_function()) {
-    needs_list_fallback = true;
-  }
-  if (needs_list_fallback) {
-    constexpr int kPageSize = 2048;
-    for (int offset = 0;; offset += kPageSize) {
-      auto listed = ListFunctions(0, std::numeric_limits<std::uint64_t>::max(), kPageSize, offset);
-      if (!listed.ok()) {
-        return StatusOr<GetFunctionResponse>::FromError(listed.status.code, listed.status.message);
-      }
-      const auto& rows = listed.value->functions;
-      for (const auto& row : rows) {
-        if (row.entry_address == address) {
-          out.function = row;
-          break;
-        }
-      }
-      if (out.function.has_value() || rows.size() < static_cast<std::size_t>(kPageSize)) {
-        break;
-      }
     }
   }
   return StatusOr<GetFunctionResponse>::FromValue(std::move(out));
