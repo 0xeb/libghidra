@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded: " << open_result.value->program_name << "\n\n";
 
   // List all functions first
-  auto funcs = client->ListFunctions(0, UINT64_MAX, 0, 0);
+  auto funcs = client->ListFunctions(0, INT64_MAX, 0, 0);
   if (!funcs.ok()) {
     std::cerr << "ListFunctions failed: " << funcs.status.message << "\n";
     return 1;
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Found " << funcs.value->functions.size() << " functions\n\n";
 
   // Get xrefs across the entire address space
-  auto xrefs = client->ListXrefs(0, UINT64_MAX, 0, 0);
+  auto xrefs = client->ListXrefs(0, INT64_MAX, 0, 0);
   if (!xrefs.ok()) {
     std::cerr << "ListXrefs failed: " << xrefs.status.message << "\n";
     return 1;

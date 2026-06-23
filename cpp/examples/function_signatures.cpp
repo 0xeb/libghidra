@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded: " << open_result.value->program_name << "\n\n";
 
   // Find first function
-  auto funcs = client->ListFunctions(0, UINT64_MAX, 1, 0);
+  auto funcs = client->ListFunctions(0, INT64_MAX, 1, 0);
   if (!funcs.ok() || funcs.value->functions.empty()) {
     std::cerr << "No functions found.\n";
     return 1;
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
   }
 
   // --- List all function signatures ---
-  auto sigs = client->ListFunctionSignatures(0, UINT64_MAX, 10, 0);
+  auto sigs = client->ListFunctionSignatures(0, INT64_MAX, 10, 0);
   if (sigs.ok()) {
     std::cout << "\nAll signatures (first " << sigs.value->signatures.size() << "):\n";
     for (const auto& s : sigs.value->signatures) {

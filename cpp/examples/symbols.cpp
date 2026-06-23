@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded: " << open_result.value->program_name << "\n\n";
 
   // --- List symbols ---
-  auto syms = client->ListSymbols(0, UINT64_MAX, 20, 0);
+  auto syms = client->ListSymbols(0, INT64_MAX, 20, 0);
   if (!syms.ok()) {
     std::cerr << "ListSymbols failed: " << syms.status.message << "\n";
     return 1;

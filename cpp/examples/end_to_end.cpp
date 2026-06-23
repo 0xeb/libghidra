@@ -28,7 +28,7 @@
 // ---------------------------------------------------------------------------
 
 static void analyze(ghidra::Client& client) {
-  auto funcs_resp = client.ListFunctions(0, UINT64_MAX, 0, 0);
+  auto funcs_resp = client.ListFunctions(0, INT64_MAX, 0, 0);
   if (!funcs_resp.ok()) {
     fprintf(stderr, "ListFunctions failed: %s\n",
             funcs_resp.status.message.c_str());

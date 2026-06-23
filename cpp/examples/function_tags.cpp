@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
   }
 
   // 4. Tag first two functions
-  auto funcs = client->ListFunctions(0, UINT64_MAX, 2, 0);
+  auto funcs = client->ListFunctions(0, INT64_MAX, 2, 0);
   if (!funcs.ok() || funcs.value->functions.empty()) {
     fprintf(stderr, "ListFunctions failed or empty\n");
     return 1;

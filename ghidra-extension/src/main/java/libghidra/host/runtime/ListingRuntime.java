@@ -69,14 +69,10 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			}
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
-				long defaultEnd = program.getMaxAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = request != null ? request.rangeEnd() : defaultEnd;
+				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
 				if (startOffset <= 0) {
 					startOffset = defaultStart;
-				}
-				if (endOffset <= 0) {
-					endOffset = defaultEnd;
 				}
 				if (endOffset < startOffset) {
 					return new ListingContract.ListInstructionsResponse(List.of());
@@ -123,14 +119,10 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			}
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
-				long defaultEnd = program.getMaxAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = request != null ? request.rangeEnd() : defaultEnd;
+				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
 				if (startOffset <= 0) {
 					startOffset = defaultStart;
-				}
-				if (endOffset <= 0) {
-					endOffset = defaultEnd;
 				}
 				if (endOffset < startOffset) {
 					return new ListingContract.GetCommentsResponse(List.of());
@@ -379,14 +371,10 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			}
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
-				long defaultEnd = program.getMaxAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = request != null ? request.rangeEnd() : defaultEnd;
+				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
 				if (startOffset <= 0) {
 					startOffset = defaultStart;
-				}
-				if (endOffset <= 0) {
-					endOffset = defaultEnd;
 				}
 				if (endOffset < startOffset) {
 					return new ListingContract.ListDataItemsResponse(List.of());
@@ -450,14 +438,10 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			}
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
-				long defaultEnd = program.getMaxAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = request != null ? request.rangeEnd() : defaultEnd;
+				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
 				if (startOffset <= 0) {
 					startOffset = defaultStart;
-				}
-				if (endOffset <= 0) {
-					endOffset = defaultEnd;
 				}
 				if (endOffset < startOffset) {
 					return new ListingContract.ListBookmarksResponse(List.of());
@@ -597,14 +581,10 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			}
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
-				long defaultEnd = program.getMaxAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = request != null ? request.rangeEnd() : defaultEnd;
+				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
 				if (startOffset <= 0) {
 					startOffset = defaultStart;
-				}
-				if (endOffset <= 0) {
-					endOffset = defaultEnd;
 				}
 				if (endOffset < startOffset) {
 					return new ListingContract.ListBreakpointsResponse(List.of());
@@ -849,14 +829,10 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			}
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
-				long defaultEnd = program.getMaxAddress().getOffset();
 				long startOff = request != null ? request.rangeStart() : defaultStart;
-				long endOff = request != null ? request.rangeEnd() : defaultEnd;
+				long endOff = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
 				if (startOff <= 0) {
 					startOff = defaultStart;
-				}
-				if (endOff <= 0) {
-					endOff = defaultEnd;
 				}
 				int offset = request != null ? Math.max(0, request.offset()) : 0;
 				int limit = request != null && request.limit() > 0 ? request.limit() : 4096;

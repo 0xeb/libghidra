@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
   }
 
   // 3. List the first 10 functions
-  auto funcs = client->ListFunctions(0, UINT64_MAX, 10, 0);
+  auto funcs = client->ListFunctions(0, INT64_MAX, 10, 0);
   if (!funcs.ok()) {
     fprintf(stderr, "ListFunctions failed: %s\n",
             funcs.status.message.c_str());
