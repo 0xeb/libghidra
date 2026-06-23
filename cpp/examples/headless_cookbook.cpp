@@ -64,7 +64,7 @@ static bool verify_connection(ghidra::Client& c) {
 static void list_functions(ghidra::Client& c) {
   print_separator("Functions");
 
-  auto resp = c.ListFunctions(0, UINT64_MAX, 0, 0);
+  auto resp = c.ListFunctions(0, INT64_MAX, 0, 0);
   if (!resp.ok()) {
     fprintf(stderr, "ListFunctions: %s\n", resp.status.message.c_str());
     return;
@@ -94,7 +94,7 @@ static void list_functions(ghidra::Client& c) {
 static void decompile_first(ghidra::Client& c) {
   print_separator("Decompilation (first function)");
 
-  auto resp = c.ListFunctions(0, UINT64_MAX, 1, 0);  // page_size=1
+  auto resp = c.ListFunctions(0, INT64_MAX, 1, 0);  // page_size=1
   if (!resp.ok() || resp.value->functions.empty()) {
     printf("  (no functions to decompile)\n");
     return;
@@ -125,7 +125,7 @@ static void decompile_first(ghidra::Client& c) {
 static void rename_demo(ghidra::Client& c) {
   print_separator("Rename demo");
 
-  auto resp = c.ListFunctions(0, UINT64_MAX, 1, 0);
+  auto resp = c.ListFunctions(0, INT64_MAX, 1, 0);
   if (!resp.ok() || resp.value->functions.empty()) {
     printf("  (no functions to rename)\n");
     return;

@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded: " << open_result.value->program_name << "\n\n";
 
   // Find first function to get a valid address
-  auto funcs = client->ListFunctions(0, UINT64_MAX, 1, 0);
+  auto funcs = client->ListFunctions(0, INT64_MAX, 1, 0);
   if (!funcs.ok() || funcs.value->functions.empty()) {
     std::cerr << "No functions found.\n";
     return 1;

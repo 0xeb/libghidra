@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded: " << open_result.value->program_name << "\n";
 
   // Find first non-trivial function
-  auto funcs = client->ListFunctions(0, UINT64_MAX, 20, 0);
+  auto funcs = client->ListFunctions(0, INT64_MAX, 20, 0);
   if (!funcs.ok() || funcs.value->functions.empty()) {
     std::cerr << "No functions found.\n";
     return 1;

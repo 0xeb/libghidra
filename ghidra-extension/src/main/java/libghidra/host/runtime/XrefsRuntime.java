@@ -24,14 +24,10 @@ public final class XrefsRuntime extends RuntimeSupport implements XrefsOperation
 			}
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
-				long defaultEnd = program.getMaxAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = request != null ? request.rangeEnd() : defaultEnd;
+				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
 				if (startOffset <= 0) {
 					startOffset = defaultStart;
-				}
-				if (endOffset <= 0) {
-					endOffset = defaultEnd;
 				}
 				if (endOffset < startOffset) {
 					return new XrefsContract.ListXrefsResponse(List.of());

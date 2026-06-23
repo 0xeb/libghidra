@@ -73,7 +73,7 @@ static InstanceResult analyze_instance(const std::string& label,
            status.value->service_name.c_str(),
            status.value->service_version.c_str());
 
-    auto funcs = h->ListFunctions(0, UINT64_MAX, 0, 0);
+    auto funcs = h->ListFunctions(0, INT64_MAX, 0, 0);
     if (!funcs.ok()) {
       result.error = "ListFunctions: " + funcs.status.message;
       h.close(false);
