@@ -32,6 +32,8 @@ message OpenProgramResponse {
   string language_id = 3;
   string compiler_spec = 4;
   uint64 image_base = 5;
+  string md5 = 6;
+  string sha256 = 7;
 }
 
 message OpenProjectRequest {

@@ -28,7 +28,9 @@ public final class SessionContract {
 		String programName,
 		String languageId,
 		String compilerSpec,
-		long imageBase) {
+		long imageBase,
+		String md5,
+		String sha256) {
 	}
 
 	public record OpenProjectRequest(

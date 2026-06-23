@@ -234,6 +234,12 @@ inline constexpr OpenProgramResponse::Impl_::Impl_(
         compiler_spec_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
+        md5_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        sha256_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
         image_base_{::uint64_t{0u}},
         _cached_size_{0} {}
 
@@ -687,6 +693,8 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.language_id_),
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.compiler_spec_),
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.image_base_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.md5_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.sha256_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProjectRequest, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -897,26 +905,26 @@ static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::libghidra::OpenProgramRequest)},
         {17, -1, -1, sizeof(::libghidra::OpenProgramResponse)},
-        {29, -1, -1, sizeof(::libghidra::OpenProjectRequest)},
-        {41, -1, -1, sizeof(::libghidra::OpenProjectResponse)},
-        {52, -1, -1, sizeof(::libghidra::CloseProjectRequest)},
-        {61, -1, -1, sizeof(::libghidra::CloseProjectResponse)},
-        {70, -1, -1, sizeof(::libghidra::ProjectFile)},
-        {85, -1, -1, sizeof(::libghidra::ListProjectFilesRequest)},
-        {95, -1, -1, sizeof(::libghidra::ListProjectFilesResponse)},
-        {104, -1, -1, sizeof(::libghidra::LoaderArg)},
-        {114, -1, -1, sizeof(::libghidra::ImportProgramRequest)},
-        {131, -1, -1, sizeof(::libghidra::ImportProgramResponse)},
-        {141, -1, -1, sizeof(::libghidra::CloseProgramRequest)},
-        {150, -1, -1, sizeof(::libghidra::CloseProgramResponse)},
-        {159, -1, -1, sizeof(::libghidra::SaveProgramRequest)},
-        {167, -1, -1, sizeof(::libghidra::SaveProgramResponse)},
-        {176, -1, -1, sizeof(::libghidra::DiscardProgramRequest)},
-        {184, -1, -1, sizeof(::libghidra::DiscardProgramResponse)},
-        {193, -1, -1, sizeof(::libghidra::GetRevisionRequest)},
-        {201, -1, -1, sizeof(::libghidra::GetRevisionResponse)},
-        {215, -1, -1, sizeof(::libghidra::ShutdownRequest)},
-        {224, -1, -1, sizeof(::libghidra::ShutdownResponse)},
+        {31, -1, -1, sizeof(::libghidra::OpenProjectRequest)},
+        {43, -1, -1, sizeof(::libghidra::OpenProjectResponse)},
+        {54, -1, -1, sizeof(::libghidra::CloseProjectRequest)},
+        {63, -1, -1, sizeof(::libghidra::CloseProjectResponse)},
+        {72, -1, -1, sizeof(::libghidra::ProjectFile)},
+        {87, -1, -1, sizeof(::libghidra::ListProjectFilesRequest)},
+        {97, -1, -1, sizeof(::libghidra::ListProjectFilesResponse)},
+        {106, -1, -1, sizeof(::libghidra::LoaderArg)},
+        {116, -1, -1, sizeof(::libghidra::ImportProgramRequest)},
+        {133, -1, -1, sizeof(::libghidra::ImportProgramResponse)},
+        {143, -1, -1, sizeof(::libghidra::CloseProgramRequest)},
+        {152, -1, -1, sizeof(::libghidra::CloseProgramResponse)},
+        {161, -1, -1, sizeof(::libghidra::SaveProgramRequest)},
+        {169, -1, -1, sizeof(::libghidra::SaveProgramResponse)},
+        {178, -1, -1, sizeof(::libghidra::DiscardProgramRequest)},
+        {186, -1, -1, sizeof(::libghidra::DiscardProgramResponse)},
+        {195, -1, -1, sizeof(::libghidra::GetRevisionRequest)},
+        {203, -1, -1, sizeof(::libghidra::GetRevisionResponse)},
+        {217, -1, -1, sizeof(::libghidra::ShutdownRequest)},
+        {226, -1, -1, sizeof(::libghidra::ShutdownResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_OpenProgramRequest_default_instance_._instance,
@@ -950,69 +958,70 @@ const char descriptor_table_protodef_libghidra_2fsession_2eproto[] ABSL_ATTRIBUT
     "e\030\002 \001(\t\022\024\n\014program_path\030\003 \001(\t\022\017\n\007analyze"
     "\030\004 \001(\010\022\021\n\tread_only\030\005 \001(\010\022\023\n\013language_id"
     "\030\006 \001(\t\022\030\n\020compiler_spec_id\030\007 \001(\t\022\016\n\006form"
-    "at\030\010 \001(\t\022\024\n\014base_address\030\t \001(\004\"k\n\023OpenPr"
-    "ogramResponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013l"
-    "anguage_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t\022"
-    "\022\n\nimage_base\030\005 \001(\004\"c\n\022OpenProjectReques"
-    "t\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_name\030"
-    "\002 \001(\t\022\016\n\006create\030\003 \001(\010\022\021\n\tread_only\030\004 \001(\010"
-    "\"R\n\023OpenProjectResponse\022\024\n\014project_path\030"
-    "\001 \001(\t\022\024\n\014project_name\030\002 \001(\t\022\017\n\007created\030\003"
-    " \001(\010\"I\n\023CloseProjectRequest\0222\n\017shutdown_"
-    "policy\030\001 \001(\0162\031.libghidra.ShutdownPolicy\""
-    "&\n\024CloseProjectResponse\022\016\n\006closed\030\001 \001(\010\""
-    "\230\001\n\013ProjectFile\022\014\n\004path\030\001 \001(\t\022\014\n\004name\030\002 "
-    "\001(\t\022\023\n\013folder_path\030\003 \001(\t\022\024\n\014content_type"
-    "\030\004 \001(\t\022\033\n\023domain_object_class\030\005 \001(\t\022\021\n\ti"
-    "s_folder\030\006 \001(\010\022\022\n\nis_program\030\007 \001(\010\"I\n\027Li"
-    "stProjectFilesRequest\022\027\n\017include_folders"
-    "\030\001 \001(\010\022\025\n\rprograms_only\030\002 \001(\010\"A\n\030ListPro"
-    "jectFilesResponse\022%\n\005files\030\001 \003(\0132\026.libgh"
-    "idra.ProjectFile\"(\n\tLoaderArg\022\014\n\004name\030\001 "
-    "\001(\t\022\r\n\005value\030\002 \001(\t\"\362\001\n\024ImportProgramRequ"
-    "est\022\023\n\013source_path\030\001 \001(\t\022\033\n\023project_fold"
-    "er_path\030\002 \001(\t\022\024\n\014program_name\030\003 \001(\t\022\021\n\to"
-    "verwrite\030\004 \001(\010\022\017\n\007analyze\030\005 \001(\010\022\023\n\013langu"
-    "age_id\030\006 \001(\t\022\030\n\020compiler_spec_id\030\007 \001(\t\022\024"
-    "\n\014loader_class\030\010 \001(\t\022)\n\013loader_args\030\t \003("
-    "\0132\024.libghidra.LoaderArg\"L\n\025ImportProgram"
-    "Response\022\025\n\rprogram_paths\030\001 \003(\t\022\034\n\024prima"
-    "ry_program_path\030\002 \001(\t\"I\n\023CloseProgramReq"
-    "uest\0222\n\017shutdown_policy\030\002 \001(\0162\031.libghidr"
-    "a.ShutdownPolicy\"&\n\024CloseProgramResponse"
-    "\022\016\n\006closed\030\001 \001(\010\"\024\n\022SaveProgramRequest\"$"
-    "\n\023SaveProgramResponse\022\r\n\005saved\030\001 \001(\010\"\027\n\025"
-    "DiscardProgramRequest\"+\n\026DiscardProgramR"
-    "esponse\022\021\n\tdiscarded\030\001 \001(\010\"\024\n\022GetRevisio"
-    "nRequest\"\244\001\n\023GetRevisionResponse\022\022\n\nprog"
-    "ram_id\030\001 \001(\004\022\033\n\023modification_number\030\002 \001("
-    "\004\022\024\n\014program_path\030\003 \001(\t\022\017\n\007file_id\030\004 \001(\t"
-    "\022\024\n\014file_version\030\005 \001(\005\022\037\n\027file_last_modi"
-    "fied_time\030\006 \001(\003\"E\n\017ShutdownRequest\0222\n\017sh"
-    "utdown_policy\030\001 \001(\0162\031.libghidra.Shutdown"
-    "Policy\"$\n\020ShutdownResponse\022\020\n\010accepted\030\001"
-    " \001(\0102\267\006\n\016SessionService\022L\n\013OpenProject\022\035"
-    ".libghidra.OpenProjectRequest\032\036.libghidr"
-    "a.OpenProjectResponse\022O\n\014CloseProject\022\036."
-    "libghidra.CloseProjectRequest\032\037.libghidr"
-    "a.CloseProjectResponse\022[\n\020ListProjectFil"
-    "es\022\".libghidra.ListProjectFilesRequest\032#"
-    ".libghidra.ListProjectFilesResponse\022R\n\rI"
-    "mportProgram\022\037.libghidra.ImportProgramRe"
-    "quest\032 .libghidra.ImportProgramResponse\022"
-    "L\n\013OpenProgram\022\035.libghidra.OpenProgramRe"
-    "quest\032\036.libghidra.OpenProgramResponse\022O\n"
-    "\014CloseProgram\022\036.libghidra.CloseProgramRe"
-    "quest\032\037.libghidra.CloseProgramResponse\022L"
-    "\n\013SaveProgram\022\035.libghidra.SaveProgramReq"
-    "uest\032\036.libghidra.SaveProgramResponse\022U\n\016"
-    "DiscardProgram\022 .libghidra.DiscardProgra"
-    "mRequest\032!.libghidra.DiscardProgramRespo"
-    "nse\022L\n\013GetRevision\022\035.libghidra.GetRevisi"
-    "onRequest\032\036.libghidra.GetRevisionRespons"
-    "e\022C\n\010Shutdown\022\032.libghidra.ShutdownReques"
-    "t\032\033.libghidra.ShutdownResponseB\033\n\tlibghi"
-    "draB\014SessionProtoP\001b\006proto3"
+    "at\030\010 \001(\t\022\024\n\014base_address\030\t \001(\004\"\210\001\n\023OpenP"
+    "rogramResponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013"
+    "language_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t"
+    "\022\022\n\nimage_base\030\005 \001(\004\022\013\n\003md5\030\006 \001(\t\022\016\n\006sha"
+    "256\030\007 \001(\t\"c\n\022OpenProjectRequest\022\024\n\014proje"
+    "ct_path\030\001 \001(\t\022\024\n\014project_name\030\002 \001(\t\022\016\n\006c"
+    "reate\030\003 \001(\010\022\021\n\tread_only\030\004 \001(\010\"R\n\023OpenPr"
+    "ojectResponse\022\024\n\014project_path\030\001 \001(\t\022\024\n\014p"
+    "roject_name\030\002 \001(\t\022\017\n\007created\030\003 \001(\010\"I\n\023Cl"
+    "oseProjectRequest\0222\n\017shutdown_policy\030\001 \001"
+    "(\0162\031.libghidra.ShutdownPolicy\"&\n\024ClosePr"
+    "ojectResponse\022\016\n\006closed\030\001 \001(\010\"\230\001\n\013Projec"
+    "tFile\022\014\n\004path\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\023\n\013fol"
+    "der_path\030\003 \001(\t\022\024\n\014content_type\030\004 \001(\t\022\033\n\023"
+    "domain_object_class\030\005 \001(\t\022\021\n\tis_folder\030\006"
+    " \001(\010\022\022\n\nis_program\030\007 \001(\010\"I\n\027ListProjectF"
+    "ilesRequest\022\027\n\017include_folders\030\001 \001(\010\022\025\n\r"
+    "programs_only\030\002 \001(\010\"A\n\030ListProjectFilesR"
+    "esponse\022%\n\005files\030\001 \003(\0132\026.libghidra.Proje"
+    "ctFile\"(\n\tLoaderArg\022\014\n\004name\030\001 \001(\t\022\r\n\005val"
+    "ue\030\002 \001(\t\"\362\001\n\024ImportProgramRequest\022\023\n\013sou"
+    "rce_path\030\001 \001(\t\022\033\n\023project_folder_path\030\002 "
+    "\001(\t\022\024\n\014program_name\030\003 \001(\t\022\021\n\toverwrite\030\004"
+    " \001(\010\022\017\n\007analyze\030\005 \001(\010\022\023\n\013language_id\030\006 \001"
+    "(\t\022\030\n\020compiler_spec_id\030\007 \001(\t\022\024\n\014loader_c"
+    "lass\030\010 \001(\t\022)\n\013loader_args\030\t \003(\0132\024.libghi"
+    "dra.LoaderArg\"L\n\025ImportProgramResponse\022\025"
+    "\n\rprogram_paths\030\001 \003(\t\022\034\n\024primary_program"
+    "_path\030\002 \001(\t\"I\n\023CloseProgramRequest\0222\n\017sh"
+    "utdown_policy\030\002 \001(\0162\031.libghidra.Shutdown"
+    "Policy\"&\n\024CloseProgramResponse\022\016\n\006closed"
+    "\030\001 \001(\010\"\024\n\022SaveProgramRequest\"$\n\023SaveProg"
+    "ramResponse\022\r\n\005saved\030\001 \001(\010\"\027\n\025DiscardPro"
+    "gramRequest\"+\n\026DiscardProgramResponse\022\021\n"
+    "\tdiscarded\030\001 \001(\010\"\024\n\022GetRevisionRequest\"\244"
+    "\001\n\023GetRevisionResponse\022\022\n\nprogram_id\030\001 \001"
+    "(\004\022\033\n\023modification_number\030\002 \001(\004\022\024\n\014progr"
+    "am_path\030\003 \001(\t\022\017\n\007file_id\030\004 \001(\t\022\024\n\014file_v"
+    "ersion\030\005 \001(\005\022\037\n\027file_last_modified_time\030"
+    "\006 \001(\003\"E\n\017ShutdownRequest\0222\n\017shutdown_pol"
+    "icy\030\001 \001(\0162\031.libghidra.ShutdownPolicy\"$\n\020"
+    "ShutdownResponse\022\020\n\010accepted\030\001 \001(\0102\267\006\n\016S"
+    "essionService\022L\n\013OpenProject\022\035.libghidra"
+    ".OpenProjectRequest\032\036.libghidra.OpenProj"
+    "ectResponse\022O\n\014CloseProject\022\036.libghidra."
+    "CloseProjectRequest\032\037.libghidra.ClosePro"
+    "jectResponse\022[\n\020ListProjectFiles\022\".libgh"
+    "idra.ListProjectFilesRequest\032#.libghidra"
+    ".ListProjectFilesResponse\022R\n\rImportProgr"
+    "am\022\037.libghidra.ImportProgramRequest\032 .li"
+    "bghidra.ImportProgramResponse\022L\n\013OpenPro"
+    "gram\022\035.libghidra.OpenProgramRequest\032\036.li"
+    "bghidra.OpenProgramResponse\022O\n\014CloseProg"
+    "ram\022\036.libghidra.CloseProgramRequest\032\037.li"
+    "bghidra.CloseProgramResponse\022L\n\013SaveProg"
+    "ram\022\035.libghidra.SaveProgramRequest\032\036.lib"
+    "ghidra.SaveProgramResponse\022U\n\016DiscardPro"
+    "gram\022 .libghidra.DiscardProgramRequest\032!"
+    ".libghidra.DiscardProgramResponse\022L\n\013Get"
+    "Revision\022\035.libghidra.GetRevisionRequest\032"
+    "\036.libghidra.GetRevisionResponse\022C\n\010Shutd"
+    "own\022\032.libghidra.ShutdownRequest\032\033.libghi"
+    "dra.ShutdownResponseB\033\n\tlibghidraB\014Sessi"
+    "onProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2fsession_2eproto_deps[1] =
     {
@@ -1022,7 +1031,7 @@ static ::absl::once_flag descriptor_table_libghidra_2fsession_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fsession_2eproto = {
     false,
     false,
-    2747,
+    2777,
     descriptor_table_protodef_libghidra_2fsession_2eproto,
     "libghidra/session.proto",
     &descriptor_table_libghidra_2fsession_2eproto_once,
@@ -1519,6 +1528,8 @@ inline PROTOBUF_NDEBUG_INLINE OpenProgramResponse::Impl_::Impl_(
       : program_name_(arena, from.program_name_),
         language_id_(arena, from.language_id_),
         compiler_spec_(arena, from.compiler_spec_),
+        md5_(arena, from.md5_),
+        sha256_(arena, from.sha256_),
         _cached_size_{0} {}
 
 OpenProgramResponse::OpenProgramResponse(
@@ -1544,6 +1555,8 @@ inline PROTOBUF_NDEBUG_INLINE OpenProgramResponse::Impl_::Impl_(
       : program_name_(arena),
         language_id_(arena),
         compiler_spec_(arena),
+        md5_(arena),
+        sha256_(arena),
         _cached_size_{0} {}
 
 inline void OpenProgramResponse::SharedCtor(::_pb::Arena* arena) {
@@ -1561,6 +1574,8 @@ inline void OpenProgramResponse::SharedDtor(MessageLite& self) {
   this_._impl_.program_name_.Destroy();
   this_._impl_.language_id_.Destroy();
   this_._impl_.compiler_spec_.Destroy();
+  this_._impl_.md5_.Destroy();
+  this_._impl_.sha256_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -1600,15 +1615,15 @@ const ::google::protobuf::internal::ClassData* OpenProgramResponse::GetClassData
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<2, 4, 0, 74, 2> OpenProgramResponse::_table_ = {
+const ::_pbi::TcParseTable<3, 6, 0, 83, 2> OpenProgramResponse::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    5, 24,  // max_field_number, fast_idx_mask
+    7, 56,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967265,  // skipmap
+    4294967169,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    4,  // num_field_entries
+    6,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     _class_data_.base(),
@@ -1618,18 +1633,26 @@ const ::_pbi::TcParseTable<2, 4, 0, 74, 2> OpenProgramResponse::_table_ = {
     ::_pbi::TcParser::GetTable<::libghidra::OpenProgramResponse>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
-    // string compiler_spec = 4;
-    {::_pbi::TcParser::FastUS1,
-     {34, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.compiler_spec_)}},
-    // uint64 image_base = 5;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(OpenProgramResponse, _impl_.image_base_), 63>(),
-     {40, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.image_base_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
     // string program_name = 2;
     {::_pbi::TcParser::FastUS1,
      {18, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.program_name_)}},
     // string language_id = 3;
     {::_pbi::TcParser::FastUS1,
      {26, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.language_id_)}},
+    // string compiler_spec = 4;
+    {::_pbi::TcParser::FastUS1,
+     {34, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.compiler_spec_)}},
+    // uint64 image_base = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(OpenProgramResponse, _impl_.image_base_), 63>(),
+     {40, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.image_base_)}},
+    // string md5 = 6;
+    {::_pbi::TcParser::FastUS1,
+     {50, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.md5_)}},
+    // string sha256 = 7;
+    {::_pbi::TcParser::FastUS1,
+     {58, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.sha256_)}},
   }}, {{
     65535, 65535
   }}, {{
@@ -1645,14 +1668,22 @@ const ::_pbi::TcParseTable<2, 4, 0, 74, 2> OpenProgramResponse::_table_ = {
     // uint64 image_base = 5;
     {PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.image_base_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // string md5 = 6;
+    {PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.md5_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string sha256 = 7;
+    {PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.sha256_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
   }},
   // no aux_entries
   {{
-    "\35\14\13\15\0\0\0\0"
+    "\35\14\13\15\0\3\6\0"
     "libghidra.OpenProgramResponse"
     "program_name"
     "language_id"
     "compiler_spec"
+    "md5"
+    "sha256"
   }},
 };
 
@@ -1666,6 +1697,8 @@ PROTOBUF_NOINLINE void OpenProgramResponse::Clear() {
   _impl_.program_name_.ClearToEmpty();
   _impl_.language_id_.ClearToEmpty();
   _impl_.compiler_spec_.ClearToEmpty();
+  _impl_.md5_.ClearToEmpty();
+  _impl_.sha256_.ClearToEmpty();
   _impl_.image_base_ = ::uint64_t{0u};
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
@@ -1716,6 +1749,22 @@ PROTOBUF_NOINLINE void OpenProgramResponse::Clear() {
                 5, this_._internal_image_base(), target);
           }
 
+          // string md5 = 6;
+          if (!this_._internal_md5().empty()) {
+            const std::string& _s = this_._internal_md5();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.OpenProgramResponse.md5");
+            target = stream->WriteStringMaybeAliased(6, _s, target);
+          }
+
+          // string sha256 = 7;
+          if (!this_._internal_sha256().empty()) {
+            const std::string& _s = this_._internal_sha256();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.OpenProgramResponse.sha256");
+            target = stream->WriteStringMaybeAliased(7, _s, target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -1756,6 +1805,16 @@ PROTOBUF_NOINLINE void OpenProgramResponse::Clear() {
               total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
                                               this_._internal_compiler_spec());
             }
+            // string md5 = 6;
+            if (!this_._internal_md5().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_md5());
+            }
+            // string sha256 = 7;
+            if (!this_._internal_sha256().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_sha256());
+            }
             // uint64 image_base = 5;
             if (this_._internal_image_base() != 0) {
               total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
@@ -1783,6 +1842,12 @@ void OpenProgramResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, con
   if (!from._internal_compiler_spec().empty()) {
     _this->_internal_set_compiler_spec(from._internal_compiler_spec());
   }
+  if (!from._internal_md5().empty()) {
+    _this->_internal_set_md5(from._internal_md5());
+  }
+  if (!from._internal_sha256().empty()) {
+    _this->_internal_set_sha256(from._internal_sha256());
+  }
   if (from._internal_image_base() != 0) {
     _this->_impl_.image_base_ = from._impl_.image_base_;
   }
@@ -1805,6 +1870,8 @@ void OpenProgramResponse::InternalSwap(OpenProgramResponse* PROTOBUF_RESTRICT ot
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.program_name_, &other->_impl_.program_name_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.language_id_, &other->_impl_.language_id_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.compiler_spec_, &other->_impl_.compiler_spec_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.md5_, &other->_impl_.md5_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.sha256_, &other->_impl_.sha256_, arena);
         swap(_impl_.image_base_, other->_impl_.image_base_);
 }
 

@@ -648,7 +648,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 	}
 
 	private SessionContract.OpenProgramResponse emptyProgram() {
-		return new SessionContract.OpenProgramResponse("", "", "", 0L);
+		return new SessionContract.OpenProgramResponse("", "", "", 0L, "", "");
 	}
 
 	private SessionContract.OpenProgramResponse describeCurrentProgram(Program program) {
@@ -656,7 +656,11 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		String languageId = program.getLanguageID().getIdAsString();
 		String compiler = program.getCompilerSpec().getCompilerSpecID().toString();
 		long imageBase = program.getImageBase().getOffset();
-		return new SessionContract.OpenProgramResponse(name, languageId, compiler, imageBase);
+		// Hashes are recorded by the loader at import time. SHA256 may be absent on older
+		// imports, so null-guard both into empty strings (proto3 has no null strings).
+		String md5 = nullableString(program.getExecutableMD5());
+		String sha256 = nullableString(program.getExecutableSHA256());
+		return new SessionContract.OpenProgramResponse(name, languageId, compiler, imageBase, md5, sha256);
 	}
 
 	private boolean applyShutdownPolicyLocked(SessionContract.ShutdownPolicy policy) {

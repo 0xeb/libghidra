@@ -391,6 +391,8 @@ public final class RpcDispatcher {
 			.setLanguageId(nullable(response != null ? response.languageId() : null))
 			.setCompilerSpec(nullable(response != null ? response.compilerSpec() : null))
 			.setImageBase(response != null ? response.imageBase() : 0L)
+			.setMd5(nullable(response != null ? response.md5() : null))
+			.setSha256(nullable(response != null ? response.sha256() : null))
 			.build();
 		return ok(proto, 0L);
 	}

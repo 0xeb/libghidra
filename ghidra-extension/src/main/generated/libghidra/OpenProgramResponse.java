@@ -30,6 +30,8 @@ private static final long serialVersionUID = 0L;
     programName_ = "";
     languageId_ = "";
     compilerSpec_ = "";
+    md5_ = "";
+    sha256_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -173,6 +175,84 @@ private static final long serialVersionUID = 0L;
     return imageBase_;
   }
 
+  public static final int MD5_FIELD_NUMBER = 6;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object md5_ = "";
+  /**
+   * <code>string md5 = 6;</code>
+   * @return The md5.
+   */
+  @java.lang.Override
+  public java.lang.String getMd5() {
+    java.lang.Object ref = md5_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      md5_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string md5 = 6;</code>
+   * @return The bytes for md5.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getMd5Bytes() {
+    java.lang.Object ref = md5_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      md5_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int SHA256_FIELD_NUMBER = 7;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object sha256_ = "";
+  /**
+   * <code>string sha256 = 7;</code>
+   * @return The sha256.
+   */
+  @java.lang.Override
+  public java.lang.String getSha256() {
+    java.lang.Object ref = sha256_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      sha256_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string sha256 = 7;</code>
+   * @return The bytes for sha256.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getSha256Bytes() {
+    java.lang.Object ref = sha256_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      sha256_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -199,6 +279,12 @@ private static final long serialVersionUID = 0L;
     if (imageBase_ != 0L) {
       output.writeUInt64(5, imageBase_);
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(md5_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 6, md5_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(sha256_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 7, sha256_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -220,6 +306,12 @@ private static final long serialVersionUID = 0L;
     if (imageBase_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
         .computeUInt64Size(5, imageBase_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(md5_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(6, md5_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(sha256_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(7, sha256_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -244,6 +336,10 @@ private static final long serialVersionUID = 0L;
         .equals(other.getCompilerSpec())) return false;
     if (getImageBase()
         != other.getImageBase()) return false;
+    if (!getMd5()
+        .equals(other.getMd5())) return false;
+    if (!getSha256()
+        .equals(other.getSha256())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -264,6 +360,10 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + IMAGE_BASE_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getImageBase());
+    hash = (37 * hash) + MD5_FIELD_NUMBER;
+    hash = (53 * hash) + getMd5().hashCode();
+    hash = (37 * hash) + SHA256_FIELD_NUMBER;
+    hash = (53 * hash) + getSha256().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -399,6 +499,8 @@ private static final long serialVersionUID = 0L;
       languageId_ = "";
       compilerSpec_ = "";
       imageBase_ = 0L;
+      md5_ = "";
+      sha256_ = "";
       return this;
     }
 
@@ -444,6 +546,12 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000008) != 0)) {
         result.imageBase_ = imageBase_;
       }
+      if (((from_bitField0_ & 0x00000010) != 0)) {
+        result.md5_ = md5_;
+      }
+      if (((from_bitField0_ & 0x00000020) != 0)) {
+        result.sha256_ = sha256_;
+      }
     }
 
     @java.lang.Override
@@ -475,6 +583,16 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getImageBase() != 0L) {
         setImageBase(other.getImageBase());
+      }
+      if (!other.getMd5().isEmpty()) {
+        md5_ = other.md5_;
+        bitField0_ |= 0x00000010;
+        onChanged();
+      }
+      if (!other.getSha256().isEmpty()) {
+        sha256_ = other.sha256_;
+        bitField0_ |= 0x00000020;
+        onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -522,6 +640,16 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000008;
               break;
             } // case 40
+            case 50: {
+              md5_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000010;
+              break;
+            } // case 50
+            case 58: {
+              sha256_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 58
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -783,6 +911,150 @@ private static final long serialVersionUID = 0L;
     public Builder clearImageBase() {
       bitField0_ = (bitField0_ & ~0x00000008);
       imageBase_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object md5_ = "";
+    /**
+     * <code>string md5 = 6;</code>
+     * @return The md5.
+     */
+    public java.lang.String getMd5() {
+      java.lang.Object ref = md5_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        md5_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string md5 = 6;</code>
+     * @return The bytes for md5.
+     */
+    public com.google.protobuf.ByteString
+        getMd5Bytes() {
+      java.lang.Object ref = md5_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        md5_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string md5 = 6;</code>
+     * @param value The md5 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setMd5(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      md5_ = value;
+      bitField0_ |= 0x00000010;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string md5 = 6;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearMd5() {
+      md5_ = getDefaultInstance().getMd5();
+      bitField0_ = (bitField0_ & ~0x00000010);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string md5 = 6;</code>
+     * @param value The bytes for md5 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setMd5Bytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      md5_ = value;
+      bitField0_ |= 0x00000010;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object sha256_ = "";
+    /**
+     * <code>string sha256 = 7;</code>
+     * @return The sha256.
+     */
+    public java.lang.String getSha256() {
+      java.lang.Object ref = sha256_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        sha256_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string sha256 = 7;</code>
+     * @return The bytes for sha256.
+     */
+    public com.google.protobuf.ByteString
+        getSha256Bytes() {
+      java.lang.Object ref = sha256_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        sha256_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string sha256 = 7;</code>
+     * @param value The sha256 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSha256(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      sha256_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string sha256 = 7;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSha256() {
+      sha256_ = getDefaultInstance().getSha256();
+      bitField0_ = (bitField0_ & ~0x00000020);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string sha256 = 7;</code>
+     * @param value The bytes for sha256 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSha256Bytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      sha256_ = value;
+      bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
