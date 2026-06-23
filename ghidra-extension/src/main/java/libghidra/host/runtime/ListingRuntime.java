@@ -70,11 +70,11 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOffset <= 0) {
+				long endOffset = request != null ? request.rangeEnd() : -1L;
+				if (startOffset == 0) {
 					startOffset = defaultStart;
 				}
-				if (endOffset < startOffset) {
+				if (Long.compareUnsigned(endOffset, startOffset) < 0) {
 					return new ListingContract.ListInstructionsResponse(List.of());
 				}
 
@@ -88,10 +88,10 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				while (it.hasNext()) {
 					Instruction instruction = it.next();
 					long address = instruction.getAddress().getOffset();
-					if (address < startOffset) {
+					if (Long.compareUnsigned(address, startOffset) < 0) {
 						continue;
 					}
-					if (address > endOffset) {
+					if (Long.compareUnsigned(address, endOffset) > 0) {
 						break;
 					}
 					if (seen++ < offset) {
@@ -120,11 +120,11 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOffset <= 0) {
+				long endOffset = request != null ? request.rangeEnd() : -1L;
+				if (startOffset == 0) {
 					startOffset = defaultStart;
 				}
-				if (endOffset < startOffset) {
+				if (Long.compareUnsigned(endOffset, startOffset) < 0) {
 					return new ListingContract.GetCommentsResponse(List.of());
 				}
 
@@ -159,9 +159,15 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				}
 
 				// Range path: iterate code units with early termination.
+				// Clamp the end to the start space's max (an unbounded request carries
+				// endOffset = -1/INT64_MAX) and intersect with loaded memory, so we never
+				// walk undefined code units across the empty gap up to the top of the
+				// address space — that turns a "list all comments" query into a hang.
 				Address start = toAddress(program, startOffset);
-				Address end = toAddress(program, endOffset);
-				AddressSet set = new AddressSet(start, end);
+				long spaceMax = start.getAddressSpace().getMaxAddress().getOffset();
+				long clampedEnd = Long.compareUnsigned(endOffset, spaceMax) > 0 ? spaceMax : endOffset;
+				Address end = toAddress(program, clampedEnd);
+				AddressSet set = new AddressSet(start, end).intersect(program.getMemory());
 				CodeUnitIterator it = listing.getCodeUnits(set, true);
 				int pageOffset = request != null ? Math.max(0, request.offset()) : 0;
 				int limit = request != null && request.limit() > 0 ? request.limit() : 512;
@@ -372,11 +378,11 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOffset <= 0) {
+				long endOffset = request != null ? request.rangeEnd() : -1L;
+				if (startOffset == 0) {
 					startOffset = defaultStart;
 				}
-				if (endOffset < startOffset) {
+				if (Long.compareUnsigned(endOffset, startOffset) < 0) {
 					return new ListingContract.ListDataItemsResponse(List.of());
 				}
 				int offset = request != null ? Math.max(0, request.offset()) : 0;
@@ -393,7 +399,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					}
 					Address address = data.getAddress();
 					long addressOffset = address.getOffset();
-					if (addressOffset < startOffset || addressOffset > endOffset) {
+					if (Long.compareUnsigned(addressOffset, startOffset) < 0 || Long.compareUnsigned(addressOffset, endOffset) > 0) {
 						continue;
 					}
 					long endAddress = data.getMaxAddress() != null
@@ -439,11 +445,11 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOffset <= 0) {
+				long endOffset = request != null ? request.rangeEnd() : -1L;
+				if (startOffset == 0) {
 					startOffset = defaultStart;
 				}
-				if (endOffset < startOffset) {
+				if (Long.compareUnsigned(endOffset, startOffset) < 0) {
 					return new ListingContract.ListBookmarksResponse(List.of());
 				}
 
@@ -465,7 +471,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 						continue;
 					}
 					long address = bookmark.getAddress().getOffset();
-					if (address < startOffset || address > endOffset) {
+					if (Long.compareUnsigned(address, startOffset) < 0 || Long.compareUnsigned(address, endOffset) > 0) {
 						continue;
 					}
 					if (!typeFilter.isEmpty() && !typeFilter.equals(bookmark.getTypeString())) {
@@ -582,11 +588,11 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOffset <= 0) {
+				long endOffset = request != null ? request.rangeEnd() : -1L;
+				if (startOffset == 0) {
 					startOffset = defaultStart;
 				}
-				if (endOffset < startOffset) {
+				if (Long.compareUnsigned(endOffset, startOffset) < 0) {
 					return new ListingContract.ListBreakpointsResponse(List.of());
 				}
 
@@ -605,7 +611,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				for (Bookmark bookmark : BreakpointBookmarkStore.all(manager)) {
 					BreakpointBookmarkStore.BreakpointRecord row =
 						BreakpointBookmarkStore.fromBookmark(bookmark);
-					if (row.address < startOffset || row.address > endOffset) {
+					if (Long.compareUnsigned(row.address, startOffset) < 0 || Long.compareUnsigned(row.address, endOffset) > 0) {
 						continue;
 					}
 					if (!kindFilter.isEmpty() &&
@@ -830,8 +836,8 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOff = request != null ? request.rangeStart() : defaultStart;
-				long endOff = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOff <= 0) {
+				long endOff = request != null ? request.rangeEnd() : -1L;
+				if (startOff == 0) {
 					startOff = defaultStart;
 				}
 				int offset = request != null ? Math.max(0, request.offset()) : 0;
@@ -843,10 +849,10 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					program,
 					dt -> dt instanceof ghidra.program.model.data.AbstractStringDataType)) {
 					long addr = data.getAddress().getOffset();
-					if (addr < startOff) {
+					if (Long.compareUnsigned(addr, startOff) < 0) {
 						continue;
 					}
-					if (addr > endOff) {
+					if (Long.compareUnsigned(addr, endOff) > 0) {
 						break;
 					}
 					if (seen++ < offset) {

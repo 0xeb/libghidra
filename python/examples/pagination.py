@@ -46,7 +46,7 @@ def main() -> int:
     print("=== fetch_all: all functions ===\n")
     all_funcs = fetch_all(
         lambda limit, offset: client.list_functions(
-            range_start=0, range_end=2**64 - 1, limit=limit, offset=offset
+            range_start=0, range_end=2**63 - 1, limit=limit, offset=offset
         ).functions
     )
     print(f"Total functions: {len(all_funcs)}")
@@ -61,7 +61,7 @@ def main() -> int:
     offset = 0
     while page_num < 5:
         items = client.list_symbols(
-            range_start=0, range_end=2**64 - 1, limit=25, offset=offset
+            range_start=0, range_end=2**63 - 1, limit=25, offset=offset
         ).symbols
         if not items:
             break
@@ -78,7 +78,7 @@ def main() -> int:
     print("\n=== fetch_all: all function signatures ===\n")
     all_sigs = fetch_all(
         lambda limit, offset: client.list_function_signatures(
-            range_start=0, range_end=2**64 - 1, limit=limit, offset=offset
+            range_start=0, range_end=2**63 - 1, limit=limit, offset=offset
         ).signatures
     )
     print(f"Total signatures: {len(all_sigs)}")
