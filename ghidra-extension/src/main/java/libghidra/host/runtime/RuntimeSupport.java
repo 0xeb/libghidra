@@ -70,21 +70,6 @@ abstract class RuntimeSupport {
 		}
 	}
 
-	/**
-	 * Normalize a "list" RPC's range-end offset, treating a non-positive value as unbounded.
-	 *
-	 * <p>The C++ client encodes an unbounded upper bound as the protobuf {@code uint64}
-	 * {@code UINT64_MAX}, which is decoded here into a signed Java {@code long} as {@code -1}.
-	 * Earlier code fell back to {@code program.getMaxAddress().getOffset()} for any
-	 * non-positive end; for programs whose maximum address lives in a low-offset space (an
-	 * EXTERNAL block, or file-backed "OTHER" sections at offset 0) that collapsed the scan
-	 * window and made range-filtered tables return no rows. Treating it as
-	 * {@link Long#MAX_VALUE} keeps the scan unbounded. See ghidrasql #2/#3/#6.
-	 */
-	protected static long resolveRangeEnd(long requestedEnd) {
-		return requestedEnd <= 0 ? Long.MAX_VALUE : requestedEnd;
-	}
-
 	protected static void writeBytesForceWritable(Program program, Address address, byte[] data)
 			throws MemoryAccessException {
 		Memory memory = program.getMemory();

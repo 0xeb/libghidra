@@ -25,11 +25,11 @@ public final class XrefsRuntime extends RuntimeSupport implements XrefsOperation
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOffset <= 0) {
+				long endOffset = request != null ? request.rangeEnd() : -1L;
+				if (startOffset == 0) {
 					startOffset = defaultStart;
 				}
-				if (endOffset < startOffset) {
+				if (Long.compareUnsigned(endOffset, startOffset) < 0) {
 					return new XrefsContract.ListXrefsResponse(List.of());
 				}
 
@@ -44,10 +44,10 @@ public final class XrefsRuntime extends RuntimeSupport implements XrefsOperation
 				while (fromIterator.hasNext()) {
 					Address fromAddress = fromIterator.next();
 					long fromOffset = fromAddress.getOffset();
-					if (fromOffset < startOffset) {
+					if (Long.compareUnsigned(fromOffset, startOffset) < 0) {
 						continue;
 					}
-					if (fromOffset > endOffset) {
+					if (Long.compareUnsigned(fromOffset, endOffset) > 0) {
 						break;
 					}
 					Reference[] refs = referenceManager.getReferencesFrom(fromAddress);

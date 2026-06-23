@@ -75,11 +75,11 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
-				long endOffset = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOffset <= 0) {
+				long endOffset = request != null ? request.rangeEnd() : -1L;
+				if (startOffset == 0) {
 					startOffset = defaultStart;
 				}
-				if (endOffset < startOffset) {
+				if (Long.compareUnsigned(endOffset, startOffset) < 0) {
 					return new FunctionsContract.ListFunctionsResponse(List.of());
 				}
 
@@ -97,10 +97,10 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 						continue;
 					}
 					long address = function.getEntryPoint().getOffset();
-					if (address < startOffset) {
+					if (Long.compareUnsigned(address, startOffset) < 0) {
 						continue;
 					}
-					if (address > endOffset) {
+					if (Long.compareUnsigned(address, endOffset) > 0) {
 						break;
 					}
 					if (seen++ < offset) {
@@ -187,8 +187,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOff = request != null ? request.rangeStart() : defaultStart;
-				long endOff = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOff <= 0) {
+				long endOff = request != null ? request.rangeEnd() : -1L;
+				if (startOff == 0) {
 					startOff = defaultStart;
 				}
 				int offset = request != null ? Math.max(0, request.offset()) : 0;
@@ -202,10 +202,10 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 				while (funcIter.hasNext() && rows.size() < limit) {
 					Function func = funcIter.next();
 					long funcEntry = func.getEntryPoint().getOffset();
-					if (funcEntry < startOff) {
+					if (Long.compareUnsigned(funcEntry, startOff) < 0) {
 						continue;
 					}
-					if (funcEntry > endOff) {
+					if (Long.compareUnsigned(funcEntry, endOff) > 0) {
 						break;
 					}
 					AddressSetView body = func.getBody();
@@ -244,8 +244,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOff = request != null ? request.rangeStart() : defaultStart;
-				long endOff = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOff <= 0) {
+				long endOff = request != null ? request.rangeEnd() : -1L;
+				if (startOff == 0) {
 					startOff = defaultStart;
 				}
 				int offset = request != null ? Math.max(0, request.offset()) : 0;
@@ -259,10 +259,10 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 				while (funcIter.hasNext() && rows.size() < limit) {
 					Function func = funcIter.next();
 					long funcEntry = func.getEntryPoint().getOffset();
-					if (funcEntry < startOff) {
+					if (Long.compareUnsigned(funcEntry, startOff) < 0) {
 						continue;
 					}
-					if (funcEntry > endOff) {
+					if (Long.compareUnsigned(funcEntry, endOff) > 0) {
 						break;
 					}
 					AddressSetView body = func.getBody();
@@ -450,8 +450,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOff = request != null ? request.rangeStart() : defaultStart;
-				long endOff = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOff <= 0) { startOff = defaultStart; }
+				long endOff = request != null ? request.rangeEnd() : -1L;
+				if (startOff == 0) { startOff = defaultStart; }
 				int pOffset = request != null ? Math.max(0, request.offset()) : 0;
 				int limit = request != null && request.limit() > 0 ? request.limit() : 4096;
 
@@ -467,8 +467,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 					while (funcIter.hasNext() && rows.size() < limit) {
 						Function func = funcIter.next();
 						long funcEntry = func.getEntryPoint().getOffset();
-						if (funcEntry < startOff) { continue; }
-						if (funcEntry > endOff) { break; }
+						if (Long.compareUnsigned(funcEntry, startOff) < 0) { continue; }
+						if (Long.compareUnsigned(funcEntry, endOff) > 0) { break; }
 						if (func.isExternal()) { continue; }
 
 						DecompileResults results =
@@ -527,8 +527,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOff = request != null ? request.rangeStart() : defaultStart;
-				long endOff = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOff <= 0) { startOff = defaultStart; }
+				long endOff = request != null ? request.rangeEnd() : -1L;
+				if (startOff == 0) { startOff = defaultStart; }
 				int pOffset = request != null ? Math.max(0, request.offset()) : 0;
 				int limit = request != null && request.limit() > 0 ? request.limit() : 4096;
 
@@ -540,8 +540,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 				while (funcIter.hasNext() && rows.size() < limit) {
 					Function func = funcIter.next();
 					long funcEntry = func.getEntryPoint().getOffset();
-					if (funcEntry < startOff) { continue; }
-					if (funcEntry > endOff) { break; }
+					if (Long.compareUnsigned(funcEntry, startOff) < 0) { continue; }
+					if (Long.compareUnsigned(funcEntry, endOff) > 0) { break; }
 
 					List<FunctionsContract.DominatorRecord> funcDoms =
 						buildDominatorRecords(func, blockModel, false);
@@ -572,8 +572,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOff = request != null ? request.rangeStart() : defaultStart;
-				long endOff = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOff <= 0) { startOff = defaultStart; }
+				long endOff = request != null ? request.rangeEnd() : -1L;
+				if (startOff == 0) { startOff = defaultStart; }
 				int pOffset = request != null ? Math.max(0, request.offset()) : 0;
 				int limit = request != null && request.limit() > 0 ? request.limit() : 4096;
 
@@ -585,8 +585,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 				while (funcIter.hasNext() && rows.size() < limit) {
 					Function func = funcIter.next();
 					long funcEntry = func.getEntryPoint().getOffset();
-					if (funcEntry < startOff) { continue; }
-					if (funcEntry > endOff) { break; }
+					if (Long.compareUnsigned(funcEntry, startOff) < 0) { continue; }
+					if (Long.compareUnsigned(funcEntry, endOff) > 0) { break; }
 
 					List<FunctionsContract.DominatorRecord> reversedDoms =
 						buildDominatorRecords(func, blockModel, true);
@@ -619,8 +619,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			try {
 				long defaultStart = program.getMinAddress().getOffset();
 				long startOff = request != null ? request.rangeStart() : defaultStart;
-				long endOff = resolveRangeEnd(request != null ? request.rangeEnd() : 0);
-				if (startOff <= 0) { startOff = defaultStart; }
+				long endOff = request != null ? request.rangeEnd() : -1L;
+				if (startOff == 0) { startOff = defaultStart; }
 				int pOffset = request != null ? Math.max(0, request.offset()) : 0;
 				int limit = request != null && request.limit() > 0 ? request.limit() : 4096;
 
@@ -636,8 +636,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 					while (funcIter.hasNext() && rows.size() < limit) {
 						Function func = funcIter.next();
 						long funcEntry = func.getEntryPoint().getOffset();
-						if (funcEntry < startOff) { continue; }
-						if (funcEntry > endOff) { break; }
+						if (Long.compareUnsigned(funcEntry, startOff) < 0) { continue; }
+						if (Long.compareUnsigned(funcEntry, endOff) > 0) { break; }
 						if (func.isExternal()) { continue; }
 
 						DecompileResults results =
