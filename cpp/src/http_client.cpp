@@ -769,6 +769,8 @@ StatusOr<OpenProgramResponse> HttpClient::OpenProgram(const OpenProgramRequest& 
   out.language_id = rpc.value->language_id();
   out.compiler_spec = rpc.value->compiler_spec();
   out.image_base = rpc.value->image_base();
+  out.md5 = rpc.value->md5();
+  out.sha256 = rpc.value->sha256();
   return StatusOr<OpenProgramResponse>::FromValue(std::move(out));
 }
 

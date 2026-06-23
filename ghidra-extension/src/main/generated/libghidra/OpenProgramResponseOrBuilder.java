@@ -50,4 +50,28 @@ public interface OpenProgramResponseOrBuilder extends
    * @return The imageBase.
    */
   long getImageBase();
+
+  /**
+   * <code>string md5 = 6;</code>
+   * @return The md5.
+   */
+  java.lang.String getMd5();
+  /**
+   * <code>string md5 = 6;</code>
+   * @return The bytes for md5.
+   */
+  com.google.protobuf.ByteString
+      getMd5Bytes();
+
+  /**
+   * <code>string sha256 = 7;</code>
+   * @return The sha256.
+   */
+  java.lang.String getSha256();
+  /**
+   * <code>string sha256 = 7;</code>
+   * @return The bytes for sha256.
+   */
+  com.google.protobuf.ByteString
+      getSha256Bytes();
 }

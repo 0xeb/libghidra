@@ -1753,6 +1753,8 @@ class OpenProgramResponse final : public ::google::protobuf::Message
     kProgramNameFieldNumber = 2,
     kLanguageIdFieldNumber = 3,
     kCompilerSpecFieldNumber = 4,
+    kMd5FieldNumber = 6,
+    kSha256FieldNumber = 7,
     kImageBaseFieldNumber = 5,
   };
   // string program_name = 2;
@@ -1803,6 +1805,38 @@ class OpenProgramResponse final : public ::google::protobuf::Message
   std::string* _internal_mutable_compiler_spec();
 
   public:
+  // string md5 = 6;
+  void clear_md5() ;
+  const std::string& md5() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_md5(Arg_&& arg, Args_... args);
+  std::string* mutable_md5();
+  PROTOBUF_NODISCARD std::string* release_md5();
+  void set_allocated_md5(std::string* value);
+
+  private:
+  const std::string& _internal_md5() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_md5(
+      const std::string& value);
+  std::string* _internal_mutable_md5();
+
+  public:
+  // string sha256 = 7;
+  void clear_sha256() ;
+  const std::string& sha256() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_sha256(Arg_&& arg, Args_... args);
+  std::string* mutable_sha256();
+  PROTOBUF_NODISCARD std::string* release_sha256();
+  void set_allocated_sha256(std::string* value);
+
+  private:
+  const std::string& _internal_sha256() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_sha256(
+      const std::string& value);
+  std::string* _internal_mutable_sha256();
+
+  public:
   // uint64 image_base = 5;
   void clear_image_base() ;
   ::uint64_t image_base() const;
@@ -1818,8 +1852,8 @@ class OpenProgramResponse final : public ::google::protobuf::Message
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      2, 4, 0,
-      74, 2>
+      3, 6, 0,
+      83, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -1839,6 +1873,8 @@ class OpenProgramResponse final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr program_name_;
     ::google::protobuf::internal::ArenaStringPtr language_id_;
     ::google::protobuf::internal::ArenaStringPtr compiler_spec_;
+    ::google::protobuf::internal::ArenaStringPtr md5_;
+    ::google::protobuf::internal::ArenaStringPtr sha256_;
     ::uint64_t image_base_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
@@ -5371,6 +5407,102 @@ inline ::uint64_t OpenProgramResponse::_internal_image_base() const {
 inline void OpenProgramResponse::_internal_set_image_base(::uint64_t value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.image_base_ = value;
+}
+
+// string md5 = 6;
+inline void OpenProgramResponse::clear_md5() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.md5_.ClearToEmpty();
+}
+inline const std::string& OpenProgramResponse::md5() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.OpenProgramResponse.md5)
+  return _internal_md5();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void OpenProgramResponse::set_md5(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.md5_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.OpenProgramResponse.md5)
+}
+inline std::string* OpenProgramResponse::mutable_md5() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_md5();
+  // @@protoc_insertion_point(field_mutable:libghidra.OpenProgramResponse.md5)
+  return _s;
+}
+inline const std::string& OpenProgramResponse::_internal_md5() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.md5_.Get();
+}
+inline void OpenProgramResponse::_internal_set_md5(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.md5_.Set(value, GetArena());
+}
+inline std::string* OpenProgramResponse::_internal_mutable_md5() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.md5_.Mutable( GetArena());
+}
+inline std::string* OpenProgramResponse::release_md5() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.OpenProgramResponse.md5)
+  return _impl_.md5_.Release();
+}
+inline void OpenProgramResponse::set_allocated_md5(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.md5_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.md5_.IsDefault()) {
+    _impl_.md5_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.OpenProgramResponse.md5)
+}
+
+// string sha256 = 7;
+inline void OpenProgramResponse::clear_sha256() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.sha256_.ClearToEmpty();
+}
+inline const std::string& OpenProgramResponse::sha256() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.OpenProgramResponse.sha256)
+  return _internal_sha256();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void OpenProgramResponse::set_sha256(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.sha256_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.OpenProgramResponse.sha256)
+}
+inline std::string* OpenProgramResponse::mutable_sha256() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_sha256();
+  // @@protoc_insertion_point(field_mutable:libghidra.OpenProgramResponse.sha256)
+  return _s;
+}
+inline const std::string& OpenProgramResponse::_internal_sha256() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.sha256_.Get();
+}
+inline void OpenProgramResponse::_internal_set_sha256(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.sha256_.Set(value, GetArena());
+}
+inline std::string* OpenProgramResponse::_internal_mutable_sha256() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.sha256_.Mutable( GetArena());
+}
+inline std::string* OpenProgramResponse::release_sha256() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.OpenProgramResponse.sha256)
+  return _impl_.sha256_.Release();
+}
+inline void OpenProgramResponse::set_allocated_sha256(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.sha256_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.sha256_.IsDefault()) {
+    _impl_.sha256_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.OpenProgramResponse.sha256)
 }
 
 // -------------------------------------------------------------------

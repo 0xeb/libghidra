@@ -50,6 +50,8 @@ struct OpenProgramResponse {
   std::string language_id;
   std::string compiler_spec;
   std::uint64_t image_base = 0;
+  std::string md5;
+  std::string sha256;
 };
 
 struct OpenProjectResponse {
