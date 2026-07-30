@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // quickstart: Connect to a running LibGhidraHost, list functions, and decompile one.
 //
@@ -38,7 +37,7 @@ int main(int argc, char* argv[]) {
 
   // 2. Open a program (if project path provided on command line)
   if (argc >= 4) {
-    ghidra::OpenRequest req;
+    ghidra::OpenProgramRequest req;
     req.project_path = argv[2];
     req.program_path = argv[3];
     auto open = client->OpenProgram(req);
@@ -54,7 +53,7 @@ int main(int argc, char* argv[]) {
   }
 
   // 3. List the first 10 functions
-  auto funcs = client->ListFunctions(0, INT64_MAX, 10, 0);
+  auto funcs = client->ListFunctions(0, UINT64_MAX, 10, 0);
   if (!funcs.ok()) {
     fprintf(stderr, "ListFunctions failed: %s\n",
             funcs.status.message.c_str());

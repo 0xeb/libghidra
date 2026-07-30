@@ -1,15 +1,14 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // libghidra: Rust client for the Ghidra decompiler with two backends.
 //
 //   * `live`  (default) — HTTP/RPC to a running Ghidra Desktop with the
 //                         libghidra extension installed (or a headless
-//                         instance launched via `launch_headless`).
+//                         project session launched via `launch_headless_project`).
 //   * `local`           — offline backend; links the C++ libghidra engine
 //                         and embedded Sleigh specs, no Ghidra install
 //                         required at runtime.
@@ -38,9 +37,9 @@ pub mod proto;
 mod retry;
 
 #[cfg(feature = "local")]
-mod local_ffi;
-#[cfg(feature = "local")]
 pub mod local;
+#[cfg(feature = "local")]
+mod local_ffi;
 
 pub use error::{Error, ErrorCode, Result};
 pub use models::*;
@@ -48,7 +47,7 @@ pub use models::*;
 #[cfg(feature = "live")]
 pub use client::{ClientOptions, GhidraClient};
 #[cfg(feature = "live")]
-pub use headless::{launch_headless, HeadlessClient, HeadlessOptions};
+pub use headless::{launch_headless_project, HeadlessClient, HeadlessProjectOptions};
 
 #[cfg(feature = "local")]
 pub use local::{LocalClient, LocalClientOptions};
@@ -98,9 +97,6 @@ pub type Client = GhidraClient;
 #[cfg(feature = "live")]
 pub type ConnectOptions = ClientOptions;
 
-#[cfg(feature = "local")]
-pub type LocalOptions = LocalClientOptions;
-
 // -- Short type aliases (always available; types live in `models`) ------------
 
 pub type Function = FunctionRecord;
@@ -132,4 +128,3 @@ pub type Dominator = DominatorRecord;
 pub type PostDominator = PostDominatorRecord;
 pub type Loop = LoopRecord;
 pub type DecompileToken = DecompileTokenRecord;
-pub type OpenRequest = OpenProgramRequest;

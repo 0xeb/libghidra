@@ -59,6 +59,10 @@ private static final long serialVersionUID = 0L;
   public static final int END_ADDRESS_FIELD_NUMBER = 2;
   private long endAddress_ = 0L;
   /**
+   * <pre>
+   * end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
+   * </pre>
+   *
    * <code>uint64 end_address = 2;</code>
    * @return The endAddress.
    */
@@ -643,6 +647,10 @@ private static final long serialVersionUID = 0L;
 
     private long endAddress_ ;
     /**
+     * <pre>
+     * end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
+     * </pre>
+     *
      * <code>uint64 end_address = 2;</code>
      * @return The endAddress.
      */
@@ -651,6 +659,10 @@ private static final long serialVersionUID = 0L;
       return endAddress_;
     }
     /**
+     * <pre>
+     * end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
+     * </pre>
+     *
      * <code>uint64 end_address = 2;</code>
      * @param value The endAddress to set.
      * @return This builder for chaining.
@@ -663,6 +675,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
+     * </pre>
+     *
      * <code>uint64 end_address = 2;</code>
      * @return This builder for chaining.
      */

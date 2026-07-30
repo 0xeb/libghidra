@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.util.ArrayList;
@@ -17,12 +23,12 @@ public final class HealthRuntime extends RuntimeSupport implements HealthOperati
 		List<String> warnings = new ArrayList<>();
 		boolean closing = state.isClosing();
 		boolean hasProgram = currentProgram() != null;
-		boolean ok = hasProgram && !closing;
+		boolean ok = !closing;
 		if (closing) {
 			warnings.add("host is closing or switching programs");
 		}
 		else if (!hasProgram) {
-			warnings.add("no active program bound");
+			warnings.add("no active program bound; project/session RPCs remain available");
 		}
 		else {
 			warnings.add("shared state: clients on this endpoint share the active program");
@@ -53,10 +59,10 @@ public final class HealthRuntime extends RuntimeSupport implements HealthOperati
 				"All clients on this endpoint share one bound program"));
 			capabilities.add(new HealthContract.Capability(
 				"program.open",
-				programState,
+				"ready",
 				ready
 					? "Returns metadata for the shared active program"
-					: "Requires an active program in GUI/headless host"));
+					: "Can open a project program on managed headless hosts"));
 			capabilities.add(new HealthContract.Capability(
 				"program.save",
 				programState,

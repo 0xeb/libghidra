@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 // disassemble: Instruction disassembly via the local backend.
 //
@@ -37,7 +36,7 @@ int main(int argc, char* argv[]) {
       .default_arch = arch,
   });
 
-  ghidra::OpenRequest req;
+  ghidra::OpenProgramRequest req;
   req.program_path = binary_path;
   auto open_result = client->OpenProgram(req);
   if (!open_result.ok()) {
@@ -47,7 +46,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded: " << open_result.value->program_name << "\n\n";
 
   // Find the first function
-  auto funcs = client->ListFunctions(0, INT64_MAX, 1, 0);
+  auto funcs = client->ListFunctions(0, UINT64_MAX, 1, 0);
   if (!funcs.ok() || funcs.value->functions.empty()) {
     std::cerr << "No functions found.\n";
     return 1;

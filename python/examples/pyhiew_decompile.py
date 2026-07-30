@@ -1,9 +1,8 @@
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 """
 Decompile - Offline decompilation via libghidra for PyHiew
@@ -67,7 +66,7 @@ class Decompiler:
                 "Decompile",
                 "Native extension not available.\n\n"
                 "Install the libghidra wheel:\n"
-                "  pip install libghidra-0.0.1-cp312-abi3-win32.whl"
+                "  pip install libghidra-0.0.3-cp312-abi3-win_amd64.whl"
             )
             return False
         except Exception as e:

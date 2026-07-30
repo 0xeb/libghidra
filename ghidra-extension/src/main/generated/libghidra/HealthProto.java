@@ -27,27 +27,27 @@ public final class HealthProto {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_HealthStatusRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_HealthStatusRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_HealthStatusResponse_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_HealthStatusResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_CapabilityRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_CapabilityRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_Capability_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_Capability_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_CapabilityResponse_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_CapabilityResponse_fieldAccessorTable;
 

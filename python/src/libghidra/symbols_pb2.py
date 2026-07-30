@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from libghidra import common_pb2 as libghidra_dot_common__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17libghidra/symbols.proto\x12\tlibghidra\x1a\x16libghidra/common.proto\"\xc6\x01\n\x0cSymbolRecord\x12\x11\n\tsymbol_id\x18\x01 \x01(\x04\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\x04\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x11\n\tfull_name\x18\x04 \x01(\t\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x16\n\x0enamespace_name\x18\x06 \x01(\t\x12\x0e\n\x06source\x18\x07 \x01(\t\x12\x12\n\nis_primary\x18\x08 \x01(\x08\x12\x13\n\x0bis_external\x18\t \x01(\x08\x12\x12\n\nis_dynamic\x18\n \x01(\x08\"#\n\x10GetSymbolRequest\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\x04\"<\n\x11GetSymbolResponse\x12\'\n\x06symbol\x18\x01 \x01(\x0b\x32\x17.libghidra.SymbolRecord\"a\n\x12ListSymbolsRequest\x12&\n\x05range\x18\x02 \x01(\x0b\x32\x17.libghidra.AddressRange\x12#\n\x04page\x18\x03 \x01(\x0b\x32\x15.libghidra.Pagination\"?\n\x13ListSymbolsResponse\x12(\n\x07symbols\x18\x01 \x03(\x0b\x32\x17.libghidra.SymbolRecord\"8\n\x13RenameSymbolRequest\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\x04\x12\x10\n\x08new_name\x18\x03 \x01(\t\"5\n\x14RenameSymbolResponse\x12\x0f\n\x07renamed\x18\x01 \x01(\x08\x12\x0c\n\x04name\x18\x02 \x01(\t\"4\n\x13\x44\x65leteSymbolRequest\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\x04\x12\x0c\n\x04name\x18\x03 \x01(\t\">\n\x14\x44\x65leteSymbolResponse\x12\x0f\n\x07\x64\x65leted\x18\x01 \x01(\x08\x12\x15\n\rdeleted_count\x18\x02 \x01(\r2\xc8\x02\n\x0eSymbolsService\x12\x46\n\tGetSymbol\x12\x1b.libghidra.GetSymbolRequest\x1a\x1c.libghidra.GetSymbolResponse\x12L\n\x0bListSymbols\x12\x1d.libghidra.ListSymbolsRequest\x1a\x1e.libghidra.ListSymbolsResponse\x12O\n\x0cRenameSymbol\x12\x1e.libghidra.RenameSymbolRequest\x1a\x1f.libghidra.RenameSymbolResponse\x12O\n\x0c\x44\x65leteSymbol\x12\x1e.libghidra.DeleteSymbolRequest\x1a\x1f.libghidra.DeleteSymbolResponseB\x1b\n\tlibghidraB\x0cSymbolsProtoP\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17libghidra/symbols.proto\x12\tlibghidra\x1a\x16libghidra/common.proto\"\xe7\x01\n\x0cSymbolRecord\x12\x11\n\tsymbol_id\x18\x01 \x01(\x04\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\x04\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x11\n\tfull_name\x18\x04 \x01(\t\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x16\n\x0enamespace_name\x18\x06 \x01(\t\x12\x0e\n\x06source\x18\x07 \x01(\t\x12\x12\n\nis_primary\x18\x08 \x01(\x08\x12\x13\n\x0bis_external\x18\t \x01(\x08\x12\x12\n\nis_dynamic\x18\n \x01(\x08\x12\x1f\n\x17is_external_entry_point\x18\x0b \x01(\x08\"#\n\x10GetSymbolRequest\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\x04\"<\n\x11GetSymbolResponse\x12\'\n\x06symbol\x18\x01 \x01(\x0b\x32\x17.libghidra.SymbolRecord\"a\n\x12ListSymbolsRequest\x12&\n\x05range\x18\x02 \x01(\x0b\x32\x17.libghidra.AddressRange\x12#\n\x04page\x18\x03 \x01(\x0b\x32\x15.libghidra.Pagination\"?\n\x13ListSymbolsResponse\x12(\n\x07symbols\x18\x01 \x03(\x0b\x32\x17.libghidra.SymbolRecord\"8\n\x13RenameSymbolRequest\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\x04\x12\x10\n\x08new_name\x18\x03 \x01(\t\"5\n\x14RenameSymbolResponse\x12\x0f\n\x07renamed\x18\x01 \x01(\x08\x12\x0c\n\x04name\x18\x02 \x01(\t\"4\n\x13\x44\x65leteSymbolRequest\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\x04\x12\x0c\n\x04name\x18\x03 \x01(\t\">\n\x14\x44\x65leteSymbolResponse\x12\x0f\n\x07\x64\x65leted\x18\x01 \x01(\x08\x12\x15\n\rdeleted_count\x18\x02 \x01(\r2\xc8\x02\n\x0eSymbolsService\x12\x46\n\tGetSymbol\x12\x1b.libghidra.GetSymbolRequest\x1a\x1c.libghidra.GetSymbolResponse\x12L\n\x0bListSymbols\x12\x1d.libghidra.ListSymbolsRequest\x1a\x1e.libghidra.ListSymbolsResponse\x12O\n\x0cRenameSymbol\x12\x1e.libghidra.RenameSymbolRequest\x1a\x1f.libghidra.RenameSymbolResponse\x12O\n\x0c\x44\x65leteSymbol\x12\x1e.libghidra.DeleteSymbolRequest\x1a\x1f.libghidra.DeleteSymbolResponseB\x1b\n\tlibghidraB\x0cSymbolsProtoP\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,23 +34,23 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n\tlibghidraB\014SymbolsProtoP\001'
   _globals['_SYMBOLRECORD']._serialized_start=63
-  _globals['_SYMBOLRECORD']._serialized_end=261
-  _globals['_GETSYMBOLREQUEST']._serialized_start=263
-  _globals['_GETSYMBOLREQUEST']._serialized_end=298
-  _globals['_GETSYMBOLRESPONSE']._serialized_start=300
-  _globals['_GETSYMBOLRESPONSE']._serialized_end=360
-  _globals['_LISTSYMBOLSREQUEST']._serialized_start=362
-  _globals['_LISTSYMBOLSREQUEST']._serialized_end=459
-  _globals['_LISTSYMBOLSRESPONSE']._serialized_start=461
-  _globals['_LISTSYMBOLSRESPONSE']._serialized_end=524
-  _globals['_RENAMESYMBOLREQUEST']._serialized_start=526
-  _globals['_RENAMESYMBOLREQUEST']._serialized_end=582
-  _globals['_RENAMESYMBOLRESPONSE']._serialized_start=584
-  _globals['_RENAMESYMBOLRESPONSE']._serialized_end=637
-  _globals['_DELETESYMBOLREQUEST']._serialized_start=639
-  _globals['_DELETESYMBOLREQUEST']._serialized_end=691
-  _globals['_DELETESYMBOLRESPONSE']._serialized_start=693
-  _globals['_DELETESYMBOLRESPONSE']._serialized_end=755
-  _globals['_SYMBOLSSERVICE']._serialized_start=758
-  _globals['_SYMBOLSSERVICE']._serialized_end=1086
+  _globals['_SYMBOLRECORD']._serialized_end=294
+  _globals['_GETSYMBOLREQUEST']._serialized_start=296
+  _globals['_GETSYMBOLREQUEST']._serialized_end=331
+  _globals['_GETSYMBOLRESPONSE']._serialized_start=333
+  _globals['_GETSYMBOLRESPONSE']._serialized_end=393
+  _globals['_LISTSYMBOLSREQUEST']._serialized_start=395
+  _globals['_LISTSYMBOLSREQUEST']._serialized_end=492
+  _globals['_LISTSYMBOLSRESPONSE']._serialized_start=494
+  _globals['_LISTSYMBOLSRESPONSE']._serialized_end=557
+  _globals['_RENAMESYMBOLREQUEST']._serialized_start=559
+  _globals['_RENAMESYMBOLREQUEST']._serialized_end=615
+  _globals['_RENAMESYMBOLRESPONSE']._serialized_start=617
+  _globals['_RENAMESYMBOLRESPONSE']._serialized_end=670
+  _globals['_DELETESYMBOLREQUEST']._serialized_start=672
+  _globals['_DELETESYMBOLREQUEST']._serialized_end=724
+  _globals['_DELETESYMBOLRESPONSE']._serialized_start=726
+  _globals['_DELETESYMBOLRESPONSE']._serialized_end=788
+  _globals['_SYMBOLSSERVICE']._serialized_start=791
+  _globals['_SYMBOLSSERVICE']._serialized_end=1119
 # @@protoc_insertion_point(module_scope)

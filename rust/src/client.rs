@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 use std::time::Duration;
 
@@ -320,6 +319,11 @@ impl GhidraClient {
             language_id: resp.language_id,
             compiler_spec: resp.compiler_spec,
             image_base: resp.image_base,
+            md5: resp.md5,
+            sha256: resp.sha256,
+            executable_format: resp.executable_format,
+            entry_point: resp.entry_point,
+            has_entry_point: resp.has_entry_point,
         };
         Ok(out)
     }
@@ -450,6 +454,54 @@ impl GhidraClient {
         )?;
         Ok(ListMemoryBlocksResponse {
             blocks: resp.blocks.into_iter().map(Into::into).collect(),
+        })
+    }
+
+    pub fn create_memory_block(
+        &self,
+        spec: CreateMemoryBlockSpec,
+    ) -> Result<CreateMemoryBlockResponse> {
+        let req: pb::CreateMemoryBlockRequest = spec.into();
+        let resp: pb::CreateMemoryBlockResponse = self.call_rpc(
+            "libghidra.MemoryService/CreateMemoryBlock",
+            &req,
+            "libghidra.CreateMemoryBlockRequest",
+        )?;
+        Ok(CreateMemoryBlockResponse {
+            created: resp.created,
+            block: resp.block.map(Into::into),
+        })
+    }
+
+    pub fn remove_memory_block(&self, address: u64) -> Result<RemoveMemoryBlockResponse> {
+        let req = pb::RemoveMemoryBlockRequest { address };
+        let resp: pb::RemoveMemoryBlockResponse = self.call_rpc(
+            "libghidra.MemoryService/RemoveMemoryBlock",
+            &req,
+            "libghidra.RemoveMemoryBlockRequest",
+        )?;
+        Ok(RemoveMemoryBlockResponse {
+            removed: resp.removed,
+        })
+    }
+
+    pub fn move_memory_block(
+        &self,
+        address: u64,
+        new_start_address: u64,
+    ) -> Result<MoveMemoryBlockResponse> {
+        let req = pb::MoveMemoryBlockRequest {
+            address,
+            new_start_address,
+        };
+        let resp: pb::MoveMemoryBlockResponse = self.call_rpc(
+            "libghidra.MemoryService/MoveMemoryBlock",
+            &req,
+            "libghidra.MoveMemoryBlockRequest",
+        )?;
+        Ok(MoveMemoryBlockResponse {
+            moved: resp.moved,
+            block: resp.block.map(Into::into),
         })
     }
 
@@ -718,6 +770,76 @@ impl GhidraClient {
         Ok(ListXrefsResponse {
             xrefs: resp.xrefs.into_iter().map(Into::into).collect(),
         })
+    }
+
+    // -- Function frames ------------------------------------------------------
+
+    pub fn list_function_frames(
+        &self,
+        range_start: u64,
+        range_end: u64,
+        limit: i32,
+        offset: i32,
+    ) -> Result<Vec<FunctionFrameRecord>> {
+        let req = pb::ListFunctionFramesRequest {
+            range: Self::address_range(range_start, range_end),
+            page: Self::pagination(limit, offset),
+        };
+        let resp: pb::ListFunctionFramesResponse = self.call_rpc(
+            "libghidra.FunctionsService/ListFunctionFrames",
+            &req,
+            "libghidra.ListFunctionFramesRequest",
+        )?;
+        Ok(resp.frames.into_iter().map(Into::into).collect())
+    }
+
+    // -- Perf benchmarks ------------------------------------------------------
+
+    pub fn add_perf_benchmark(&self, record: PerfBenchmarkRecord) -> Result<bool> {
+        let req = pb::AddPerfBenchmarkRequest {
+            record: Some(record.into()),
+        };
+        let resp: pb::AddPerfBenchmarkResponse = self.call_rpc(
+            "libghidra.SessionService/AddPerfBenchmark",
+            &req,
+            "libghidra.AddPerfBenchmarkRequest",
+        )?;
+        Ok(resp.added)
+    }
+
+    pub fn list_perf_benchmarks(&self) -> Result<Vec<PerfBenchmarkRecord>> {
+        let req = pb::ListPerfBenchmarksRequest::default();
+        let resp: pb::ListPerfBenchmarksResponse = self.call_rpc(
+            "libghidra.SessionService/ListPerfBenchmarks",
+            &req,
+            "libghidra.ListPerfBenchmarksRequest",
+        )?;
+        Ok(resp.records.into_iter().map(Into::into).collect())
+    }
+
+    pub fn clear_perf_benchmarks(&self) -> Result<ClearPerfBenchmarksResponse> {
+        let req = pb::ClearPerfBenchmarksRequest::default();
+        let resp: pb::ClearPerfBenchmarksResponse = self.call_rpc(
+            "libghidra.SessionService/ClearPerfBenchmarks",
+            &req,
+            "libghidra.ClearPerfBenchmarksRequest",
+        )?;
+        Ok(ClearPerfBenchmarksResponse {
+            cleared: resp.cleared,
+            removed_count: resp.removed_count,
+        })
+    }
+
+    pub fn delete_perf_benchmark(&self, bench_id: &str) -> Result<bool> {
+        let req = pb::DeletePerfBenchmarkRequest {
+            bench_id: bench_id.to_string(),
+        };
+        let resp: pb::DeletePerfBenchmarkResponse = self.call_rpc(
+            "libghidra.SessionService/DeletePerfBenchmark",
+            &req,
+            "libghidra.DeletePerfBenchmarkRequest",
+        )?;
+        Ok(resp.deleted)
     }
 
     // -- Types ----------------------------------------------------------------
@@ -1312,6 +1434,48 @@ impl GhidraClient {
         })
     }
 
+    pub fn set_type_member_comment(
+        &self,
+        parent_type_id_or_path: &str,
+        ordinal: u64,
+        comment: &str,
+    ) -> Result<SetTypeMemberCommentResponse> {
+        let req = pb::SetTypeMemberCommentRequest {
+            r#type: parent_type_id_or_path.to_string(),
+            ordinal,
+            comment: comment.to_string(),
+        };
+        let resp: pb::SetTypeMemberCommentResponse = self.call_rpc(
+            "libghidra.TypesService/SetTypeMemberComment",
+            &req,
+            "libghidra.SetTypeMemberCommentRequest",
+        )?;
+        Ok(SetTypeMemberCommentResponse {
+            updated: resp.updated,
+        })
+    }
+
+    pub fn set_type_enum_member_comment(
+        &self,
+        parent_type_id_or_path: &str,
+        ordinal: u64,
+        comment: &str,
+    ) -> Result<SetTypeEnumMemberCommentResponse> {
+        let req = pb::SetTypeEnumMemberCommentRequest {
+            r#type: parent_type_id_or_path.to_string(),
+            ordinal,
+            comment: comment.to_string(),
+        };
+        let resp: pb::SetTypeEnumMemberCommentResponse = self.call_rpc(
+            "libghidra.TypesService/SetTypeEnumMemberComment",
+            &req,
+            "libghidra.SetTypeEnumMemberCommentRequest",
+        )?;
+        Ok(SetTypeEnumMemberCommentResponse {
+            updated: resp.updated,
+        })
+    }
+
     // -- Decompiler -----------------------------------------------------------
 
     pub fn get_decompilation(
@@ -1356,6 +1520,32 @@ impl GhidraClient {
         })
     }
 
+    /// High P-code (SSA) op stream for a single function -- the Ghidra leg of
+    /// the cross-tool low-IR. One RPC per function.
+    pub fn get_pcode(
+        &self,
+        address: u64,
+        maturity: crate::models::PcodeMaturity,
+        timeout_ms: u32,
+    ) -> Result<GetPcodeResponse> {
+        let req = pb::GetPcodeRequest {
+            address,
+            timeout_ms,
+            maturity: match maturity {
+                crate::models::PcodeMaturity::Raw => pb::PcodeMaturity::Raw as i32,
+                crate::models::PcodeMaturity::High => pb::PcodeMaturity::High as i32,
+            },
+        };
+        let resp: pb::GetPcodeResponse = self.call_rpc(
+            "libghidra.DecompilerService/GetPcode",
+            &req,
+            "libghidra.GetPcodeRequest",
+        )?;
+        Ok(GetPcodeResponse {
+            pcode: resp.pcode.map(Into::into),
+        })
+    }
+
     // -- Listing --------------------------------------------------------------
 
     pub fn get_instruction(&self, address: u64) -> Result<GetInstructionResponse> {
@@ -1388,6 +1578,29 @@ impl GhidraClient {
         )?;
         Ok(ListInstructionsResponse {
             instructions: resp.instructions.into_iter().map(Into::into).collect(),
+        })
+    }
+
+    /// Per-operand decode of every instruction in a range -- the operand leg of
+    /// the cross-tool low-IR (register/immediate/memory/address kinds + ref type).
+    pub fn list_instruction_operands(
+        &self,
+        range_start: u64,
+        range_end: u64,
+        limit: i32,
+        offset: i32,
+    ) -> Result<ListInstructionOperandsResponse> {
+        let req = pb::ListInstructionOperandsRequest {
+            range: Self::address_range(range_start, range_end),
+            page: Self::pagination(limit, offset),
+        };
+        let resp: pb::ListInstructionOperandsResponse = self.call_rpc(
+            "libghidra.ListingService/ListInstructionOperands",
+            &req,
+            "libghidra.ListInstructionOperandsRequest",
+        )?;
+        Ok(ListInstructionOperandsResponse {
+            operands: resp.operands.into_iter().map(Into::into).collect(),
         })
     }
 

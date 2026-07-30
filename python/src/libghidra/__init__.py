@@ -1,15 +1,16 @@
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 """libghidra Python client — typed RPC bindings for Ghidra."""
 
+from ._version import __version__
+
 from .client import ClientOptions, GhidraClient
 from .errors import ErrorCode, GhidraError
-from .headless import HeadlessClient, HeadlessOptions, launch_headless
+from .headless import HeadlessClient, HeadlessProjectOptions, launch_headless_project
 
 # Core type aliases (parity with C++ ghidra:: facade)
 Client = GhidraClient
@@ -18,6 +19,7 @@ from .models import (
     CommentKind,
     DecompileLocalKind,
     DecompileTokenKind,
+    PcodeMaturity,
     ShutdownPolicy,
     # Short aliases for commonly-used record types
     FunctionRecord as Function,
@@ -25,7 +27,11 @@ from .models import (
     DecompilationRecord as Decompilation,
     DecompileLocalRecord as DecompileLocal,
     DecompileTokenRecord as DecompileToken,
+    VarnodeRecord as Varnode,
+    PcodeOpRecord as PcodeOp,
+    PcodeRecord as Pcode,
     InstructionRecord as Instruction,
+    InstructionOperandRecord as InstructionOperand,
     XrefRecord as Xref,
     TypeRecord as Type,
     CommentRecord as Comment,
@@ -50,16 +56,27 @@ from .models import (
     DominatorRecord as Dominator,
     PostDominatorRecord as PostDominator,
     LoopRecord as Loop,
+    FunctionFrameRecord as FunctionFrame,
+    StackVariableRecord as StackVariable,
+    PerfBenchmarkRecord as PerfBenchmark,
+    CloseProgramResponse,
+    ClearPerfBenchmarksResponse,
+    CloseProjectResponse,
+    DiscardProgramResponse,
     ImportProgramRequest,
     ImportProgramResponse,
     ListProjectFilesRequest,
     ListProjectFilesResponse,
-    OpenProgramRequest as OpenRequest,
+    LoaderArg,
+    OpenProgramRequest,
+    OpenProgramResponse,
     OpenProjectRequest,
     OpenProjectResponse,
     ProjectFile,
+    RevisionResponse,
+    SaveProgramResponse,
+    ShutdownResponse,
 )
-
 
 def connect(url: str = "http://127.0.0.1:18080") -> GhidraClient:
     """Create a client for a libghidra host at the given URL.
@@ -71,7 +88,7 @@ def connect(url: str = "http://127.0.0.1:18080") -> GhidraClient:
 
 
 # Local client (always importable; fails at init if _native extension not built)
-from .local import LocalClient, LocalClientOptions as LocalOptions
+from .local import LocalClient, LocalClientOptions
 
 
 def local(arch: str = "", state_path: str = "", pool_size: int = 1) -> LocalClient:
@@ -84,14 +101,16 @@ def local(arch: str = "", state_path: str = "", pool_size: int = 1) -> LocalClie
     >>> client = ghidra.local(arch="x86:LE:64:default")
     >>> client.open_program("binary.exe")
     """
-    return LocalClient(LocalOptions(default_arch=arch, state_path=state_path, pool_size=pool_size))
+    return LocalClient(LocalClientOptions(default_arch=arch, state_path=state_path, pool_size=pool_size))
 
 
 __all__ = [
+    # Metadata
+    "__version__",
     # Factory
     "connect",
     "local",
-    "launch_headless",
+    "launch_headless_project",
     # Client + options
     "Client",
     "ConnectOptions",
@@ -99,16 +118,17 @@ __all__ = [
     "GhidraClient",
     # Local (optional)
     "LocalClient",
-    "LocalOptions",
+    "LocalClientOptions",
     # Headless
     "HeadlessClient",
-    "HeadlessOptions",
+    "HeadlessProjectOptions",
     # Errors
     "ErrorCode",
     "GhidraError",
     # Enums
     "CommentKind",
     "DecompileLocalKind",
+    "PcodeMaturity",
     "ShutdownPolicy",
     # Short record aliases
     "Function",
@@ -116,7 +136,11 @@ __all__ = [
     "Decompilation",
     "DecompileLocal",
     "DecompileToken",
+    "Varnode",
+    "PcodeOp",
+    "Pcode",
     "Instruction",
+    "InstructionOperand",
     "Xref",
     "Type",
     "Comment",
@@ -141,13 +165,25 @@ __all__ = [
     "Dominator",
     "PostDominator",
     "Loop",
+    "FunctionFrame",
+    "StackVariable",
+    "PerfBenchmark",
+    "CloseProgramResponse",
+    "ClearPerfBenchmarksResponse",
+    "CloseProjectResponse",
+    "DiscardProgramResponse",
     "ImportProgramRequest",
     "ImportProgramResponse",
     "ListProjectFilesRequest",
     "ListProjectFilesResponse",
+    "LoaderArg",
     "DecompileTokenKind",
-    "OpenRequest",
+    "OpenProgramRequest",
+    "OpenProgramResponse",
     "OpenProjectRequest",
     "OpenProjectResponse",
     "ProjectFile",
+    "RevisionResponse",
+    "SaveProgramResponse",
+    "ShutdownResponse",
 ]

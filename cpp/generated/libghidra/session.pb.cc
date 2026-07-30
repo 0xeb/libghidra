@@ -160,6 +160,48 @@ struct ProjectFileDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ProjectFileDefaultTypeInternal _ProjectFile_default_instance_;
 
+inline constexpr PerfBenchmarkRecord::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : bench_id_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        query_family_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        dataset_profile_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        status_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        cold_ms_p50_{0},
+        cold_ms_p95_{0},
+        warm_ms_p50_{0},
+        warm_ms_p95_{0},
+        throughput_qps_{0},
+        regression_pct_{0},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR PerfBenchmarkRecord::PerfBenchmarkRecord(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct PerfBenchmarkRecordDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PerfBenchmarkRecordDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PerfBenchmarkRecordDefaultTypeInternal() {}
+  union {
+    PerfBenchmarkRecord _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PerfBenchmarkRecordDefaultTypeInternal _PerfBenchmarkRecord_default_instance_;
+
 inline constexpr OpenProjectResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : project_path_(
@@ -240,7 +282,12 @@ inline constexpr OpenProgramResponse::Impl_::Impl_(
         sha256_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
+        executable_format_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
         image_base_{::uint64_t{0u}},
+        entry_point_{::uint64_t{0u}},
+        has_entry_point_{false},
         _cached_size_{0} {}
 
 template <typename>
@@ -363,6 +410,24 @@ struct ListProjectFilesRequestDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListProjectFilesRequestDefaultTypeInternal _ListProjectFilesRequest_default_instance_;
+              template <typename>
+PROTOBUF_CONSTEXPR ListPerfBenchmarksRequest::ListPerfBenchmarksRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::internal::ZeroFieldsBase(_class_data_.base()){}
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::internal::ZeroFieldsBase() {
+}
+#endif  // PROTOBUF_CUSTOM_VTABLE
+struct ListPerfBenchmarksRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListPerfBenchmarksRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListPerfBenchmarksRequestDefaultTypeInternal() {}
+  union {
+    ListPerfBenchmarksRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListPerfBenchmarksRequestDefaultTypeInternal _ListPerfBenchmarksRequest_default_instance_;
 
 inline constexpr ImportProgramResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -487,6 +552,58 @@ struct DiscardProgramRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DiscardProgramRequestDefaultTypeInternal _DiscardProgramRequest_default_instance_;
 
+inline constexpr DeletePerfBenchmarkResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : deleted_{false},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR DeletePerfBenchmarkResponse::DeletePerfBenchmarkResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct DeletePerfBenchmarkResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR DeletePerfBenchmarkResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~DeletePerfBenchmarkResponseDefaultTypeInternal() {}
+  union {
+    DeletePerfBenchmarkResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DeletePerfBenchmarkResponseDefaultTypeInternal _DeletePerfBenchmarkResponse_default_instance_;
+
+inline constexpr DeletePerfBenchmarkRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : bench_id_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR DeletePerfBenchmarkRequest::DeletePerfBenchmarkRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct DeletePerfBenchmarkRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR DeletePerfBenchmarkRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~DeletePerfBenchmarkRequestDefaultTypeInternal() {}
+  union {
+    DeletePerfBenchmarkRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DeletePerfBenchmarkRequestDefaultTypeInternal _DeletePerfBenchmarkRequest_default_instance_;
+
 inline constexpr CloseProjectResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : closed_{false},
@@ -587,6 +704,75 @@ struct CloseProgramRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CloseProgramRequestDefaultTypeInternal _CloseProgramRequest_default_instance_;
 
+inline constexpr ClearPerfBenchmarksResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : cleared_{false},
+        removed_count_{0u},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ClearPerfBenchmarksResponse::ClearPerfBenchmarksResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ClearPerfBenchmarksResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ClearPerfBenchmarksResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ClearPerfBenchmarksResponseDefaultTypeInternal() {}
+  union {
+    ClearPerfBenchmarksResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ClearPerfBenchmarksResponseDefaultTypeInternal _ClearPerfBenchmarksResponse_default_instance_;
+              template <typename>
+PROTOBUF_CONSTEXPR ClearPerfBenchmarksRequest::ClearPerfBenchmarksRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::internal::ZeroFieldsBase(_class_data_.base()){}
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::internal::ZeroFieldsBase() {
+}
+#endif  // PROTOBUF_CUSTOM_VTABLE
+struct ClearPerfBenchmarksRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ClearPerfBenchmarksRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ClearPerfBenchmarksRequestDefaultTypeInternal() {}
+  union {
+    ClearPerfBenchmarksRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ClearPerfBenchmarksRequestDefaultTypeInternal _ClearPerfBenchmarksRequest_default_instance_;
+
+inline constexpr AddPerfBenchmarkResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : added_{false},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AddPerfBenchmarkResponse::AddPerfBenchmarkResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct AddPerfBenchmarkResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AddPerfBenchmarkResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AddPerfBenchmarkResponseDefaultTypeInternal() {}
+  union {
+    AddPerfBenchmarkResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AddPerfBenchmarkResponseDefaultTypeInternal _AddPerfBenchmarkResponse_default_instance_;
+
 inline constexpr ListProjectFilesResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : files_{},
@@ -611,6 +797,31 @@ struct ListProjectFilesResponseDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListProjectFilesResponseDefaultTypeInternal _ListProjectFilesResponse_default_instance_;
+
+inline constexpr ListPerfBenchmarksResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : records_{},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ListPerfBenchmarksResponse::ListPerfBenchmarksResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ListPerfBenchmarksResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListPerfBenchmarksResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListPerfBenchmarksResponseDefaultTypeInternal() {}
+  union {
+    ListPerfBenchmarksResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListPerfBenchmarksResponseDefaultTypeInternal _ListPerfBenchmarksResponse_default_instance_;
 
 inline constexpr ImportProgramRequest::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -656,6 +867,31 @@ struct ImportProgramRequestDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ImportProgramRequestDefaultTypeInternal _ImportProgramRequest_default_instance_;
+
+inline constexpr AddPerfBenchmarkRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        record_{nullptr} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AddPerfBenchmarkRequest::AddPerfBenchmarkRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct AddPerfBenchmarkRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AddPerfBenchmarkRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AddPerfBenchmarkRequestDefaultTypeInternal() {}
+  union {
+    AddPerfBenchmarkRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AddPerfBenchmarkRequestDefaultTypeInternal _AddPerfBenchmarkRequest_default_instance_;
 }  // namespace libghidra
 static constexpr const ::_pb::EnumDescriptor**
     file_level_enum_descriptors_libghidra_2fsession_2eproto = nullptr;
@@ -695,6 +931,9 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.image_base_),
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.md5_),
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.sha256_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.executable_format_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.entry_point_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramResponse, _impl_.has_entry_point_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProjectRequest, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -899,32 +1138,131 @@ const ::uint32_t
         ~0u,  // no _split_
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::ShutdownResponse, _impl_.accepted_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.bench_id_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.query_family_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.dataset_profile_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.cold_ms_p50_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.cold_ms_p95_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.warm_ms_p50_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.warm_ms_p95_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.throughput_qps_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.regression_pct_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PerfBenchmarkRecord, _impl_.status_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::AddPerfBenchmarkRequest, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::AddPerfBenchmarkRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::AddPerfBenchmarkRequest, _impl_.record_),
+        0,
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::AddPerfBenchmarkResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::AddPerfBenchmarkResponse, _impl_.added_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListPerfBenchmarksRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListPerfBenchmarksResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListPerfBenchmarksResponse, _impl_.records_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ClearPerfBenchmarksRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ClearPerfBenchmarksResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ClearPerfBenchmarksResponse, _impl_.cleared_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ClearPerfBenchmarksResponse, _impl_.removed_count_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::DeletePerfBenchmarkRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::DeletePerfBenchmarkRequest, _impl_.bench_id_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::DeletePerfBenchmarkResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::DeletePerfBenchmarkResponse, _impl_.deleted_),
 };
 
 static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::libghidra::OpenProgramRequest)},
         {17, -1, -1, sizeof(::libghidra::OpenProgramResponse)},
-        {31, -1, -1, sizeof(::libghidra::OpenProjectRequest)},
-        {43, -1, -1, sizeof(::libghidra::OpenProjectResponse)},
-        {54, -1, -1, sizeof(::libghidra::CloseProjectRequest)},
-        {63, -1, -1, sizeof(::libghidra::CloseProjectResponse)},
-        {72, -1, -1, sizeof(::libghidra::ProjectFile)},
-        {87, -1, -1, sizeof(::libghidra::ListProjectFilesRequest)},
-        {97, -1, -1, sizeof(::libghidra::ListProjectFilesResponse)},
-        {106, -1, -1, sizeof(::libghidra::LoaderArg)},
-        {116, -1, -1, sizeof(::libghidra::ImportProgramRequest)},
-        {133, -1, -1, sizeof(::libghidra::ImportProgramResponse)},
-        {143, -1, -1, sizeof(::libghidra::CloseProgramRequest)},
-        {152, -1, -1, sizeof(::libghidra::CloseProgramResponse)},
-        {161, -1, -1, sizeof(::libghidra::SaveProgramRequest)},
-        {169, -1, -1, sizeof(::libghidra::SaveProgramResponse)},
-        {178, -1, -1, sizeof(::libghidra::DiscardProgramRequest)},
-        {186, -1, -1, sizeof(::libghidra::DiscardProgramResponse)},
-        {195, -1, -1, sizeof(::libghidra::GetRevisionRequest)},
-        {203, -1, -1, sizeof(::libghidra::GetRevisionResponse)},
-        {217, -1, -1, sizeof(::libghidra::ShutdownRequest)},
-        {226, -1, -1, sizeof(::libghidra::ShutdownResponse)},
+        {34, -1, -1, sizeof(::libghidra::OpenProjectRequest)},
+        {46, -1, -1, sizeof(::libghidra::OpenProjectResponse)},
+        {57, -1, -1, sizeof(::libghidra::CloseProjectRequest)},
+        {66, -1, -1, sizeof(::libghidra::CloseProjectResponse)},
+        {75, -1, -1, sizeof(::libghidra::ProjectFile)},
+        {90, -1, -1, sizeof(::libghidra::ListProjectFilesRequest)},
+        {100, -1, -1, sizeof(::libghidra::ListProjectFilesResponse)},
+        {109, -1, -1, sizeof(::libghidra::LoaderArg)},
+        {119, -1, -1, sizeof(::libghidra::ImportProgramRequest)},
+        {136, -1, -1, sizeof(::libghidra::ImportProgramResponse)},
+        {146, -1, -1, sizeof(::libghidra::CloseProgramRequest)},
+        {155, -1, -1, sizeof(::libghidra::CloseProgramResponse)},
+        {164, -1, -1, sizeof(::libghidra::SaveProgramRequest)},
+        {172, -1, -1, sizeof(::libghidra::SaveProgramResponse)},
+        {181, -1, -1, sizeof(::libghidra::DiscardProgramRequest)},
+        {189, -1, -1, sizeof(::libghidra::DiscardProgramResponse)},
+        {198, -1, -1, sizeof(::libghidra::GetRevisionRequest)},
+        {206, -1, -1, sizeof(::libghidra::GetRevisionResponse)},
+        {220, -1, -1, sizeof(::libghidra::ShutdownRequest)},
+        {229, -1, -1, sizeof(::libghidra::ShutdownResponse)},
+        {238, -1, -1, sizeof(::libghidra::PerfBenchmarkRecord)},
+        {256, 265, -1, sizeof(::libghidra::AddPerfBenchmarkRequest)},
+        {266, -1, -1, sizeof(::libghidra::AddPerfBenchmarkResponse)},
+        {275, -1, -1, sizeof(::libghidra::ListPerfBenchmarksRequest)},
+        {283, -1, -1, sizeof(::libghidra::ListPerfBenchmarksResponse)},
+        {292, -1, -1, sizeof(::libghidra::ClearPerfBenchmarksRequest)},
+        {300, -1, -1, sizeof(::libghidra::ClearPerfBenchmarksResponse)},
+        {310, -1, -1, sizeof(::libghidra::DeletePerfBenchmarkRequest)},
+        {319, -1, -1, sizeof(::libghidra::DeletePerfBenchmarkResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_OpenProgramRequest_default_instance_._instance,
@@ -949,6 +1287,15 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_GetRevisionResponse_default_instance_._instance,
     &::libghidra::_ShutdownRequest_default_instance_._instance,
     &::libghidra::_ShutdownResponse_default_instance_._instance,
+    &::libghidra::_PerfBenchmarkRecord_default_instance_._instance,
+    &::libghidra::_AddPerfBenchmarkRequest_default_instance_._instance,
+    &::libghidra::_AddPerfBenchmarkResponse_default_instance_._instance,
+    &::libghidra::_ListPerfBenchmarksRequest_default_instance_._instance,
+    &::libghidra::_ListPerfBenchmarksResponse_default_instance_._instance,
+    &::libghidra::_ClearPerfBenchmarksRequest_default_instance_._instance,
+    &::libghidra::_ClearPerfBenchmarksResponse_default_instance_._instance,
+    &::libghidra::_DeletePerfBenchmarkRequest_default_instance_._instance,
+    &::libghidra::_DeletePerfBenchmarkResponse_default_instance_._instance,
 };
 const char descriptor_table_protodef_libghidra_2fsession_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
@@ -958,70 +1305,98 @@ const char descriptor_table_protodef_libghidra_2fsession_2eproto[] ABSL_ATTRIBUT
     "e\030\002 \001(\t\022\024\n\014program_path\030\003 \001(\t\022\017\n\007analyze"
     "\030\004 \001(\010\022\021\n\tread_only\030\005 \001(\010\022\023\n\013language_id"
     "\030\006 \001(\t\022\030\n\020compiler_spec_id\030\007 \001(\t\022\016\n\006form"
-    "at\030\010 \001(\t\022\024\n\014base_address\030\t \001(\004\"\210\001\n\023OpenP"
+    "at\030\010 \001(\t\022\024\n\014base_address\030\t \001(\004\"\321\001\n\023OpenP"
     "rogramResponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013"
     "language_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t"
     "\022\022\n\nimage_base\030\005 \001(\004\022\013\n\003md5\030\006 \001(\t\022\016\n\006sha"
-    "256\030\007 \001(\t\"c\n\022OpenProjectRequest\022\024\n\014proje"
-    "ct_path\030\001 \001(\t\022\024\n\014project_name\030\002 \001(\t\022\016\n\006c"
-    "reate\030\003 \001(\010\022\021\n\tread_only\030\004 \001(\010\"R\n\023OpenPr"
-    "ojectResponse\022\024\n\014project_path\030\001 \001(\t\022\024\n\014p"
-    "roject_name\030\002 \001(\t\022\017\n\007created\030\003 \001(\010\"I\n\023Cl"
-    "oseProjectRequest\0222\n\017shutdown_policy\030\001 \001"
-    "(\0162\031.libghidra.ShutdownPolicy\"&\n\024ClosePr"
-    "ojectResponse\022\016\n\006closed\030\001 \001(\010\"\230\001\n\013Projec"
-    "tFile\022\014\n\004path\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\023\n\013fol"
-    "der_path\030\003 \001(\t\022\024\n\014content_type\030\004 \001(\t\022\033\n\023"
-    "domain_object_class\030\005 \001(\t\022\021\n\tis_folder\030\006"
-    " \001(\010\022\022\n\nis_program\030\007 \001(\010\"I\n\027ListProjectF"
-    "ilesRequest\022\027\n\017include_folders\030\001 \001(\010\022\025\n\r"
-    "programs_only\030\002 \001(\010\"A\n\030ListProjectFilesR"
-    "esponse\022%\n\005files\030\001 \003(\0132\026.libghidra.Proje"
-    "ctFile\"(\n\tLoaderArg\022\014\n\004name\030\001 \001(\t\022\r\n\005val"
-    "ue\030\002 \001(\t\"\362\001\n\024ImportProgramRequest\022\023\n\013sou"
-    "rce_path\030\001 \001(\t\022\033\n\023project_folder_path\030\002 "
-    "\001(\t\022\024\n\014program_name\030\003 \001(\t\022\021\n\toverwrite\030\004"
-    " \001(\010\022\017\n\007analyze\030\005 \001(\010\022\023\n\013language_id\030\006 \001"
-    "(\t\022\030\n\020compiler_spec_id\030\007 \001(\t\022\024\n\014loader_c"
-    "lass\030\010 \001(\t\022)\n\013loader_args\030\t \003(\0132\024.libghi"
-    "dra.LoaderArg\"L\n\025ImportProgramResponse\022\025"
-    "\n\rprogram_paths\030\001 \003(\t\022\034\n\024primary_program"
-    "_path\030\002 \001(\t\"I\n\023CloseProgramRequest\0222\n\017sh"
-    "utdown_policy\030\002 \001(\0162\031.libghidra.Shutdown"
-    "Policy\"&\n\024CloseProgramResponse\022\016\n\006closed"
-    "\030\001 \001(\010\"\024\n\022SaveProgramRequest\"$\n\023SaveProg"
-    "ramResponse\022\r\n\005saved\030\001 \001(\010\"\027\n\025DiscardPro"
-    "gramRequest\"+\n\026DiscardProgramResponse\022\021\n"
-    "\tdiscarded\030\001 \001(\010\"\024\n\022GetRevisionRequest\"\244"
-    "\001\n\023GetRevisionResponse\022\022\n\nprogram_id\030\001 \001"
-    "(\004\022\033\n\023modification_number\030\002 \001(\004\022\024\n\014progr"
-    "am_path\030\003 \001(\t\022\017\n\007file_id\030\004 \001(\t\022\024\n\014file_v"
-    "ersion\030\005 \001(\005\022\037\n\027file_last_modified_time\030"
-    "\006 \001(\003\"E\n\017ShutdownRequest\0222\n\017shutdown_pol"
-    "icy\030\001 \001(\0162\031.libghidra.ShutdownPolicy\"$\n\020"
-    "ShutdownResponse\022\020\n\010accepted\030\001 \001(\0102\267\006\n\016S"
-    "essionService\022L\n\013OpenProject\022\035.libghidra"
-    ".OpenProjectRequest\032\036.libghidra.OpenProj"
-    "ectResponse\022O\n\014CloseProject\022\036.libghidra."
-    "CloseProjectRequest\032\037.libghidra.ClosePro"
-    "jectResponse\022[\n\020ListProjectFiles\022\".libgh"
-    "idra.ListProjectFilesRequest\032#.libghidra"
-    ".ListProjectFilesResponse\022R\n\rImportProgr"
-    "am\022\037.libghidra.ImportProgramRequest\032 .li"
-    "bghidra.ImportProgramResponse\022L\n\013OpenPro"
-    "gram\022\035.libghidra.OpenProgramRequest\032\036.li"
-    "bghidra.OpenProgramResponse\022O\n\014CloseProg"
-    "ram\022\036.libghidra.CloseProgramRequest\032\037.li"
-    "bghidra.CloseProgramResponse\022L\n\013SaveProg"
-    "ram\022\035.libghidra.SaveProgramRequest\032\036.lib"
-    "ghidra.SaveProgramResponse\022U\n\016DiscardPro"
-    "gram\022 .libghidra.DiscardProgramRequest\032!"
-    ".libghidra.DiscardProgramResponse\022L\n\013Get"
-    "Revision\022\035.libghidra.GetRevisionRequest\032"
-    "\036.libghidra.GetRevisionResponse\022C\n\010Shutd"
-    "own\022\032.libghidra.ShutdownRequest\032\033.libghi"
-    "dra.ShutdownResponseB\033\n\tlibghidraB\014Sessi"
-    "onProtoP\001b\006proto3"
+    "256\030\007 \001(\t\022\031\n\021executable_format\030\010 \001(\t\022\023\n\013"
+    "entry_point\030\t \001(\004\022\027\n\017has_entry_point\030\n \001"
+    "(\010\"c\n\022OpenProjectRequest\022\024\n\014project_path"
+    "\030\001 \001(\t\022\024\n\014project_name\030\002 \001(\t\022\016\n\006create\030\003"
+    " \001(\010\022\021\n\tread_only\030\004 \001(\010\"R\n\023OpenProjectRe"
+    "sponse\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_"
+    "name\030\002 \001(\t\022\017\n\007created\030\003 \001(\010\"I\n\023CloseProj"
+    "ectRequest\0222\n\017shutdown_policy\030\001 \001(\0162\031.li"
+    "bghidra.ShutdownPolicy\"&\n\024CloseProjectRe"
+    "sponse\022\016\n\006closed\030\001 \001(\010\"\230\001\n\013ProjectFile\022\014"
+    "\n\004path\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\023\n\013folder_pat"
+    "h\030\003 \001(\t\022\024\n\014content_type\030\004 \001(\t\022\033\n\023domain_"
+    "object_class\030\005 \001(\t\022\021\n\tis_folder\030\006 \001(\010\022\022\n"
+    "\nis_program\030\007 \001(\010\"I\n\027ListProjectFilesReq"
+    "uest\022\027\n\017include_folders\030\001 \001(\010\022\025\n\rprogram"
+    "s_only\030\002 \001(\010\"A\n\030ListProjectFilesResponse"
+    "\022%\n\005files\030\001 \003(\0132\026.libghidra.ProjectFile\""
+    "(\n\tLoaderArg\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001("
+    "\t\"\362\001\n\024ImportProgramRequest\022\023\n\013source_pat"
+    "h\030\001 \001(\t\022\033\n\023project_folder_path\030\002 \001(\t\022\024\n\014"
+    "program_name\030\003 \001(\t\022\021\n\toverwrite\030\004 \001(\010\022\017\n"
+    "\007analyze\030\005 \001(\010\022\023\n\013language_id\030\006 \001(\t\022\030\n\020c"
+    "ompiler_spec_id\030\007 \001(\t\022\024\n\014loader_class\030\010 "
+    "\001(\t\022)\n\013loader_args\030\t \003(\0132\024.libghidra.Loa"
+    "derArg\"L\n\025ImportProgramResponse\022\025\n\rprogr"
+    "am_paths\030\001 \003(\t\022\034\n\024primary_program_path\030\002"
+    " \001(\t\"I\n\023CloseProgramRequest\0222\n\017shutdown_"
+    "policy\030\002 \001(\0162\031.libghidra.ShutdownPolicy\""
+    "&\n\024CloseProgramResponse\022\016\n\006closed\030\001 \001(\010\""
+    "\024\n\022SaveProgramRequest\"$\n\023SaveProgramResp"
+    "onse\022\r\n\005saved\030\001 \001(\010\"\027\n\025DiscardProgramReq"
+    "uest\"+\n\026DiscardProgramResponse\022\021\n\tdiscar"
+    "ded\030\001 \001(\010\"\024\n\022GetRevisionRequest\"\244\001\n\023GetR"
+    "evisionResponse\022\022\n\nprogram_id\030\001 \001(\004\022\033\n\023m"
+    "odification_number\030\002 \001(\004\022\024\n\014program_path"
+    "\030\003 \001(\t\022\017\n\007file_id\030\004 \001(\t\022\024\n\014file_version\030"
+    "\005 \001(\005\022\037\n\027file_last_modified_time\030\006 \001(\003\"E"
+    "\n\017ShutdownRequest\0222\n\017shutdown_policy\030\001 \001"
+    "(\0162\031.libghidra.ShutdownPolicy\"$\n\020Shutdow"
+    "nResponse\022\020\n\010accepted\030\001 \001(\010\"\352\001\n\023PerfBenc"
+    "hmarkRecord\022\020\n\010bench_id\030\001 \001(\t\022\024\n\014query_f"
+    "amily\030\002 \001(\t\022\027\n\017dataset_profile\030\003 \001(\t\022\023\n\013"
+    "cold_ms_p50\030\004 \001(\001\022\023\n\013cold_ms_p95\030\005 \001(\001\022\023"
+    "\n\013warm_ms_p50\030\006 \001(\001\022\023\n\013warm_ms_p95\030\007 \001(\001"
+    "\022\026\n\016throughput_qps\030\010 \001(\001\022\026\n\016regression_p"
+    "ct\030\t \001(\001\022\016\n\006status\030\n \001(\t\"I\n\027AddPerfBench"
+    "markRequest\022.\n\006record\030\001 \001(\0132\036.libghidra."
+    "PerfBenchmarkRecord\")\n\030AddPerfBenchmarkR"
+    "esponse\022\r\n\005added\030\001 \001(\010\"\033\n\031ListPerfBenchm"
+    "arksRequest\"M\n\032ListPerfBenchmarksRespons"
+    "e\022/\n\007records\030\001 \003(\0132\036.libghidra.PerfBench"
+    "markRecord\"\034\n\032ClearPerfBenchmarksRequest"
+    "\"E\n\033ClearPerfBenchmarksResponse\022\017\n\007clear"
+    "ed\030\001 \001(\010\022\025\n\rremoved_count\030\002 \001(\r\".\n\032Delet"
+    "ePerfBenchmarkRequest\022\020\n\010bench_id\030\001 \001(\t\""
+    ".\n\033DeletePerfBenchmarkResponse\022\017\n\007delete"
+    "d\030\001 \001(\0102\303\t\n\016SessionService\022L\n\013OpenProjec"
+    "t\022\035.libghidra.OpenProjectRequest\032\036.libgh"
+    "idra.OpenProjectResponse\022O\n\014CloseProject"
+    "\022\036.libghidra.CloseProjectRequest\032\037.libgh"
+    "idra.CloseProjectResponse\022[\n\020ListProject"
+    "Files\022\".libghidra.ListProjectFilesReques"
+    "t\032#.libghidra.ListProjectFilesResponse\022R"
+    "\n\rImportProgram\022\037.libghidra.ImportProgra"
+    "mRequest\032 .libghidra.ImportProgramRespon"
+    "se\022L\n\013OpenProgram\022\035.libghidra.OpenProgra"
+    "mRequest\032\036.libghidra.OpenProgramResponse"
+    "\022O\n\014CloseProgram\022\036.libghidra.CloseProgra"
+    "mRequest\032\037.libghidra.CloseProgramRespons"
+    "e\022L\n\013SaveProgram\022\035.libghidra.SaveProgram"
+    "Request\032\036.libghidra.SaveProgramResponse\022"
+    "U\n\016DiscardProgram\022 .libghidra.DiscardPro"
+    "gramRequest\032!.libghidra.DiscardProgramRe"
+    "sponse\022L\n\013GetRevision\022\035.libghidra.GetRev"
+    "isionRequest\032\036.libghidra.GetRevisionResp"
+    "onse\022C\n\010Shutdown\022\032.libghidra.ShutdownReq"
+    "uest\032\033.libghidra.ShutdownResponse\022[\n\020Add"
+    "PerfBenchmark\022\".libghidra.AddPerfBenchma"
+    "rkRequest\032#.libghidra.AddPerfBenchmarkRe"
+    "sponse\022a\n\022ListPerfBenchmarks\022$.libghidra"
+    ".ListPerfBenchmarksRequest\032%.libghidra.L"
+    "istPerfBenchmarksResponse\022d\n\023ClearPerfBe"
+    "nchmarks\022%.libghidra.ClearPerfBenchmarks"
+    "Request\032&.libghidra.ClearPerfBenchmarksR"
+    "esponse\022d\n\023DeletePerfBenchmark\022%.libghid"
+    "ra.DeletePerfBenchmarkRequest\032&.libghidr"
+    "a.DeletePerfBenchmarkResponseB\033\n\tlibghid"
+    "raB\014SessionProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2fsession_2eproto_deps[1] =
     {
@@ -1031,13 +1406,13 @@ static ::absl::once_flag descriptor_table_libghidra_2fsession_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fsession_2eproto = {
     false,
     false,
-    2777,
+    3906,
     descriptor_table_protodef_libghidra_2fsession_2eproto,
     "libghidra/session.proto",
     &descriptor_table_libghidra_2fsession_2eproto_once,
     descriptor_table_libghidra_2fsession_2eproto_deps,
     1,
-    22,
+    31,
     schemas,
     file_default_instances,
     TableStruct_libghidra_2fsession_2eproto::offsets,
@@ -1530,6 +1905,7 @@ inline PROTOBUF_NDEBUG_INLINE OpenProgramResponse::Impl_::Impl_(
         compiler_spec_(arena, from.compiler_spec_),
         md5_(arena, from.md5_),
         sha256_(arena, from.sha256_),
+        executable_format_(arena, from.executable_format_),
         _cached_size_{0} {}
 
 OpenProgramResponse::OpenProgramResponse(
@@ -1545,7 +1921,13 @@ OpenProgramResponse::OpenProgramResponse(
   _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
       from._internal_metadata_);
   new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
-  _impl_.image_base_ = from._impl_.image_base_;
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, image_base_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, image_base_),
+           offsetof(Impl_, has_entry_point_) -
+               offsetof(Impl_, image_base_) +
+               sizeof(Impl_::has_entry_point_));
 
   // @@protoc_insertion_point(copy_constructor:libghidra.OpenProgramResponse)
 }
@@ -1557,11 +1939,17 @@ inline PROTOBUF_NDEBUG_INLINE OpenProgramResponse::Impl_::Impl_(
         compiler_spec_(arena),
         md5_(arena),
         sha256_(arena),
+        executable_format_(arena),
         _cached_size_{0} {}
 
 inline void OpenProgramResponse::SharedCtor(::_pb::Arena* arena) {
   new (&_impl_) Impl_(internal_visibility(), arena);
-  _impl_.image_base_ = {};
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, image_base_),
+           0,
+           offsetof(Impl_, has_entry_point_) -
+               offsetof(Impl_, image_base_) +
+               sizeof(Impl_::has_entry_point_));
 }
 OpenProgramResponse::~OpenProgramResponse() {
   // @@protoc_insertion_point(destructor:libghidra.OpenProgramResponse)
@@ -1576,6 +1964,7 @@ inline void OpenProgramResponse::SharedDtor(MessageLite& self) {
   this_._impl_.compiler_spec_.Destroy();
   this_._impl_.md5_.Destroy();
   this_._impl_.sha256_.Destroy();
+  this_._impl_.executable_format_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -1615,15 +2004,15 @@ const ::google::protobuf::internal::ClassData* OpenProgramResponse::GetClassData
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<3, 6, 0, 83, 2> OpenProgramResponse::_table_ = {
+const ::_pbi::TcParseTable<4, 9, 0, 108, 2> OpenProgramResponse::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    7, 56,  // max_field_number, fast_idx_mask
+    10, 120,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967169,  // skipmap
+    4294966273,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    6,  // num_field_entries
+    9,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     _class_data_.base(),
@@ -1653,6 +2042,20 @@ const ::_pbi::TcParseTable<3, 6, 0, 83, 2> OpenProgramResponse::_table_ = {
     // string sha256 = 7;
     {::_pbi::TcParser::FastUS1,
      {58, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.sha256_)}},
+    // string executable_format = 8;
+    {::_pbi::TcParser::FastUS1,
+     {66, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.executable_format_)}},
+    // uint64 entry_point = 9;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(OpenProgramResponse, _impl_.entry_point_), 63>(),
+     {72, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.entry_point_)}},
+    // bool has_entry_point = 10;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(OpenProgramResponse, _impl_.has_entry_point_), 63>(),
+     {80, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.has_entry_point_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
   }}, {{
     65535, 65535
   }}, {{
@@ -1674,16 +2077,26 @@ const ::_pbi::TcParseTable<3, 6, 0, 83, 2> OpenProgramResponse::_table_ = {
     // string sha256 = 7;
     {PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.sha256_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string executable_format = 8;
+    {PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.executable_format_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // uint64 entry_point = 9;
+    {PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.entry_point_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // bool has_entry_point = 10;
+    {PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.has_entry_point_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
   }},
   // no aux_entries
   {{
-    "\35\14\13\15\0\3\6\0"
+    "\35\14\13\15\0\3\6\21\0\0\0\0\0\0\0\0"
     "libghidra.OpenProgramResponse"
     "program_name"
     "language_id"
     "compiler_spec"
     "md5"
     "sha256"
+    "executable_format"
   }},
 };
 
@@ -1699,7 +2112,10 @@ PROTOBUF_NOINLINE void OpenProgramResponse::Clear() {
   _impl_.compiler_spec_.ClearToEmpty();
   _impl_.md5_.ClearToEmpty();
   _impl_.sha256_.ClearToEmpty();
-  _impl_.image_base_ = ::uint64_t{0u};
+  _impl_.executable_format_.ClearToEmpty();
+  ::memset(&_impl_.image_base_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.has_entry_point_) -
+      reinterpret_cast<char*>(&_impl_.image_base_)) + sizeof(_impl_.has_entry_point_));
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
@@ -1765,6 +2181,28 @@ PROTOBUF_NOINLINE void OpenProgramResponse::Clear() {
             target = stream->WriteStringMaybeAliased(7, _s, target);
           }
 
+          // string executable_format = 8;
+          if (!this_._internal_executable_format().empty()) {
+            const std::string& _s = this_._internal_executable_format();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.OpenProgramResponse.executable_format");
+            target = stream->WriteStringMaybeAliased(8, _s, target);
+          }
+
+          // uint64 entry_point = 9;
+          if (this_._internal_entry_point() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                9, this_._internal_entry_point(), target);
+          }
+
+          // bool has_entry_point = 10;
+          if (this_._internal_has_entry_point() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                10, this_._internal_has_entry_point(), target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -1815,10 +2253,24 @@ PROTOBUF_NOINLINE void OpenProgramResponse::Clear() {
               total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
                                               this_._internal_sha256());
             }
+            // string executable_format = 8;
+            if (!this_._internal_executable_format().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_executable_format());
+            }
             // uint64 image_base = 5;
             if (this_._internal_image_base() != 0) {
               total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
                   this_._internal_image_base());
+            }
+            // uint64 entry_point = 9;
+            if (this_._internal_entry_point() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_entry_point());
+            }
+            // bool has_entry_point = 10;
+            if (this_._internal_has_entry_point() != 0) {
+              total_size += 2;
             }
           }
           return this_.MaybeComputeUnknownFieldsSize(total_size,
@@ -1848,8 +2300,17 @@ void OpenProgramResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, con
   if (!from._internal_sha256().empty()) {
     _this->_internal_set_sha256(from._internal_sha256());
   }
+  if (!from._internal_executable_format().empty()) {
+    _this->_internal_set_executable_format(from._internal_executable_format());
+  }
   if (from._internal_image_base() != 0) {
     _this->_impl_.image_base_ = from._impl_.image_base_;
+  }
+  if (from._internal_entry_point() != 0) {
+    _this->_impl_.entry_point_ = from._impl_.entry_point_;
+  }
+  if (from._internal_has_entry_point() != 0) {
+    _this->_impl_.has_entry_point_ = from._impl_.has_entry_point_;
   }
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -1872,7 +2333,13 @@ void OpenProgramResponse::InternalSwap(OpenProgramResponse* PROTOBUF_RESTRICT ot
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.compiler_spec_, &other->_impl_.compiler_spec_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.md5_, &other->_impl_.md5_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.sha256_, &other->_impl_.sha256_, arena);
-        swap(_impl_.image_base_, other->_impl_.image_base_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.executable_format_, &other->_impl_.executable_format_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.has_entry_point_)
+      + sizeof(OpenProgramResponse::_impl_.has_entry_point_)
+      - PROTOBUF_FIELD_OFFSET(OpenProgramResponse, _impl_.image_base_)>(
+          reinterpret_cast<char*>(&_impl_.image_base_),
+          reinterpret_cast<char*>(&other->_impl_.image_base_));
 }
 
 ::google::protobuf::Metadata OpenProgramResponse::GetMetadata() const {
@@ -6719,6 +7186,2051 @@ void ShutdownResponse::InternalSwap(ShutdownResponse* PROTOBUF_RESTRICT other) {
 }
 
 ::google::protobuf::Metadata ShutdownResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class PerfBenchmarkRecord::_Internal {
+ public:
+};
+
+PerfBenchmarkRecord::PerfBenchmarkRecord(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.PerfBenchmarkRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE PerfBenchmarkRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::PerfBenchmarkRecord& from_msg)
+      : bench_id_(arena, from.bench_id_),
+        query_family_(arena, from.query_family_),
+        dataset_profile_(arena, from.dataset_profile_),
+        status_(arena, from.status_),
+        _cached_size_{0} {}
+
+PerfBenchmarkRecord::PerfBenchmarkRecord(
+    ::google::protobuf::Arena* arena,
+    const PerfBenchmarkRecord& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  PerfBenchmarkRecord* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, cold_ms_p50_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, cold_ms_p50_),
+           offsetof(Impl_, regression_pct_) -
+               offsetof(Impl_, cold_ms_p50_) +
+               sizeof(Impl_::regression_pct_));
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.PerfBenchmarkRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE PerfBenchmarkRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : bench_id_(arena),
+        query_family_(arena),
+        dataset_profile_(arena),
+        status_(arena),
+        _cached_size_{0} {}
+
+inline void PerfBenchmarkRecord::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, cold_ms_p50_),
+           0,
+           offsetof(Impl_, regression_pct_) -
+               offsetof(Impl_, cold_ms_p50_) +
+               sizeof(Impl_::regression_pct_));
+}
+PerfBenchmarkRecord::~PerfBenchmarkRecord() {
+  // @@protoc_insertion_point(destructor:libghidra.PerfBenchmarkRecord)
+  SharedDtor(*this);
+}
+inline void PerfBenchmarkRecord::SharedDtor(MessageLite& self) {
+  PerfBenchmarkRecord& this_ = static_cast<PerfBenchmarkRecord&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.bench_id_.Destroy();
+  this_._impl_.query_family_.Destroy();
+  this_._impl_.dataset_profile_.Destroy();
+  this_._impl_.status_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* PerfBenchmarkRecord::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) PerfBenchmarkRecord(arena);
+}
+constexpr auto PerfBenchmarkRecord::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(PerfBenchmarkRecord),
+                                            alignof(PerfBenchmarkRecord));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull PerfBenchmarkRecord::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_PerfBenchmarkRecord_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &PerfBenchmarkRecord::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<PerfBenchmarkRecord>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &PerfBenchmarkRecord::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<PerfBenchmarkRecord>(), &PerfBenchmarkRecord::ByteSizeLong,
+            &PerfBenchmarkRecord::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_._cached_size_),
+        false,
+    },
+    &PerfBenchmarkRecord::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* PerfBenchmarkRecord::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<4, 10, 0, 87, 2> PerfBenchmarkRecord::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    10, 120,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294966272,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    10,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::PerfBenchmarkRecord>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // string bench_id = 1;
+    {::_pbi::TcParser::FastUS1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.bench_id_)}},
+    // string query_family = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.query_family_)}},
+    // string dataset_profile = 3;
+    {::_pbi::TcParser::FastUS1,
+     {26, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.dataset_profile_)}},
+    // double cold_ms_p50 = 4;
+    {::_pbi::TcParser::FastF64S1,
+     {33, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.cold_ms_p50_)}},
+    // double cold_ms_p95 = 5;
+    {::_pbi::TcParser::FastF64S1,
+     {41, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.cold_ms_p95_)}},
+    // double warm_ms_p50 = 6;
+    {::_pbi::TcParser::FastF64S1,
+     {49, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.warm_ms_p50_)}},
+    // double warm_ms_p95 = 7;
+    {::_pbi::TcParser::FastF64S1,
+     {57, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.warm_ms_p95_)}},
+    // double throughput_qps = 8;
+    {::_pbi::TcParser::FastF64S1,
+     {65, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.throughput_qps_)}},
+    // double regression_pct = 9;
+    {::_pbi::TcParser::FastF64S1,
+     {73, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.regression_pct_)}},
+    // string status = 10;
+    {::_pbi::TcParser::FastUS1,
+     {82, 63, 0, PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.status_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // string bench_id = 1;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.bench_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string query_family = 2;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.query_family_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string dataset_profile = 3;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.dataset_profile_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // double cold_ms_p50 = 4;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.cold_ms_p50_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kDouble)},
+    // double cold_ms_p95 = 5;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.cold_ms_p95_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kDouble)},
+    // double warm_ms_p50 = 6;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.warm_ms_p50_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kDouble)},
+    // double warm_ms_p95 = 7;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.warm_ms_p95_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kDouble)},
+    // double throughput_qps = 8;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.throughput_qps_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kDouble)},
+    // double regression_pct = 9;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.regression_pct_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kDouble)},
+    // string status = 10;
+    {PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.status_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\35\10\14\17\0\0\0\0\0\0\6\0\0\0\0\0"
+    "libghidra.PerfBenchmarkRecord"
+    "bench_id"
+    "query_family"
+    "dataset_profile"
+    "status"
+  }},
+};
+
+PROTOBUF_NOINLINE void PerfBenchmarkRecord::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.PerfBenchmarkRecord)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.bench_id_.ClearToEmpty();
+  _impl_.query_family_.ClearToEmpty();
+  _impl_.dataset_profile_.ClearToEmpty();
+  _impl_.status_.ClearToEmpty();
+  ::memset(&_impl_.cold_ms_p50_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.regression_pct_) -
+      reinterpret_cast<char*>(&_impl_.cold_ms_p50_)) + sizeof(_impl_.regression_pct_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* PerfBenchmarkRecord::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const PerfBenchmarkRecord& this_ = static_cast<const PerfBenchmarkRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* PerfBenchmarkRecord::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const PerfBenchmarkRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.PerfBenchmarkRecord)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // string bench_id = 1;
+          if (!this_._internal_bench_id().empty()) {
+            const std::string& _s = this_._internal_bench_id();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.PerfBenchmarkRecord.bench_id");
+            target = stream->WriteStringMaybeAliased(1, _s, target);
+          }
+
+          // string query_family = 2;
+          if (!this_._internal_query_family().empty()) {
+            const std::string& _s = this_._internal_query_family();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.PerfBenchmarkRecord.query_family");
+            target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          // string dataset_profile = 3;
+          if (!this_._internal_dataset_profile().empty()) {
+            const std::string& _s = this_._internal_dataset_profile();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.PerfBenchmarkRecord.dataset_profile");
+            target = stream->WriteStringMaybeAliased(3, _s, target);
+          }
+
+          // double cold_ms_p50 = 4;
+          if (::absl::bit_cast<::uint64_t>(this_._internal_cold_ms_p50()) != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteDoubleToArray(
+                4, this_._internal_cold_ms_p50(), target);
+          }
+
+          // double cold_ms_p95 = 5;
+          if (::absl::bit_cast<::uint64_t>(this_._internal_cold_ms_p95()) != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteDoubleToArray(
+                5, this_._internal_cold_ms_p95(), target);
+          }
+
+          // double warm_ms_p50 = 6;
+          if (::absl::bit_cast<::uint64_t>(this_._internal_warm_ms_p50()) != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteDoubleToArray(
+                6, this_._internal_warm_ms_p50(), target);
+          }
+
+          // double warm_ms_p95 = 7;
+          if (::absl::bit_cast<::uint64_t>(this_._internal_warm_ms_p95()) != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteDoubleToArray(
+                7, this_._internal_warm_ms_p95(), target);
+          }
+
+          // double throughput_qps = 8;
+          if (::absl::bit_cast<::uint64_t>(this_._internal_throughput_qps()) != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteDoubleToArray(
+                8, this_._internal_throughput_qps(), target);
+          }
+
+          // double regression_pct = 9;
+          if (::absl::bit_cast<::uint64_t>(this_._internal_regression_pct()) != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteDoubleToArray(
+                9, this_._internal_regression_pct(), target);
+          }
+
+          // string status = 10;
+          if (!this_._internal_status().empty()) {
+            const std::string& _s = this_._internal_status();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.PerfBenchmarkRecord.status");
+            target = stream->WriteStringMaybeAliased(10, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.PerfBenchmarkRecord)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t PerfBenchmarkRecord::ByteSizeLong(const MessageLite& base) {
+          const PerfBenchmarkRecord& this_ = static_cast<const PerfBenchmarkRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t PerfBenchmarkRecord::ByteSizeLong() const {
+          const PerfBenchmarkRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.PerfBenchmarkRecord)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string bench_id = 1;
+            if (!this_._internal_bench_id().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_bench_id());
+            }
+            // string query_family = 2;
+            if (!this_._internal_query_family().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_query_family());
+            }
+            // string dataset_profile = 3;
+            if (!this_._internal_dataset_profile().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_dataset_profile());
+            }
+            // string status = 10;
+            if (!this_._internal_status().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_status());
+            }
+            // double cold_ms_p50 = 4;
+            if (::absl::bit_cast<::uint64_t>(this_._internal_cold_ms_p50()) != 0) {
+              total_size += 9;
+            }
+            // double cold_ms_p95 = 5;
+            if (::absl::bit_cast<::uint64_t>(this_._internal_cold_ms_p95()) != 0) {
+              total_size += 9;
+            }
+            // double warm_ms_p50 = 6;
+            if (::absl::bit_cast<::uint64_t>(this_._internal_warm_ms_p50()) != 0) {
+              total_size += 9;
+            }
+            // double warm_ms_p95 = 7;
+            if (::absl::bit_cast<::uint64_t>(this_._internal_warm_ms_p95()) != 0) {
+              total_size += 9;
+            }
+            // double throughput_qps = 8;
+            if (::absl::bit_cast<::uint64_t>(this_._internal_throughput_qps()) != 0) {
+              total_size += 9;
+            }
+            // double regression_pct = 9;
+            if (::absl::bit_cast<::uint64_t>(this_._internal_regression_pct()) != 0) {
+              total_size += 9;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void PerfBenchmarkRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<PerfBenchmarkRecord*>(&to_msg);
+  auto& from = static_cast<const PerfBenchmarkRecord&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.PerfBenchmarkRecord)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_bench_id().empty()) {
+    _this->_internal_set_bench_id(from._internal_bench_id());
+  }
+  if (!from._internal_query_family().empty()) {
+    _this->_internal_set_query_family(from._internal_query_family());
+  }
+  if (!from._internal_dataset_profile().empty()) {
+    _this->_internal_set_dataset_profile(from._internal_dataset_profile());
+  }
+  if (!from._internal_status().empty()) {
+    _this->_internal_set_status(from._internal_status());
+  }
+  if (::absl::bit_cast<::uint64_t>(from._internal_cold_ms_p50()) != 0) {
+    _this->_impl_.cold_ms_p50_ = from._impl_.cold_ms_p50_;
+  }
+  if (::absl::bit_cast<::uint64_t>(from._internal_cold_ms_p95()) != 0) {
+    _this->_impl_.cold_ms_p95_ = from._impl_.cold_ms_p95_;
+  }
+  if (::absl::bit_cast<::uint64_t>(from._internal_warm_ms_p50()) != 0) {
+    _this->_impl_.warm_ms_p50_ = from._impl_.warm_ms_p50_;
+  }
+  if (::absl::bit_cast<::uint64_t>(from._internal_warm_ms_p95()) != 0) {
+    _this->_impl_.warm_ms_p95_ = from._impl_.warm_ms_p95_;
+  }
+  if (::absl::bit_cast<::uint64_t>(from._internal_throughput_qps()) != 0) {
+    _this->_impl_.throughput_qps_ = from._impl_.throughput_qps_;
+  }
+  if (::absl::bit_cast<::uint64_t>(from._internal_regression_pct()) != 0) {
+    _this->_impl_.regression_pct_ = from._impl_.regression_pct_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void PerfBenchmarkRecord::CopyFrom(const PerfBenchmarkRecord& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.PerfBenchmarkRecord)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void PerfBenchmarkRecord::InternalSwap(PerfBenchmarkRecord* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.bench_id_, &other->_impl_.bench_id_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.query_family_, &other->_impl_.query_family_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.dataset_profile_, &other->_impl_.dataset_profile_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.status_, &other->_impl_.status_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.regression_pct_)
+      + sizeof(PerfBenchmarkRecord::_impl_.regression_pct_)
+      - PROTOBUF_FIELD_OFFSET(PerfBenchmarkRecord, _impl_.cold_ms_p50_)>(
+          reinterpret_cast<char*>(&_impl_.cold_ms_p50_),
+          reinterpret_cast<char*>(&other->_impl_.cold_ms_p50_));
+}
+
+::google::protobuf::Metadata PerfBenchmarkRecord::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class AddPerfBenchmarkRequest::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<AddPerfBenchmarkRequest>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(AddPerfBenchmarkRequest, _impl_._has_bits_);
+};
+
+AddPerfBenchmarkRequest::AddPerfBenchmarkRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.AddPerfBenchmarkRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE AddPerfBenchmarkRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::AddPerfBenchmarkRequest& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0} {}
+
+AddPerfBenchmarkRequest::AddPerfBenchmarkRequest(
+    ::google::protobuf::Arena* arena,
+    const AddPerfBenchmarkRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  AddPerfBenchmarkRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.record_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::PerfBenchmarkRecord>(
+                              arena, *from._impl_.record_)
+                        : nullptr;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.AddPerfBenchmarkRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE AddPerfBenchmarkRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void AddPerfBenchmarkRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.record_ = {};
+}
+AddPerfBenchmarkRequest::~AddPerfBenchmarkRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.AddPerfBenchmarkRequest)
+  SharedDtor(*this);
+}
+inline void AddPerfBenchmarkRequest::SharedDtor(MessageLite& self) {
+  AddPerfBenchmarkRequest& this_ = static_cast<AddPerfBenchmarkRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  delete this_._impl_.record_;
+  this_._impl_.~Impl_();
+}
+
+inline void* AddPerfBenchmarkRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) AddPerfBenchmarkRequest(arena);
+}
+constexpr auto AddPerfBenchmarkRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(AddPerfBenchmarkRequest),
+                                            alignof(AddPerfBenchmarkRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull AddPerfBenchmarkRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_AddPerfBenchmarkRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &AddPerfBenchmarkRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<AddPerfBenchmarkRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &AddPerfBenchmarkRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<AddPerfBenchmarkRequest>(), &AddPerfBenchmarkRequest::ByteSizeLong,
+            &AddPerfBenchmarkRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(AddPerfBenchmarkRequest, _impl_._cached_size_),
+        false,
+    },
+    &AddPerfBenchmarkRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* AddPerfBenchmarkRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 1, 0, 2> AddPerfBenchmarkRequest::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AddPerfBenchmarkRequest, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::AddPerfBenchmarkRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // .libghidra.PerfBenchmarkRecord record = 1;
+    {::_pbi::TcParser::FastMtS1,
+     {10, 0, 0, PROTOBUF_FIELD_OFFSET(AddPerfBenchmarkRequest, _impl_.record_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // .libghidra.PerfBenchmarkRecord record = 1;
+    {PROTOBUF_FIELD_OFFSET(AddPerfBenchmarkRequest, _impl_.record_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::PerfBenchmarkRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void AddPerfBenchmarkRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.AddPerfBenchmarkRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(_impl_.record_ != nullptr);
+    _impl_.record_->Clear();
+  }
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* AddPerfBenchmarkRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const AddPerfBenchmarkRequest& this_ = static_cast<const AddPerfBenchmarkRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* AddPerfBenchmarkRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const AddPerfBenchmarkRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.AddPerfBenchmarkRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // .libghidra.PerfBenchmarkRecord record = 1;
+          if (cached_has_bits & 0x00000001u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                1, *this_._impl_.record_, this_._impl_.record_->GetCachedSize(), target,
+                stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.AddPerfBenchmarkRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t AddPerfBenchmarkRequest::ByteSizeLong(const MessageLite& base) {
+          const AddPerfBenchmarkRequest& this_ = static_cast<const AddPerfBenchmarkRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t AddPerfBenchmarkRequest::ByteSizeLong() const {
+          const AddPerfBenchmarkRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.AddPerfBenchmarkRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+           {
+            // .libghidra.PerfBenchmarkRecord record = 1;
+            cached_has_bits = this_._impl_._has_bits_[0];
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.record_);
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void AddPerfBenchmarkRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<AddPerfBenchmarkRequest*>(&to_msg);
+  auto& from = static_cast<const AddPerfBenchmarkRequest&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.AddPerfBenchmarkRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(from._impl_.record_ != nullptr);
+    if (_this->_impl_.record_ == nullptr) {
+      _this->_impl_.record_ =
+          ::google::protobuf::Message::CopyConstruct<::libghidra::PerfBenchmarkRecord>(arena, *from._impl_.record_);
+    } else {
+      _this->_impl_.record_->MergeFrom(*from._impl_.record_);
+    }
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void AddPerfBenchmarkRequest::CopyFrom(const AddPerfBenchmarkRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.AddPerfBenchmarkRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void AddPerfBenchmarkRequest::InternalSwap(AddPerfBenchmarkRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  swap(_impl_.record_, other->_impl_.record_);
+}
+
+::google::protobuf::Metadata AddPerfBenchmarkRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class AddPerfBenchmarkResponse::_Internal {
+ public:
+};
+
+AddPerfBenchmarkResponse::AddPerfBenchmarkResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.AddPerfBenchmarkResponse)
+}
+AddPerfBenchmarkResponse::AddPerfBenchmarkResponse(
+    ::google::protobuf::Arena* arena, const AddPerfBenchmarkResponse& from)
+    : AddPerfBenchmarkResponse(arena) {
+  MergeFrom(from);
+}
+inline PROTOBUF_NDEBUG_INLINE AddPerfBenchmarkResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void AddPerfBenchmarkResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.added_ = {};
+}
+AddPerfBenchmarkResponse::~AddPerfBenchmarkResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.AddPerfBenchmarkResponse)
+  SharedDtor(*this);
+}
+inline void AddPerfBenchmarkResponse::SharedDtor(MessageLite& self) {
+  AddPerfBenchmarkResponse& this_ = static_cast<AddPerfBenchmarkResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* AddPerfBenchmarkResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) AddPerfBenchmarkResponse(arena);
+}
+constexpr auto AddPerfBenchmarkResponse::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(AddPerfBenchmarkResponse),
+                                            alignof(AddPerfBenchmarkResponse));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull AddPerfBenchmarkResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_AddPerfBenchmarkResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &AddPerfBenchmarkResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<AddPerfBenchmarkResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &AddPerfBenchmarkResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<AddPerfBenchmarkResponse>(), &AddPerfBenchmarkResponse::ByteSizeLong,
+            &AddPerfBenchmarkResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(AddPerfBenchmarkResponse, _impl_._cached_size_),
+        false,
+    },
+    &AddPerfBenchmarkResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* AddPerfBenchmarkResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AddPerfBenchmarkResponse::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::AddPerfBenchmarkResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // bool added = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AddPerfBenchmarkResponse, _impl_.added_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(AddPerfBenchmarkResponse, _impl_.added_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // bool added = 1;
+    {PROTOBUF_FIELD_OFFSET(AddPerfBenchmarkResponse, _impl_.added_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+PROTOBUF_NOINLINE void AddPerfBenchmarkResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.AddPerfBenchmarkResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.added_ = false;
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* AddPerfBenchmarkResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const AddPerfBenchmarkResponse& this_ = static_cast<const AddPerfBenchmarkResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* AddPerfBenchmarkResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const AddPerfBenchmarkResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.AddPerfBenchmarkResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // bool added = 1;
+          if (this_._internal_added() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                1, this_._internal_added(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.AddPerfBenchmarkResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t AddPerfBenchmarkResponse::ByteSizeLong(const MessageLite& base) {
+          const AddPerfBenchmarkResponse& this_ = static_cast<const AddPerfBenchmarkResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t AddPerfBenchmarkResponse::ByteSizeLong() const {
+          const AddPerfBenchmarkResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.AddPerfBenchmarkResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+           {
+            // bool added = 1;
+            if (this_._internal_added() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void AddPerfBenchmarkResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<AddPerfBenchmarkResponse*>(&to_msg);
+  auto& from = static_cast<const AddPerfBenchmarkResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.AddPerfBenchmarkResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_added() != 0) {
+    _this->_impl_.added_ = from._impl_.added_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void AddPerfBenchmarkResponse::CopyFrom(const AddPerfBenchmarkResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.AddPerfBenchmarkResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void AddPerfBenchmarkResponse::InternalSwap(AddPerfBenchmarkResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+        swap(_impl_.added_, other->_impl_.added_);
+}
+
+::google::protobuf::Metadata AddPerfBenchmarkResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListPerfBenchmarksRequest::_Internal {
+ public:
+};
+
+ListPerfBenchmarksRequest::ListPerfBenchmarksRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::internal::ZeroFieldsBase(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::internal::ZeroFieldsBase(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListPerfBenchmarksRequest)
+}
+ListPerfBenchmarksRequest::ListPerfBenchmarksRequest(
+    ::google::protobuf::Arena* arena,
+    const ListPerfBenchmarksRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::internal::ZeroFieldsBase(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::internal::ZeroFieldsBase(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListPerfBenchmarksRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListPerfBenchmarksRequest)
+}
+
+inline void* ListPerfBenchmarksRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListPerfBenchmarksRequest(arena);
+}
+constexpr auto ListPerfBenchmarksRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(ListPerfBenchmarksRequest),
+                                            alignof(ListPerfBenchmarksRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListPerfBenchmarksRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListPerfBenchmarksRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListPerfBenchmarksRequest::MergeImpl,
+        ::google::protobuf::internal::ZeroFieldsBase::GetNewImpl<ListPerfBenchmarksRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListPerfBenchmarksRequest::SharedDtor,
+        ::google::protobuf::internal::ZeroFieldsBase::GetClearImpl<ListPerfBenchmarksRequest>(), &ListPerfBenchmarksRequest::ByteSizeLong,
+            &ListPerfBenchmarksRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListPerfBenchmarksRequest, _impl_._cached_size_),
+        false,
+    },
+    &ListPerfBenchmarksRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListPerfBenchmarksRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 0, 0, 0, 2> ListPerfBenchmarksRequest::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    0, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967295,  // skipmap
+    offsetof(decltype(_table_), field_names),  // no field_entries
+    0,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListPerfBenchmarksRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }},
+  // no field_entries, or aux_entries
+  {{
+  }},
+};
+
+
+
+
+
+
+
+
+::google::protobuf::Metadata ListPerfBenchmarksRequest::GetMetadata() const {
+  return ::google::protobuf::internal::ZeroFieldsBase::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListPerfBenchmarksResponse::_Internal {
+ public:
+};
+
+ListPerfBenchmarksResponse::ListPerfBenchmarksResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListPerfBenchmarksResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListPerfBenchmarksResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::ListPerfBenchmarksResponse& from_msg)
+      : records_{visibility, arena, from.records_},
+        _cached_size_{0} {}
+
+ListPerfBenchmarksResponse::ListPerfBenchmarksResponse(
+    ::google::protobuf::Arena* arena,
+    const ListPerfBenchmarksResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListPerfBenchmarksResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListPerfBenchmarksResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListPerfBenchmarksResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : records_{visibility, arena},
+        _cached_size_{0} {}
+
+inline void ListPerfBenchmarksResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+}
+ListPerfBenchmarksResponse::~ListPerfBenchmarksResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.ListPerfBenchmarksResponse)
+  SharedDtor(*this);
+}
+inline void ListPerfBenchmarksResponse::SharedDtor(MessageLite& self) {
+  ListPerfBenchmarksResponse& this_ = static_cast<ListPerfBenchmarksResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* ListPerfBenchmarksResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListPerfBenchmarksResponse(arena);
+}
+constexpr auto ListPerfBenchmarksResponse::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(ListPerfBenchmarksResponse, _impl_.records_) +
+          decltype(ListPerfBenchmarksResponse::_impl_.records_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::ZeroInit(
+        sizeof(ListPerfBenchmarksResponse), alignof(ListPerfBenchmarksResponse), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&ListPerfBenchmarksResponse::PlacementNew_,
+                                 sizeof(ListPerfBenchmarksResponse),
+                                 alignof(ListPerfBenchmarksResponse));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListPerfBenchmarksResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListPerfBenchmarksResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListPerfBenchmarksResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ListPerfBenchmarksResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListPerfBenchmarksResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ListPerfBenchmarksResponse>(), &ListPerfBenchmarksResponse::ByteSizeLong,
+            &ListPerfBenchmarksResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListPerfBenchmarksResponse, _impl_._cached_size_),
+        false,
+    },
+    &ListPerfBenchmarksResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListPerfBenchmarksResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 1, 0, 2> ListPerfBenchmarksResponse::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListPerfBenchmarksResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // repeated .libghidra.PerfBenchmarkRecord records = 1;
+    {::_pbi::TcParser::FastMtR1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(ListPerfBenchmarksResponse, _impl_.records_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // repeated .libghidra.PerfBenchmarkRecord records = 1;
+    {PROTOBUF_FIELD_OFFSET(ListPerfBenchmarksResponse, _impl_.records_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::PerfBenchmarkRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void ListPerfBenchmarksResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ListPerfBenchmarksResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.records_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ListPerfBenchmarksResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ListPerfBenchmarksResponse& this_ = static_cast<const ListPerfBenchmarksResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ListPerfBenchmarksResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ListPerfBenchmarksResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ListPerfBenchmarksResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // repeated .libghidra.PerfBenchmarkRecord records = 1;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_records_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_records().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    1, repfield, repfield.GetCachedSize(),
+                    target, stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ListPerfBenchmarksResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ListPerfBenchmarksResponse::ByteSizeLong(const MessageLite& base) {
+          const ListPerfBenchmarksResponse& this_ = static_cast<const ListPerfBenchmarksResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ListPerfBenchmarksResponse::ByteSizeLong() const {
+          const ListPerfBenchmarksResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ListPerfBenchmarksResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated .libghidra.PerfBenchmarkRecord records = 1;
+            {
+              total_size += 1UL * this_._internal_records_size();
+              for (const auto& msg : this_._internal_records()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ListPerfBenchmarksResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ListPerfBenchmarksResponse*>(&to_msg);
+  auto& from = static_cast<const ListPerfBenchmarksResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ListPerfBenchmarksResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_records()->MergeFrom(
+      from._internal_records());
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ListPerfBenchmarksResponse::CopyFrom(const ListPerfBenchmarksResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ListPerfBenchmarksResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ListPerfBenchmarksResponse::InternalSwap(ListPerfBenchmarksResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.records_.InternalSwap(&other->_impl_.records_);
+}
+
+::google::protobuf::Metadata ListPerfBenchmarksResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ClearPerfBenchmarksRequest::_Internal {
+ public:
+};
+
+ClearPerfBenchmarksRequest::ClearPerfBenchmarksRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::internal::ZeroFieldsBase(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::internal::ZeroFieldsBase(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  // @@protoc_insertion_point(arena_constructor:libghidra.ClearPerfBenchmarksRequest)
+}
+ClearPerfBenchmarksRequest::ClearPerfBenchmarksRequest(
+    ::google::protobuf::Arena* arena,
+    const ClearPerfBenchmarksRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::internal::ZeroFieldsBase(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::internal::ZeroFieldsBase(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ClearPerfBenchmarksRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ClearPerfBenchmarksRequest)
+}
+
+inline void* ClearPerfBenchmarksRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ClearPerfBenchmarksRequest(arena);
+}
+constexpr auto ClearPerfBenchmarksRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(ClearPerfBenchmarksRequest),
+                                            alignof(ClearPerfBenchmarksRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ClearPerfBenchmarksRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ClearPerfBenchmarksRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ClearPerfBenchmarksRequest::MergeImpl,
+        ::google::protobuf::internal::ZeroFieldsBase::GetNewImpl<ClearPerfBenchmarksRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ClearPerfBenchmarksRequest::SharedDtor,
+        ::google::protobuf::internal::ZeroFieldsBase::GetClearImpl<ClearPerfBenchmarksRequest>(), &ClearPerfBenchmarksRequest::ByteSizeLong,
+            &ClearPerfBenchmarksRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ClearPerfBenchmarksRequest, _impl_._cached_size_),
+        false,
+    },
+    &ClearPerfBenchmarksRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ClearPerfBenchmarksRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 0, 0, 0, 2> ClearPerfBenchmarksRequest::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    0, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967295,  // skipmap
+    offsetof(decltype(_table_), field_names),  // no field_entries
+    0,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ClearPerfBenchmarksRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }},
+  // no field_entries, or aux_entries
+  {{
+  }},
+};
+
+
+
+
+
+
+
+
+::google::protobuf::Metadata ClearPerfBenchmarksRequest::GetMetadata() const {
+  return ::google::protobuf::internal::ZeroFieldsBase::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ClearPerfBenchmarksResponse::_Internal {
+ public:
+};
+
+ClearPerfBenchmarksResponse::ClearPerfBenchmarksResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ClearPerfBenchmarksResponse)
+}
+ClearPerfBenchmarksResponse::ClearPerfBenchmarksResponse(
+    ::google::protobuf::Arena* arena, const ClearPerfBenchmarksResponse& from)
+    : ClearPerfBenchmarksResponse(arena) {
+  MergeFrom(from);
+}
+inline PROTOBUF_NDEBUG_INLINE ClearPerfBenchmarksResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void ClearPerfBenchmarksResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, cleared_),
+           0,
+           offsetof(Impl_, removed_count_) -
+               offsetof(Impl_, cleared_) +
+               sizeof(Impl_::removed_count_));
+}
+ClearPerfBenchmarksResponse::~ClearPerfBenchmarksResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.ClearPerfBenchmarksResponse)
+  SharedDtor(*this);
+}
+inline void ClearPerfBenchmarksResponse::SharedDtor(MessageLite& self) {
+  ClearPerfBenchmarksResponse& this_ = static_cast<ClearPerfBenchmarksResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* ClearPerfBenchmarksResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ClearPerfBenchmarksResponse(arena);
+}
+constexpr auto ClearPerfBenchmarksResponse::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(ClearPerfBenchmarksResponse),
+                                            alignof(ClearPerfBenchmarksResponse));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ClearPerfBenchmarksResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ClearPerfBenchmarksResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ClearPerfBenchmarksResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ClearPerfBenchmarksResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ClearPerfBenchmarksResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ClearPerfBenchmarksResponse>(), &ClearPerfBenchmarksResponse::ByteSizeLong,
+            &ClearPerfBenchmarksResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ClearPerfBenchmarksResponse, _impl_._cached_size_),
+        false,
+    },
+    &ClearPerfBenchmarksResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ClearPerfBenchmarksResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 0, 0, 2> ClearPerfBenchmarksResponse::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ClearPerfBenchmarksResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // uint32 removed_count = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(ClearPerfBenchmarksResponse, _impl_.removed_count_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(ClearPerfBenchmarksResponse, _impl_.removed_count_)}},
+    // bool cleared = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClearPerfBenchmarksResponse, _impl_.cleared_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(ClearPerfBenchmarksResponse, _impl_.cleared_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // bool cleared = 1;
+    {PROTOBUF_FIELD_OFFSET(ClearPerfBenchmarksResponse, _impl_.cleared_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // uint32 removed_count = 2;
+    {PROTOBUF_FIELD_OFFSET(ClearPerfBenchmarksResponse, _impl_.removed_count_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+PROTOBUF_NOINLINE void ClearPerfBenchmarksResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ClearPerfBenchmarksResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&_impl_.cleared_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.removed_count_) -
+      reinterpret_cast<char*>(&_impl_.cleared_)) + sizeof(_impl_.removed_count_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ClearPerfBenchmarksResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ClearPerfBenchmarksResponse& this_ = static_cast<const ClearPerfBenchmarksResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ClearPerfBenchmarksResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ClearPerfBenchmarksResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ClearPerfBenchmarksResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // bool cleared = 1;
+          if (this_._internal_cleared() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                1, this_._internal_cleared(), target);
+          }
+
+          // uint32 removed_count = 2;
+          if (this_._internal_removed_count() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                2, this_._internal_removed_count(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ClearPerfBenchmarksResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ClearPerfBenchmarksResponse::ByteSizeLong(const MessageLite& base) {
+          const ClearPerfBenchmarksResponse& this_ = static_cast<const ClearPerfBenchmarksResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ClearPerfBenchmarksResponse::ByteSizeLong() const {
+          const ClearPerfBenchmarksResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ClearPerfBenchmarksResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // bool cleared = 1;
+            if (this_._internal_cleared() != 0) {
+              total_size += 2;
+            }
+            // uint32 removed_count = 2;
+            if (this_._internal_removed_count() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_removed_count());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ClearPerfBenchmarksResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ClearPerfBenchmarksResponse*>(&to_msg);
+  auto& from = static_cast<const ClearPerfBenchmarksResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ClearPerfBenchmarksResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_cleared() != 0) {
+    _this->_impl_.cleared_ = from._impl_.cleared_;
+  }
+  if (from._internal_removed_count() != 0) {
+    _this->_impl_.removed_count_ = from._impl_.removed_count_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ClearPerfBenchmarksResponse::CopyFrom(const ClearPerfBenchmarksResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ClearPerfBenchmarksResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ClearPerfBenchmarksResponse::InternalSwap(ClearPerfBenchmarksResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ClearPerfBenchmarksResponse, _impl_.removed_count_)
+      + sizeof(ClearPerfBenchmarksResponse::_impl_.removed_count_)
+      - PROTOBUF_FIELD_OFFSET(ClearPerfBenchmarksResponse, _impl_.cleared_)>(
+          reinterpret_cast<char*>(&_impl_.cleared_),
+          reinterpret_cast<char*>(&other->_impl_.cleared_));
+}
+
+::google::protobuf::Metadata ClearPerfBenchmarksResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class DeletePerfBenchmarkRequest::_Internal {
+ public:
+};
+
+DeletePerfBenchmarkRequest::DeletePerfBenchmarkRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.DeletePerfBenchmarkRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE DeletePerfBenchmarkRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::DeletePerfBenchmarkRequest& from_msg)
+      : bench_id_(arena, from.bench_id_),
+        _cached_size_{0} {}
+
+DeletePerfBenchmarkRequest::DeletePerfBenchmarkRequest(
+    ::google::protobuf::Arena* arena,
+    const DeletePerfBenchmarkRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  DeletePerfBenchmarkRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.DeletePerfBenchmarkRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE DeletePerfBenchmarkRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : bench_id_(arena),
+        _cached_size_{0} {}
+
+inline void DeletePerfBenchmarkRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+}
+DeletePerfBenchmarkRequest::~DeletePerfBenchmarkRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.DeletePerfBenchmarkRequest)
+  SharedDtor(*this);
+}
+inline void DeletePerfBenchmarkRequest::SharedDtor(MessageLite& self) {
+  DeletePerfBenchmarkRequest& this_ = static_cast<DeletePerfBenchmarkRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.bench_id_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* DeletePerfBenchmarkRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) DeletePerfBenchmarkRequest(arena);
+}
+constexpr auto DeletePerfBenchmarkRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(DeletePerfBenchmarkRequest),
+                                            alignof(DeletePerfBenchmarkRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull DeletePerfBenchmarkRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_DeletePerfBenchmarkRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &DeletePerfBenchmarkRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<DeletePerfBenchmarkRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &DeletePerfBenchmarkRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<DeletePerfBenchmarkRequest>(), &DeletePerfBenchmarkRequest::ByteSizeLong,
+            &DeletePerfBenchmarkRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(DeletePerfBenchmarkRequest, _impl_._cached_size_),
+        false,
+    },
+    &DeletePerfBenchmarkRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* DeletePerfBenchmarkRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 53, 2> DeletePerfBenchmarkRequest::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::DeletePerfBenchmarkRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // string bench_id = 1;
+    {::_pbi::TcParser::FastUS1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(DeletePerfBenchmarkRequest, _impl_.bench_id_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // string bench_id = 1;
+    {PROTOBUF_FIELD_OFFSET(DeletePerfBenchmarkRequest, _impl_.bench_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\44\10\0\0\0\0\0\0"
+    "libghidra.DeletePerfBenchmarkRequest"
+    "bench_id"
+  }},
+};
+
+PROTOBUF_NOINLINE void DeletePerfBenchmarkRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.DeletePerfBenchmarkRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.bench_id_.ClearToEmpty();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* DeletePerfBenchmarkRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const DeletePerfBenchmarkRequest& this_ = static_cast<const DeletePerfBenchmarkRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* DeletePerfBenchmarkRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const DeletePerfBenchmarkRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.DeletePerfBenchmarkRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // string bench_id = 1;
+          if (!this_._internal_bench_id().empty()) {
+            const std::string& _s = this_._internal_bench_id();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.DeletePerfBenchmarkRequest.bench_id");
+            target = stream->WriteStringMaybeAliased(1, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.DeletePerfBenchmarkRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t DeletePerfBenchmarkRequest::ByteSizeLong(const MessageLite& base) {
+          const DeletePerfBenchmarkRequest& this_ = static_cast<const DeletePerfBenchmarkRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t DeletePerfBenchmarkRequest::ByteSizeLong() const {
+          const DeletePerfBenchmarkRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.DeletePerfBenchmarkRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+           {
+            // string bench_id = 1;
+            if (!this_._internal_bench_id().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_bench_id());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void DeletePerfBenchmarkRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<DeletePerfBenchmarkRequest*>(&to_msg);
+  auto& from = static_cast<const DeletePerfBenchmarkRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.DeletePerfBenchmarkRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_bench_id().empty()) {
+    _this->_internal_set_bench_id(from._internal_bench_id());
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void DeletePerfBenchmarkRequest::CopyFrom(const DeletePerfBenchmarkRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.DeletePerfBenchmarkRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void DeletePerfBenchmarkRequest::InternalSwap(DeletePerfBenchmarkRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.bench_id_, &other->_impl_.bench_id_, arena);
+}
+
+::google::protobuf::Metadata DeletePerfBenchmarkRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class DeletePerfBenchmarkResponse::_Internal {
+ public:
+};
+
+DeletePerfBenchmarkResponse::DeletePerfBenchmarkResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.DeletePerfBenchmarkResponse)
+}
+DeletePerfBenchmarkResponse::DeletePerfBenchmarkResponse(
+    ::google::protobuf::Arena* arena, const DeletePerfBenchmarkResponse& from)
+    : DeletePerfBenchmarkResponse(arena) {
+  MergeFrom(from);
+}
+inline PROTOBUF_NDEBUG_INLINE DeletePerfBenchmarkResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void DeletePerfBenchmarkResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.deleted_ = {};
+}
+DeletePerfBenchmarkResponse::~DeletePerfBenchmarkResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.DeletePerfBenchmarkResponse)
+  SharedDtor(*this);
+}
+inline void DeletePerfBenchmarkResponse::SharedDtor(MessageLite& self) {
+  DeletePerfBenchmarkResponse& this_ = static_cast<DeletePerfBenchmarkResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* DeletePerfBenchmarkResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) DeletePerfBenchmarkResponse(arena);
+}
+constexpr auto DeletePerfBenchmarkResponse::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(DeletePerfBenchmarkResponse),
+                                            alignof(DeletePerfBenchmarkResponse));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull DeletePerfBenchmarkResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_DeletePerfBenchmarkResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &DeletePerfBenchmarkResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<DeletePerfBenchmarkResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &DeletePerfBenchmarkResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<DeletePerfBenchmarkResponse>(), &DeletePerfBenchmarkResponse::ByteSizeLong,
+            &DeletePerfBenchmarkResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(DeletePerfBenchmarkResponse, _impl_._cached_size_),
+        false,
+    },
+    &DeletePerfBenchmarkResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* DeletePerfBenchmarkResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> DeletePerfBenchmarkResponse::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::DeletePerfBenchmarkResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // bool deleted = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(DeletePerfBenchmarkResponse, _impl_.deleted_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(DeletePerfBenchmarkResponse, _impl_.deleted_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // bool deleted = 1;
+    {PROTOBUF_FIELD_OFFSET(DeletePerfBenchmarkResponse, _impl_.deleted_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+PROTOBUF_NOINLINE void DeletePerfBenchmarkResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.DeletePerfBenchmarkResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.deleted_ = false;
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* DeletePerfBenchmarkResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const DeletePerfBenchmarkResponse& this_ = static_cast<const DeletePerfBenchmarkResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* DeletePerfBenchmarkResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const DeletePerfBenchmarkResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.DeletePerfBenchmarkResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // bool deleted = 1;
+          if (this_._internal_deleted() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                1, this_._internal_deleted(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.DeletePerfBenchmarkResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t DeletePerfBenchmarkResponse::ByteSizeLong(const MessageLite& base) {
+          const DeletePerfBenchmarkResponse& this_ = static_cast<const DeletePerfBenchmarkResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t DeletePerfBenchmarkResponse::ByteSizeLong() const {
+          const DeletePerfBenchmarkResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.DeletePerfBenchmarkResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+           {
+            // bool deleted = 1;
+            if (this_._internal_deleted() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void DeletePerfBenchmarkResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<DeletePerfBenchmarkResponse*>(&to_msg);
+  auto& from = static_cast<const DeletePerfBenchmarkResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.DeletePerfBenchmarkResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_deleted() != 0) {
+    _this->_impl_.deleted_ = from._impl_.deleted_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void DeletePerfBenchmarkResponse::CopyFrom(const DeletePerfBenchmarkResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.DeletePerfBenchmarkResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void DeletePerfBenchmarkResponse::InternalSwap(DeletePerfBenchmarkResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+        swap(_impl_.deleted_, other->_impl_.deleted_);
+}
+
+::google::protobuf::Metadata DeletePerfBenchmarkResponse::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // @@protoc_insertion_point(namespace_scope)

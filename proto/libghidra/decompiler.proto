@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 syntax = "proto3";
 
@@ -89,9 +88,53 @@ message ListDecompilationsResponse {
   repeated DecompileRecord decompilations = 1;
 }
 
+// P-code — the register-transfer IR. Two maturity rungs: HIGH (refined, SSA, via
+// HighFunction.getPcodeOps()) and RAW (per-instruction, non-SSA, via
+// Instruction.getPcode()). The Ghidra leg of the cross-tool low-level IR.
+enum PcodeMaturity {
+  PCODE_MATURITY_HIGH = 0;  // default — refined SSA p-code (getPcodeOps)
+  PCODE_MATURITY_RAW = 1;   // raw per-instruction p-code (getPcode), non-SSA
+}
+
+message VarnodeRecord {
+  string space = 1;   // address space name (register / const / ram / unique / stack)
+  uint64 offset = 2;
+  uint32 size = 3;
+  string kind = 4;    // canonical operand kind: reg / imm / mem / result / var
+}
+
+message PcodeOpRecord {
+  uint64 seq = 1;                     // sequential index within the function
+  string op = 2;                      // PcodeOp mnemonic (COPY, INT_ADD, LOAD, CALL, MULTIEQUAL, ...)
+  uint64 addr = 3;                    // source machine address
+  VarnodeRecord output = 4;           // output varnode (presence: has_output())
+  repeated VarnodeRecord inputs = 5;  // input varnodes
+  bool has_address = 6;               // false when the op has no source machine address
+}
+
+message PcodeRecord {
+  uint64 function_entry_address = 1;
+  repeated PcodeOpRecord ops = 2;
+  bool completed = 3;
+  string error_message = 4;
+  PcodeMaturity maturity = 5;   // the rung actually produced (echoed for honesty)
+}
+
+// Field 1 reserved for future common request context.
+message GetPcodeRequest {
+  uint64 address = 2;
+  uint32 timeout_ms = 3;
+  PcodeMaturity maturity = 4;   // requested rung (default HIGH)
+}
+
+message GetPcodeResponse {
+  PcodeRecord pcode = 1;
+}
+
 service DecompilerService {
   rpc DecompileFunction(DecompileFunctionRequest)
       returns (DecompileFunctionResponse);
   rpc ListDecompilations(ListDecompilationsRequest)
       returns (ListDecompilationsResponse);
+  rpc GetPcode(GetPcodeRequest) returns (GetPcodeResponse);
 }

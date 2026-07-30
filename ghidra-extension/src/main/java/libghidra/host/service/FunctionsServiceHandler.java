@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.service;
 
 import libghidra.host.contract.FunctionsContract;
@@ -147,5 +153,13 @@ public final class FunctionsServiceHandler {
 			request = new FunctionsContract.ListLoopsRequest(0L, 0L, 0, 0);
 		}
 		return runtime.listLoops(request);
+	}
+
+	public FunctionsContract.ListFunctionFramesResponse listFunctionFrames(
+			FunctionsContract.ListFunctionFramesRequest request) {
+		if (request == null) {
+			request = new FunctionsContract.ListFunctionFramesRequest(0L, 0L, 0, 0);
+		}
+		return runtime.listFunctionFrames(request);
 	}
 }

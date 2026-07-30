@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.rpc;
 
 import java.util.ArrayList;
@@ -61,6 +67,14 @@ public final class RpcDispatcher {
 					return sessionGetRevision(request);
 				case "libghidra.SessionService/Shutdown":
 					return sessionShutdown(request);
+				case "libghidra.SessionService/AddPerfBenchmark":
+					return sessionAddPerfBenchmark(request);
+				case "libghidra.SessionService/ListPerfBenchmarks":
+					return sessionListPerfBenchmarks(request);
+				case "libghidra.SessionService/ClearPerfBenchmarks":
+					return sessionClearPerfBenchmarks(request);
+				case "libghidra.SessionService/DeletePerfBenchmark":
+					return sessionDeletePerfBenchmark(request);
 				case "libghidra.MemoryService/ReadBytes":
 					return memoryReadBytes(request);
 				case "libghidra.MemoryService/WriteBytes":
@@ -69,6 +83,12 @@ public final class RpcDispatcher {
 					return memoryPatchBytesBatch(request);
 				case "libghidra.MemoryService/ListMemoryBlocks":
 					return memoryListMemoryBlocks(request);
+				case "libghidra.MemoryService/CreateMemoryBlock":
+					return memoryCreateMemoryBlock(request);
+				case "libghidra.MemoryService/RemoveMemoryBlock":
+					return memoryRemoveMemoryBlock(request);
+				case "libghidra.MemoryService/MoveMemoryBlock":
+					return memoryMoveMemoryBlock(request);
 				case "libghidra.FunctionsService/GetFunction":
 					return functionsGetFunction(request);
 				case "libghidra.FunctionsService/ListFunctions":
@@ -99,6 +119,8 @@ public final class RpcDispatcher {
 					return functionsListPostDominators(request);
 				case "libghidra.FunctionsService/ListLoops":
 					return functionsListLoops(request);
+				case "libghidra.FunctionsService/ListFunctionFrames":
+					return functionsListFunctionFrames(request);
 				case "libghidra.SymbolsService/GetSymbol":
 					return symbolsGetSymbol(request);
 				case "libghidra.SymbolsService/ListSymbols":
@@ -113,10 +135,14 @@ public final class RpcDispatcher {
 					return decompilerDecompileFunction(request);
 				case "libghidra.DecompilerService/ListDecompilations":
 					return decompilerListDecompilations(request);
+				case "libghidra.DecompilerService/GetPcode":
+					return decompilerGetPcode(request);
 				case "libghidra.ListingService/GetInstruction":
 					return listingGetInstruction(request);
 				case "libghidra.ListingService/ListInstructions":
 					return listingListInstructions(request);
+				case "libghidra.ListingService/ListInstructionOperands":
+					return listingListInstructionOperands(request);
 				case "libghidra.ListingService/GetComments":
 					return listingGetComments(request);
 				case "libghidra.ListingService/SetComment":
@@ -393,6 +419,9 @@ public final class RpcDispatcher {
 			.setImageBase(response != null ? response.imageBase() : 0L)
 			.setMd5(nullable(response != null ? response.md5() : null))
 			.setSha256(nullable(response != null ? response.sha256() : null))
+			.setExecutableFormat(nullable(response != null ? response.executableFormat() : null))
+			.setEntryPoint(response != null ? response.entryPoint() : 0L)
+			.setHasEntryPoint(response != null && response.hasEntryPoint())
 			.build();
 		return ok(proto, 0L);
 	}
@@ -467,6 +496,100 @@ public final class RpcDispatcher {
 			.setAccepted(response != null && response.accepted())
 			.build();
 		return ok(proto, 0L);
+	}
+
+	private libghidra.RpcResponse sessionAddPerfBenchmark(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.AddPerfBenchmarkRequest protoRequest = unpackPayload(request,
+			libghidra.AddPerfBenchmarkRequest.class,
+			libghidra.AddPerfBenchmarkRequest.getDefaultInstance());
+		SessionContract.PerfBenchmarkRecord record = protoRequest.hasRecord()
+			? toPerfBenchmarkRecord(protoRequest.getRecord())
+			: null;
+		SessionContract.AddPerfBenchmarkResponse response = callbacks.addPerfBenchmark(
+			new SessionContract.AddPerfBenchmarkRequest(record));
+		libghidra.AddPerfBenchmarkResponse proto = libghidra.AddPerfBenchmarkResponse.newBuilder()
+			.setAdded(response != null && response.added())
+			.build();
+		return ok(proto, 0L);
+	}
+
+	private libghidra.RpcResponse sessionListPerfBenchmarks(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		unpackPayload(request,
+			libghidra.ListPerfBenchmarksRequest.class,
+			libghidra.ListPerfBenchmarksRequest.getDefaultInstance());
+		SessionContract.ListPerfBenchmarksResponse response = callbacks.listPerfBenchmarks(
+			new SessionContract.ListPerfBenchmarksRequest());
+		libghidra.ListPerfBenchmarksResponse.Builder out =
+			libghidra.ListPerfBenchmarksResponse.newBuilder();
+		if (response != null && response.records() != null) {
+			for (SessionContract.PerfBenchmarkRecord row : response.records()) {
+				if (row == null) {
+					continue;
+				}
+				out.addRecords(toPerfBenchmarkRecordProto(row));
+			}
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private libghidra.RpcResponse sessionClearPerfBenchmarks(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		unpackPayload(request,
+			libghidra.ClearPerfBenchmarksRequest.class,
+			libghidra.ClearPerfBenchmarksRequest.getDefaultInstance());
+		SessionContract.ClearPerfBenchmarksResponse response = callbacks.clearPerfBenchmarks(
+			new SessionContract.ClearPerfBenchmarksRequest());
+		libghidra.ClearPerfBenchmarksResponse proto = libghidra.ClearPerfBenchmarksResponse.newBuilder()
+			.setCleared(response != null && response.cleared())
+			.setRemovedCount(response != null ? response.removedCount() : 0)
+			.build();
+		return ok(proto, 0L);
+	}
+
+	private libghidra.RpcResponse sessionDeletePerfBenchmark(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.DeletePerfBenchmarkRequest protoRequest = unpackPayload(request,
+			libghidra.DeletePerfBenchmarkRequest.class,
+			libghidra.DeletePerfBenchmarkRequest.getDefaultInstance());
+		SessionContract.DeletePerfBenchmarkResponse response = callbacks.deletePerfBenchmark(
+			new SessionContract.DeletePerfBenchmarkRequest(protoRequest.getBenchId()));
+		libghidra.DeletePerfBenchmarkResponse proto = libghidra.DeletePerfBenchmarkResponse.newBuilder()
+			.setDeleted(response != null && response.deleted())
+			.build();
+		return ok(proto, 0L);
+	}
+
+	private static SessionContract.PerfBenchmarkRecord toPerfBenchmarkRecord(
+			libghidra.PerfBenchmarkRecord proto) {
+		return new SessionContract.PerfBenchmarkRecord(
+			proto.getBenchId(),
+			proto.getQueryFamily(),
+			proto.getDatasetProfile(),
+			proto.getColdMsP50(),
+			proto.getColdMsP95(),
+			proto.getWarmMsP50(),
+			proto.getWarmMsP95(),
+			proto.getThroughputQps(),
+			proto.getRegressionPct(),
+			proto.getStatus());
+	}
+
+	private static libghidra.PerfBenchmarkRecord toPerfBenchmarkRecordProto(
+			SessionContract.PerfBenchmarkRecord row) {
+		return libghidra.PerfBenchmarkRecord.newBuilder()
+			.setBenchId(row.benchId() != null ? row.benchId() : "")
+			.setQueryFamily(row.queryFamily() != null ? row.queryFamily() : "")
+			.setDatasetProfile(row.datasetProfile() != null ? row.datasetProfile() : "")
+			.setColdMsP50(row.coldMsP50())
+			.setColdMsP95(row.coldMsP95())
+			.setWarmMsP50(row.warmMsP50())
+			.setWarmMsP95(row.warmMsP95())
+			.setThroughputQps(row.throughputQps())
+			.setRegressionPct(row.regressionPct())
+			.setStatus(row.status() != null ? row.status() : "")
+			.build();
 	}
 
 	private libghidra.RpcResponse memoryReadBytes(libghidra.RpcRequest request)
@@ -555,6 +678,103 @@ public final class RpcDispatcher {
 		return ok(out.build(), 0L);
 	}
 
+	private static libghidra.MemoryBlockRecord toMemoryBlockRecordProto(
+			MemoryContract.MemoryBlockRecord row) {
+		return libghidra.MemoryBlockRecord.newBuilder()
+			.setName(row.name() != null ? row.name() : "")
+			.setStartAddress(row.startAddress())
+			.setEndAddress(row.endAddress())
+			.setSize(row.size())
+			.setIsRead(row.isRead())
+			.setIsWrite(row.isWrite())
+			.setIsExecute(row.isExecute())
+			.setIsVolatile(row.isVolatile())
+			.setIsInitialized(row.isInitialized())
+			.setSourceName(row.sourceName() != null ? row.sourceName() : "")
+			.setComment(row.comment() != null ? row.comment() : "")
+			.build();
+	}
+
+	private libghidra.RpcResponse memoryCreateMemoryBlock(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.CreateMemoryBlockRequest protoRequest = unpackPayload(request,
+			libghidra.CreateMemoryBlockRequest.class,
+			libghidra.CreateMemoryBlockRequest.getDefaultInstance());
+		MemoryContract.CreateMemoryBlockResponse response = callbacks.createMemoryBlock(
+			new MemoryContract.CreateMemoryBlockRequest(
+				protoRequest.getName(),
+				protoRequest.getStartAddress(),
+				protoRequest.getSize(),
+				protoRequest.getIsRead(),
+				protoRequest.getIsWrite(),
+				protoRequest.getIsExecute(),
+				protoRequest.getInitialized(),
+				protoRequest.getOverlay()));
+		if (response != null && !response.created() && response.errorMessage() != null &&
+			!response.errorMessage().isBlank()) {
+			return error(
+				response.errorCode() != null && !response.errorCode().isBlank()
+					? response.errorCode()
+					: "create_memory_block_failed",
+				response.errorMessage());
+		}
+		libghidra.CreateMemoryBlockResponse.Builder out =
+			libghidra.CreateMemoryBlockResponse.newBuilder()
+				.setCreated(response != null && response.created());
+		if (response != null && response.block() != null) {
+			out.setBlock(toMemoryBlockRecordProto(response.block()));
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private libghidra.RpcResponse memoryRemoveMemoryBlock(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.RemoveMemoryBlockRequest protoRequest = unpackPayload(request,
+			libghidra.RemoveMemoryBlockRequest.class,
+			libghidra.RemoveMemoryBlockRequest.getDefaultInstance());
+		MemoryContract.RemoveMemoryBlockResponse response = callbacks.removeMemoryBlock(
+			new MemoryContract.RemoveMemoryBlockRequest(protoRequest.getAddress()));
+		if (response != null && !response.removed() && response.errorMessage() != null &&
+			!response.errorMessage().isBlank()) {
+			return error(
+				response.errorCode() != null && !response.errorCode().isBlank()
+					? response.errorCode()
+					: "remove_memory_block_failed",
+				response.errorMessage());
+		}
+		libghidra.RemoveMemoryBlockResponse proto =
+			libghidra.RemoveMemoryBlockResponse.newBuilder()
+				.setRemoved(response != null && response.removed())
+				.build();
+		return ok(proto, 0L);
+	}
+
+	private libghidra.RpcResponse memoryMoveMemoryBlock(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.MoveMemoryBlockRequest protoRequest = unpackPayload(request,
+			libghidra.MoveMemoryBlockRequest.class,
+			libghidra.MoveMemoryBlockRequest.getDefaultInstance());
+		MemoryContract.MoveMemoryBlockResponse response = callbacks.moveMemoryBlock(
+			new MemoryContract.MoveMemoryBlockRequest(
+				protoRequest.getAddress(),
+				protoRequest.getNewStartAddress()));
+		if (response != null && !response.moved() && response.errorMessage() != null &&
+			!response.errorMessage().isBlank()) {
+			return error(
+				response.errorCode() != null && !response.errorCode().isBlank()
+					? response.errorCode()
+					: "move_memory_block_failed",
+				response.errorMessage());
+		}
+		libghidra.MoveMemoryBlockResponse.Builder out =
+			libghidra.MoveMemoryBlockResponse.newBuilder()
+				.setMoved(response != null && response.moved());
+		if (response != null && response.block() != null) {
+			out.setBlock(toMemoryBlockRecordProto(response.block()));
+		}
+		return ok(out.build(), 0L);
+	}
+
 	private libghidra.RpcResponse functionsGetFunction(libghidra.RpcRequest request)
 			throws InvalidProtocolBufferException {
 		libghidra.GetFunctionRequest protoRequest = unpackPayload(request,
@@ -576,7 +796,8 @@ public final class RpcDispatcher {
 			libghidra.ListFunctionsRequest.class,
 			libghidra.ListFunctionsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		FunctionsContract.ListFunctionsResponse response = callbacks.listFunctions(
@@ -626,7 +847,8 @@ public final class RpcDispatcher {
 			libghidra.ListBasicBlocksRequest.class,
 			libghidra.ListBasicBlocksRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		FunctionsContract.ListBasicBlocksResponse response = callbacks.listBasicBlocks(
@@ -654,7 +876,8 @@ public final class RpcDispatcher {
 			libghidra.ListCFGEdgesRequest.class,
 			libghidra.ListCFGEdgesRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		FunctionsContract.ListCFGEdgesResponse response = callbacks.listCFGEdges(
@@ -780,7 +1003,8 @@ public final class RpcDispatcher {
 			libghidra.ListSwitchTablesRequest.class,
 			libghidra.ListSwitchTablesRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		FunctionsContract.ListSwitchTablesResponse response = callbacks.listSwitchTables(
@@ -814,7 +1038,8 @@ public final class RpcDispatcher {
 			libghidra.ListDominatorsRequest.class,
 			libghidra.ListDominatorsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		FunctionsContract.ListDominatorsResponse response = callbacks.listDominators(
@@ -841,7 +1066,8 @@ public final class RpcDispatcher {
 			libghidra.ListPostDominatorsRequest.class,
 			libghidra.ListPostDominatorsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		FunctionsContract.ListPostDominatorsResponse response = callbacks.listPostDominators(
@@ -868,7 +1094,8 @@ public final class RpcDispatcher {
 			libghidra.ListLoopsRequest.class,
 			libghidra.ListLoopsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		FunctionsContract.ListLoopsResponse response = callbacks.listLoops(
@@ -890,6 +1117,52 @@ public final class RpcDispatcher {
 		return ok(out.build(), 0L);
 	}
 
+	private libghidra.RpcResponse functionsListFunctionFrames(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.ListFunctionFramesRequest protoRequest = unpackPayload(request,
+			libghidra.ListFunctionFramesRequest.class,
+			libghidra.ListFunctionFramesRequest.getDefaultInstance());
+		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
+		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
+		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
+		FunctionsContract.ListFunctionFramesResponse response = callbacks.listFunctionFrames(
+			new FunctionsContract.ListFunctionFramesRequest(start, end, limit, offset));
+		libghidra.ListFunctionFramesResponse.Builder out =
+			libghidra.ListFunctionFramesResponse.newBuilder();
+		if (response != null && response.frames() != null) {
+			for (FunctionsContract.FunctionFrameRecord row : response.frames()) {
+				libghidra.FunctionFrameRecord.Builder rec = libghidra.FunctionFrameRecord.newBuilder()
+					.setFunctionEntry(row.functionEntry())
+					.setFrameSize(row.frameSize())
+					.setLocalSize(row.localSize())
+					.setParameterSize(row.parameterSize())
+					.setParameterOffset(row.parameterOffset())
+					.setReturnAddressOffset(row.returnAddressOffset())
+					.setGrowsNegative(row.growsNegative())
+					.setStackPointerRegister(
+						row.stackPointerRegister() != null ? row.stackPointerRegister() : "");
+				if (row.stackVariables() != null) {
+					for (FunctionsContract.StackVariableRecord v : row.stackVariables()) {
+						rec.addStackVariables(libghidra.StackVariableRecord.newBuilder()
+							.setVarId(v.varId() != null ? v.varId() : "")
+							.setName(v.name() != null ? v.name() : "")
+							.setDataType(v.dataType() != null ? v.dataType() : "")
+							.setStackOffset(v.stackOffset())
+							.setSize(v.size())
+							.setIsParameter(v.isParameter())
+							.setFirstUseOffset(v.firstUseOffset())
+							.setSourceType(v.sourceType() != null ? v.sourceType() : "")
+							.build());
+					}
+				}
+				out.addFrames(rec.build());
+			}
+		}
+		return ok(out.build(), 0L);
+	}
+
 	private libghidra.RpcResponse symbolsGetSymbol(libghidra.RpcRequest request)
 			throws InvalidProtocolBufferException {
 		libghidra.GetSymbolRequest protoRequest = unpackPayload(request,
@@ -898,10 +1171,15 @@ public final class RpcDispatcher {
 		SymbolsContract.GetSymbolResponse response = callbacks.getSymbol(
 			new SymbolsContract.GetSymbolRequest(
 				protoRequest.getAddress()));
-		libghidra.GetSymbolResponse proto = libghidra.GetSymbolResponse.newBuilder()
-			.setSymbol(toSymbolRecord(response != null ? response.symbol() : null))
-			.build();
-		return ok(proto, 0L);
+		// Only set the symbol field when there is a real symbol. Setting it to a
+		// default instance would make GetSymbolResponse.hasSymbol() true on the
+		// client, turning a not-found into a phantom empty symbol.
+		SymbolsContract.SymbolRecord row = response != null ? response.symbol() : null;
+		libghidra.GetSymbolResponse.Builder proto = libghidra.GetSymbolResponse.newBuilder();
+		if (row != null) {
+			proto.setSymbol(toSymbolRecord(row));
+		}
+		return ok(proto.build(), 0L);
 	}
 
 	private libghidra.RpcResponse symbolsListSymbols(libghidra.RpcRequest request)
@@ -910,7 +1188,8 @@ public final class RpcDispatcher {
 			libghidra.ListSymbolsRequest.class,
 			libghidra.ListSymbolsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		SymbolsContract.ListSymbolsResponse response = callbacks.listSymbols(
@@ -966,7 +1245,8 @@ public final class RpcDispatcher {
 			libghidra.ListXrefsRequest.class,
 			libghidra.ListXrefsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		XrefsContract.ListXrefsResponse response = callbacks.listXrefs(
@@ -1000,13 +1280,79 @@ public final class RpcDispatcher {
 		return ok(proto, 0L);
 	}
 
+	private libghidra.RpcResponse decompilerGetPcode(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.GetPcodeRequest protoRequest = unpackPayload(request,
+			libghidra.GetPcodeRequest.class,
+			libghidra.GetPcodeRequest.getDefaultInstance());
+		DecompilerContract.GetPcodeResponse response = callbacks.getPcode(
+			new DecompilerContract.GetPcodeRequest(
+				protoRequest.getAddress(),
+				(int) protoRequest.getTimeoutMs(),
+				protoRequest.getMaturity() == libghidra.PcodeMaturity.PCODE_MATURITY_RAW
+					? DecompilerContract.PcodeMaturity.RAW
+					: DecompilerContract.PcodeMaturity.HIGH));
+		libghidra.GetPcodeResponse.Builder out = libghidra.GetPcodeResponse.newBuilder();
+		if (response != null && response.pcode() != null) {
+			out.setPcode(toProtoPcodeRecord(response.pcode()));
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private static libghidra.PcodeRecord toProtoPcodeRecord(DecompilerContract.PcodeRecord rec) {
+		libghidra.PcodeRecord.Builder b = libghidra.PcodeRecord.newBuilder()
+			.setFunctionEntryAddress(rec.functionEntryAddress())
+			.setCompleted(rec.completed())
+			.setMaturity(rec.maturity() == DecompilerContract.PcodeMaturity.RAW
+				? libghidra.PcodeMaturity.PCODE_MATURITY_RAW
+				: libghidra.PcodeMaturity.PCODE_MATURITY_HIGH);
+		if (rec.errorMessage() != null) {
+			b.setErrorMessage(rec.errorMessage());
+		}
+		if (rec.ops() != null) {
+			for (DecompilerContract.PcodeOpRecord op : rec.ops()) {
+				libghidra.PcodeOpRecord.Builder ob = libghidra.PcodeOpRecord.newBuilder()
+					.setSeq(op.seq())
+					.setAddr(op.address())
+					.setHasAddress(op.hasAddress());
+				if (op.op() != null) {
+					ob.setOp(op.op());
+				}
+				if (op.hasOutput() && op.output() != null) {
+					ob.setOutput(toProtoVarnode(op.output()));
+				}
+				if (op.inputs() != null) {
+					for (DecompilerContract.VarnodeRecord in : op.inputs()) {
+						ob.addInputs(toProtoVarnode(in));
+					}
+				}
+				b.addOps(ob.build());
+			}
+		}
+		return b.build();
+	}
+
+	private static libghidra.VarnodeRecord toProtoVarnode(DecompilerContract.VarnodeRecord vn) {
+		libghidra.VarnodeRecord.Builder b = libghidra.VarnodeRecord.newBuilder()
+			.setOffset(vn.offset())
+			.setSize(vn.size());
+		if (vn.space() != null) {
+			b.setSpace(vn.space());
+		}
+		if (vn.kind() != null) {
+			b.setKind(vn.kind());
+		}
+		return b.build();
+	}
+
 	private libghidra.RpcResponse decompilerListDecompilations(libghidra.RpcRequest request)
 			throws InvalidProtocolBufferException {
 		libghidra.ListDecompilationsRequest protoRequest = unpackPayload(request,
 			libghidra.ListDecompilationsRequest.class,
 			libghidra.ListDecompilationsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		DecompilerContract.ListDecompilationsResponse response = callbacks.listDecompilations(
@@ -1047,7 +1393,8 @@ public final class RpcDispatcher {
 			libghidra.ListInstructionsRequest.class,
 			libghidra.ListInstructionsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		ListingContract.ListInstructionsResponse response = callbacks.listInstructions(
@@ -1066,13 +1413,40 @@ public final class RpcDispatcher {
 		return ok(out.build(), 0L);
 	}
 
+	private libghidra.RpcResponse listingListInstructionOperands(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.ListInstructionOperandsRequest protoRequest = unpackPayload(request,
+			libghidra.ListInstructionOperandsRequest.class,
+			libghidra.ListInstructionOperandsRequest.getDefaultInstance());
+		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
+		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
+		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
+		ListingContract.ListInstructionOperandsResponse response = callbacks.listInstructionOperands(
+			new ListingContract.ListInstructionOperandsRequest(
+				start,
+				end,
+				limit,
+				offset));
+		libghidra.ListInstructionOperandsResponse.Builder out =
+			libghidra.ListInstructionOperandsResponse.newBuilder();
+		if (response != null && response.operands() != null) {
+			for (ListingContract.InstructionOperandRecord row : response.operands()) {
+				out.addOperands(toInstructionOperandRecord(row));
+			}
+		}
+		return ok(out.build(), 0L);
+	}
+
 	private libghidra.RpcResponse listingGetComments(libghidra.RpcRequest request)
 			throws InvalidProtocolBufferException {
 		libghidra.GetCommentsRequest protoRequest = unpackPayload(request,
 			libghidra.GetCommentsRequest.class,
 			libghidra.GetCommentsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		ListingContract.GetCommentsResponse response = callbacks.getComments(
@@ -1176,7 +1550,8 @@ public final class RpcDispatcher {
 			libghidra.ListDataItemsRequest.class,
 			libghidra.ListDataItemsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		ListingContract.ListDataItemsResponse response = callbacks.listDataItems(
@@ -1201,7 +1576,8 @@ public final class RpcDispatcher {
 			libghidra.ListBookmarksRequest.class,
 			libghidra.ListBookmarksRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		ListingContract.ListBookmarksResponse response = callbacks.listBookmarks(
@@ -1262,7 +1638,8 @@ public final class RpcDispatcher {
 			libghidra.ListBreakpointsRequest.class,
 			libghidra.ListBreakpointsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		ListingContract.ListBreakpointsResponse response = callbacks.listBreakpoints(
@@ -1403,7 +1780,8 @@ public final class RpcDispatcher {
 			libghidra.ListDefinedStringsRequest.class,
 			libghidra.ListDefinedStringsRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		ListingContract.ListDefinedStringsResponse response = callbacks.listDefinedStrings(
@@ -1591,7 +1969,8 @@ public final class RpcDispatcher {
 			libghidra.ListFunctionSignaturesRequest.class,
 			libghidra.ListFunctionSignaturesRequest.getDefaultInstance());
 		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
-		long end = protoRequest.hasRange() ? protoRequest.getRange().getEnd() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
 		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
 		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
 		TypesContract.ListFunctionSignaturesResponse response = callbacks.listFunctionSignatures(
@@ -2174,6 +2553,20 @@ public final class RpcDispatcher {
 			.build();
 	}
 
+	private static libghidra.InstructionOperandRecord toInstructionOperandRecord(
+			ListingContract.InstructionOperandRecord row) {
+		if (row == null) {
+			return libghidra.InstructionOperandRecord.getDefaultInstance();
+		}
+		return libghidra.InstructionOperandRecord.newBuilder()
+			.setAddress(row.address())
+			.setOperandIndex(row.operandIndex())
+			.setText(nullable(row.text()))
+			.setTypeName(nullable(row.typeName()))
+			.setRefType(nullable(row.refType()))
+			.build();
+	}
+
 	private static libghidra.CommentRecord toCommentRecord(ListingContract.CommentRecord row) {
 		if (row == null) {
 			return libghidra.CommentRecord.getDefaultInstance();
@@ -2348,6 +2741,7 @@ public final class RpcDispatcher {
 			.setIsPrimary(row.isPrimary())
 			.setIsExternal(row.isExternal())
 			.setIsDynamic(row.isDynamic())
+			.setIsExternalEntryPoint(row.isExternalEntryPoint())
 			.build();
 	}
 

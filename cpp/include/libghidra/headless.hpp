@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // Launch headless Ghidra and return a connected IClient.
 
@@ -19,19 +18,12 @@
 
 namespace libghidra::client {
 
-struct HeadlessOptions {
+struct HeadlessProjectOptions {
   std::string ghidra_dir;       // Path to Ghidra distribution
-  std::string binary;           // Path to binary to import (empty if using program)
-  std::vector<std::string> binaries;  // Additional binaries to import
-  std::string program;          // Reopen existing program
-  std::vector<std::string> programs;  // Additional existing programs
-  std::string initial_program;  // Active project program for the live RPC host
   int port = 18080;
   std::string bind = "127.0.0.1";  // Bind address for the headless server
   std::string project_dir;     // Empty = temp dir (auto-cleaned)
   std::string project_name = "HeadlessProject";
-  bool analyze = true;
-  bool overwrite = true;
   std::string shutdown = "save";   // "save"|"discard"|"none"
   std::string auth_token;          // Bearer auth token
   int max_runtime_seconds = 0;     // 0 = no limit (forwarded as max_runtime_ms)
@@ -50,7 +42,7 @@ struct HeadlessOptions {
 /// Provides smart-pointer-style access to IClient via operator-> / operator*,
 /// so API calls use the same arrow syntax as unique_ptr<IClient>:
 ///
-///   auto h = LaunchHeadless({...});
+///   auto h = LaunchHeadlessProject({...});
 ///   h->ListFunctions(...);   // operator-> → IClient*
 ///   h.close(true);           // lifecycle (dot)
 ///
@@ -99,13 +91,13 @@ class HeadlessClient {
             std::chrono::milliseconds timeout = std::chrono::seconds(60));
 
  private:
-  friend HeadlessClient LaunchHeadless(HeadlessOptions);
+  friend HeadlessClient LaunchHeadlessProject(HeadlessProjectOptions);
   struct Impl;
   explicit HeadlessClient(std::unique_ptr<Impl> impl);
   std::unique_ptr<Impl> impl_;
 };
 
-/// Launch headless Ghidra, wait for readiness, return a connected client.
-HeadlessClient LaunchHeadless(HeadlessOptions opts);
+/// Launch a project-scoped headless Ghidra host and return a connected client.
+HeadlessClient LaunchHeadlessProject(HeadlessProjectOptions opts);
 
 }  // namespace libghidra::client

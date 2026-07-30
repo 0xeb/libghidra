@@ -21,7 +21,7 @@ For human users: see `README.md` instead.
 | JDK 21 | `java -version` | `21` in output | Install Eclipse Adoptium 21: <https://adoptium.net/temurin/releases/?version=21> |
 | Python ≥ 3.12 | `python --version` | major.minor ≥ 3.12 | <https://www.python.org/downloads/> (the abi3 wheels target cp312) |
 | pip (recent) | `python -m pip --version` | any modern | `python -m ensurepip --upgrade` |
-| Gradle ≥ 8 | `gradle --version` | major ≥ 8 | <https://gradle.org/install/>, or use `ghidra/gradlew*` from the Ghidra source tree if you have one |
+| Gradle ≥ 8 | `gradle --version` | major ≥ 8 | Install from <https://gradle.org/install/> (**winget has no Gradle package** — do not try `winget install gradle`), or use the `gradlew` wrapper bundled in your Ghidra source checkout at `Ghidra/RuntimeScripts/support/gradle` (currently Gradle 9.4.1) |
 | Git | `git --version` | any modern | <https://git-scm.com/downloads> |
 | curl | `curl --version` | any modern | OS package manager |
 
@@ -40,7 +40,10 @@ Download Ghidra 12.0.4+ from the official release page:
 Verify the SHA-256 against the release-page hash:
 
 ```bash
-sha256sum ghidra_*_PUBLIC.zip   # compare to release-page hash
+sha256sum ghidra_*_PUBLIC.zip   # Linux/macOS — compare to release-page hash
+```
+```powershell
+Get-FileHash -Algorithm SHA256 ghidra_*_PUBLIC.zip   # Windows (PowerShell; no sha256sum)
 ```
 
 Extract to a stable location and set `GHIDRA_INSTALL_DIR` to the
@@ -103,8 +106,28 @@ test -f "$GHIDRA_INSTALL_DIR/Ghidra/Extensions/LibGhidraHost/ghidra_scripts/LibG
 If the gate fails: try `gradle clean buildExtension` and copy the
 produced `.zip` from `dist/` into
 `$GHIDRA_INSTALL_DIR/Extensions/Ghidra/`. Ghidra unpacks it on next
-launch. Pre-generated Java protobuf stubs are checked in, so `protoc`
-is **not** required for the extension build.
+launch.
+
+Pre-generated Java protobuf stubs are committed; `protoc` is **not**
+required and is **ignored** even if present on `PATH`. Regeneration
+is opt-in via `-PREGEN_PROTO=true`, which requires protoc **29.x**
+(matching the pinned `protobuf-java:4.29.3` gencode); any other version
+fails with a clear error. Use `-PPROTOC=<path>` to select which
+`protoc` binary, but the version check still applies. protoc 29.3 is
+available from the protobuf GitHub releases (tag `v29.3`).
+
+**Troubleshooting `error: cannot find symbol`** (`getMessageType(int)`,
+`getValue(int)`, or a `validateProtobufGencodeVersion` runtime failure):
+the committed generated stubs were overwritten by an incompatible
+`protoc` (only possible on older checkouts or with a forced regen).
+Fix:
+1. Run `git status` — if `ghidra-extension/src/main/generated/` is
+   modified, restore it: `git checkout -- ghidra-extension/src/main/generated`
+   (or regenerate correctly with `-PREGEN_PROTO=true` and protoc 29.3).
+2. Delete any stale `protobuf-java-*.jar`s from the previously installed
+   extension's `lib/` directory under
+   `$GHIDRA_INSTALL_DIR/Ghidra/Extensions/LibGhidraHost/lib/`.
+3. Re-run `gradle installExtension`.
 
 ---
 
@@ -202,14 +225,17 @@ Use the HTTP `/status` endpoint as the authoritative readiness signal.
 **Gate**:
 ```bash
 # Wait until the host responds with HTTP 200 (~3 min ceiling)
-until [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18080/status)" = "200" ]; do
+until [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18080/)" = "200" ]; do
   sleep 2
 done
-curl -s http://127.0.0.1:18080/status
+curl -s http://127.0.0.1:18080/
 ```
 
-The `/status` JSON should contain a non-empty `service_name` and the
-program's `language_id` (e.g. `x86:LE:64:default`).
+HTTP 200 is the readiness signal. The host exposes only `GET /`,
+`GET /help`, and `POST /rpc` — there is no `/status` JSON endpoint; `GET /`
+returns a short plain-text banner (`libghidra host` + the transport lines).
+The typed service fields (`service_name`, `service_version`, `host_mode`, …)
+come from `client.get_status()` in Step 7.
 
 **Alternative — start from the GUI:** launch
 `$GHIDRA_INSTALL_DIR/ghidraRun*`, open or import the program, then
@@ -240,7 +266,7 @@ if funcs.functions:
     first = funcs.functions[0]
     decomp = client.get_decompilation(first.entry_address)
     print(f"--- decompilation of {first.name} ---")
-    print(decomp.pseudocode_c[:400])
+    print(decomp.decompilation.pseudocode[:400])
 ```
 
 Or use the bundled CLI:
@@ -254,8 +280,8 @@ libghidra decompile --url http://127.0.0.1:18080 0x<entry-of-first-function>
 **Gate**:
 - `client.get_status().service_name` is non-empty.
 - `client.list_functions()` returns ≥ 1 function for a real binary.
-- `client.get_decompilation(addr)` returns a non-empty
-  `pseudocode_c` string for the first function's entry address.
+- `client.get_decompilation(addr).decompilation.pseudocode` is a
+  non-empty string for the first function's entry address.
 
 If `list_functions()` returns zero entries:
 - The post-script may have been launched before analysis completed —
@@ -268,12 +294,16 @@ If `list_functions()` returns zero entries:
 
 ## Step 8 — Clean shutdown
 
+Shutdown is the typed RPC `libghidra.SessionService/Shutdown`, not a
+plain HTTP route — there is no `POST /shutdown` (the host answers
+`method not allowed`). Issue it through the client:
+
 ```bash
-curl -X POST http://127.0.0.1:18080/shutdown
+python -c "import libghidra; print(libghidra.connect('http://127.0.0.1:18080').shutdown())"
 ```
 
-`/shutdown` returns `{"success":true}` once the HTTP listener is
-stopping. The Java host then applies the launch-time save policy and
+This prints `ShutdownResponse(accepted=True)` once the host accepts the
+request. The Java host then applies the launch-time save policy and
 exits. **For large pending state this can take tens of seconds.** Wait
 for both `java` and any related processes to leave the process list
 before reusing the project directory.
@@ -291,6 +321,12 @@ ls /tmp/libghidra-bootstrap              # expect: only boot.gpr and boot.rep/
 **Gate**: the process list contains no `java`, and the project
 directory contains only `<name>.gpr` and `<name>.rep/` — no
 `*.lock` / `*.lock~` files.
+
+> **False-positive note**: the process check can match an unrelated Java
+> process — in particular a lingering Gradle build daemon. Verify the
+> PID/command line belongs to the Ghidra host before concluding the
+> shutdown failed. Run `gradle --stop` to terminate a stray Gradle
+> daemon if one is present.
 
 If `*.lock` files remain after the host exited (force-kill from a
 previous run), remove them before launching again.
@@ -325,10 +361,13 @@ recognizes the symptoms.
   The pure-Python fallback (`libghidra-*-py3-none-any.whl` from the
   release zip) accepts Python ≥ 3.10 but ships only the HTTP/RPC
   client; the offline `LocalClient` engine is unavailable.
-- **`POST /shutdown` returns success ~150 ms in.** After the listener
-  stops, the Java host flushes the project per its launch-time save
-  policy. Trust the response and just wait for the Java process to
-  exit before reusing the project directory.
+- **Shutdown is the `SessionService/Shutdown` RPC, not `POST /shutdown`.**
+  The only HTTP routes are `GET /`, `GET /help`, and `POST /rpc`; anything
+  else answers `method not allowed`. `client.shutdown()` returns
+  `accepted=True` almost immediately — after the listener stops, the Java
+  host flushes the project per its launch-time save policy. Trust the
+  response and just wait for the Java process to exit before reusing the
+  project directory.
 - **Force-killing leaves orphaned `*.lock` / `*.lock~` files** in the
   project directory. If you find them after a previous crash and no
   `java` is running, delete both before launching again.

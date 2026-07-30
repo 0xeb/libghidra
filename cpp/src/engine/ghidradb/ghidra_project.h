@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 #include <string>
@@ -33,10 +32,19 @@ struct ProjectData {
     std::vector<FunctionEntry> functions;
 };
 
+class MemoryImage;  // ghidradb/memory_image.h
+
 class GHIDRA_API GhidraProject {
 public:
     bool open(const std::string& gpr_path);
     ProjectData extract();
+
+    // Reconstruct the program's loaded memory image (File Bytes + Memory Blocks)
+    // from this project's db, so the offline decompiler can read bytes at their
+    // real virtual addresses without the original binary. Returns false if the
+    // project carries no image bytes (getError() explains).
+    bool loadMemoryImage(MemoryImage& out);
+
     std::string getError() const { return error_; }
 
 private:

@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 
@@ -28,6 +27,15 @@ class Translate;
 }  // namespace ghidra
 
 namespace libghidra::client::detail {
+
+/// Outcome of a function-local mutation (rename/retype). Lets callers surface a
+/// precise error code instead of collapsing every failure into one bucket.
+enum class LocalMutationStatus {
+  kOk,               // applied successfully
+  kNotFound,         // the local_id did not resolve to a function-local
+  kInvalidType,      // (retype only) the type string did not parse
+  kDecompileFailed,  // the function could not be decompiled
+};
 
 class ArchAdapter {
  public:
@@ -105,6 +113,37 @@ class ArchAdapter {
   };
   CFGResult decompileAndExtractCFG(std::uint64_t func_entry);
 
+  /// Decompile a function and return both its pseudocode and its local-variable
+  /// surface in one pass.  Locals are enumerated from the function scope BEFORE
+  /// clearAnalysis (which discards the HighFunction layer), mirroring the live
+  /// host's decomp_lvars.  `ok` is false if the function could not be decompiled.
+  struct DecompileWithLocalsResult {
+    std::string pseudocode;
+    std::vector<DecompileLocalRecord> locals;
+    bool ok = false;
+    // Populated when ok == false. This path bypasses Decompiler::decompileAt, so
+    // the engine's lastError is stale/empty for offline failures; carry the real
+    // reason here instead of reading Decompiler::getError() downstream.
+    std::string error;
+  };
+  DecompileWithLocalsResult decompileWithLocals(std::uint64_t func_entry);
+
+  /// Apply a durable rename to a function-local identified by its canonical
+  /// local_id (as emitted by decompileWithLocals).  The symbol is name-locked so
+  /// the rename survives re-decompilation.  Returns kNotFound if the local_id
+  /// does not resolve, or kDecompileFailed if the function cannot be decompiled.
+  LocalMutationStatus applyLocalRename(std::uint64_t func_entry,
+                                       const std::string& local_id,
+                                       const std::string& new_name);
+
+  /// Apply a durable retype to a function-local identified by its canonical
+  /// local_id.  The symbol is type-locked.  Returns kInvalidType if the type
+  /// string does not parse, kNotFound if the local_id does not resolve, or
+  /// kDecompileFailed if the function cannot be decompiled.
+  LocalMutationStatus applyLocalRetype(std::uint64_t func_entry,
+                                       const std::string& local_id,
+                                       const std::string& new_type);
+
   /// Delete a type by name.  Returns false if not found or if it's a core type.
   bool deleteType(const std::string& name);
 
@@ -167,6 +206,16 @@ class ArchAdapter {
 
  private:
   ghidra::Architecture* arch_ = nullptr;
+
+  // Persistent local-variable renames, keyed by (function entry, local id) ->
+  // new name. A pure name-lock does NOT survive Ghidra's clearUnlocked on the next
+  // decompile (only type-locked symbols are held — database.cc:2050), so an offline
+  // rename would silently vanish. This registry re-applies the rename after every
+  // decompile (reapplyLocalRenames), reproducing the live host's durable-edit model.
+  std::map<std::pair<std::uint64_t, std::string>, std::string> local_renames_;
+
+  // Re-apply the stored renames for func_entry onto a freshly decompiled Funcdata.
+  void reapplyLocalRenames(std::uint64_t func_entry, void* fd);
   // In-memory comment store: (address, kind) → text
   std::map<std::pair<std::uint64_t, int>, std::string> comments_;
   // In-memory type member comment store: (type_name, ordinal) → comment

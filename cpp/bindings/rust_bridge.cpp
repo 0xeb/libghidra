@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // rust_bridge.cpp — implementations for the cxx FFI bridge declared in
 // rust_bridge.hpp. Mirrors python_bindings.cpp's mapping from C++
@@ -173,6 +172,7 @@ static void encode(Json& j, const SymbolRecord& r) {
     .field("is_primary", r.is_primary)
     .field("is_external", r.is_external)
     .field("is_dynamic", r.is_dynamic)
+    .field("is_external_entry_point", r.is_external_entry_point)
     .end_obj();
 }
 
@@ -406,6 +406,11 @@ rust::String LocalClientHandle::open_program_json(rust::Str program_path,
     .field("language_id", resp.language_id)
     .field("compiler_spec", resp.compiler_spec)
     .field("image_base", resp.image_base)
+    .field("md5", resp.md5)
+    .field("sha256", resp.sha256)
+    .field("executable_format", resp.executable_format)
+    .field("entry_point", resp.entry_point)
+    .field("has_entry_point", resp.has_entry_point)
     .end_obj();
   return rust::String(j.take());
 }

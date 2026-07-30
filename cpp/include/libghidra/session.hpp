@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 
@@ -68,6 +67,12 @@ class ISessionClient {
   virtual StatusOr<DiscardProgramResponse> DiscardProgram() = 0;
   virtual StatusOr<RevisionResponse> GetRevision() = 0;
   virtual StatusOr<ShutdownResponse> Shutdown(ShutdownPolicy policy) = 0;
+  virtual StatusOr<AddPerfBenchmarkResponse> AddPerfBenchmark(
+      const PerfBenchmarkRecord& record) = 0;
+  virtual StatusOr<ListPerfBenchmarksResponse> ListPerfBenchmarks() = 0;
+  virtual StatusOr<ClearPerfBenchmarksResponse> ClearPerfBenchmarks() = 0;
+  virtual StatusOr<DeletePerfBenchmarkResponse> DeletePerfBenchmark(
+      const std::string& bench_id) = 0;
 };
 
 }  // namespace libghidra::client

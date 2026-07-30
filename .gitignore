@@ -38,3 +38,8 @@ ghidra-extension/lib/
 
 # Local private notes
 CLAUDE.md
+
+# Locally-built native offline extension (platform-specific; never commit)
+python/src/libghidra/_libghidra*.pyd
+python/src/libghidra/_libghidra*.so
+python/src/libghidra/_libghidra*.dylib

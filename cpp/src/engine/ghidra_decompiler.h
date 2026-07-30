@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 #include <string>
@@ -58,8 +57,12 @@ public:
     Decompiler& operator=(const Decompiler&) = delete;
 
     /// Load a binary file. arch is a language id like "x86:LE:64:default".
-    /// If empty, the format/architecture will be auto-detected.
-    bool loadBinary(const std::string& filepath, const std::string& arch = "");
+    /// If empty, the format/architecture will be auto-detected. Raw loaders
+    /// map structured images into virtual-address layout and place them at
+    /// base_address; use format="raw" for an already-flat image.
+    bool loadBinary(const std::string& filepath, const std::string& arch = "",
+                    uint64_t base_address = 0,
+                    const std::string& format = "");
 
     /// Decompile the function at the given address, returning C source.
     std::string decompileAt(uint64_t address);
@@ -101,9 +104,12 @@ public:
     // ----- Project Loading -----
 
     /// Load a Ghidra project (.gpr file) directly.
-    /// Opens the project database, extracts the binary path and architecture,
-    /// calls loadBinary(), then applies all function names from the project.
-    /// If binary_override is non-empty, it is used instead of the stored path.
+    /// Opens the project database and extracts the architecture + function names.
+    /// The program bytes come from the project db itself (the reconstructed memory
+    /// image), so no external binary is needed and offline decompilation reads
+    /// correct bytes at real virtual addresses. If the db carries no image bytes
+    /// (older/raw import), falls back to raw-loading binary_override / the stored
+    /// executable path.
     bool loadProject(const std::string& gpr_path, const std::string& binary_override = "");
 
     // ----- State Persistence -----

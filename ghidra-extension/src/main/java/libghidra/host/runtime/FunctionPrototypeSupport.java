@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.util.ArrayList;
@@ -301,7 +307,14 @@ final class FunctionPrototypeSupport {
 		String convention = callingConvention;
 		if (convention == null || convention.isBlank()) {
 			convention = parsed.getCallingConventionName();
-			if (convention != null && convention.isBlank()) {
+			// The parser returns the compiler-spec default "unknown" when the
+			// prototype has no explicit convention; that is non-blank, so it used to
+			// reach updateFunction and OVERWRITE the stored convention with
+			// UNKNOWN_CALLING_CONVENTION_ID (clobbering a prior __cdecl/__stdcall/
+			// __thiscall or the compiler default). Treat unknown/blank as
+			// "unspecified" (null) so updateFunction leaves the convention intact.
+			if (convention != null
+					&& (convention.isBlank() || convention.equals("unknown"))) {
 				convention = null;
 			}
 		}
@@ -353,10 +366,17 @@ final class FunctionPrototypeSupport {
 		if (thisType != null) {
 			Parameter autoThis = function.getParameter(0);
 			if (autoThis != null && autoThis.isAutoParameter()) {
+				// setCustomVariableStorage invalidates the auto-parameter handle:
+				// setDataType/setName on the pre-flip AutoParameterImpl throws
+				// InvalidInputException (which broke EVERY __thiscall prototype).
+				// Flip storage first, then re-fetch the now-editable ParameterDB.
 				function.setCustomVariableStorage(true);
-				autoThis.setDataType(thisType, SourceType.USER_DEFINED);
-				if (thisName != null && !thisName.isBlank()) {
-					autoThis.setName(thisName, SourceType.USER_DEFINED);
+				Parameter editableThis = function.getParameter(0);
+				if (editableThis != null) {
+					editableThis.setDataType(thisType, SourceType.USER_DEFINED);
+					if (thisName != null && !thisName.isBlank()) {
+						editableThis.setName(thisName, SourceType.USER_DEFINED);
+					}
 				}
 			}
 		}

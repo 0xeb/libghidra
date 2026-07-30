@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #include "libghidra/http.hpp"
 
@@ -292,6 +291,7 @@ SymbolRecord from_proto_symbol_record(const libghidra::SymbolRecord& row) {
   out.is_primary = row.is_primary();
   out.is_external = row.is_external();
   out.is_dynamic = row.is_dynamic();
+  out.is_external_entry_point = row.is_external_entry_point();
   return out;
 }
 
@@ -307,6 +307,43 @@ XrefRecord from_proto_xref_record(const libghidra::XrefRecord& row) {
   out.is_external = row.is_external();
   out.is_memory = row.is_memory();
   out.is_flow = row.is_flow();
+  return out;
+}
+
+VarnodeRecord from_proto_varnode(const libghidra::VarnodeRecord& vn) {
+  VarnodeRecord out;
+  out.space = vn.space();
+  out.offset = vn.offset();
+  out.size = vn.size();
+  out.kind = vn.kind();
+  return out;
+}
+
+PcodeRecord from_proto_pcode_record(const libghidra::PcodeRecord& rec) {
+  PcodeRecord out;
+  out.function_entry_address = rec.function_entry_address();
+  out.completed = rec.completed();
+  out.error_message = rec.error_message();
+  out.maturity = rec.maturity() == libghidra::PCODE_MATURITY_RAW
+                     ? PcodeMaturity::Raw
+                     : PcodeMaturity::High;
+  out.ops.reserve(static_cast<std::size_t>(rec.ops_size()));
+  for (const auto& op : rec.ops()) {
+    PcodeOpRecord mapped;
+    mapped.seq = op.seq();
+    mapped.op = op.op();
+    mapped.addr = op.addr();
+    mapped.has_address = op.has_address();
+    mapped.has_output = op.has_output();
+    if (op.has_output()) {
+      mapped.output = from_proto_varnode(op.output());
+    }
+    mapped.inputs.reserve(static_cast<std::size_t>(op.inputs_size()));
+    for (const auto& in : op.inputs()) {
+      mapped.inputs.push_back(from_proto_varnode(in));
+    }
+    out.ops.push_back(std::move(mapped));
+  }
   return out;
 }
 
@@ -473,6 +510,40 @@ bool is_retryable(const std::string& code) {
          code == "gateway_timeout";
 }
 
+// Read-vs-write retry asymmetry.
+//
+// Idempotent READs (Get*/List*/DecompileFunction/ReadBytes) carry no
+// server-side side effects, so re-sending one after a transient connection
+// drop or read timeout is always safe. Mutating WRITEs (Rename*/Set*/Create*/
+// Delete*/Add*/Write*/Patch*/Move*/Remove*/Tag*/Untag*/Apply*/Parse*/Save*/
+// Discard*/Open*/Close*/Import*/Shutdown) MUST NOT be silently re-sent after a
+// client-side timeout: the first attempt may already have been applied
+// server-side, so a blind retry risks a double-apply / data corruption. The
+// locked-in contract: a timed-out non-idempotent write with max_retries=0 is
+// sent AT MOST once and returns without a backoff loop.
+//
+// This classifier is intentionally *fail-safe*: only method names whose leaf
+// verb is a known read return true; every other name (including any future verb
+// not enumerated here) falls through to `false` = write semantics = no default
+// retry. An oversight can therefore never turn a write into a silently-retried
+// call.
+bool is_idempotent_method(const std::string& method) {
+  // Leaf verb is the token after the trailing '/', e.g.
+  // "libghidra.SymbolsService/ListSymbols" -> "ListSymbols".
+  const std::size_t slash = method.rfind('/');
+  const std::string_view leaf =
+      slash == std::string::npos
+          ? std::string_view(method)
+          : std::string_view(method).substr(slash + 1);
+  auto starts_with = [&](std::string_view prefix) {
+    return leaf.size() >= prefix.size() &&
+           leaf.substr(0, prefix.size()) == prefix;
+  };
+  // Pure readers: Get*, List*, plus the two non-Get/List reads.
+  return starts_with("Get") || starts_with("List") ||
+         leaf == "DecompileFunction" || leaf == "ReadBytes";
+}
+
 std::chrono::milliseconds compute_backoff(int attempt,
                                           std::chrono::milliseconds initial,
                                           std::chrono::milliseconds max_backoff,
@@ -524,7 +595,19 @@ class HttpClient::Impl {
       return StatusOr<TResponse>::FromError("encode_error", "failed to encode RpcRequest");
     }
 
-    const int max_attempts = options_.max_retries + 1;
+    // Retry budget: honor an explicit operator override (max_retries > 0) for
+    // both reads and writes. When no override is set (the default 0), idempotent
+    // reads still get a small budget so a transient connection drop / timeout on
+    // a side-effect-free RPC doesn't surface as a hard failure; writes stay at 0
+    // (single attempt) — see is_idempotent_method() and the no-write-retry
+    // guarantee. kReadRetryDefault=2 (=> 3 attempts) with the existing backoff
+    // keeps added latency bounded (<= ~1.5s worst case under the 100ms/5s knobs).
+    constexpr int kReadRetryDefault = 2;
+    const int effective_retries =
+        (options_.max_retries == 0 && is_idempotent_method(method))
+            ? kReadRetryDefault
+            : options_.max_retries;
+    const int max_attempts = effective_retries + 1;
     StatusOr<std::string> raw;
     for (int attempt = 0; attempt < max_attempts; ++attempt) {
       raw = request_bytes("POST", "/rpc", encoded, "application/x-protobuf");
@@ -771,6 +854,9 @@ StatusOr<OpenProgramResponse> HttpClient::OpenProgram(const OpenProgramRequest& 
   out.image_base = rpc.value->image_base();
   out.md5 = rpc.value->md5();
   out.sha256 = rpc.value->sha256();
+  out.executable_format = rpc.value->executable_format();
+  out.entry_point = rpc.value->entry_point();
+  out.has_entry_point = rpc.value->has_entry_point();
   return StatusOr<OpenProgramResponse>::FromValue(std::move(out));
 }
 
@@ -846,6 +932,95 @@ StatusOr<ShutdownResponse> HttpClient::Shutdown(ShutdownPolicy policy) {
   ShutdownResponse out;
   out.accepted = rpc.value->accepted();
   return StatusOr<ShutdownResponse>::FromValue(out);
+}
+
+StatusOr<AddPerfBenchmarkResponse> HttpClient::AddPerfBenchmark(
+    const PerfBenchmarkRecord& record) {
+  libghidra::AddPerfBenchmarkRequest rpc_request;
+  libghidra::PerfBenchmarkRecord* proto = rpc_request.mutable_record();
+  proto->set_bench_id(record.bench_id);
+  proto->set_query_family(record.query_family);
+  proto->set_dataset_profile(record.dataset_profile);
+  proto->set_cold_ms_p50(record.cold_ms_p50);
+  proto->set_cold_ms_p95(record.cold_ms_p95);
+  proto->set_warm_ms_p50(record.warm_ms_p50);
+  proto->set_warm_ms_p95(record.warm_ms_p95);
+  proto->set_throughput_qps(record.throughput_qps);
+  proto->set_regression_pct(record.regression_pct);
+  proto->set_status(record.status);
+  auto rpc = impl_->call_rpc<libghidra::AddPerfBenchmarkRequest,
+                             libghidra::AddPerfBenchmarkResponse>(
+      "libghidra.SessionService/AddPerfBenchmark",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<AddPerfBenchmarkResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  AddPerfBenchmarkResponse out;
+  out.added = rpc.value->added();
+  return StatusOr<AddPerfBenchmarkResponse>::FromValue(out);
+}
+
+StatusOr<ListPerfBenchmarksResponse> HttpClient::ListPerfBenchmarks() {
+  libghidra::ListPerfBenchmarksRequest rpc_request;
+  auto rpc = impl_->call_rpc<libghidra::ListPerfBenchmarksRequest,
+                             libghidra::ListPerfBenchmarksResponse>(
+      "libghidra.SessionService/ListPerfBenchmarks",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListPerfBenchmarksResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListPerfBenchmarksResponse out;
+  out.records.reserve(static_cast<std::size_t>(rpc.value->records_size()));
+  for (const auto& proto : rpc.value->records()) {
+    PerfBenchmarkRecord record;
+    record.bench_id = proto.bench_id();
+    record.query_family = proto.query_family();
+    record.dataset_profile = proto.dataset_profile();
+    record.cold_ms_p50 = proto.cold_ms_p50();
+    record.cold_ms_p95 = proto.cold_ms_p95();
+    record.warm_ms_p50 = proto.warm_ms_p50();
+    record.warm_ms_p95 = proto.warm_ms_p95();
+    record.throughput_qps = proto.throughput_qps();
+    record.regression_pct = proto.regression_pct();
+    record.status = proto.status();
+    out.records.push_back(std::move(record));
+  }
+  return StatusOr<ListPerfBenchmarksResponse>::FromValue(std::move(out));
+}
+
+// NOTE: DeletePerfBenchmark is a write. is_idempotent_method() classifies only
+// Get*/List* (+ DecompileFunction/ReadBytes) as retry-eligible reads, so a
+// "Delete..." leaf verb falls through to write semantics = single attempt, no
+// silent retry after a client-side timeout.
+StatusOr<DeletePerfBenchmarkResponse> HttpClient::DeletePerfBenchmark(
+    const std::string& bench_id) {
+  libghidra::DeletePerfBenchmarkRequest rpc_request;
+  rpc_request.set_bench_id(bench_id);
+  auto rpc = impl_->call_rpc<libghidra::DeletePerfBenchmarkRequest,
+                             libghidra::DeletePerfBenchmarkResponse>(
+      "libghidra.SessionService/DeletePerfBenchmark",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<DeletePerfBenchmarkResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  DeletePerfBenchmarkResponse out;
+  out.deleted = rpc.value->deleted();
+  return StatusOr<DeletePerfBenchmarkResponse>::FromValue(out);
+}
+
+StatusOr<ClearPerfBenchmarksResponse> HttpClient::ClearPerfBenchmarks() {
+  libghidra::ClearPerfBenchmarksRequest rpc_request;
+  auto rpc = impl_->call_rpc<libghidra::ClearPerfBenchmarksRequest,
+                             libghidra::ClearPerfBenchmarksResponse>(
+      "libghidra.SessionService/ClearPerfBenchmarks",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ClearPerfBenchmarksResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ClearPerfBenchmarksResponse out;
+  out.cleared = rpc.value->cleared();
+  out.removed_count = rpc.value->removed_count();
+  return StatusOr<ClearPerfBenchmarksResponse>::FromValue(out);
 }
 
 StatusOr<ReadBytesResponse> HttpClient::ReadBytes(std::uint64_t address, std::uint32_t length) {
@@ -934,6 +1109,80 @@ StatusOr<ListMemoryBlocksResponse> HttpClient::ListMemoryBlocks(int limit, int o
     out.blocks.push_back(std::move(rec));
   }
   return StatusOr<ListMemoryBlocksResponse>::FromValue(std::move(out));
+}
+
+namespace {
+void copy_block_record(const libghidra::MemoryBlockRecord& row, MemoryBlockRecord& rec) {
+  rec.name = row.name();
+  rec.start_address = row.start_address();
+  rec.end_address = row.end_address();
+  rec.size = row.size();
+  rec.is_read = row.is_read();
+  rec.is_write = row.is_write();
+  rec.is_execute = row.is_execute();
+  rec.is_volatile = row.is_volatile();
+  rec.is_initialized = row.is_initialized();
+  rec.source_name = row.source_name();
+  rec.comment = row.comment();
+}
+}  // namespace
+
+StatusOr<CreateMemoryBlockResponse> HttpClient::CreateMemoryBlock(
+    const CreateMemoryBlockSpec& spec) {
+  libghidra::CreateMemoryBlockRequest rpc_request;
+  rpc_request.set_name(spec.name);
+  rpc_request.set_start_address(spec.start_address);
+  rpc_request.set_size(spec.size);
+  rpc_request.set_is_read(spec.is_read);
+  rpc_request.set_is_write(spec.is_write);
+  rpc_request.set_is_execute(spec.is_execute);
+  rpc_request.set_initialized(spec.initialized);
+  rpc_request.set_overlay(spec.overlay);
+  auto rpc = impl_->call_rpc<libghidra::CreateMemoryBlockRequest,
+                             libghidra::CreateMemoryBlockResponse>(
+      "libghidra.MemoryService/CreateMemoryBlock", rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<CreateMemoryBlockResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  CreateMemoryBlockResponse out;
+  out.created = rpc.value->created();
+  if (rpc.value->has_block()) {
+    copy_block_record(rpc.value->block(), out.block);
+  }
+  return StatusOr<CreateMemoryBlockResponse>::FromValue(std::move(out));
+}
+
+StatusOr<RemoveMemoryBlockResponse> HttpClient::RemoveMemoryBlock(std::uint64_t address) {
+  libghidra::RemoveMemoryBlockRequest rpc_request;
+  rpc_request.set_address(address);
+  auto rpc = impl_->call_rpc<libghidra::RemoveMemoryBlockRequest,
+                             libghidra::RemoveMemoryBlockResponse>(
+      "libghidra.MemoryService/RemoveMemoryBlock", rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<RemoveMemoryBlockResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  RemoveMemoryBlockResponse out;
+  out.removed = rpc.value->removed();
+  return StatusOr<RemoveMemoryBlockResponse>::FromValue(std::move(out));
+}
+
+StatusOr<MoveMemoryBlockResponse> HttpClient::MoveMemoryBlock(
+    std::uint64_t address, std::uint64_t new_start_address) {
+  libghidra::MoveMemoryBlockRequest rpc_request;
+  rpc_request.set_address(address);
+  rpc_request.set_new_start_address(new_start_address);
+  auto rpc = impl_->call_rpc<libghidra::MoveMemoryBlockRequest,
+                             libghidra::MoveMemoryBlockResponse>(
+      "libghidra.MemoryService/MoveMemoryBlock", rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<MoveMemoryBlockResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  MoveMemoryBlockResponse out;
+  out.moved = rpc.value->moved();
+  if (rpc.value->has_block()) {
+    copy_block_record(rpc.value->block(), out.block);
+  }
+  return StatusOr<MoveMemoryBlockResponse>::FromValue(std::move(out));
 }
 
 StatusOr<GetFunctionResponse> HttpClient::GetFunction(std::uint64_t address) {
@@ -1190,6 +1439,52 @@ StatusOr<ListLoopsResponse> HttpClient::ListLoops(std::uint64_t range_start,
     out.loops.push_back(std::move(rec));
   }
   return StatusOr<ListLoopsResponse>::FromValue(std::move(out));
+}
+
+StatusOr<ListFunctionFramesResponse> HttpClient::ListFunctionFrames(std::uint64_t range_start,
+                                                                    std::uint64_t range_end,
+                                                                    int limit,
+                                                                    int offset) {
+  libghidra::ListFunctionFramesRequest rpc_request;
+  rpc_request.mutable_range()->set_start(range_start);
+  rpc_request.mutable_range()->set_end(range_end);
+  rpc_request.mutable_page()->set_limit(limit > 0 ? static_cast<std::uint32_t>(limit) : 0);
+  rpc_request.mutable_page()->set_offset(offset > 0 ? static_cast<std::uint32_t>(offset) : 0);
+  auto rpc = impl_->call_rpc<libghidra::ListFunctionFramesRequest,
+                             libghidra::ListFunctionFramesResponse>(
+      "libghidra.FunctionsService/ListFunctionFrames",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListFunctionFramesResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListFunctionFramesResponse out;
+  out.frames.reserve(static_cast<std::size_t>(rpc.value->frames_size()));
+  for (const auto& row : rpc.value->frames()) {
+    FunctionFrameRecord rec;
+    rec.function_entry = row.function_entry();
+    rec.frame_size = row.frame_size();
+    rec.local_size = row.local_size();
+    rec.parameter_size = row.parameter_size();
+    rec.parameter_offset = row.parameter_offset();
+    rec.return_address_offset = row.return_address_offset();
+    rec.grows_negative = row.grows_negative();
+    rec.stack_pointer_register = row.stack_pointer_register();
+    rec.stack_variables.reserve(static_cast<std::size_t>(row.stack_variables_size()));
+    for (const auto& v : row.stack_variables()) {
+      StackVariableRecord vr;
+      vr.var_id = v.var_id();
+      vr.name = v.name();
+      vr.data_type = v.data_type();
+      vr.stack_offset = v.stack_offset();
+      vr.size = v.size();
+      vr.is_parameter = v.is_parameter();
+      vr.first_use_offset = v.first_use_offset();
+      vr.source_type = v.source_type();
+      rec.stack_variables.push_back(std::move(vr));
+    }
+    out.frames.push_back(std::move(rec));
+  }
+  return StatusOr<ListFunctionFramesResponse>::FromValue(std::move(out));
 }
 
 // -- Function tags --------------------------------------------------------
@@ -2081,6 +2376,26 @@ StatusOr<GetDecompilationResponse> HttpClient::GetDecompilation(std::uint64_t ad
   return StatusOr<GetDecompilationResponse>::FromValue(std::move(out));
 }
 
+StatusOr<GetPcodeResponse> HttpClient::GetPcode(std::uint64_t address,
+                                                PcodeMaturity maturity, int timeout_ms) {
+  libghidra::GetPcodeRequest rpc_request;
+  rpc_request.set_address(address);
+  rpc_request.set_timeout_ms(timeout_ms > 0 ? static_cast<std::uint32_t>(timeout_ms) : 0);
+  rpc_request.set_maturity(maturity == PcodeMaturity::Raw
+                               ? libghidra::PCODE_MATURITY_RAW
+                               : libghidra::PCODE_MATURITY_HIGH);
+  auto rpc = impl_->call_rpc<libghidra::GetPcodeRequest, libghidra::GetPcodeResponse>(
+      "libghidra.DecompilerService/GetPcode", rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<GetPcodeResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  GetPcodeResponse out;
+  if (rpc.value->has_pcode()) {
+    out.pcode = from_proto_pcode_record(rpc.value->pcode());
+  }
+  return StatusOr<GetPcodeResponse>::FromValue(std::move(out));
+}
+
 StatusOr<ListDecompilationsResponse> HttpClient::ListDecompilations(std::uint64_t range_start,
                                                                     std::uint64_t range_end,
                                                                     int limit,
@@ -2144,6 +2459,35 @@ StatusOr<ListInstructionsResponse> HttpClient::ListInstructions(std::uint64_t ra
     out.instructions.push_back(from_proto_instruction_record(row));
   }
   return StatusOr<ListInstructionsResponse>::FromValue(std::move(out));
+}
+
+StatusOr<ListInstructionOperandsResponse> HttpClient::ListInstructionOperands(
+    std::uint64_t range_start, std::uint64_t range_end, int limit, int offset) {
+  libghidra::ListInstructionOperandsRequest rpc_request;
+  rpc_request.mutable_range()->set_start(range_start);
+  rpc_request.mutable_range()->set_end(range_end);
+  rpc_request.mutable_page()->set_limit(limit > 0 ? static_cast<std::uint32_t>(limit) : 0);
+  rpc_request.mutable_page()->set_offset(offset > 0 ? static_cast<std::uint32_t>(offset) : 0);
+  auto rpc = impl_->call_rpc<libghidra::ListInstructionOperandsRequest,
+                             libghidra::ListInstructionOperandsResponse>(
+      "libghidra.ListingService/ListInstructionOperands",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListInstructionOperandsResponse>::FromError(rpc.status.code,
+                                                                rpc.status.message);
+  }
+  ListInstructionOperandsResponse out;
+  out.operands.reserve(static_cast<std::size_t>(rpc.value->operands_size()));
+  for (const auto& row : rpc.value->operands()) {
+    InstructionOperandRecord rec;
+    rec.address = row.address();
+    rec.operand_index = row.operand_index();
+    rec.text = row.text();
+    rec.type_name = row.type_name();
+    rec.ref_type = row.ref_type();
+    out.operands.push_back(std::move(rec));
+  }
+  return StatusOr<ListInstructionOperandsResponse>::FromValue(std::move(out));
 }
 
 StatusOr<GetCommentsResponse> HttpClient::GetComments(std::uint64_t range_start,

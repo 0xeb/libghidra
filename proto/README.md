@@ -1,7 +1,7 @@
 # libghidra Proto Contracts
 
 This directory is the source of truth for all external API contracts. The current
-contracts define 88 typed domain RPCs across 9 service areas, plus one generic
+contracts define 90 typed domain RPCs across 9 service areas, plus one generic
 transport RPC.
 
 ## Service Catalog
@@ -15,12 +15,12 @@ transport RPC.
 | `symbols.proto` | SymbolsService | 4 | `GetSymbol`, `ListSymbols`, `RenameSymbol`, `DeleteSymbol` |
 | `xrefs.proto` | XrefsService | 1 | `ListXrefs` |
 | `types.proto` | TypesService | 34 | Types, aliases, enums, members, function signatures, parameters, locals, data type application, declaration parsing |
-| `decompiler.proto` | DecompilerService | 2 | `DecompileFunction`, `ListDecompilations` |
-| `listing.proto` | ListingService | 20 | Instructions, comments, data items, bookmarks, breakpoints, defined strings |
+| `decompiler.proto` | DecompilerService | 3 | `DecompileFunction`, `ListDecompilations`, `GetPcode` |
+| `listing.proto` | ListingService | 21 | Instructions and per-operand decoding, comments, data items, bookmarks, breakpoints, defined strings |
 | `common.proto` | — | 0 | Shared types: `ErrorDetail`, `Pagination`, `AddressRange`, `ShutdownPolicy` |
 | `rpc.proto` | RpcService | 1 | Generic `Call` — `RpcRequest`/`RpcResponse` envelope |
 
-**Total: 88 domain service RPCs + 1 transport RPC = 89 RPCs**
+**Total: 90 domain service RPCs + 1 transport RPC = 91 RPCs**
 
 Client SDKs may expose convenience names that differ from the wire RPC name. For
 example, the wire RPC is `DecompilerService/DecompileFunction`, while SDKs expose

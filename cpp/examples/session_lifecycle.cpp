@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 // session_lifecycle: Session management via the local backend.
 //
@@ -40,7 +39,7 @@ int main(int argc, char* argv[]) {
   });
 
   // --- Open binary ---
-  ghidra::OpenRequest req;
+  ghidra::OpenProgramRequest req;
   req.program_path = binary_path;
   auto open_result = client->OpenProgram(req);
   if (!open_result.ok()) {
@@ -106,7 +105,7 @@ int main(int argc, char* argv[]) {
       .default_arch = arch,
   });
 
-  ghidra::OpenRequest req2;
+  ghidra::OpenProgramRequest req2;
   req2.program_path = binary_path;
   auto open2 = client2->OpenProgram(req2);
   std::cout << "\nRestore: " << (open2.ok() ? "OK" : open2.status.message) << "\n";

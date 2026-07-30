@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // end_to_end: Launch headless Ghidra, analyze a binary, enumerate functions
 // with basic blocks and decompilation, save the project, and shut down.
@@ -127,9 +126,8 @@ fn main() {
         std::process::exit(1);
     }
 
-    let mut h = match ghidra::launch_headless(ghidra::HeadlessOptions {
+    let mut h = match ghidra::launch_headless_project(ghidra::HeadlessProjectOptions {
         ghidra_dir,
-        binary,
         port,
         on_output: Some(Box::new(|line| println!("  [ghidra] {line}"))),
         ..Default::default()
@@ -140,6 +138,27 @@ fn main() {
             std::process::exit(1);
         }
     };
+
+    let imported = match h.import_program(&ghidra::ImportProgramRequest {
+        source_path: binary,
+        overwrite: true,
+        analyze: true,
+        ..Default::default()
+    }) {
+        Ok(imported) => imported,
+        Err(e) => {
+            eprintln!("Import failed: {e}");
+            std::process::exit(1);
+        }
+    };
+    if let Err(e) = h.open_program(&ghidra::OpenProgramRequest {
+        program_path: imported.primary_program_path,
+        analyze: false,
+        ..Default::default()
+    }) {
+        eprintln!("Open failed: {e}");
+        std::process::exit(1);
+    }
 
     let status = match h.get_status() {
         Ok(s) => s,

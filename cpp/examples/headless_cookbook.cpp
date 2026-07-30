@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // headless_cookbook: Complete headless workflow — launch Ghidra, open/analyze
 // a binary, run typed RPC calls, save, and shut down.
@@ -64,7 +63,7 @@ static bool verify_connection(ghidra::Client& c) {
 static void list_functions(ghidra::Client& c) {
   print_separator("Functions");
 
-  auto resp = c.ListFunctions(0, INT64_MAX, 0, 0);
+  auto resp = c.ListFunctions(0, UINT64_MAX, 0, 0);
   if (!resp.ok()) {
     fprintf(stderr, "ListFunctions: %s\n", resp.status.message.c_str());
     return;
@@ -94,7 +93,7 @@ static void list_functions(ghidra::Client& c) {
 static void decompile_first(ghidra::Client& c) {
   print_separator("Decompilation (first function)");
 
-  auto resp = c.ListFunctions(0, INT64_MAX, 1, 0);  // page_size=1
+  auto resp = c.ListFunctions(0, UINT64_MAX, 1, 0);  // page_size=1
   if (!resp.ok() || resp.value->functions.empty()) {
     printf("  (no functions to decompile)\n");
     return;
@@ -125,7 +124,7 @@ static void decompile_first(ghidra::Client& c) {
 static void rename_demo(ghidra::Client& c) {
   print_separator("Rename demo");
 
-  auto resp = c.ListFunctions(0, INT64_MAX, 1, 0);
+  auto resp = c.ListFunctions(0, UINT64_MAX, 1, 0);
   if (!resp.ok() || resp.value->functions.empty()) {
     printf("  (no functions to rename)\n");
     return;
@@ -214,11 +213,9 @@ int main(int argc, char* argv[]) {
     printf("  project name: %s\n", project_name.c_str());
 
   try {
-    ghidra::HeadlessOptions opts;
+    ghidra::HeadlessProjectOptions opts;
     opts.ghidra_dir = ghidra_dir;
-    opts.binary = binary_path;
     opts.port = port;
-    opts.analyze = analyze;
     if (!project_dir.empty()) opts.project_dir = project_dir;
     if (!project_name.empty()) opts.project_name = project_name;
     opts.on_output = [](const std::string& line) {
@@ -226,7 +223,26 @@ int main(int argc, char* argv[]) {
     };
 
     printf("\nLaunching headless Ghidra on port %d...\n", port);
-    auto h = ghidra::launch_headless(std::move(opts));
+    auto h = ghidra::launch_headless_project(std::move(opts));
+
+    ghidra::ImportProgramRequest import;
+    import.source_path = binary_path;
+    import.overwrite = true;
+    import.analyze = analyze;
+    auto imported = h->ImportProgram(import);
+    if (!imported.ok()) {
+      fprintf(stderr, "ImportProgram: %s\n", imported.status.message.c_str());
+      return 1;
+    }
+
+    ghidra::OpenProgramRequest open;
+    open.program_path = imported.value->primary_program_path;
+    open.analyze = false;
+    auto opened = h->OpenProgram(open);
+    if (!opened.ok()) {
+      fprintf(stderr, "OpenProgram: %s\n", opened.status.message.c_str());
+      return 1;
+    }
 
     if (!verify_connection(*h)) return 1;
 

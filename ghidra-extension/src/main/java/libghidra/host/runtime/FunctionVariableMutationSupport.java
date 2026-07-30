@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.util.Iterator;
@@ -89,6 +95,7 @@ final class FunctionVariableMutationSupport {
 	}
 
 	static boolean decompileAndRenameHighVariable(
+			HostState state,
 			Program program,
 			long functionAddress,
 			String localId,
@@ -98,11 +105,11 @@ final class FunctionVariableMutationSupport {
 		if (function == null) {
 			return false;
 		}
-		DecompInterface decompiler = DecompilerSupport.createDecompiler(program);
-		if (decompiler == null) {
-			return false;
-		}
-		try {
+		try (DecompilerLease lease = state.leaseDecompiler(program)) {
+			DecompInterface decompiler = lease.get();
+			if (decompiler == null) {
+				return false;
+			}
 			DecompileResults results = decompiler.decompileFunction(function, 30, TaskMonitor.DUMMY);
 			if (results == null || !results.decompileCompleted()) {
 				return false;
@@ -135,12 +142,10 @@ final class FunctionVariableMutationSupport {
 				e);
 			return false;
 		}
-		finally {
-			decompiler.dispose();
-		}
 	}
 
 	static String decompileAndRetypeHighVariable(
+			HostState state,
 			Program program,
 			long functionAddress,
 			String localId,
@@ -150,11 +155,11 @@ final class FunctionVariableMutationSupport {
 		if (function == null) {
 			return null;
 		}
-		DecompInterface decompiler = DecompilerSupport.createDecompiler(program);
-		if (decompiler == null) {
-			return null;
-		}
-		try {
+		try (DecompilerLease lease = state.leaseDecompiler(program)) {
+			DecompInterface decompiler = lease.get();
+			if (decompiler == null) {
+				return null;
+			}
 			DecompileResults results = decompiler.decompileFunction(function, 30, TaskMonitor.DUMMY);
 			if (results == null || !results.decompileCompleted()) {
 				return null;
@@ -184,9 +189,6 @@ final class FunctionVariableMutationSupport {
 				"decompileAndRetypeHighVariable failed: " + e.getMessage(),
 				e);
 			return null;
-		}
-		finally {
-			decompiler.dispose();
 		}
 	}
 }

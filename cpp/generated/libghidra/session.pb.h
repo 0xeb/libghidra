@@ -54,6 +54,18 @@ struct TableStruct_libghidra_2fsession_2eproto {
 extern const ::google::protobuf::internal::DescriptorTable
     descriptor_table_libghidra_2fsession_2eproto;
 namespace libghidra {
+class AddPerfBenchmarkRequest;
+struct AddPerfBenchmarkRequestDefaultTypeInternal;
+extern AddPerfBenchmarkRequestDefaultTypeInternal _AddPerfBenchmarkRequest_default_instance_;
+class AddPerfBenchmarkResponse;
+struct AddPerfBenchmarkResponseDefaultTypeInternal;
+extern AddPerfBenchmarkResponseDefaultTypeInternal _AddPerfBenchmarkResponse_default_instance_;
+class ClearPerfBenchmarksRequest;
+struct ClearPerfBenchmarksRequestDefaultTypeInternal;
+extern ClearPerfBenchmarksRequestDefaultTypeInternal _ClearPerfBenchmarksRequest_default_instance_;
+class ClearPerfBenchmarksResponse;
+struct ClearPerfBenchmarksResponseDefaultTypeInternal;
+extern ClearPerfBenchmarksResponseDefaultTypeInternal _ClearPerfBenchmarksResponse_default_instance_;
 class CloseProgramRequest;
 struct CloseProgramRequestDefaultTypeInternal;
 extern CloseProgramRequestDefaultTypeInternal _CloseProgramRequest_default_instance_;
@@ -66,6 +78,12 @@ extern CloseProjectRequestDefaultTypeInternal _CloseProjectRequest_default_insta
 class CloseProjectResponse;
 struct CloseProjectResponseDefaultTypeInternal;
 extern CloseProjectResponseDefaultTypeInternal _CloseProjectResponse_default_instance_;
+class DeletePerfBenchmarkRequest;
+struct DeletePerfBenchmarkRequestDefaultTypeInternal;
+extern DeletePerfBenchmarkRequestDefaultTypeInternal _DeletePerfBenchmarkRequest_default_instance_;
+class DeletePerfBenchmarkResponse;
+struct DeletePerfBenchmarkResponseDefaultTypeInternal;
+extern DeletePerfBenchmarkResponseDefaultTypeInternal _DeletePerfBenchmarkResponse_default_instance_;
 class DiscardProgramRequest;
 struct DiscardProgramRequestDefaultTypeInternal;
 extern DiscardProgramRequestDefaultTypeInternal _DiscardProgramRequest_default_instance_;
@@ -84,6 +102,12 @@ extern ImportProgramRequestDefaultTypeInternal _ImportProgramRequest_default_ins
 class ImportProgramResponse;
 struct ImportProgramResponseDefaultTypeInternal;
 extern ImportProgramResponseDefaultTypeInternal _ImportProgramResponse_default_instance_;
+class ListPerfBenchmarksRequest;
+struct ListPerfBenchmarksRequestDefaultTypeInternal;
+extern ListPerfBenchmarksRequestDefaultTypeInternal _ListPerfBenchmarksRequest_default_instance_;
+class ListPerfBenchmarksResponse;
+struct ListPerfBenchmarksResponseDefaultTypeInternal;
+extern ListPerfBenchmarksResponseDefaultTypeInternal _ListPerfBenchmarksResponse_default_instance_;
 class ListProjectFilesRequest;
 struct ListProjectFilesRequestDefaultTypeInternal;
 extern ListProjectFilesRequestDefaultTypeInternal _ListProjectFilesRequest_default_instance_;
@@ -105,6 +129,9 @@ extern OpenProjectRequestDefaultTypeInternal _OpenProjectRequest_default_instanc
 class OpenProjectResponse;
 struct OpenProjectResponseDefaultTypeInternal;
 extern OpenProjectResponseDefaultTypeInternal _OpenProjectResponse_default_instance_;
+class PerfBenchmarkRecord;
+struct PerfBenchmarkRecordDefaultTypeInternal;
+extern PerfBenchmarkRecordDefaultTypeInternal _PerfBenchmarkRecord_default_instance_;
 class ProjectFile;
 struct ProjectFileDefaultTypeInternal;
 extern ProjectFileDefaultTypeInternal _ProjectFile_default_instance_;
@@ -1140,6 +1167,328 @@ class ProjectFile final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
+class PerfBenchmarkRecord final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.PerfBenchmarkRecord) */ {
+ public:
+  inline PerfBenchmarkRecord() : PerfBenchmarkRecord(nullptr) {}
+  ~PerfBenchmarkRecord() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PerfBenchmarkRecord* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PerfBenchmarkRecord));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PerfBenchmarkRecord(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PerfBenchmarkRecord(const PerfBenchmarkRecord& from) : PerfBenchmarkRecord(nullptr, from) {}
+  inline PerfBenchmarkRecord(PerfBenchmarkRecord&& from) noexcept
+      : PerfBenchmarkRecord(nullptr, std::move(from)) {}
+  inline PerfBenchmarkRecord& operator=(const PerfBenchmarkRecord& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PerfBenchmarkRecord& operator=(PerfBenchmarkRecord&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PerfBenchmarkRecord& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PerfBenchmarkRecord* internal_default_instance() {
+    return reinterpret_cast<const PerfBenchmarkRecord*>(
+        &_PerfBenchmarkRecord_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 22;
+  friend void swap(PerfBenchmarkRecord& a, PerfBenchmarkRecord& b) { a.Swap(&b); }
+  inline void Swap(PerfBenchmarkRecord* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PerfBenchmarkRecord* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PerfBenchmarkRecord* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PerfBenchmarkRecord>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PerfBenchmarkRecord& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PerfBenchmarkRecord& from) { PerfBenchmarkRecord::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PerfBenchmarkRecord* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.PerfBenchmarkRecord"; }
+
+ protected:
+  explicit PerfBenchmarkRecord(::google::protobuf::Arena* arena);
+  PerfBenchmarkRecord(::google::protobuf::Arena* arena, const PerfBenchmarkRecord& from);
+  PerfBenchmarkRecord(::google::protobuf::Arena* arena, PerfBenchmarkRecord&& from) noexcept
+      : PerfBenchmarkRecord(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kBenchIdFieldNumber = 1,
+    kQueryFamilyFieldNumber = 2,
+    kDatasetProfileFieldNumber = 3,
+    kStatusFieldNumber = 10,
+    kColdMsP50FieldNumber = 4,
+    kColdMsP95FieldNumber = 5,
+    kWarmMsP50FieldNumber = 6,
+    kWarmMsP95FieldNumber = 7,
+    kThroughputQpsFieldNumber = 8,
+    kRegressionPctFieldNumber = 9,
+  };
+  // string bench_id = 1;
+  void clear_bench_id() ;
+  const std::string& bench_id() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_bench_id(Arg_&& arg, Args_... args);
+  std::string* mutable_bench_id();
+  PROTOBUF_NODISCARD std::string* release_bench_id();
+  void set_allocated_bench_id(std::string* value);
+
+  private:
+  const std::string& _internal_bench_id() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_bench_id(
+      const std::string& value);
+  std::string* _internal_mutable_bench_id();
+
+  public:
+  // string query_family = 2;
+  void clear_query_family() ;
+  const std::string& query_family() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_query_family(Arg_&& arg, Args_... args);
+  std::string* mutable_query_family();
+  PROTOBUF_NODISCARD std::string* release_query_family();
+  void set_allocated_query_family(std::string* value);
+
+  private:
+  const std::string& _internal_query_family() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_query_family(
+      const std::string& value);
+  std::string* _internal_mutable_query_family();
+
+  public:
+  // string dataset_profile = 3;
+  void clear_dataset_profile() ;
+  const std::string& dataset_profile() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_dataset_profile(Arg_&& arg, Args_... args);
+  std::string* mutable_dataset_profile();
+  PROTOBUF_NODISCARD std::string* release_dataset_profile();
+  void set_allocated_dataset_profile(std::string* value);
+
+  private:
+  const std::string& _internal_dataset_profile() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_dataset_profile(
+      const std::string& value);
+  std::string* _internal_mutable_dataset_profile();
+
+  public:
+  // string status = 10;
+  void clear_status() ;
+  const std::string& status() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_status(Arg_&& arg, Args_... args);
+  std::string* mutable_status();
+  PROTOBUF_NODISCARD std::string* release_status();
+  void set_allocated_status(std::string* value);
+
+  private:
+  const std::string& _internal_status() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_status(
+      const std::string& value);
+  std::string* _internal_mutable_status();
+
+  public:
+  // double cold_ms_p50 = 4;
+  void clear_cold_ms_p50() ;
+  double cold_ms_p50() const;
+  void set_cold_ms_p50(double value);
+
+  private:
+  double _internal_cold_ms_p50() const;
+  void _internal_set_cold_ms_p50(double value);
+
+  public:
+  // double cold_ms_p95 = 5;
+  void clear_cold_ms_p95() ;
+  double cold_ms_p95() const;
+  void set_cold_ms_p95(double value);
+
+  private:
+  double _internal_cold_ms_p95() const;
+  void _internal_set_cold_ms_p95(double value);
+
+  public:
+  // double warm_ms_p50 = 6;
+  void clear_warm_ms_p50() ;
+  double warm_ms_p50() const;
+  void set_warm_ms_p50(double value);
+
+  private:
+  double _internal_warm_ms_p50() const;
+  void _internal_set_warm_ms_p50(double value);
+
+  public:
+  // double warm_ms_p95 = 7;
+  void clear_warm_ms_p95() ;
+  double warm_ms_p95() const;
+  void set_warm_ms_p95(double value);
+
+  private:
+  double _internal_warm_ms_p95() const;
+  void _internal_set_warm_ms_p95(double value);
+
+  public:
+  // double throughput_qps = 8;
+  void clear_throughput_qps() ;
+  double throughput_qps() const;
+  void set_throughput_qps(double value);
+
+  private:
+  double _internal_throughput_qps() const;
+  void _internal_set_throughput_qps(double value);
+
+  public:
+  // double regression_pct = 9;
+  void clear_regression_pct() ;
+  double regression_pct() const;
+  void set_regression_pct(double value);
+
+  private:
+  double _internal_regression_pct() const;
+  void _internal_set_regression_pct(double value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.PerfBenchmarkRecord)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      4, 10, 0,
+      87, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PerfBenchmarkRecord& from_msg);
+    ::google::protobuf::internal::ArenaStringPtr bench_id_;
+    ::google::protobuf::internal::ArenaStringPtr query_family_;
+    ::google::protobuf::internal::ArenaStringPtr dataset_profile_;
+    ::google::protobuf::internal::ArenaStringPtr status_;
+    double cold_ms_p50_;
+    double cold_ms_p95_;
+    double warm_ms_p50_;
+    double warm_ms_p95_;
+    double throughput_qps_;
+    double regression_pct_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fsession_2eproto;
+};
+// -------------------------------------------------------------------
+
 class OpenProjectResponse final : public ::google::protobuf::Message
 /* @@protoc_insertion_point(class_definition:libghidra.OpenProjectResponse) */ {
  public:
@@ -1755,7 +2104,10 @@ class OpenProgramResponse final : public ::google::protobuf::Message
     kCompilerSpecFieldNumber = 4,
     kMd5FieldNumber = 6,
     kSha256FieldNumber = 7,
+    kExecutableFormatFieldNumber = 8,
     kImageBaseFieldNumber = 5,
+    kEntryPointFieldNumber = 9,
+    kHasEntryPointFieldNumber = 10,
   };
   // string program_name = 2;
   void clear_program_name() ;
@@ -1837,6 +2189,22 @@ class OpenProgramResponse final : public ::google::protobuf::Message
   std::string* _internal_mutable_sha256();
 
   public:
+  // string executable_format = 8;
+  void clear_executable_format() ;
+  const std::string& executable_format() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_executable_format(Arg_&& arg, Args_... args);
+  std::string* mutable_executable_format();
+  PROTOBUF_NODISCARD std::string* release_executable_format();
+  void set_allocated_executable_format(std::string* value);
+
+  private:
+  const std::string& _internal_executable_format() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_executable_format(
+      const std::string& value);
+  std::string* _internal_mutable_executable_format();
+
+  public:
   // uint64 image_base = 5;
   void clear_image_base() ;
   ::uint64_t image_base() const;
@@ -1847,13 +2215,33 @@ class OpenProgramResponse final : public ::google::protobuf::Message
   void _internal_set_image_base(::uint64_t value);
 
   public:
+  // uint64 entry_point = 9;
+  void clear_entry_point() ;
+  ::uint64_t entry_point() const;
+  void set_entry_point(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_entry_point() const;
+  void _internal_set_entry_point(::uint64_t value);
+
+  public:
+  // bool has_entry_point = 10;
+  void clear_has_entry_point() ;
+  bool has_entry_point() const;
+  void set_has_entry_point(bool value);
+
+  private:
+  bool _internal_has_entry_point() const;
+  void _internal_set_has_entry_point(bool value);
+
+  public:
   // @@protoc_insertion_point(class_scope:libghidra.OpenProgramResponse)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 6, 0,
-      83, 2>
+      4, 9, 0,
+      108, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -1875,7 +2263,10 @@ class OpenProgramResponse final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr compiler_spec_;
     ::google::protobuf::internal::ArenaStringPtr md5_;
     ::google::protobuf::internal::ArenaStringPtr sha256_;
+    ::google::protobuf::internal::ArenaStringPtr executable_format_;
     ::uint64_t image_base_;
+    ::uint64_t entry_point_;
+    bool has_entry_point_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -2618,6 +3009,151 @@ class ListProjectFilesRequest final : public ::google::protobuf::Message
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fsession_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ListPerfBenchmarksRequest final : public ::google::protobuf::internal::ZeroFieldsBase
+/* @@protoc_insertion_point(class_definition:libghidra.ListPerfBenchmarksRequest) */ {
+ public:
+  inline ListPerfBenchmarksRequest() : ListPerfBenchmarksRequest(nullptr) {}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(ListPerfBenchmarksRequest* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(ListPerfBenchmarksRequest));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR ListPerfBenchmarksRequest(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline ListPerfBenchmarksRequest(const ListPerfBenchmarksRequest& from) : ListPerfBenchmarksRequest(nullptr, from) {}
+  inline ListPerfBenchmarksRequest(ListPerfBenchmarksRequest&& from) noexcept
+      : ListPerfBenchmarksRequest(nullptr, std::move(from)) {}
+  inline ListPerfBenchmarksRequest& operator=(const ListPerfBenchmarksRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ListPerfBenchmarksRequest& operator=(ListPerfBenchmarksRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const ListPerfBenchmarksRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const ListPerfBenchmarksRequest* internal_default_instance() {
+    return reinterpret_cast<const ListPerfBenchmarksRequest*>(
+        &_ListPerfBenchmarksRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 25;
+  friend void swap(ListPerfBenchmarksRequest& a, ListPerfBenchmarksRequest& b) { a.Swap(&b); }
+  inline void Swap(ListPerfBenchmarksRequest* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ListPerfBenchmarksRequest* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  ListPerfBenchmarksRequest* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::internal::ZeroFieldsBase::DefaultConstruct<ListPerfBenchmarksRequest>(arena);
+  }
+  using ::google::protobuf::internal::ZeroFieldsBase::CopyFrom;
+  inline void CopyFrom(const ListPerfBenchmarksRequest& from) {
+    ::google::protobuf::internal::ZeroFieldsBase::CopyImpl(*this, from);
+  }
+  using ::google::protobuf::internal::ZeroFieldsBase::MergeFrom;
+  void MergeFrom(const ListPerfBenchmarksRequest& from) {
+    ::google::protobuf::internal::ZeroFieldsBase::MergeImpl(*this, from);
+  }
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.ListPerfBenchmarksRequest"; }
+
+ protected:
+  explicit ListPerfBenchmarksRequest(::google::protobuf::Arena* arena);
+  ListPerfBenchmarksRequest(::google::protobuf::Arena* arena, const ListPerfBenchmarksRequest& from);
+  ListPerfBenchmarksRequest(::google::protobuf::Arena* arena, ListPerfBenchmarksRequest&& from) noexcept
+      : ListPerfBenchmarksRequest(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  // @@protoc_insertion_point(class_scope:libghidra.ListPerfBenchmarksRequest)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      0, 0, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const ListPerfBenchmarksRequest& from_msg);
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
   friend struct ::TableStruct_libghidra_2fsession_2eproto;
 };
 // -------------------------------------------------------------------
@@ -3584,6 +4120,392 @@ class DiscardProgramRequest final : public ::google::protobuf::internal::ZeroFie
 };
 // -------------------------------------------------------------------
 
+class DeletePerfBenchmarkResponse final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.DeletePerfBenchmarkResponse) */ {
+ public:
+  inline DeletePerfBenchmarkResponse() : DeletePerfBenchmarkResponse(nullptr) {}
+  ~DeletePerfBenchmarkResponse() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(DeletePerfBenchmarkResponse* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(DeletePerfBenchmarkResponse));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR DeletePerfBenchmarkResponse(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline DeletePerfBenchmarkResponse(const DeletePerfBenchmarkResponse& from) : DeletePerfBenchmarkResponse(nullptr, from) {}
+  inline DeletePerfBenchmarkResponse(DeletePerfBenchmarkResponse&& from) noexcept
+      : DeletePerfBenchmarkResponse(nullptr, std::move(from)) {}
+  inline DeletePerfBenchmarkResponse& operator=(const DeletePerfBenchmarkResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline DeletePerfBenchmarkResponse& operator=(DeletePerfBenchmarkResponse&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const DeletePerfBenchmarkResponse& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const DeletePerfBenchmarkResponse* internal_default_instance() {
+    return reinterpret_cast<const DeletePerfBenchmarkResponse*>(
+        &_DeletePerfBenchmarkResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 30;
+  friend void swap(DeletePerfBenchmarkResponse& a, DeletePerfBenchmarkResponse& b) { a.Swap(&b); }
+  inline void Swap(DeletePerfBenchmarkResponse* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(DeletePerfBenchmarkResponse* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  DeletePerfBenchmarkResponse* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<DeletePerfBenchmarkResponse>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const DeletePerfBenchmarkResponse& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const DeletePerfBenchmarkResponse& from) { DeletePerfBenchmarkResponse::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(DeletePerfBenchmarkResponse* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.DeletePerfBenchmarkResponse"; }
+
+ protected:
+  explicit DeletePerfBenchmarkResponse(::google::protobuf::Arena* arena);
+  DeletePerfBenchmarkResponse(::google::protobuf::Arena* arena, const DeletePerfBenchmarkResponse& from);
+  DeletePerfBenchmarkResponse(::google::protobuf::Arena* arena, DeletePerfBenchmarkResponse&& from) noexcept
+      : DeletePerfBenchmarkResponse(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kDeletedFieldNumber = 1,
+  };
+  // bool deleted = 1;
+  void clear_deleted() ;
+  bool deleted() const;
+  void set_deleted(bool value);
+
+  private:
+  bool _internal_deleted() const;
+  void _internal_set_deleted(bool value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.DeletePerfBenchmarkResponse)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      0, 1, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const DeletePerfBenchmarkResponse& from_msg);
+    bool deleted_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fsession_2eproto;
+};
+// -------------------------------------------------------------------
+
+class DeletePerfBenchmarkRequest final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.DeletePerfBenchmarkRequest) */ {
+ public:
+  inline DeletePerfBenchmarkRequest() : DeletePerfBenchmarkRequest(nullptr) {}
+  ~DeletePerfBenchmarkRequest() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(DeletePerfBenchmarkRequest* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(DeletePerfBenchmarkRequest));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR DeletePerfBenchmarkRequest(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline DeletePerfBenchmarkRequest(const DeletePerfBenchmarkRequest& from) : DeletePerfBenchmarkRequest(nullptr, from) {}
+  inline DeletePerfBenchmarkRequest(DeletePerfBenchmarkRequest&& from) noexcept
+      : DeletePerfBenchmarkRequest(nullptr, std::move(from)) {}
+  inline DeletePerfBenchmarkRequest& operator=(const DeletePerfBenchmarkRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline DeletePerfBenchmarkRequest& operator=(DeletePerfBenchmarkRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const DeletePerfBenchmarkRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const DeletePerfBenchmarkRequest* internal_default_instance() {
+    return reinterpret_cast<const DeletePerfBenchmarkRequest*>(
+        &_DeletePerfBenchmarkRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 29;
+  friend void swap(DeletePerfBenchmarkRequest& a, DeletePerfBenchmarkRequest& b) { a.Swap(&b); }
+  inline void Swap(DeletePerfBenchmarkRequest* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(DeletePerfBenchmarkRequest* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  DeletePerfBenchmarkRequest* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<DeletePerfBenchmarkRequest>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const DeletePerfBenchmarkRequest& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const DeletePerfBenchmarkRequest& from) { DeletePerfBenchmarkRequest::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(DeletePerfBenchmarkRequest* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.DeletePerfBenchmarkRequest"; }
+
+ protected:
+  explicit DeletePerfBenchmarkRequest(::google::protobuf::Arena* arena);
+  DeletePerfBenchmarkRequest(::google::protobuf::Arena* arena, const DeletePerfBenchmarkRequest& from);
+  DeletePerfBenchmarkRequest(::google::protobuf::Arena* arena, DeletePerfBenchmarkRequest&& from) noexcept
+      : DeletePerfBenchmarkRequest(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kBenchIdFieldNumber = 1,
+  };
+  // string bench_id = 1;
+  void clear_bench_id() ;
+  const std::string& bench_id() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_bench_id(Arg_&& arg, Args_... args);
+  std::string* mutable_bench_id();
+  PROTOBUF_NODISCARD std::string* release_bench_id();
+  void set_allocated_bench_id(std::string* value);
+
+  private:
+  const std::string& _internal_bench_id() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_bench_id(
+      const std::string& value);
+  std::string* _internal_mutable_bench_id();
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.DeletePerfBenchmarkRequest)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      0, 1, 0,
+      53, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const DeletePerfBenchmarkRequest& from_msg);
+    ::google::protobuf::internal::ArenaStringPtr bench_id_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fsession_2eproto;
+};
+// -------------------------------------------------------------------
+
 class CloseProjectResponse final : public ::google::protobuf::Message
 /* @@protoc_insertion_point(class_definition:libghidra.CloseProjectResponse) */ {
  public:
@@ -4344,6 +5266,543 @@ class CloseProgramRequest final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
+class ClearPerfBenchmarksResponse final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.ClearPerfBenchmarksResponse) */ {
+ public:
+  inline ClearPerfBenchmarksResponse() : ClearPerfBenchmarksResponse(nullptr) {}
+  ~ClearPerfBenchmarksResponse() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(ClearPerfBenchmarksResponse* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(ClearPerfBenchmarksResponse));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR ClearPerfBenchmarksResponse(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline ClearPerfBenchmarksResponse(const ClearPerfBenchmarksResponse& from) : ClearPerfBenchmarksResponse(nullptr, from) {}
+  inline ClearPerfBenchmarksResponse(ClearPerfBenchmarksResponse&& from) noexcept
+      : ClearPerfBenchmarksResponse(nullptr, std::move(from)) {}
+  inline ClearPerfBenchmarksResponse& operator=(const ClearPerfBenchmarksResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ClearPerfBenchmarksResponse& operator=(ClearPerfBenchmarksResponse&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const ClearPerfBenchmarksResponse& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const ClearPerfBenchmarksResponse* internal_default_instance() {
+    return reinterpret_cast<const ClearPerfBenchmarksResponse*>(
+        &_ClearPerfBenchmarksResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 28;
+  friend void swap(ClearPerfBenchmarksResponse& a, ClearPerfBenchmarksResponse& b) { a.Swap(&b); }
+  inline void Swap(ClearPerfBenchmarksResponse* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ClearPerfBenchmarksResponse* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  ClearPerfBenchmarksResponse* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<ClearPerfBenchmarksResponse>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const ClearPerfBenchmarksResponse& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const ClearPerfBenchmarksResponse& from) { ClearPerfBenchmarksResponse::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(ClearPerfBenchmarksResponse* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.ClearPerfBenchmarksResponse"; }
+
+ protected:
+  explicit ClearPerfBenchmarksResponse(::google::protobuf::Arena* arena);
+  ClearPerfBenchmarksResponse(::google::protobuf::Arena* arena, const ClearPerfBenchmarksResponse& from);
+  ClearPerfBenchmarksResponse(::google::protobuf::Arena* arena, ClearPerfBenchmarksResponse&& from) noexcept
+      : ClearPerfBenchmarksResponse(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kClearedFieldNumber = 1,
+    kRemovedCountFieldNumber = 2,
+  };
+  // bool cleared = 1;
+  void clear_cleared() ;
+  bool cleared() const;
+  void set_cleared(bool value);
+
+  private:
+  bool _internal_cleared() const;
+  void _internal_set_cleared(bool value);
+
+  public:
+  // uint32 removed_count = 2;
+  void clear_removed_count() ;
+  ::uint32_t removed_count() const;
+  void set_removed_count(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_removed_count() const;
+  void _internal_set_removed_count(::uint32_t value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.ClearPerfBenchmarksResponse)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      1, 2, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const ClearPerfBenchmarksResponse& from_msg);
+    bool cleared_;
+    ::uint32_t removed_count_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fsession_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ClearPerfBenchmarksRequest final : public ::google::protobuf::internal::ZeroFieldsBase
+/* @@protoc_insertion_point(class_definition:libghidra.ClearPerfBenchmarksRequest) */ {
+ public:
+  inline ClearPerfBenchmarksRequest() : ClearPerfBenchmarksRequest(nullptr) {}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(ClearPerfBenchmarksRequest* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(ClearPerfBenchmarksRequest));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR ClearPerfBenchmarksRequest(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline ClearPerfBenchmarksRequest(const ClearPerfBenchmarksRequest& from) : ClearPerfBenchmarksRequest(nullptr, from) {}
+  inline ClearPerfBenchmarksRequest(ClearPerfBenchmarksRequest&& from) noexcept
+      : ClearPerfBenchmarksRequest(nullptr, std::move(from)) {}
+  inline ClearPerfBenchmarksRequest& operator=(const ClearPerfBenchmarksRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ClearPerfBenchmarksRequest& operator=(ClearPerfBenchmarksRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const ClearPerfBenchmarksRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const ClearPerfBenchmarksRequest* internal_default_instance() {
+    return reinterpret_cast<const ClearPerfBenchmarksRequest*>(
+        &_ClearPerfBenchmarksRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 27;
+  friend void swap(ClearPerfBenchmarksRequest& a, ClearPerfBenchmarksRequest& b) { a.Swap(&b); }
+  inline void Swap(ClearPerfBenchmarksRequest* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ClearPerfBenchmarksRequest* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  ClearPerfBenchmarksRequest* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::internal::ZeroFieldsBase::DefaultConstruct<ClearPerfBenchmarksRequest>(arena);
+  }
+  using ::google::protobuf::internal::ZeroFieldsBase::CopyFrom;
+  inline void CopyFrom(const ClearPerfBenchmarksRequest& from) {
+    ::google::protobuf::internal::ZeroFieldsBase::CopyImpl(*this, from);
+  }
+  using ::google::protobuf::internal::ZeroFieldsBase::MergeFrom;
+  void MergeFrom(const ClearPerfBenchmarksRequest& from) {
+    ::google::protobuf::internal::ZeroFieldsBase::MergeImpl(*this, from);
+  }
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.ClearPerfBenchmarksRequest"; }
+
+ protected:
+  explicit ClearPerfBenchmarksRequest(::google::protobuf::Arena* arena);
+  ClearPerfBenchmarksRequest(::google::protobuf::Arena* arena, const ClearPerfBenchmarksRequest& from);
+  ClearPerfBenchmarksRequest(::google::protobuf::Arena* arena, ClearPerfBenchmarksRequest&& from) noexcept
+      : ClearPerfBenchmarksRequest(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  // @@protoc_insertion_point(class_scope:libghidra.ClearPerfBenchmarksRequest)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      0, 0, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const ClearPerfBenchmarksRequest& from_msg);
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  friend struct ::TableStruct_libghidra_2fsession_2eproto;
+};
+// -------------------------------------------------------------------
+
+class AddPerfBenchmarkResponse final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.AddPerfBenchmarkResponse) */ {
+ public:
+  inline AddPerfBenchmarkResponse() : AddPerfBenchmarkResponse(nullptr) {}
+  ~AddPerfBenchmarkResponse() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(AddPerfBenchmarkResponse* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(AddPerfBenchmarkResponse));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR AddPerfBenchmarkResponse(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline AddPerfBenchmarkResponse(const AddPerfBenchmarkResponse& from) : AddPerfBenchmarkResponse(nullptr, from) {}
+  inline AddPerfBenchmarkResponse(AddPerfBenchmarkResponse&& from) noexcept
+      : AddPerfBenchmarkResponse(nullptr, std::move(from)) {}
+  inline AddPerfBenchmarkResponse& operator=(const AddPerfBenchmarkResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline AddPerfBenchmarkResponse& operator=(AddPerfBenchmarkResponse&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const AddPerfBenchmarkResponse& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const AddPerfBenchmarkResponse* internal_default_instance() {
+    return reinterpret_cast<const AddPerfBenchmarkResponse*>(
+        &_AddPerfBenchmarkResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 24;
+  friend void swap(AddPerfBenchmarkResponse& a, AddPerfBenchmarkResponse& b) { a.Swap(&b); }
+  inline void Swap(AddPerfBenchmarkResponse* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(AddPerfBenchmarkResponse* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  AddPerfBenchmarkResponse* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<AddPerfBenchmarkResponse>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const AddPerfBenchmarkResponse& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const AddPerfBenchmarkResponse& from) { AddPerfBenchmarkResponse::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(AddPerfBenchmarkResponse* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.AddPerfBenchmarkResponse"; }
+
+ protected:
+  explicit AddPerfBenchmarkResponse(::google::protobuf::Arena* arena);
+  AddPerfBenchmarkResponse(::google::protobuf::Arena* arena, const AddPerfBenchmarkResponse& from);
+  AddPerfBenchmarkResponse(::google::protobuf::Arena* arena, AddPerfBenchmarkResponse&& from) noexcept
+      : AddPerfBenchmarkResponse(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kAddedFieldNumber = 1,
+  };
+  // bool added = 1;
+  void clear_added() ;
+  bool added() const;
+  void set_added(bool value);
+
+  private:
+  bool _internal_added() const;
+  void _internal_set_added(bool value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.AddPerfBenchmarkResponse)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      0, 1, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const AddPerfBenchmarkResponse& from_msg);
+    bool added_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fsession_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ListProjectFilesResponse final : public ::google::protobuf::Message
 /* @@protoc_insertion_point(class_definition:libghidra.ListProjectFilesResponse) */ {
  public:
@@ -4533,6 +5992,203 @@ class ListProjectFilesResponse final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const ListProjectFilesResponse& from_msg);
     ::google::protobuf::RepeatedPtrField< ::libghidra::ProjectFile > files_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fsession_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ListPerfBenchmarksResponse final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.ListPerfBenchmarksResponse) */ {
+ public:
+  inline ListPerfBenchmarksResponse() : ListPerfBenchmarksResponse(nullptr) {}
+  ~ListPerfBenchmarksResponse() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(ListPerfBenchmarksResponse* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(ListPerfBenchmarksResponse));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR ListPerfBenchmarksResponse(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline ListPerfBenchmarksResponse(const ListPerfBenchmarksResponse& from) : ListPerfBenchmarksResponse(nullptr, from) {}
+  inline ListPerfBenchmarksResponse(ListPerfBenchmarksResponse&& from) noexcept
+      : ListPerfBenchmarksResponse(nullptr, std::move(from)) {}
+  inline ListPerfBenchmarksResponse& operator=(const ListPerfBenchmarksResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ListPerfBenchmarksResponse& operator=(ListPerfBenchmarksResponse&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const ListPerfBenchmarksResponse& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const ListPerfBenchmarksResponse* internal_default_instance() {
+    return reinterpret_cast<const ListPerfBenchmarksResponse*>(
+        &_ListPerfBenchmarksResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 26;
+  friend void swap(ListPerfBenchmarksResponse& a, ListPerfBenchmarksResponse& b) { a.Swap(&b); }
+  inline void Swap(ListPerfBenchmarksResponse* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ListPerfBenchmarksResponse* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  ListPerfBenchmarksResponse* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<ListPerfBenchmarksResponse>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const ListPerfBenchmarksResponse& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const ListPerfBenchmarksResponse& from) { ListPerfBenchmarksResponse::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(ListPerfBenchmarksResponse* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.ListPerfBenchmarksResponse"; }
+
+ protected:
+  explicit ListPerfBenchmarksResponse(::google::protobuf::Arena* arena);
+  ListPerfBenchmarksResponse(::google::protobuf::Arena* arena, const ListPerfBenchmarksResponse& from);
+  ListPerfBenchmarksResponse(::google::protobuf::Arena* arena, ListPerfBenchmarksResponse&& from) noexcept
+      : ListPerfBenchmarksResponse(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kRecordsFieldNumber = 1,
+  };
+  // repeated .libghidra.PerfBenchmarkRecord records = 1;
+  int records_size() const;
+  private:
+  int _internal_records_size() const;
+
+  public:
+  void clear_records() ;
+  ::libghidra::PerfBenchmarkRecord* mutable_records(int index);
+  ::google::protobuf::RepeatedPtrField<::libghidra::PerfBenchmarkRecord>* mutable_records();
+
+  private:
+  const ::google::protobuf::RepeatedPtrField<::libghidra::PerfBenchmarkRecord>& _internal_records() const;
+  ::google::protobuf::RepeatedPtrField<::libghidra::PerfBenchmarkRecord>* _internal_mutable_records();
+  public:
+  const ::libghidra::PerfBenchmarkRecord& records(int index) const;
+  ::libghidra::PerfBenchmarkRecord* add_records();
+  const ::google::protobuf::RepeatedPtrField<::libghidra::PerfBenchmarkRecord>& records() const;
+  // @@protoc_insertion_point(class_scope:libghidra.ListPerfBenchmarksResponse)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      0, 1, 1,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const ListPerfBenchmarksResponse& from_msg);
+    ::google::protobuf::RepeatedPtrField< ::libghidra::PerfBenchmarkRecord > records_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -4863,6 +6519,202 @@ class ImportProgramRequest final : public ::google::protobuf::Message
     bool overwrite_;
     bool analyze_;
     ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fsession_2eproto;
+};
+// -------------------------------------------------------------------
+
+class AddPerfBenchmarkRequest final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.AddPerfBenchmarkRequest) */ {
+ public:
+  inline AddPerfBenchmarkRequest() : AddPerfBenchmarkRequest(nullptr) {}
+  ~AddPerfBenchmarkRequest() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(AddPerfBenchmarkRequest* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(AddPerfBenchmarkRequest));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR AddPerfBenchmarkRequest(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline AddPerfBenchmarkRequest(const AddPerfBenchmarkRequest& from) : AddPerfBenchmarkRequest(nullptr, from) {}
+  inline AddPerfBenchmarkRequest(AddPerfBenchmarkRequest&& from) noexcept
+      : AddPerfBenchmarkRequest(nullptr, std::move(from)) {}
+  inline AddPerfBenchmarkRequest& operator=(const AddPerfBenchmarkRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline AddPerfBenchmarkRequest& operator=(AddPerfBenchmarkRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const AddPerfBenchmarkRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const AddPerfBenchmarkRequest* internal_default_instance() {
+    return reinterpret_cast<const AddPerfBenchmarkRequest*>(
+        &_AddPerfBenchmarkRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 23;
+  friend void swap(AddPerfBenchmarkRequest& a, AddPerfBenchmarkRequest& b) { a.Swap(&b); }
+  inline void Swap(AddPerfBenchmarkRequest* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(AddPerfBenchmarkRequest* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  AddPerfBenchmarkRequest* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<AddPerfBenchmarkRequest>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const AddPerfBenchmarkRequest& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const AddPerfBenchmarkRequest& from) { AddPerfBenchmarkRequest::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(AddPerfBenchmarkRequest* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.AddPerfBenchmarkRequest"; }
+
+ protected:
+  explicit AddPerfBenchmarkRequest(::google::protobuf::Arena* arena);
+  AddPerfBenchmarkRequest(::google::protobuf::Arena* arena, const AddPerfBenchmarkRequest& from);
+  AddPerfBenchmarkRequest(::google::protobuf::Arena* arena, AddPerfBenchmarkRequest&& from) noexcept
+      : AddPerfBenchmarkRequest(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kRecordFieldNumber = 1,
+  };
+  // .libghidra.PerfBenchmarkRecord record = 1;
+  bool has_record() const;
+  void clear_record() ;
+  const ::libghidra::PerfBenchmarkRecord& record() const;
+  PROTOBUF_NODISCARD ::libghidra::PerfBenchmarkRecord* release_record();
+  ::libghidra::PerfBenchmarkRecord* mutable_record();
+  void set_allocated_record(::libghidra::PerfBenchmarkRecord* value);
+  void unsafe_arena_set_allocated_record(::libghidra::PerfBenchmarkRecord* value);
+  ::libghidra::PerfBenchmarkRecord* unsafe_arena_release_record();
+
+  private:
+  const ::libghidra::PerfBenchmarkRecord& _internal_record() const;
+  ::libghidra::PerfBenchmarkRecord* _internal_mutable_record();
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.AddPerfBenchmarkRequest)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      0, 1, 1,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const AddPerfBenchmarkRequest& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::libghidra::PerfBenchmarkRecord* record_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -5503,6 +7355,98 @@ inline void OpenProgramResponse::set_allocated_sha256(std::string* value) {
     _impl_.sha256_.Set("", GetArena());
   }
   // @@protoc_insertion_point(field_set_allocated:libghidra.OpenProgramResponse.sha256)
+}
+
+// string executable_format = 8;
+inline void OpenProgramResponse::clear_executable_format() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.executable_format_.ClearToEmpty();
+}
+inline const std::string& OpenProgramResponse::executable_format() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.OpenProgramResponse.executable_format)
+  return _internal_executable_format();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void OpenProgramResponse::set_executable_format(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.executable_format_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.OpenProgramResponse.executable_format)
+}
+inline std::string* OpenProgramResponse::mutable_executable_format() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_executable_format();
+  // @@protoc_insertion_point(field_mutable:libghidra.OpenProgramResponse.executable_format)
+  return _s;
+}
+inline const std::string& OpenProgramResponse::_internal_executable_format() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.executable_format_.Get();
+}
+inline void OpenProgramResponse::_internal_set_executable_format(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.executable_format_.Set(value, GetArena());
+}
+inline std::string* OpenProgramResponse::_internal_mutable_executable_format() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.executable_format_.Mutable( GetArena());
+}
+inline std::string* OpenProgramResponse::release_executable_format() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.OpenProgramResponse.executable_format)
+  return _impl_.executable_format_.Release();
+}
+inline void OpenProgramResponse::set_allocated_executable_format(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.executable_format_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.executable_format_.IsDefault()) {
+    _impl_.executable_format_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.OpenProgramResponse.executable_format)
+}
+
+// uint64 entry_point = 9;
+inline void OpenProgramResponse::clear_entry_point() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.entry_point_ = ::uint64_t{0u};
+}
+inline ::uint64_t OpenProgramResponse::entry_point() const {
+  // @@protoc_insertion_point(field_get:libghidra.OpenProgramResponse.entry_point)
+  return _internal_entry_point();
+}
+inline void OpenProgramResponse::set_entry_point(::uint64_t value) {
+  _internal_set_entry_point(value);
+  // @@protoc_insertion_point(field_set:libghidra.OpenProgramResponse.entry_point)
+}
+inline ::uint64_t OpenProgramResponse::_internal_entry_point() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.entry_point_;
+}
+inline void OpenProgramResponse::_internal_set_entry_point(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.entry_point_ = value;
+}
+
+// bool has_entry_point = 10;
+inline void OpenProgramResponse::clear_has_entry_point() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.has_entry_point_ = false;
+}
+inline bool OpenProgramResponse::has_entry_point() const {
+  // @@protoc_insertion_point(field_get:libghidra.OpenProgramResponse.has_entry_point)
+  return _internal_has_entry_point();
+}
+inline void OpenProgramResponse::set_has_entry_point(bool value) {
+  _internal_set_has_entry_point(value);
+  // @@protoc_insertion_point(field_set:libghidra.OpenProgramResponse.has_entry_point)
+}
+inline bool OpenProgramResponse::_internal_has_entry_point() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.has_entry_point_;
+}
+inline void OpenProgramResponse::_internal_set_has_entry_point(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.has_entry_point_ = value;
 }
 
 // -------------------------------------------------------------------
@@ -7167,6 +9111,647 @@ inline bool ShutdownResponse::_internal_accepted() const {
 inline void ShutdownResponse::_internal_set_accepted(bool value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.accepted_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PerfBenchmarkRecord
+
+// string bench_id = 1;
+inline void PerfBenchmarkRecord::clear_bench_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.bench_id_.ClearToEmpty();
+}
+inline const std::string& PerfBenchmarkRecord::bench_id() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.bench_id)
+  return _internal_bench_id();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PerfBenchmarkRecord::set_bench_id(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.bench_id_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.bench_id)
+}
+inline std::string* PerfBenchmarkRecord::mutable_bench_id() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_bench_id();
+  // @@protoc_insertion_point(field_mutable:libghidra.PerfBenchmarkRecord.bench_id)
+  return _s;
+}
+inline const std::string& PerfBenchmarkRecord::_internal_bench_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.bench_id_.Get();
+}
+inline void PerfBenchmarkRecord::_internal_set_bench_id(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.bench_id_.Set(value, GetArena());
+}
+inline std::string* PerfBenchmarkRecord::_internal_mutable_bench_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.bench_id_.Mutable( GetArena());
+}
+inline std::string* PerfBenchmarkRecord::release_bench_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.PerfBenchmarkRecord.bench_id)
+  return _impl_.bench_id_.Release();
+}
+inline void PerfBenchmarkRecord::set_allocated_bench_id(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.bench_id_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.bench_id_.IsDefault()) {
+    _impl_.bench_id_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.PerfBenchmarkRecord.bench_id)
+}
+
+// string query_family = 2;
+inline void PerfBenchmarkRecord::clear_query_family() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.query_family_.ClearToEmpty();
+}
+inline const std::string& PerfBenchmarkRecord::query_family() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.query_family)
+  return _internal_query_family();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PerfBenchmarkRecord::set_query_family(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.query_family_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.query_family)
+}
+inline std::string* PerfBenchmarkRecord::mutable_query_family() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_query_family();
+  // @@protoc_insertion_point(field_mutable:libghidra.PerfBenchmarkRecord.query_family)
+  return _s;
+}
+inline const std::string& PerfBenchmarkRecord::_internal_query_family() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.query_family_.Get();
+}
+inline void PerfBenchmarkRecord::_internal_set_query_family(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.query_family_.Set(value, GetArena());
+}
+inline std::string* PerfBenchmarkRecord::_internal_mutable_query_family() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.query_family_.Mutable( GetArena());
+}
+inline std::string* PerfBenchmarkRecord::release_query_family() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.PerfBenchmarkRecord.query_family)
+  return _impl_.query_family_.Release();
+}
+inline void PerfBenchmarkRecord::set_allocated_query_family(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.query_family_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.query_family_.IsDefault()) {
+    _impl_.query_family_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.PerfBenchmarkRecord.query_family)
+}
+
+// string dataset_profile = 3;
+inline void PerfBenchmarkRecord::clear_dataset_profile() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.dataset_profile_.ClearToEmpty();
+}
+inline const std::string& PerfBenchmarkRecord::dataset_profile() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.dataset_profile)
+  return _internal_dataset_profile();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PerfBenchmarkRecord::set_dataset_profile(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.dataset_profile_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.dataset_profile)
+}
+inline std::string* PerfBenchmarkRecord::mutable_dataset_profile() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_dataset_profile();
+  // @@protoc_insertion_point(field_mutable:libghidra.PerfBenchmarkRecord.dataset_profile)
+  return _s;
+}
+inline const std::string& PerfBenchmarkRecord::_internal_dataset_profile() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.dataset_profile_.Get();
+}
+inline void PerfBenchmarkRecord::_internal_set_dataset_profile(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.dataset_profile_.Set(value, GetArena());
+}
+inline std::string* PerfBenchmarkRecord::_internal_mutable_dataset_profile() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.dataset_profile_.Mutable( GetArena());
+}
+inline std::string* PerfBenchmarkRecord::release_dataset_profile() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.PerfBenchmarkRecord.dataset_profile)
+  return _impl_.dataset_profile_.Release();
+}
+inline void PerfBenchmarkRecord::set_allocated_dataset_profile(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.dataset_profile_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.dataset_profile_.IsDefault()) {
+    _impl_.dataset_profile_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.PerfBenchmarkRecord.dataset_profile)
+}
+
+// double cold_ms_p50 = 4;
+inline void PerfBenchmarkRecord::clear_cold_ms_p50() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.cold_ms_p50_ = 0;
+}
+inline double PerfBenchmarkRecord::cold_ms_p50() const {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.cold_ms_p50)
+  return _internal_cold_ms_p50();
+}
+inline void PerfBenchmarkRecord::set_cold_ms_p50(double value) {
+  _internal_set_cold_ms_p50(value);
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.cold_ms_p50)
+}
+inline double PerfBenchmarkRecord::_internal_cold_ms_p50() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.cold_ms_p50_;
+}
+inline void PerfBenchmarkRecord::_internal_set_cold_ms_p50(double value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.cold_ms_p50_ = value;
+}
+
+// double cold_ms_p95 = 5;
+inline void PerfBenchmarkRecord::clear_cold_ms_p95() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.cold_ms_p95_ = 0;
+}
+inline double PerfBenchmarkRecord::cold_ms_p95() const {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.cold_ms_p95)
+  return _internal_cold_ms_p95();
+}
+inline void PerfBenchmarkRecord::set_cold_ms_p95(double value) {
+  _internal_set_cold_ms_p95(value);
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.cold_ms_p95)
+}
+inline double PerfBenchmarkRecord::_internal_cold_ms_p95() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.cold_ms_p95_;
+}
+inline void PerfBenchmarkRecord::_internal_set_cold_ms_p95(double value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.cold_ms_p95_ = value;
+}
+
+// double warm_ms_p50 = 6;
+inline void PerfBenchmarkRecord::clear_warm_ms_p50() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.warm_ms_p50_ = 0;
+}
+inline double PerfBenchmarkRecord::warm_ms_p50() const {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.warm_ms_p50)
+  return _internal_warm_ms_p50();
+}
+inline void PerfBenchmarkRecord::set_warm_ms_p50(double value) {
+  _internal_set_warm_ms_p50(value);
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.warm_ms_p50)
+}
+inline double PerfBenchmarkRecord::_internal_warm_ms_p50() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.warm_ms_p50_;
+}
+inline void PerfBenchmarkRecord::_internal_set_warm_ms_p50(double value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.warm_ms_p50_ = value;
+}
+
+// double warm_ms_p95 = 7;
+inline void PerfBenchmarkRecord::clear_warm_ms_p95() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.warm_ms_p95_ = 0;
+}
+inline double PerfBenchmarkRecord::warm_ms_p95() const {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.warm_ms_p95)
+  return _internal_warm_ms_p95();
+}
+inline void PerfBenchmarkRecord::set_warm_ms_p95(double value) {
+  _internal_set_warm_ms_p95(value);
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.warm_ms_p95)
+}
+inline double PerfBenchmarkRecord::_internal_warm_ms_p95() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.warm_ms_p95_;
+}
+inline void PerfBenchmarkRecord::_internal_set_warm_ms_p95(double value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.warm_ms_p95_ = value;
+}
+
+// double throughput_qps = 8;
+inline void PerfBenchmarkRecord::clear_throughput_qps() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.throughput_qps_ = 0;
+}
+inline double PerfBenchmarkRecord::throughput_qps() const {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.throughput_qps)
+  return _internal_throughput_qps();
+}
+inline void PerfBenchmarkRecord::set_throughput_qps(double value) {
+  _internal_set_throughput_qps(value);
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.throughput_qps)
+}
+inline double PerfBenchmarkRecord::_internal_throughput_qps() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.throughput_qps_;
+}
+inline void PerfBenchmarkRecord::_internal_set_throughput_qps(double value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.throughput_qps_ = value;
+}
+
+// double regression_pct = 9;
+inline void PerfBenchmarkRecord::clear_regression_pct() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.regression_pct_ = 0;
+}
+inline double PerfBenchmarkRecord::regression_pct() const {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.regression_pct)
+  return _internal_regression_pct();
+}
+inline void PerfBenchmarkRecord::set_regression_pct(double value) {
+  _internal_set_regression_pct(value);
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.regression_pct)
+}
+inline double PerfBenchmarkRecord::_internal_regression_pct() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.regression_pct_;
+}
+inline void PerfBenchmarkRecord::_internal_set_regression_pct(double value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.regression_pct_ = value;
+}
+
+// string status = 10;
+inline void PerfBenchmarkRecord::clear_status() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.status_.ClearToEmpty();
+}
+inline const std::string& PerfBenchmarkRecord::status() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.PerfBenchmarkRecord.status)
+  return _internal_status();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PerfBenchmarkRecord::set_status(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.status_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.PerfBenchmarkRecord.status)
+}
+inline std::string* PerfBenchmarkRecord::mutable_status() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_status();
+  // @@protoc_insertion_point(field_mutable:libghidra.PerfBenchmarkRecord.status)
+  return _s;
+}
+inline const std::string& PerfBenchmarkRecord::_internal_status() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.status_.Get();
+}
+inline void PerfBenchmarkRecord::_internal_set_status(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.status_.Set(value, GetArena());
+}
+inline std::string* PerfBenchmarkRecord::_internal_mutable_status() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.status_.Mutable( GetArena());
+}
+inline std::string* PerfBenchmarkRecord::release_status() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.PerfBenchmarkRecord.status)
+  return _impl_.status_.Release();
+}
+inline void PerfBenchmarkRecord::set_allocated_status(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.status_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.status_.IsDefault()) {
+    _impl_.status_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.PerfBenchmarkRecord.status)
+}
+
+// -------------------------------------------------------------------
+
+// AddPerfBenchmarkRequest
+
+// .libghidra.PerfBenchmarkRecord record = 1;
+inline bool AddPerfBenchmarkRequest::has_record() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.record_ != nullptr);
+  return value;
+}
+inline void AddPerfBenchmarkRequest::clear_record() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.record_ != nullptr) _impl_.record_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+inline const ::libghidra::PerfBenchmarkRecord& AddPerfBenchmarkRequest::_internal_record() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  const ::libghidra::PerfBenchmarkRecord* p = _impl_.record_;
+  return p != nullptr ? *p : reinterpret_cast<const ::libghidra::PerfBenchmarkRecord&>(::libghidra::_PerfBenchmarkRecord_default_instance_);
+}
+inline const ::libghidra::PerfBenchmarkRecord& AddPerfBenchmarkRequest::record() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.AddPerfBenchmarkRequest.record)
+  return _internal_record();
+}
+inline void AddPerfBenchmarkRequest::unsafe_arena_set_allocated_record(::libghidra::PerfBenchmarkRecord* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.record_);
+  }
+  _impl_.record_ = reinterpret_cast<::libghidra::PerfBenchmarkRecord*>(value);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:libghidra.AddPerfBenchmarkRequest.record)
+}
+inline ::libghidra::PerfBenchmarkRecord* AddPerfBenchmarkRequest::release_record() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::PerfBenchmarkRecord* released = _impl_.record_;
+  _impl_.record_ = nullptr;
+  if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
+    auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
+    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    if (GetArena() == nullptr) {
+      delete old;
+    }
+  } else {
+    if (GetArena() != nullptr) {
+      released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    }
+  }
+  return released;
+}
+inline ::libghidra::PerfBenchmarkRecord* AddPerfBenchmarkRequest::unsafe_arena_release_record() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.AddPerfBenchmarkRequest.record)
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::PerfBenchmarkRecord* temp = _impl_.record_;
+  _impl_.record_ = nullptr;
+  return temp;
+}
+inline ::libghidra::PerfBenchmarkRecord* AddPerfBenchmarkRequest::_internal_mutable_record() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.record_ == nullptr) {
+    auto* p = ::google::protobuf::Message::DefaultConstruct<::libghidra::PerfBenchmarkRecord>(GetArena());
+    _impl_.record_ = reinterpret_cast<::libghidra::PerfBenchmarkRecord*>(p);
+  }
+  return _impl_.record_;
+}
+inline ::libghidra::PerfBenchmarkRecord* AddPerfBenchmarkRequest::mutable_record() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  _impl_._has_bits_[0] |= 0x00000001u;
+  ::libghidra::PerfBenchmarkRecord* _msg = _internal_mutable_record();
+  // @@protoc_insertion_point(field_mutable:libghidra.AddPerfBenchmarkRequest.record)
+  return _msg;
+}
+inline void AddPerfBenchmarkRequest::set_allocated_record(::libghidra::PerfBenchmarkRecord* value) {
+  ::google::protobuf::Arena* message_arena = GetArena();
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (message_arena == nullptr) {
+    delete (_impl_.record_);
+  }
+
+  if (value != nullptr) {
+    ::google::protobuf::Arena* submessage_arena = (value)->GetArena();
+    if (message_arena != submessage_arena) {
+      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
+    }
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+
+  _impl_.record_ = reinterpret_cast<::libghidra::PerfBenchmarkRecord*>(value);
+  // @@protoc_insertion_point(field_set_allocated:libghidra.AddPerfBenchmarkRequest.record)
+}
+
+// -------------------------------------------------------------------
+
+// AddPerfBenchmarkResponse
+
+// bool added = 1;
+inline void AddPerfBenchmarkResponse::clear_added() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.added_ = false;
+}
+inline bool AddPerfBenchmarkResponse::added() const {
+  // @@protoc_insertion_point(field_get:libghidra.AddPerfBenchmarkResponse.added)
+  return _internal_added();
+}
+inline void AddPerfBenchmarkResponse::set_added(bool value) {
+  _internal_set_added(value);
+  // @@protoc_insertion_point(field_set:libghidra.AddPerfBenchmarkResponse.added)
+}
+inline bool AddPerfBenchmarkResponse::_internal_added() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.added_;
+}
+inline void AddPerfBenchmarkResponse::_internal_set_added(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.added_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// ListPerfBenchmarksRequest
+
+// -------------------------------------------------------------------
+
+// ListPerfBenchmarksResponse
+
+// repeated .libghidra.PerfBenchmarkRecord records = 1;
+inline int ListPerfBenchmarksResponse::_internal_records_size() const {
+  return _internal_records().size();
+}
+inline int ListPerfBenchmarksResponse::records_size() const {
+  return _internal_records_size();
+}
+inline void ListPerfBenchmarksResponse::clear_records() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.records_.Clear();
+}
+inline ::libghidra::PerfBenchmarkRecord* ListPerfBenchmarksResponse::mutable_records(int index)
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_mutable:libghidra.ListPerfBenchmarksResponse.records)
+  return _internal_mutable_records()->Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField<::libghidra::PerfBenchmarkRecord>* ListPerfBenchmarksResponse::mutable_records()
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_mutable_list:libghidra.ListPerfBenchmarksResponse.records)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _internal_mutable_records();
+}
+inline const ::libghidra::PerfBenchmarkRecord& ListPerfBenchmarksResponse::records(int index) const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.ListPerfBenchmarksResponse.records)
+  return _internal_records().Get(index);
+}
+inline ::libghidra::PerfBenchmarkRecord* ListPerfBenchmarksResponse::add_records() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::libghidra::PerfBenchmarkRecord* _add = _internal_mutable_records()->Add();
+  // @@protoc_insertion_point(field_add:libghidra.ListPerfBenchmarksResponse.records)
+  return _add;
+}
+inline const ::google::protobuf::RepeatedPtrField<::libghidra::PerfBenchmarkRecord>& ListPerfBenchmarksResponse::records() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_list:libghidra.ListPerfBenchmarksResponse.records)
+  return _internal_records();
+}
+inline const ::google::protobuf::RepeatedPtrField<::libghidra::PerfBenchmarkRecord>&
+ListPerfBenchmarksResponse::_internal_records() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.records_;
+}
+inline ::google::protobuf::RepeatedPtrField<::libghidra::PerfBenchmarkRecord>*
+ListPerfBenchmarksResponse::_internal_mutable_records() {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return &_impl_.records_;
+}
+
+// -------------------------------------------------------------------
+
+// ClearPerfBenchmarksRequest
+
+// -------------------------------------------------------------------
+
+// ClearPerfBenchmarksResponse
+
+// bool cleared = 1;
+inline void ClearPerfBenchmarksResponse::clear_cleared() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.cleared_ = false;
+}
+inline bool ClearPerfBenchmarksResponse::cleared() const {
+  // @@protoc_insertion_point(field_get:libghidra.ClearPerfBenchmarksResponse.cleared)
+  return _internal_cleared();
+}
+inline void ClearPerfBenchmarksResponse::set_cleared(bool value) {
+  _internal_set_cleared(value);
+  // @@protoc_insertion_point(field_set:libghidra.ClearPerfBenchmarksResponse.cleared)
+}
+inline bool ClearPerfBenchmarksResponse::_internal_cleared() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.cleared_;
+}
+inline void ClearPerfBenchmarksResponse::_internal_set_cleared(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.cleared_ = value;
+}
+
+// uint32 removed_count = 2;
+inline void ClearPerfBenchmarksResponse::clear_removed_count() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.removed_count_ = 0u;
+}
+inline ::uint32_t ClearPerfBenchmarksResponse::removed_count() const {
+  // @@protoc_insertion_point(field_get:libghidra.ClearPerfBenchmarksResponse.removed_count)
+  return _internal_removed_count();
+}
+inline void ClearPerfBenchmarksResponse::set_removed_count(::uint32_t value) {
+  _internal_set_removed_count(value);
+  // @@protoc_insertion_point(field_set:libghidra.ClearPerfBenchmarksResponse.removed_count)
+}
+inline ::uint32_t ClearPerfBenchmarksResponse::_internal_removed_count() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.removed_count_;
+}
+inline void ClearPerfBenchmarksResponse::_internal_set_removed_count(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.removed_count_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// DeletePerfBenchmarkRequest
+
+// string bench_id = 1;
+inline void DeletePerfBenchmarkRequest::clear_bench_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.bench_id_.ClearToEmpty();
+}
+inline const std::string& DeletePerfBenchmarkRequest::bench_id() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.DeletePerfBenchmarkRequest.bench_id)
+  return _internal_bench_id();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void DeletePerfBenchmarkRequest::set_bench_id(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.bench_id_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.DeletePerfBenchmarkRequest.bench_id)
+}
+inline std::string* DeletePerfBenchmarkRequest::mutable_bench_id() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_bench_id();
+  // @@protoc_insertion_point(field_mutable:libghidra.DeletePerfBenchmarkRequest.bench_id)
+  return _s;
+}
+inline const std::string& DeletePerfBenchmarkRequest::_internal_bench_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.bench_id_.Get();
+}
+inline void DeletePerfBenchmarkRequest::_internal_set_bench_id(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.bench_id_.Set(value, GetArena());
+}
+inline std::string* DeletePerfBenchmarkRequest::_internal_mutable_bench_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.bench_id_.Mutable( GetArena());
+}
+inline std::string* DeletePerfBenchmarkRequest::release_bench_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.DeletePerfBenchmarkRequest.bench_id)
+  return _impl_.bench_id_.Release();
+}
+inline void DeletePerfBenchmarkRequest::set_allocated_bench_id(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.bench_id_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.bench_id_.IsDefault()) {
+    _impl_.bench_id_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.DeletePerfBenchmarkRequest.bench_id)
+}
+
+// -------------------------------------------------------------------
+
+// DeletePerfBenchmarkResponse
+
+// bool deleted = 1;
+inline void DeletePerfBenchmarkResponse::clear_deleted() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.deleted_ = false;
+}
+inline bool DeletePerfBenchmarkResponse::deleted() const {
+  // @@protoc_insertion_point(field_get:libghidra.DeletePerfBenchmarkResponse.deleted)
+  return _internal_deleted();
+}
+inline void DeletePerfBenchmarkResponse::set_deleted(bool value) {
+  _internal_set_deleted(value);
+  // @@protoc_insertion_point(field_set:libghidra.DeletePerfBenchmarkResponse.deleted)
+}
+inline bool DeletePerfBenchmarkResponse::_internal_deleted() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.deleted_;
+}
+inline void DeletePerfBenchmarkResponse::_internal_set_deleted(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.deleted_ = value;
 }
 
 #ifdef __GNUC__

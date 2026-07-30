@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 syntax = "proto3";
 
@@ -34,6 +33,13 @@ message OpenProgramResponse {
   uint64 image_base = 5;
   string md5 = 6;
   string sha256 = 7;
+  // Executable container format as reported by the loader (e.g.
+  // "Portable Executable (PE)"); empty when the loader reports none.
+  string executable_format = 8;
+  // Program entry point address; only meaningful when has_entry_point is true
+  // (0 is a valid address, so presence needs its own flag).
+  uint64 entry_point = 9;
+  bool has_entry_point = 10;
 }
 
 message OpenProjectRequest {
@@ -138,6 +144,50 @@ message ShutdownResponse {
   bool accepted = 1;
 }
 
+// A performance-benchmark record persisted in the program database: three string
+// identifiers, six double-valued timing/throughput metrics, and a status string.
+message PerfBenchmarkRecord {
+  string bench_id = 1;
+  string query_family = 2;
+  string dataset_profile = 3;
+  double cold_ms_p50 = 4;
+  double cold_ms_p95 = 5;
+  double warm_ms_p50 = 6;
+  double warm_ms_p95 = 7;
+  double throughput_qps = 8;
+  double regression_pct = 9;
+  string status = 10;
+}
+
+message AddPerfBenchmarkRequest {
+  PerfBenchmarkRecord record = 1;
+}
+
+message AddPerfBenchmarkResponse {
+  bool added = 1;
+}
+
+message ListPerfBenchmarksRequest {}
+
+message ListPerfBenchmarksResponse {
+  repeated PerfBenchmarkRecord records = 1;
+}
+
+message ClearPerfBenchmarksRequest {}
+
+message ClearPerfBenchmarksResponse {
+  bool cleared = 1;
+  uint32 removed_count = 2;
+}
+
+message DeletePerfBenchmarkRequest {
+  string bench_id = 1;
+}
+
+message DeletePerfBenchmarkResponse {
+  bool deleted = 1;
+}
+
 service SessionService {
   rpc OpenProject(OpenProjectRequest) returns (OpenProjectResponse);
   rpc CloseProject(CloseProjectRequest) returns (CloseProjectResponse);
@@ -149,4 +199,8 @@ service SessionService {
   rpc DiscardProgram(DiscardProgramRequest) returns (DiscardProgramResponse);
   rpc GetRevision(GetRevisionRequest) returns (GetRevisionResponse);
   rpc Shutdown(ShutdownRequest) returns (ShutdownResponse);
+  rpc AddPerfBenchmark(AddPerfBenchmarkRequest) returns (AddPerfBenchmarkResponse);
+  rpc ListPerfBenchmarks(ListPerfBenchmarksRequest) returns (ListPerfBenchmarksResponse);
+  rpc ClearPerfBenchmarks(ClearPerfBenchmarksRequest) returns (ClearPerfBenchmarksResponse);
+  rpc DeletePerfBenchmark(DeletePerfBenchmarkRequest) returns (DeletePerfBenchmarkResponse);
 }

@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // annotate_and_export: create types, rename functions, add comments, then
 // batch-decompile and write the output to a file. Mirrors
@@ -23,10 +22,7 @@ fn main() {
         .get(1)
         .map(String::as_str)
         .unwrap_or("http://127.0.0.1:18080");
-    let output_file = args
-        .get(2)
-        .map(String::as_str)
-        .unwrap_or("decompiled.c");
+    let output_file = args.get(2).map(String::as_str).unwrap_or("decompiled.c");
 
     let client = ghidra::connect(host_url);
     let status = client.get_status().unwrap_or_else(|e| {
@@ -40,7 +36,10 @@ fn main() {
 
     // -- Create types ---------------------------------------------------------
     println!("\nCreating types...");
-    log_result("create_type(context_t)", client.create_type("context_t", "struct", 64));
+    log_result(
+        "create_type(context_t)",
+        client.create_type("context_t", "struct", 64),
+    );
     log_result(
         "create_type_enum(error_code_t)",
         client.create_type_enum("error_code_t", 4, false),
@@ -83,7 +82,11 @@ fn main() {
             }
         }
         let _ = client
-            .set_comment(f.entry_address, CommentKind::Plate, "Annotated by libghidra example")
+            .set_comment(
+                f.entry_address,
+                CommentKind::Plate,
+                "Annotated by libghidra example",
+            )
             .map_err(|e| println!("  set_comment({}): {e}", f.name));
     }
 
@@ -111,7 +114,11 @@ fn main() {
             d.function_name, d.function_entry_address, d.pseudocode
         );
     }
-    println!("Wrote {} functions to {}", decomps.decompilations.len(), output_file);
+    println!(
+        "Wrote {} functions to {}",
+        decomps.decompilations.len(),
+        output_file
+    );
 }
 
 fn log_result<T>(label: &str, r: ghidra::Result<T>) {

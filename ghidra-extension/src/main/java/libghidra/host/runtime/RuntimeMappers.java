@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.util.ArrayList;
@@ -14,10 +20,12 @@ import ghidra.program.model.data.Pointer;
 import ghidra.program.model.data.Structure;
 import ghidra.program.model.data.TypeDef;
 import ghidra.program.model.data.Union;
+import ghidra.program.model.lang.OperandType;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Parameter;
 import ghidra.program.model.listing.VariableFilter;
+import ghidra.program.model.symbol.RefType;
 import ghidra.program.model.symbol.Reference;
 import ghidra.program.model.symbol.Symbol;
 import libghidra.host.contract.FunctionsContract;
@@ -47,6 +55,43 @@ final class RuntimeMappers {
 			operands.toString(),
 			instruction.toString(),
 			instruction.getLength());
+	}
+
+	static ListingContract.InstructionOperandRecord toInstructionOperandRecord(
+			Instruction instruction, int operandIndex) {
+		String text = instruction.getDefaultOperandRepresentation(operandIndex);
+		String typeName = operandTypeName(instruction.getOperandType(operandIndex));
+		RefType ref = instruction.getOperandRefType(operandIndex);
+		return new ListingContract.InstructionOperandRecord(
+			instruction.getAddress().getOffset(),
+			operandIndex,
+			text != null ? text : "",
+			typeName,
+			ref != null ? ref.toString() : "");
+	}
+
+	// Structural operand kind in the canonical cross-tool vocabulary. Read/write/flow
+	// is a RefType concept (surfaced separately as ref_type), NOT an OperandType flag,
+	// so only the structural predicates are decoded here (empirically verified against
+	// Ghidra's OperandType bits): reg 0x200, scalar 0x4000, [reg+disp] 0x402000
+	// (ADDRESS|DYNAMIC), direct/code address 0x2080/0x2040 (ADDRESS).
+	private static String operandTypeName(int operandType) {
+		if (OperandType.isRegister(operandType)) {
+			return "register";
+		}
+		if (OperandType.isScalar(operandType)) {
+			return "immediate";
+		}
+		if (OperandType.isAddress(operandType) && OperandType.isDynamic(operandType)) {
+			return "memory";
+		}
+		if (OperandType.isAddress(operandType)) {
+			return "address";
+		}
+		if (OperandType.isDynamic(operandType)) {
+			return "memory";
+		}
+		return "unknown";
 	}
 
 	static FunctionsContract.FunctionRecord toFunctionRecord(Function function) {
@@ -168,7 +213,8 @@ final class RuntimeMappers {
 			sourceName,
 			symbol.isPrimary(),
 			symbol.isExternal(),
-			symbol.isDynamic());
+			symbol.isDynamic(),
+			symbol.isExternalEntryPoint());
 	}
 
 	static XrefsContract.XrefRecord toXrefRecord(Reference reference) {
@@ -337,7 +383,10 @@ final class RuntimeMappers {
 		long parentTypeId = manager.getID(composite);
 		String parentPath = RuntimeSupport.nullableString(composite.getPathName());
 		String parentName = RuntimeSupport.nullableString(composite.getName());
-		DataTypeComponent[] components = composite.getComponents();
+		// getComponents() includes the undefined DEFAULT padding filler present in
+		// every non-packed structure (emitting one phantom "field_<n>" member per
+		// padding byte). getDefinedComponents() returns only the real declared fields.
+		DataTypeComponent[] components = composite.getDefinedComponents();
 		for (int i = 0; i < components.length; i++) {
 			DataTypeComponent component = components[i];
 			if (component == null) {
@@ -346,9 +395,12 @@ final class RuntimeMappers {
 			if (seen++ < offset) {
 				continue;
 			}
+			// Use the component's real ordinal, not the array index: getDefinedComponents
+			// skips filler so array index != ordinal in a non-packed struct.
+			int ordinal = component.getOrdinal();
 			String name = RuntimeSupport.nullableString(component.getFieldName());
 			if (name.isBlank()) {
-				name = "field_" + i;
+				name = "field_" + ordinal;
 			}
 			DataType memberType = component.getDataType();
 			String memberTypePath = memberType != null
@@ -360,7 +412,7 @@ final class RuntimeMappers {
 				parentTypeId,
 				parentPath,
 				parentName,
-				i,
+				ordinal,
 				name,
 				memberTypePath,
 				component.getOffset(),

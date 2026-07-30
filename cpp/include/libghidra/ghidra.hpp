@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // Convenience facade: short aliases in the `ghidra::` namespace.
 //
@@ -42,17 +41,17 @@ inline std::unique_ptr<Client> local(libghidra::client::LocalClientOptions opts 
 }
 
 // --- Headless ---
-using HeadlessOptions = libghidra::client::HeadlessOptions;
+using HeadlessProjectOptions = libghidra::client::HeadlessProjectOptions;
 using HeadlessClient = libghidra::client::HeadlessClient;
 
-inline HeadlessClient launch_headless(HeadlessOptions opts) {
-  return libghidra::client::LaunchHeadless(std::move(opts));
+inline HeadlessClient launch_headless_project(HeadlessProjectOptions opts) {
+  return libghidra::client::LaunchHeadlessProject(std::move(opts));
 }
 
 // --- Options ---
 using ConnectOptions = libghidra::client::HttpClientOptions;
-using LocalOptions = libghidra::client::LocalClientOptions;
-using OpenRequest = libghidra::client::OpenProgramRequest;
+using LocalClientOptions = libghidra::client::LocalClientOptions;
+using OpenProgramRequest = libghidra::client::OpenProgramRequest;
 using OpenProjectRequest = libghidra::client::OpenProjectRequest;
 using ListProjectFilesRequest = libghidra::client::ListProjectFilesRequest;
 using ImportProgramRequest = libghidra::client::ImportProgramRequest;
@@ -86,5 +85,6 @@ using TypeEnum = libghidra::client::TypeEnumRecord;
 using TypeEnumMember = libghidra::client::TypeEnumMemberRecord;
 using TypeAlias = libghidra::client::TypeAliasRecord;
 using TypeUnion = libghidra::client::TypeUnionRecord;
+using PerfBenchmarkRecord = libghidra::client::PerfBenchmarkRecord;
 
 }  // namespace ghidra

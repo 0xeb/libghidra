@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 
@@ -52,6 +51,13 @@ struct OpenProgramResponse {
   std::uint64_t image_base = 0;
   std::string md5;
   std::string sha256;
+  // Executable container format from the loader (e.g. "Portable Executable (PE)");
+  // empty when the loader reports none.
+  std::string executable_format;
+  // Program entry point; valid only when has_entry_point is true (0 is a valid
+  // address, so presence needs its own flag).
+  std::uint64_t entry_point = 0;
+  bool has_entry_point = false;
 };
 
 struct OpenProjectResponse {
@@ -108,6 +114,38 @@ struct ShutdownResponse {
   bool accepted = false;
 };
 
+// A performance-benchmark record persisted in the program database. Mirrors the
+// ten columns of the ghidrasql `perf_benchmarks` SQL table.
+struct PerfBenchmarkRecord {
+  std::string bench_id;
+  std::string query_family;
+  std::string dataset_profile;
+  double cold_ms_p50 = 0.0;
+  double cold_ms_p95 = 0.0;
+  double warm_ms_p50 = 0.0;
+  double warm_ms_p95 = 0.0;
+  double throughput_qps = 0.0;
+  double regression_pct = 0.0;
+  std::string status;
+};
+
+struct AddPerfBenchmarkResponse {
+  bool added = false;
+};
+
+struct ListPerfBenchmarksResponse {
+  std::vector<PerfBenchmarkRecord> records;
+};
+
+struct ClearPerfBenchmarksResponse {
+  bool cleared = false;
+  std::uint32_t removed_count = 0;
+};
+
+struct DeletePerfBenchmarkResponse {
+  bool deleted = false;
+};
+
 struct ReadBytesResponse {
   std::vector<std::uint8_t> data;
 };
@@ -124,6 +162,7 @@ struct PatchBytesBatchResponse {
 struct MemoryBlockRecord {
   std::string name;
   std::uint64_t start_address = 0;
+  // end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
   std::uint64_t end_address = 0;
   std::uint64_t size = 0;
   bool is_read = false;
@@ -139,10 +178,25 @@ struct ListMemoryBlocksResponse {
   std::vector<MemoryBlockRecord> blocks;
 };
 
+struct CreateMemoryBlockResponse {
+  bool created = false;
+  MemoryBlockRecord block;
+};
+
+struct RemoveMemoryBlockResponse {
+  bool removed = false;
+};
+
+struct MoveMemoryBlockResponse {
+  bool moved = false;
+  MemoryBlockRecord block;
+};
+
 struct FunctionRecord {
   std::uint64_t entry_address = 0;
   std::string name;
   std::uint64_t start_address = 0;
+  // end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
   std::uint64_t end_address = 0;
   std::uint64_t size = 0;
   std::string namespace_name;
@@ -167,6 +221,7 @@ struct RenameFunctionResponse {
 struct BasicBlockRecord {
   std::uint64_t function_entry = 0;
   std::uint64_t start_address = 0;
+  // end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
   std::uint64_t end_address = 0;
   std::uint32_t in_degree = 0;
   std::uint32_t out_degree = 0;
@@ -241,6 +296,33 @@ struct ListLoopsResponse {
   std::vector<LoopRecord> loops;
 };
 
+struct StackVariableRecord {
+  std::string var_id;
+  std::string name;
+  std::string data_type;
+  std::int64_t stack_offset = 0;
+  std::uint32_t size = 0;
+  bool is_parameter = false;
+  std::int32_t first_use_offset = 0;
+  std::string source_type;
+};
+
+struct FunctionFrameRecord {
+  std::uint64_t function_entry = 0;
+  std::int64_t frame_size = 0;
+  std::int64_t local_size = 0;
+  std::int64_t parameter_size = 0;
+  std::int64_t parameter_offset = 0;
+  std::int64_t return_address_offset = 0;
+  bool grows_negative = false;
+  std::string stack_pointer_register;
+  std::vector<StackVariableRecord> stack_variables;
+};
+
+struct ListFunctionFramesResponse {
+  std::vector<FunctionFrameRecord> frames;
+};
+
 // Function tags — Ghidra-native categorization
 struct FunctionTagRecord {
   std::string name;
@@ -287,6 +369,7 @@ struct SymbolRecord {
   bool is_primary = false;
   bool is_external = false;
   bool is_dynamic = false;
+  bool is_external_entry_point = false;
 };
 
 struct GetSymbolResponse {
@@ -612,6 +695,40 @@ struct ListDecompilationsResponse {
   std::vector<DecompilationRecord> decompilations;
 };
 
+// P-code (the Ghidra leg of the cross-tool low-level IR). Two maturity rungs:
+// High (refined, SSA — HighFunction.getPcodeOps()) and Raw (per-instruction, non-SSA —
+// Instruction.getPcode()). Mirrors proto PcodeMaturity.
+enum class PcodeMaturity { High = 0, Raw = 1 };
+
+struct VarnodeRecord {
+  std::string space;   // register / const / ram / unique / stack
+  std::uint64_t offset = 0;
+  std::uint32_t size = 0;
+  std::string kind;    // canonical operand kind: reg / imm / mem / result / var
+};
+
+struct PcodeOpRecord {
+  std::uint64_t seq = 0;
+  std::string op;      // PcodeOp mnemonic (COPY, INT_ADD, LOAD, CALL, MULTIEQUAL, ...)
+  std::uint64_t addr = 0;
+  bool has_address = false;
+  bool has_output = false;
+  VarnodeRecord output;
+  std::vector<VarnodeRecord> inputs;
+};
+
+struct PcodeRecord {
+  std::uint64_t function_entry_address = 0;
+  std::vector<PcodeOpRecord> ops;
+  bool completed = false;
+  std::string error_message;
+  PcodeMaturity maturity = PcodeMaturity::High;  // the rung actually produced
+};
+
+struct GetPcodeResponse {
+  std::optional<PcodeRecord> pcode;
+};
+
 struct InstructionRecord {
   std::uint64_t address = 0;
   std::string mnemonic;
@@ -626,6 +743,18 @@ struct GetInstructionResponse {
 
 struct ListInstructionsResponse {
   std::vector<InstructionRecord> instructions;
+};
+
+struct InstructionOperandRecord {
+  std::uint64_t address = 0;       // instruction address
+  std::uint32_t operand_index = 0; // 0-based operand position
+  std::string text;                // rendered per-operand representation
+  std::string type_name;           // register / immediate / memory / address / ...
+  std::string ref_type;            // RefType (READ / WRITE / READ_WRITE / DATA / ...)
+};
+
+struct ListInstructionOperandsResponse {
+  std::vector<InstructionOperandRecord> operands;
 };
 
 struct CommentRecord {
@@ -657,6 +786,7 @@ struct DeleteDataItemResponse {
 
 struct DataItemRecord {
   std::uint64_t address = 0;
+  // end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
   std::uint64_t end_address = 0;
   std::string name;
   std::string data_type;

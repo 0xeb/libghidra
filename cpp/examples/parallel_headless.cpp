@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // parallel_headless: Launch two headless Ghidra instances on different RPC
 // ports and query them concurrently.
@@ -52,16 +51,36 @@ static InstanceResult analyze_instance(const std::string& label,
     printf("[%s] Launching on port %d: %s\n", label.c_str(), port,
            binary_path.c_str());
 
-    ghidra::HeadlessOptions opts;
+    ghidra::HeadlessProjectOptions opts;
     opts.ghidra_dir = ghidra_dir;
-    opts.binary = binary_path;
     opts.port = port;
     opts.shutdown = "discard";  // read-only analysis, no save needed
     opts.on_output = [&label](const std::string& line) {
       printf("  [%s] %s\n", label.c_str(), line.c_str());
     };
 
-    auto h = ghidra::launch_headless(std::move(opts));
+    auto h = ghidra::launch_headless_project(std::move(opts));
+
+    ghidra::ImportProgramRequest import;
+    import.source_path = binary_path;
+    import.overwrite = true;
+    import.analyze = true;
+    auto imported = h->ImportProgram(import);
+    if (!imported.ok()) {
+      result.error = "ImportProgram: " + imported.status.message;
+      h.close(false);
+      return result;
+    }
+
+    ghidra::OpenProgramRequest open;
+    open.program_path = imported.value->primary_program_path;
+    open.analyze = false;
+    auto opened = h->OpenProgram(open);
+    if (!opened.ok()) {
+      result.error = "OpenProgram: " + opened.status.message;
+      h.close(false);
+      return result;
+    }
 
     auto status = h->GetStatus();
     if (!status.ok()) {
@@ -73,7 +92,7 @@ static InstanceResult analyze_instance(const std::string& label,
            status.value->service_name.c_str(),
            status.value->service_version.c_str());
 
-    auto funcs = h->ListFunctions(0, INT64_MAX, 0, 0);
+    auto funcs = h->ListFunctions(0, UINT64_MAX, 0, 0);
     if (!funcs.ok()) {
       result.error = "ListFunctions: " + funcs.status.message;
       h.close(false);

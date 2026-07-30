@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // cxx FFI bridge to the C++ libghidra::local backend. The C++
 // implementation lives in `cpp/bindings/rust_bridge.{hpp,cpp}` and links
@@ -117,11 +116,7 @@ pub(crate) mod ffi {
         ) -> Result<String>;
 
         // -- Memory -------------------------------------------------------
-        fn read_bytes(
-            self: &LocalClientHandle,
-            address: u64,
-            length: u32,
-        ) -> Result<Vec<u8>>;
+        fn read_bytes(self: &LocalClientHandle, address: u64, length: u32) -> Result<Vec<u8>>;
         fn list_memory_blocks_json(
             self: &LocalClientHandle,
             limit: i32,

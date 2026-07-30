@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 
@@ -23,6 +22,8 @@ class IListingClient {
   virtual StatusOr<ListInstructionsResponse> ListInstructions(std::uint64_t range_start,
                                                               std::uint64_t range_end, int limit,
                                                               int offset) = 0;
+  virtual StatusOr<ListInstructionOperandsResponse> ListInstructionOperands(
+      std::uint64_t range_start, std::uint64_t range_end, int limit, int offset) = 0;
   virtual StatusOr<GetCommentsResponse> GetComments(std::uint64_t range_start,
                                                     std::uint64_t range_end, int limit,
                                                     int offset) = 0;

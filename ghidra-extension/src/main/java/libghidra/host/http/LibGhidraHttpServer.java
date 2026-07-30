@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.http;
 
 import java.io.IOException;
@@ -47,11 +53,25 @@ public final class LibGhidraHttpServer {
 		SessionContract.DiscardProgramResponse discardProgram(SessionContract.DiscardProgramRequest request);
 		SessionContract.GetRevisionResponse getRevision(SessionContract.GetRevisionRequest request);
 		SessionContract.ShutdownResponse shutdown(SessionContract.ShutdownRequest request);
+		SessionContract.AddPerfBenchmarkResponse addPerfBenchmark(
+			SessionContract.AddPerfBenchmarkRequest request);
+		SessionContract.ListPerfBenchmarksResponse listPerfBenchmarks(
+			SessionContract.ListPerfBenchmarksRequest request);
+		SessionContract.ClearPerfBenchmarksResponse clearPerfBenchmarks(
+			SessionContract.ClearPerfBenchmarksRequest request);
+		SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
+			SessionContract.DeletePerfBenchmarkRequest request);
 		MemoryContract.ReadBytesResponse readBytes(MemoryContract.ReadBytesRequest request);
 		MemoryContract.WriteBytesResponse writeBytes(MemoryContract.WriteBytesRequest request);
 		MemoryContract.PatchBytesBatchResponse patchBytes(MemoryContract.PatchBytesBatchRequest request);
 		MemoryContract.ListMemoryBlocksResponse listMemoryBlocks(
 			MemoryContract.ListMemoryBlocksRequest request);
+		MemoryContract.CreateMemoryBlockResponse createMemoryBlock(
+			MemoryContract.CreateMemoryBlockRequest request);
+		MemoryContract.RemoveMemoryBlockResponse removeMemoryBlock(
+			MemoryContract.RemoveMemoryBlockRequest request);
+		MemoryContract.MoveMemoryBlockResponse moveMemoryBlock(
+			MemoryContract.MoveMemoryBlockRequest request);
 		FunctionsContract.GetFunctionResponse getFunction(
 			FunctionsContract.GetFunctionRequest request);
 		FunctionsContract.ListFunctionsResponse listFunctions(
@@ -82,6 +102,8 @@ public final class LibGhidraHttpServer {
 			FunctionsContract.ListPostDominatorsRequest request);
 		FunctionsContract.ListLoopsResponse listLoops(
 			FunctionsContract.ListLoopsRequest request);
+		FunctionsContract.ListFunctionFramesResponse listFunctionFrames(
+			FunctionsContract.ListFunctionFramesRequest request);
 		SymbolsContract.GetSymbolResponse getSymbol(
 			SymbolsContract.GetSymbolRequest request);
 		SymbolsContract.ListSymbolsResponse listSymbols(
@@ -164,10 +186,14 @@ public final class LibGhidraHttpServer {
 			DecompilerContract.DecompileFunctionRequest request);
 		DecompilerContract.ListDecompilationsResponse listDecompilations(
 			DecompilerContract.ListDecompilationsRequest request);
+		DecompilerContract.GetPcodeResponse getPcode(
+			DecompilerContract.GetPcodeRequest request);
 		ListingContract.GetInstructionResponse getInstruction(
 			ListingContract.GetInstructionRequest request);
 		ListingContract.ListInstructionsResponse listInstructions(
 			ListingContract.ListInstructionsRequest request);
+		ListingContract.ListInstructionOperandsResponse listInstructionOperands(
+			ListingContract.ListInstructionOperandsRequest request);
 		ListingContract.GetCommentsResponse getComments(
 			ListingContract.GetCommentsRequest request);
 		ListingContract.SetCommentResponse setComment(

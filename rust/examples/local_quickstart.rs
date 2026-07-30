@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // local_quickstart: open a binary in offline mode and decompile a function.
 //
@@ -54,17 +53,22 @@ fn main() {
     );
 
     // Decompile the function at the requested address.
-    let resp = client.get_decompilation(address, 30_000).unwrap_or_else(|e| {
-        eprintln!("get_decompilation failed: {e}");
-        std::process::exit(1);
-    });
+    let resp = client
+        .get_decompilation(address, 30_000)
+        .unwrap_or_else(|e| {
+            eprintln!("get_decompilation failed: {e}");
+            std::process::exit(1);
+        });
 
     let Some(d) = resp.decompilation else {
         eprintln!("no decompilation returned for 0x{:x}", address);
         std::process::exit(1);
     };
 
-    println!("\n--- {} @ 0x{:x} ---", d.function_name, d.function_entry_address);
+    println!(
+        "\n--- {} @ 0x{:x} ---",
+        d.function_name, d.function_entry_address
+    );
     if d.pseudocode.is_empty() {
         eprintln!("(empty pseudocode; error_message: {})", d.error_message);
         std::process::exit(1);

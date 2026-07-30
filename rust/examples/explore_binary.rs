@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // explore_binary: deep-dive over a program already open in LibGhidraHost.
 // Mirrors python/examples/explore_binary.py: memory blocks, functions,
@@ -58,10 +57,7 @@ fn main() {
     }
 
     section("Functions (first 20)");
-    let funcs = unwrap_or_exit(
-        "list_functions",
-        client.list_functions(0, u64::MAX, 20, 0),
-    );
+    let funcs = unwrap_or_exit("list_functions", client.list_functions(0, u64::MAX, 20, 0));
     for f in &funcs.functions {
         let thunk = if f.is_thunk { " [thunk]" } else { "" };
         println!(
@@ -94,10 +90,7 @@ fn main() {
     section("Types (first 20)");
     let types = unwrap_or_exit("list_types", client.list_types("", 20, 0));
     for t in &types.types {
-        println!(
-            "  {:30}  kind={:12}  size={}",
-            t.name, t.kind, t.length
-        );
+        println!("  {:30}  kind={:12}  size={}", t.name, t.kind, t.length);
     }
 
     section("Cross-References (first 20)");

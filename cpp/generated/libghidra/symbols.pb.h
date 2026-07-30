@@ -249,6 +249,7 @@ class SymbolRecord final : public ::google::protobuf::Message
     kIsPrimaryFieldNumber = 8,
     kIsExternalFieldNumber = 9,
     kIsDynamicFieldNumber = 10,
+    kIsExternalEntryPointFieldNumber = 11,
   };
   // string name = 3;
   void clear_name() ;
@@ -380,12 +381,22 @@ class SymbolRecord final : public ::google::protobuf::Message
   void _internal_set_is_dynamic(bool value);
 
   public:
+  // bool is_external_entry_point = 11;
+  void clear_is_external_entry_point() ;
+  bool is_external_entry_point() const;
+  void set_is_external_entry_point(bool value);
+
+  private:
+  bool _internal_is_external_entry_point() const;
+  void _internal_set_is_external_entry_point(bool value);
+
+  public:
   // @@protoc_insertion_point(class_scope:libghidra.SymbolRecord)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      4, 10, 0,
+      4, 11, 0,
       76, 2>
       _table_;
 
@@ -413,6 +424,7 @@ class SymbolRecord final : public ::google::protobuf::Message
     bool is_primary_;
     bool is_external_;
     bool is_dynamic_;
+    bool is_external_entry_point_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -2406,6 +2418,28 @@ inline bool SymbolRecord::_internal_is_dynamic() const {
 inline void SymbolRecord::_internal_set_is_dynamic(bool value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.is_dynamic_ = value;
+}
+
+// bool is_external_entry_point = 11;
+inline void SymbolRecord::clear_is_external_entry_point() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.is_external_entry_point_ = false;
+}
+inline bool SymbolRecord::is_external_entry_point() const {
+  // @@protoc_insertion_point(field_get:libghidra.SymbolRecord.is_external_entry_point)
+  return _internal_is_external_entry_point();
+}
+inline void SymbolRecord::set_is_external_entry_point(bool value) {
+  _internal_set_is_external_entry_point(value);
+  // @@protoc_insertion_point(field_set:libghidra.SymbolRecord.is_external_entry_point)
+}
+inline bool SymbolRecord::_internal_is_external_entry_point() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.is_external_entry_point_;
+}
+inline void SymbolRecord::_internal_set_is_external_entry_point(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.is_external_entry_point_ = value;
 }
 
 // -------------------------------------------------------------------

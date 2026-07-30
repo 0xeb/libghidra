@@ -32,6 +32,7 @@ private static final long serialVersionUID = 0L;
     compilerSpec_ = "";
     md5_ = "";
     sha256_ = "";
+    executableFormat_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -253,6 +254,82 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int EXECUTABLE_FORMAT_FIELD_NUMBER = 8;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object executableFormat_ = "";
+  /**
+   * <pre>
+   * Executable container format as reported by the loader (e.g.
+   * "Portable Executable (PE)"); empty when the loader reports none.
+   * </pre>
+   *
+   * <code>string executable_format = 8;</code>
+   * @return The executableFormat.
+   */
+  @java.lang.Override
+  public java.lang.String getExecutableFormat() {
+    java.lang.Object ref = executableFormat_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      executableFormat_ = s;
+      return s;
+    }
+  }
+  /**
+   * <pre>
+   * Executable container format as reported by the loader (e.g.
+   * "Portable Executable (PE)"); empty when the loader reports none.
+   * </pre>
+   *
+   * <code>string executable_format = 8;</code>
+   * @return The bytes for executableFormat.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getExecutableFormatBytes() {
+    java.lang.Object ref = executableFormat_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      executableFormat_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int ENTRY_POINT_FIELD_NUMBER = 9;
+  private long entryPoint_ = 0L;
+  /**
+   * <pre>
+   * Program entry point address; only meaningful when has_entry_point is true
+   * (0 is a valid address, so presence needs its own flag).
+   * </pre>
+   *
+   * <code>uint64 entry_point = 9;</code>
+   * @return The entryPoint.
+   */
+  @java.lang.Override
+  public long getEntryPoint() {
+    return entryPoint_;
+  }
+
+  public static final int HAS_ENTRY_POINT_FIELD_NUMBER = 10;
+  private boolean hasEntryPoint_ = false;
+  /**
+   * <code>bool has_entry_point = 10;</code>
+   * @return The hasEntryPoint.
+   */
+  @java.lang.Override
+  public boolean getHasEntryPoint() {
+    return hasEntryPoint_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -285,6 +362,15 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(sha256_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 7, sha256_);
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(executableFormat_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 8, executableFormat_);
+    }
+    if (entryPoint_ != 0L) {
+      output.writeUInt64(9, entryPoint_);
+    }
+    if (hasEntryPoint_ != false) {
+      output.writeBool(10, hasEntryPoint_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -313,6 +399,17 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(sha256_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(7, sha256_);
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(executableFormat_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(8, executableFormat_);
+    }
+    if (entryPoint_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(9, entryPoint_);
+    }
+    if (hasEntryPoint_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(10, hasEntryPoint_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -340,6 +437,12 @@ private static final long serialVersionUID = 0L;
         .equals(other.getMd5())) return false;
     if (!getSha256()
         .equals(other.getSha256())) return false;
+    if (!getExecutableFormat()
+        .equals(other.getExecutableFormat())) return false;
+    if (getEntryPoint()
+        != other.getEntryPoint()) return false;
+    if (getHasEntryPoint()
+        != other.getHasEntryPoint()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -364,6 +467,14 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getMd5().hashCode();
     hash = (37 * hash) + SHA256_FIELD_NUMBER;
     hash = (53 * hash) + getSha256().hashCode();
+    hash = (37 * hash) + EXECUTABLE_FORMAT_FIELD_NUMBER;
+    hash = (53 * hash) + getExecutableFormat().hashCode();
+    hash = (37 * hash) + ENTRY_POINT_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getEntryPoint());
+    hash = (37 * hash) + HAS_ENTRY_POINT_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getHasEntryPoint());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -501,6 +612,9 @@ private static final long serialVersionUID = 0L;
       imageBase_ = 0L;
       md5_ = "";
       sha256_ = "";
+      executableFormat_ = "";
+      entryPoint_ = 0L;
+      hasEntryPoint_ = false;
       return this;
     }
 
@@ -552,6 +666,15 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000020) != 0)) {
         result.sha256_ = sha256_;
       }
+      if (((from_bitField0_ & 0x00000040) != 0)) {
+        result.executableFormat_ = executableFormat_;
+      }
+      if (((from_bitField0_ & 0x00000080) != 0)) {
+        result.entryPoint_ = entryPoint_;
+      }
+      if (((from_bitField0_ & 0x00000100) != 0)) {
+        result.hasEntryPoint_ = hasEntryPoint_;
+      }
     }
 
     @java.lang.Override
@@ -593,6 +716,17 @@ private static final long serialVersionUID = 0L;
         sha256_ = other.sha256_;
         bitField0_ |= 0x00000020;
         onChanged();
+      }
+      if (!other.getExecutableFormat().isEmpty()) {
+        executableFormat_ = other.executableFormat_;
+        bitField0_ |= 0x00000040;
+        onChanged();
+      }
+      if (other.getEntryPoint() != 0L) {
+        setEntryPoint(other.getEntryPoint());
+      }
+      if (other.getHasEntryPoint() != false) {
+        setHasEntryPoint(other.getHasEntryPoint());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -650,6 +784,21 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000020;
               break;
             } // case 58
+            case 66: {
+              executableFormat_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000040;
+              break;
+            } // case 66
+            case 72: {
+              entryPoint_ = input.readUInt64();
+              bitField0_ |= 0x00000080;
+              break;
+            } // case 72
+            case 80: {
+              hasEntryPoint_ = input.readBool();
+              bitField0_ |= 0x00000100;
+              break;
+            } // case 80
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1055,6 +1204,182 @@ private static final long serialVersionUID = 0L;
       checkByteStringIsUtf8(value);
       sha256_ = value;
       bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object executableFormat_ = "";
+    /**
+     * <pre>
+     * Executable container format as reported by the loader (e.g.
+     * "Portable Executable (PE)"); empty when the loader reports none.
+     * </pre>
+     *
+     * <code>string executable_format = 8;</code>
+     * @return The executableFormat.
+     */
+    public java.lang.String getExecutableFormat() {
+      java.lang.Object ref = executableFormat_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        executableFormat_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <pre>
+     * Executable container format as reported by the loader (e.g.
+     * "Portable Executable (PE)"); empty when the loader reports none.
+     * </pre>
+     *
+     * <code>string executable_format = 8;</code>
+     * @return The bytes for executableFormat.
+     */
+    public com.google.protobuf.ByteString
+        getExecutableFormatBytes() {
+      java.lang.Object ref = executableFormat_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        executableFormat_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <pre>
+     * Executable container format as reported by the loader (e.g.
+     * "Portable Executable (PE)"); empty when the loader reports none.
+     * </pre>
+     *
+     * <code>string executable_format = 8;</code>
+     * @param value The executableFormat to set.
+     * @return This builder for chaining.
+     */
+    public Builder setExecutableFormat(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      executableFormat_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Executable container format as reported by the loader (e.g.
+     * "Portable Executable (PE)"); empty when the loader reports none.
+     * </pre>
+     *
+     * <code>string executable_format = 8;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearExecutableFormat() {
+      executableFormat_ = getDefaultInstance().getExecutableFormat();
+      bitField0_ = (bitField0_ & ~0x00000040);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Executable container format as reported by the loader (e.g.
+     * "Portable Executable (PE)"); empty when the loader reports none.
+     * </pre>
+     *
+     * <code>string executable_format = 8;</code>
+     * @param value The bytes for executableFormat to set.
+     * @return This builder for chaining.
+     */
+    public Builder setExecutableFormatBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      executableFormat_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+
+    private long entryPoint_ ;
+    /**
+     * <pre>
+     * Program entry point address; only meaningful when has_entry_point is true
+     * (0 is a valid address, so presence needs its own flag).
+     * </pre>
+     *
+     * <code>uint64 entry_point = 9;</code>
+     * @return The entryPoint.
+     */
+    @java.lang.Override
+    public long getEntryPoint() {
+      return entryPoint_;
+    }
+    /**
+     * <pre>
+     * Program entry point address; only meaningful when has_entry_point is true
+     * (0 is a valid address, so presence needs its own flag).
+     * </pre>
+     *
+     * <code>uint64 entry_point = 9;</code>
+     * @param value The entryPoint to set.
+     * @return This builder for chaining.
+     */
+    public Builder setEntryPoint(long value) {
+
+      entryPoint_ = value;
+      bitField0_ |= 0x00000080;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Program entry point address; only meaningful when has_entry_point is true
+     * (0 is a valid address, so presence needs its own flag).
+     * </pre>
+     *
+     * <code>uint64 entry_point = 9;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearEntryPoint() {
+      bitField0_ = (bitField0_ & ~0x00000080);
+      entryPoint_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private boolean hasEntryPoint_ ;
+    /**
+     * <code>bool has_entry_point = 10;</code>
+     * @return The hasEntryPoint.
+     */
+    @java.lang.Override
+    public boolean getHasEntryPoint() {
+      return hasEntryPoint_;
+    }
+    /**
+     * <code>bool has_entry_point = 10;</code>
+     * @param value The hasEntryPoint to set.
+     * @return This builder for chaining.
+     */
+    public Builder setHasEntryPoint(boolean value) {
+
+      hasEntryPoint_ = value;
+      bitField0_ |= 0x00000100;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool has_entry_point = 10;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearHasEntryPoint() {
+      bitField0_ = (bitField0_ & ~0x00000100);
+      hasEntryPoint_ = false;
       onChanged();
       return this;
     }

@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.util.ArrayList;
@@ -33,15 +39,9 @@ public final class DecompilerRuntime extends RuntimeSupport implements Decompile
 				}
 
 				int timeoutSeconds = DecompilerSupport.normalizeDecompileTimeoutSeconds(request.timeoutMs());
-				DecompInterface decompiler = DecompilerSupport.createDecompiler(program);
-				try {
+				try (DecompilerLease lease = state.leaseDecompiler(program)) {
 					return new DecompilerContract.DecompileFunctionResponse(
-						DecompilerSupport.toDecompileRecord(function, decompiler, timeoutSeconds));
-				}
-				finally {
-					if (decompiler != null) {
-						decompiler.dispose();
-					}
+						DecompilerSupport.toDecompileRecord(function, lease.get(), timeoutSeconds));
 				}
 			}
 			catch (IllegalArgumentException e) {
@@ -51,15 +51,44 @@ public final class DecompilerRuntime extends RuntimeSupport implements Decompile
 	}
 
 	@Override
+	public DecompilerContract.GetPcodeResponse getPcode(
+			DecompilerContract.GetPcodeRequest request) {
+		try (LockScope ignored = readLock()) {
+			Program program = currentProgram();
+			if (program == null || request == null) {
+				return new DecompilerContract.GetPcodeResponse(null);
+			}
+			try {
+				Address address = toAddress(program, request.address());
+				Function function = program.getFunctionManager().getFunctionContaining(address);
+				if (function == null) {
+					return new DecompilerContract.GetPcodeResponse(null);
+				}
+				int timeoutSeconds = DecompilerSupport.normalizeDecompileTimeoutSeconds(request.timeoutMs());
+				if (request.maturity() == DecompilerContract.PcodeMaturity.RAW) {
+					return new DecompilerContract.GetPcodeResponse(
+						DecompilerSupport.toPcodeRecord(function, null, timeoutSeconds,
+							request.maturity()));
+				}
+				try (DecompilerLease lease = state.leaseDecompiler(program)) {
+					return new DecompilerContract.GetPcodeResponse(
+						DecompilerSupport.toPcodeRecord(function, lease.get(), timeoutSeconds,
+							request.maturity()));
+				}
+			}
+			catch (IllegalArgumentException e) {
+				return new DecompilerContract.GetPcodeResponse(null);
+			}
+		}
+	}
+
+	@Override
 	public DecompilerContract.ListDecompilationsResponse listDecompilations(
 			DecompilerContract.ListDecompilationsRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new DecompilerContract.ListDecompilationsResponse(List.of());
-			}
+			Program program = requireProgram();
 			try {
-				long defaultStart = program.getMinAddress().getOffset();
+				long defaultStart = programMinOffset(program);
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
 				long endOffset = request != null ? request.rangeEnd() : -1L;
 				if (startOffset == 0) {
@@ -80,8 +109,8 @@ public final class DecompilerRuntime extends RuntimeSupport implements Decompile
 				List<DecompilerContract.DecompileRecord> rows = new ArrayList<>();
 				int seen = 0;
 
-				DecompInterface decompiler = DecompilerSupport.createDecompiler(program);
-				try {
+				try (DecompilerLease lease = state.leaseDecompiler(program)) {
+					DecompInterface decompiler = lease.get();
 					while (it.hasNext()) {
 						Function function = it.next();
 						if (function == null) {
@@ -91,6 +120,10 @@ public final class DecompilerRuntime extends RuntimeSupport implements Decompile
 						if (Long.compareUnsigned(address, startOffset) < 0) {
 							continue;
 						}
+						// INCLUSIVE upper bound, aligned with every other range
+						// RPC (FunctionsRuntime et al.). The -1L "no bound"
+						// sentinel needs no special case: compareUnsigned
+						// against unsigned all-ones is never > 0.
 						if (Long.compareUnsigned(address, endOffset) > 0) {
 							break;
 						}
@@ -101,11 +134,6 @@ public final class DecompilerRuntime extends RuntimeSupport implements Decompile
 						if (rows.size() >= limit) {
 							break;
 						}
-					}
-				}
-				finally {
-					if (decompiler != null) {
-						decompiler.dispose();
 					}
 				}
 				return new DecompilerContract.ListDecompilationsResponse(rows);

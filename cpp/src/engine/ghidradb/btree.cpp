@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #include "btree.h"
 #include <algorithm>
@@ -48,6 +47,30 @@ static constexpr int VK_REC_ENTRY_SIZE = 5;
 // ChainedBuffer reading
 // -----------------------------------------------------------------------
 
+// Ghidra's ChainedBuffer XOR de-obfuscation mask (ChainedBuffer.java:62-80),
+// exactly 128 bytes. Ghidra applies it with the offset reset to 0 at each data
+// node boundary (getBytes reseeds bufferDataOffset=0 per node), so a global
+// index over a concatenation of nodes is wrong when a node's data size is not a
+// multiple of 128.
+static const uint8_t kChainedBufferXorMask[128] = {
+    0x59, 0xea, 0x67, 0x23, 0xda, 0xb8, 0x00, 0xb8,
+    0xc3, 0x48, 0xdd, 0x8b, 0x21, 0xd6, 0x94, 0x78,
+    0x35, 0xab, 0x2b, 0x7e, 0xb2, 0x4f, 0x82, 0x4e,
+    0x0e, 0x16, 0xc4, 0x57, 0x12, 0x8e, 0x7e, 0xe6,
+    0xb6, 0xbd, 0x56, 0x91, 0x57, 0x72, 0xe6, 0x91,
+    0xdc, 0x52, 0x2e, 0xf2, 0x1a, 0xb7, 0xd6, 0x6f,
+    0xda, 0xde, 0xe8, 0x48, 0xb1, 0xbb, 0x50, 0x6f,
+    0xf4, 0xdd, 0x11, 0xee, 0xf2, 0x67, 0xfe, 0x48,
+    0x8d, 0xae, 0x69, 0x1a, 0xe0, 0x26, 0x8c, 0x24,
+    0x8e, 0x17, 0x76, 0x51, 0xe2, 0x60, 0xd7, 0xe6,
+    0x83, 0x65, 0xd5, 0xf0, 0x7f, 0xf2, 0xa0, 0xd6,
+    0x4b, 0xbd, 0x24, 0xd8, 0xab, 0xea, 0x9e, 0xa6,
+    0x48, 0x94, 0x3e, 0x7b, 0x2c, 0xf4, 0xce, 0xdc,
+    0x69, 0x11, 0xf8, 0x3c, 0xa7, 0x3f, 0x5d, 0x77,
+    0x94, 0x3f, 0xe4, 0x8e, 0x48, 0x20, 0xdb, 0x56,
+    0x32, 0xc1, 0x87, 0x01, 0x2e, 0xe3, 0x7f, 0x40,
+};
+
 bool BTreeReader::readChainedBuffer(int32_t buffer_id, std::vector<uint8_t>& out) {
     std::vector<uint8_t> buf;
     if (!bf_.readBuffer(buffer_id, buf)) {
@@ -62,7 +85,11 @@ bool BTreeReader::readChainedBuffer(int32_t buffer_id, std::vector<uint8_t>& out
         int32_t data_len = readInt(buf.data() + 1);
         bool obfuscated = (data_len < 0);
         if (obfuscated) {
-            data_len = -data_len - 1;
+            // Clear the obfuscation flag bit (MSB), matching Ghidra
+            // ChainedBuffer.java: size &= Integer.MAX_VALUE. (Was -data_len-1, a
+            // complement that yields a bogus ~2^31 length and over-reads the
+            // INDEX path, which has no clamp.)
+            data_len &= 0x7FFFFFFF;
         }
         int32_t data_offset = 5; // 1 + 4
         if (data_offset + data_len > static_cast<int32_t>(buf.size())) {
@@ -71,15 +98,9 @@ bool BTreeReader::readChainedBuffer(int32_t buffer_id, std::vector<uint8_t>& out
         out.assign(buf.begin() + data_offset, buf.begin() + data_offset + data_len);
 
         if (obfuscated) {
-            // XOR with the mask used by Ghidra
-            static const uint8_t XOR_MASK[] = {
-                (uint8_t)0x59, (uint8_t)0xea, (uint8_t)0x67, (uint8_t)0x23,
-                (uint8_t)0x52, (uint8_t)0x93, (uint8_t)0x6f, (uint8_t)0x36,
-                (uint8_t)0xd1, (uint8_t)0x4a, (uint8_t)0xa7, (uint8_t)0x2e,
-                (uint8_t)0xcd, (uint8_t)0xb4, (uint8_t)0xe5, (uint8_t)0x8c
-            };
+            // Single data node: the output index already equals the node offset.
             for (size_t i = 0; i < out.size(); i++) {
-                out[i] ^= XOR_MASK[i % 16];
+                out[i] ^= kChainedBufferXorMask[i % 128];
             }
         }
         return true;
@@ -91,7 +112,11 @@ bool BTreeReader::readChainedBuffer(int32_t buffer_id, std::vector<uint8_t>& out
         int32_t data_len = readInt(buf.data() + 1);
         bool obfuscated = (data_len < 0);
         if (obfuscated) {
-            data_len = -data_len - 1;
+            // Clear the obfuscation flag bit (MSB), matching Ghidra
+            // ChainedBuffer.java: size &= Integer.MAX_VALUE. (Was -data_len-1, a
+            // complement that yields a bogus ~2^31 length and over-reads the
+            // INDEX path, which has no clamp.)
+            data_len &= 0x7FFFFFFF;
         }
         // int32_t next_index_id = readInt(buf.data() + 5); // for multi-index chains
         int32_t index_base = 9; // 1+4+4
@@ -114,21 +139,19 @@ bool BTreeReader::readChainedBuffer(int32_t buffer_id, std::vector<uint8_t>& out
             int32_t data_start = 1; // skip node type byte
             int32_t chunk = std::min(remaining,
                                      static_cast<int32_t>(data_buf.size()) - data_start);
+            size_t chunk_begin = out.size();
             out.insert(out.end(), data_buf.begin() + data_start,
                        data_buf.begin() + data_start + chunk);
-            remaining -= chunk;
-        }
-
-        if (obfuscated) {
-            static const uint8_t XOR_MASK[] = {
-                (uint8_t)0x59, (uint8_t)0xea, (uint8_t)0x67, (uint8_t)0x23,
-                (uint8_t)0x52, (uint8_t)0x93, (uint8_t)0x6f, (uint8_t)0x36,
-                (uint8_t)0xd1, (uint8_t)0x4a, (uint8_t)0xa7, (uint8_t)0x2e,
-                (uint8_t)0xcd, (uint8_t)0xb4, (uint8_t)0xe5, (uint8_t)0x8c
-            };
-            for (size_t i = 0; i < out.size(); i++) {
-                out[i] ^= XOR_MASK[i % 16];
+            if (obfuscated) {
+                // Mask offset resets to 0 at each data-node boundary (Ghidra
+                // getBytes reseeds bufferDataOffset=0 per node); a global index
+                // over the concatenation is wrong when a node's data size is not
+                // a multiple of 128.
+                for (int32_t j = 0; j < chunk; j++) {
+                    out[chunk_begin + j] ^= kChainedBufferXorMask[j % 128];
+                }
             }
+            remaining -= chunk;
         }
         return true;
     }

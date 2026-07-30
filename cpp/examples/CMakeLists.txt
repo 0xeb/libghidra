@@ -1,3 +1,11 @@
+#
+# Copyright (c) 2024-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+#
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
+#
+
 # Examples demonstrating the libghidra C++ SDK.
 
 # -- HTTP backend example --
@@ -63,6 +71,14 @@ if(MSVC)
     target_compile_options(api_switch_active_program PRIVATE /EHsc /W3 /O2)
 else()
     target_compile_options(api_switch_active_program PRIVATE -O2 -Wall)
+endif()
+
+add_executable(api_multi_program_strings multi_program_strings.cpp)
+target_link_libraries(api_multi_program_strings PRIVATE libghidra::client)
+if(MSVC)
+    target_compile_options(api_multi_program_strings PRIVATE /EHsc /W3 /O2)
+else()
+    target_compile_options(api_multi_program_strings PRIVATE -O2 -Wall)
 endif()
 
 # -- Local backend examples (require libghidra_local) --

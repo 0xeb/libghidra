@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 #
 # enum_builder: Create an enum, add/rename/retype/delete members, clean up.
 #
@@ -30,7 +29,7 @@ def main() -> None:
 
     print(f"Connected: {status.service_name} v{status.service_version}")
 
-    enum_name = "/example_status_e"
+    enum_name = "example_status_e"
 
     # 2. Create a 4-byte unsigned enum
     print(f"\n--- Creating enum '{enum_name}' (4 bytes, unsigned) ---")

@@ -34,6 +34,10 @@ public interface FunctionRecordOrBuilder extends
   long getStartAddress();
 
   /**
+   * <pre>
+   * end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
+   * </pre>
+   *
    * <code>uint64 end_address = 4;</code>
    * @return The endAddress.
    */

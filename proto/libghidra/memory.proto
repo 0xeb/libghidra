@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 syntax = "proto3";
 
@@ -53,6 +52,7 @@ message PatchBytesBatchResponse {
 message MemoryBlockRecord {
   string name = 1;
   uint64 start_address = 2;
+  // end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
   uint64 end_address = 3;
   uint64 size = 4;
   bool is_read = 5;
@@ -73,9 +73,51 @@ message ListMemoryBlocksResponse {
   repeated MemoryBlockRecord blocks = 1;
 }
 
+// ---- Writable memory map (create / remove / move blocks) ----
+
+// Field 1 reserved for future common request context.
+message CreateMemoryBlockRequest {
+  string name = 2;
+  uint64 start_address = 3;
+  uint64 size = 4;
+  bool is_read = 5;
+  bool is_write = 6;
+  bool is_execute = 7;
+  bool initialized = 8;  // true: zero-filled initialized block; false: uninitialized (e.g. SRAM)
+  bool overlay = 9;
+}
+
+message CreateMemoryBlockResponse {
+  bool created = 1;
+  MemoryBlockRecord block = 2;
+}
+
+// Field 1 reserved for future common request context.
+message RemoveMemoryBlockRequest {
+  uint64 address = 2;  // any address within the target block
+}
+
+message RemoveMemoryBlockResponse {
+  bool removed = 1;
+}
+
+// Field 1 reserved for future common request context.
+message MoveMemoryBlockRequest {
+  uint64 address = 2;            // any address within the target block
+  uint64 new_start_address = 3;  // rebase target
+}
+
+message MoveMemoryBlockResponse {
+  bool moved = 1;
+  MemoryBlockRecord block = 2;
+}
+
 service MemoryService {
   rpc ReadBytes(ReadBytesRequest) returns (ReadBytesResponse);
   rpc WriteBytes(WriteBytesRequest) returns (WriteBytesResponse);
   rpc PatchBytesBatch(PatchBytesBatchRequest) returns (PatchBytesBatchResponse);
   rpc ListMemoryBlocks(ListMemoryBlocksRequest) returns (ListMemoryBlocksResponse);
+  rpc CreateMemoryBlock(CreateMemoryBlockRequest) returns (CreateMemoryBlockResponse);
+  rpc RemoveMemoryBlock(RemoveMemoryBlockRequest) returns (RemoveMemoryBlockResponse);
+  rpc MoveMemoryBlock(MoveMemoryBlockRequest) returns (MoveMemoryBlockResponse);
 }

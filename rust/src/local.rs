@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // LocalClient — offline decompiler backend backed by the C++ libghidra
 // engine via the cxx FFI bridge declared in `local_ffi.rs`. Mirrors
@@ -22,13 +21,12 @@ use crate::models::{
     BasicBlockRecord, CFGEdgeRecord, Capability, DecompilationRecord, DecompileLocalKind,
     DecompileLocalRecord, DecompileTokenKind, DecompileTokenRecord, DefinedStringRecord,
     FunctionRecord, GetDecompilationResponse, GetFunctionResponse, GetInstructionResponse,
-    GetSymbolResponse, GetTypeResponse, HealthStatus, InstructionRecord,
-    ListBasicBlocksResponse, ListCFGEdgesResponse, ListDecompilationsResponse,
-    ListDefinedStringsResponse, ListFunctionsResponse, ListInstructionsResponse,
-    ListMemoryBlocksResponse, ListSymbolsResponse, ListTypeMembersResponse, ListTypesResponse,
-    ListXrefsResponse, MemoryBlockRecord, OpenProgramRequest, OpenProgramResponse, ReadBytesResponse,
-    RenameFunctionResponse, RenameSymbolResponse, RevisionResponse, SymbolRecord,
-    TypeMemberRecord, TypeRecord, XrefRecord,
+    GetSymbolResponse, GetTypeResponse, HealthStatus, InstructionRecord, ListBasicBlocksResponse,
+    ListCFGEdgesResponse, ListDecompilationsResponse, ListDefinedStringsResponse,
+    ListFunctionsResponse, ListInstructionsResponse, ListMemoryBlocksResponse, ListSymbolsResponse,
+    ListTypeMembersResponse, ListTypesResponse, ListXrefsResponse, MemoryBlockRecord,
+    OpenProgramRequest, OpenProgramResponse, ReadBytesResponse, RenameFunctionResponse,
+    RenameSymbolResponse, RevisionResponse, SymbolRecord, TypeMemberRecord, TypeRecord, XrefRecord,
 };
 
 // ===========================================================================
@@ -143,6 +141,11 @@ impl LocalClient {
             language_id: take_str(&v, "language_id"),
             compiler_spec: take_str(&v, "compiler_spec"),
             image_base: v["image_base"].as_u64().unwrap_or(0),
+            md5: take_str(&v, "md5"),
+            sha256: take_str(&v, "sha256"),
+            executable_format: take_str(&v, "executable_format"),
+            entry_point: v["entry_point"].as_u64().unwrap_or(0),
+            has_entry_point: v["has_entry_point"].as_bool().unwrap_or(false),
         })
     }
 
@@ -169,7 +172,10 @@ impl LocalClient {
     // -- Functions -------------------------------------------------------
 
     pub fn get_function(&self, address: u64) -> Result<GetFunctionResponse> {
-        let json = self.handle.get_function_json(address).map_err(map_cxx_err)?;
+        let json = self
+            .handle
+            .get_function_json(address)
+            .map_err(map_cxx_err)?;
         let function = if json.is_empty() {
             None
         } else {
@@ -197,11 +203,7 @@ impl LocalClient {
         })
     }
 
-    pub fn rename_function(
-        &self,
-        address: u64,
-        new_name: &str,
-    ) -> Result<RenameFunctionResponse> {
+    pub fn rename_function(&self, address: u64, new_name: &str) -> Result<RenameFunctionResponse> {
         let v = call_json(self.handle.rename_function_json(address, new_name))?;
         Ok(RenameFunctionResponse {
             renamed: v["renamed"].as_bool().unwrap_or(false),
@@ -216,10 +218,11 @@ impl LocalClient {
         limit: i32,
         offset: i32,
     ) -> Result<ListBasicBlocksResponse> {
-        let v = call_json(
-            self.handle
-                .list_basic_blocks_json(range_start, range_end, limit, offset),
-        )?;
+        let v =
+            call_json(
+                self.handle
+                    .list_basic_blocks_json(range_start, range_end, limit, offset),
+            )?;
         Ok(ListBasicBlocksResponse {
             blocks: v
                 .as_array()
@@ -338,11 +341,7 @@ impl LocalClient {
         Ok(ReadBytesResponse { data })
     }
 
-    pub fn list_memory_blocks(
-        &self,
-        limit: i32,
-        offset: i32,
-    ) -> Result<ListMemoryBlocksResponse> {
+    pub fn list_memory_blocks(&self, limit: i32, offset: i32) -> Result<ListMemoryBlocksResponse> {
         let v = call_json(self.handle.list_memory_blocks_json(limit, offset))?;
         Ok(ListMemoryBlocksResponse {
             blocks: v
@@ -374,10 +373,11 @@ impl LocalClient {
         limit: i32,
         offset: i32,
     ) -> Result<ListInstructionsResponse> {
-        let v = call_json(
-            self.handle
-                .list_instructions_json(range_start, range_end, limit, offset),
-        )?;
+        let v =
+            call_json(
+                self.handle
+                    .list_instructions_json(range_start, range_end, limit, offset),
+            )?;
         Ok(ListInstructionsResponse {
             instructions: v
                 .as_array()
@@ -393,10 +393,12 @@ impl LocalClient {
         limit: i32,
         offset: i32,
     ) -> Result<ListDefinedStringsResponse> {
-        let v = call_json(
-            self.handle
-                .list_defined_strings_json(range_start, range_end, limit, offset),
-        )?;
+        let v = call_json(self.handle.list_defined_strings_json(
+            range_start,
+            range_end,
+            limit,
+            offset,
+        ))?;
         Ok(ListDefinedStringsResponse {
             strings: v
                 .as_array()
@@ -438,12 +440,7 @@ impl LocalClient {
         Ok(GetTypeResponse { r#type })
     }
 
-    pub fn list_types(
-        &self,
-        query: &str,
-        limit: i32,
-        offset: i32,
-    ) -> Result<ListTypesResponse> {
+    pub fn list_types(&self, query: &str, limit: i32, offset: i32) -> Result<ListTypesResponse> {
         let v = call_json(self.handle.list_types_json(query, limit, offset))?;
         Ok(ListTypesResponse {
             types: v
@@ -556,6 +553,7 @@ fn decode_symbol(v: &Value) -> SymbolRecord {
         is_primary: v["is_primary"].as_bool().unwrap_or(false),
         is_external: v["is_external"].as_bool().unwrap_or(false),
         is_dynamic: v["is_dynamic"].as_bool().unwrap_or(false),
+        is_external_entry_point: v["is_external_entry_point"].as_bool().unwrap_or(false),
     }
 }
 

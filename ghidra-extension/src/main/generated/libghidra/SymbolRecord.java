@@ -297,6 +297,17 @@ private static final long serialVersionUID = 0L;
     return isDynamic_;
   }
 
+  public static final int IS_EXTERNAL_ENTRY_POINT_FIELD_NUMBER = 11;
+  private boolean isExternalEntryPoint_ = false;
+  /**
+   * <code>bool is_external_entry_point = 11;</code>
+   * @return The isExternalEntryPoint.
+   */
+  @java.lang.Override
+  public boolean getIsExternalEntryPoint() {
+    return isExternalEntryPoint_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -340,6 +351,9 @@ private static final long serialVersionUID = 0L;
     }
     if (isDynamic_ != false) {
       output.writeBool(10, isDynamic_);
+    }
+    if (isExternalEntryPoint_ != false) {
+      output.writeBool(11, isExternalEntryPoint_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -385,6 +399,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(10, isDynamic_);
     }
+    if (isExternalEntryPoint_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(11, isExternalEntryPoint_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -420,6 +438,8 @@ private static final long serialVersionUID = 0L;
         != other.getIsExternal()) return false;
     if (getIsDynamic()
         != other.getIsDynamic()) return false;
+    if (getIsExternalEntryPoint()
+        != other.getIsExternalEntryPoint()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -456,6 +476,9 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + IS_DYNAMIC_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getIsDynamic());
+    hash = (37 * hash) + IS_EXTERNAL_ENTRY_POINT_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getIsExternalEntryPoint());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -597,6 +620,7 @@ private static final long serialVersionUID = 0L;
       isPrimary_ = false;
       isExternal_ = false;
       isDynamic_ = false;
+      isExternalEntryPoint_ = false;
       return this;
     }
 
@@ -660,6 +684,9 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000200) != 0)) {
         result.isDynamic_ = isDynamic_;
       }
+      if (((from_bitField0_ & 0x00000400) != 0)) {
+        result.isExternalEntryPoint_ = isExternalEntryPoint_;
+      }
     }
 
     @java.lang.Override
@@ -713,6 +740,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getIsDynamic() != false) {
         setIsDynamic(other.getIsDynamic());
+      }
+      if (other.getIsExternalEntryPoint() != false) {
+        setIsExternalEntryPoint(other.getIsExternalEntryPoint());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -790,6 +820,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000200;
               break;
             } // case 80
+            case 88: {
+              isExternalEntryPoint_ = input.readBool();
+              bitField0_ |= 0x00000400;
+              break;
+            } // case 88
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1323,6 +1358,38 @@ private static final long serialVersionUID = 0L;
     public Builder clearIsDynamic() {
       bitField0_ = (bitField0_ & ~0x00000200);
       isDynamic_ = false;
+      onChanged();
+      return this;
+    }
+
+    private boolean isExternalEntryPoint_ ;
+    /**
+     * <code>bool is_external_entry_point = 11;</code>
+     * @return The isExternalEntryPoint.
+     */
+    @java.lang.Override
+    public boolean getIsExternalEntryPoint() {
+      return isExternalEntryPoint_;
+    }
+    /**
+     * <code>bool is_external_entry_point = 11;</code>
+     * @param value The isExternalEntryPoint to set.
+     * @return This builder for chaining.
+     */
+    public Builder setIsExternalEntryPoint(boolean value) {
+
+      isExternalEntryPoint_ = value;
+      bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool is_external_entry_point = 11;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearIsExternalEntryPoint() {
+      bitField0_ = (bitField0_ & ~0x00000400);
+      isExternalEntryPoint_ = false;
       onChanged();
       return this;
     }

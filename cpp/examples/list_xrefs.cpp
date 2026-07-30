@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 // list_xrefs: Demonstrate cross-reference extraction via the local backend.
 //
@@ -40,7 +39,7 @@ int main(int argc, char* argv[]) {
   });
 
   // Open the binary
-  ghidra::OpenRequest req;
+  ghidra::OpenProgramRequest req;
   req.program_path = binary_path;
   auto open_result = client->OpenProgram(req);
   if (!open_result.ok()) {
@@ -50,7 +49,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded: " << open_result.value->program_name << "\n\n";
 
   // List all functions first
-  auto funcs = client->ListFunctions(0, INT64_MAX, 0, 0);
+  auto funcs = client->ListFunctions(0, UINT64_MAX, 0, 0);
   if (!funcs.ok()) {
     std::cerr << "ListFunctions failed: " << funcs.status.message << "\n";
     return 1;
@@ -58,7 +57,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Found " << funcs.value->functions.size() << " functions\n\n";
 
   // Get xrefs across the entire address space
-  auto xrefs = client->ListXrefs(0, INT64_MAX, 0, 0);
+  auto xrefs = client->ListXrefs(0, UINT64_MAX, 0, 0);
   if (!xrefs.ok()) {
     std::cerr << "ListXrefs failed: " << xrefs.status.message << "\n";
     return 1;

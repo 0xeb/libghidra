@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.util.ArrayList;
@@ -10,13 +16,17 @@ import ghidra.app.decompiler.DecompInterface;
 import ghidra.app.decompiler.DecompileOptions;
 import ghidra.app.decompiler.DecompileResults;
 import ghidra.app.decompiler.DecompiledFunction;
+import ghidra.program.model.address.Address;
 import ghidra.program.model.data.DataType;
 import ghidra.program.model.listing.Function;
+import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.listing.VariableStorage;
 import ghidra.program.model.pcode.HighFunction;
 import ghidra.program.model.pcode.HighSymbol;
 import ghidra.program.model.pcode.HighVariable;
+import ghidra.program.model.pcode.PcodeOp;
+import ghidra.program.model.pcode.PcodeOpAST;
 import ghidra.program.model.pcode.Varnode;
 import ghidra.util.task.TaskMonitor;
 import ghidra.app.decompiler.ClangLine;
@@ -247,6 +257,123 @@ final class DecompilerSupport {
 			RuntimeSupport.nullableString(error),
 			locals,
 			tokens);
+	}
+
+	// Extract P-code at the requested maturity — the Ghidra leg of the cross-tool low-level IR.
+	// HIGH: refined SSA via HighFunction.getPcodeOps() (needs a decompile).
+	// RAW:  per-instruction, non-SSA, via Instruction.getPcode() over the function body (no
+	//       decompile). Varnodes map to the canonical operand kind by address space.
+	static DecompilerContract.PcodeRecord toPcodeRecord(
+			Function function, DecompInterface decompiler, int timeoutSeconds,
+			DecompilerContract.PcodeMaturity maturity) {
+		long entry = function.getEntryPoint().getOffset();
+		List<DecompilerContract.PcodeOpRecord> ops = new ArrayList<>();
+		boolean completed = false;
+		String error = null;
+		boolean raw = maturity == DecompilerContract.PcodeMaturity.RAW;
+
+		if (function.isExternal()) {
+			error = "external function";
+		}
+		else if (raw) {
+			// Raw p-code: iterate the function's instructions; no decompile needed.
+			try {
+				long seq = 0;
+				Iterator<Instruction> it =
+					function.getProgram().getListing().getInstructions(function.getBody(), true);
+				while (it.hasNext()) {
+					Instruction instr = it.next();
+					long addr = instr.getAddress().getOffset();
+					for (PcodeOp op : instr.getPcode()) {
+						Varnode outVn = op.getOutput();
+						DecompilerContract.VarnodeRecord out =
+							outVn != null ? toVarnodeRecord(outVn) : null;
+						List<DecompilerContract.VarnodeRecord> inputs = new ArrayList<>();
+						for (int i = 0; i < op.getNumInputs(); i++) {
+							Varnode in = op.getInput(i);
+							if (in != null) {
+								inputs.add(toVarnodeRecord(in));
+							}
+						}
+						ops.add(new DecompilerContract.PcodeOpRecord(
+							seq++, op.getMnemonic(), addr, true, outVn != null, out, inputs));
+					}
+				}
+				completed = true;
+			}
+			catch (Exception e) {
+				error = e.getMessage() != null ? e.getMessage() : "raw pcode extraction failed";
+			}
+		}
+		else if (decompiler == null) {
+			error = "decompiler unavailable";
+		}
+		else {
+			try {
+				DecompileResults results =
+					decompiler.decompileFunction(function, timeoutSeconds, TaskMonitor.DUMMY);
+				if (results == null) {
+					error = "decompiler returned no result";
+				}
+				else {
+					completed = results.decompileCompleted();
+					String errorMessage = results.getErrorMessage();
+					if (errorMessage != null && !errorMessage.isBlank()) {
+						error = errorMessage;
+					}
+					HighFunction highFunction = results.getHighFunction();
+					if (highFunction != null) {
+						long seq = 0;
+						Iterator<PcodeOpAST> it = highFunction.getPcodeOps();
+						while (it.hasNext()) {
+							PcodeOp op = it.next();
+							Address target = op.getSeqnum() != null
+								? op.getSeqnum().getTarget() : null;
+							boolean hasAddress = target != null && target != Address.NO_ADDRESS;
+							long addr = hasAddress ? target.getOffset() : 0L;
+							Varnode outVn = op.getOutput();
+							DecompilerContract.VarnodeRecord out =
+								outVn != null ? toVarnodeRecord(outVn) : null;
+							List<DecompilerContract.VarnodeRecord> inputs = new ArrayList<>();
+							for (int i = 0; i < op.getNumInputs(); i++) {
+								Varnode in = op.getInput(i);
+								if (in != null) {
+									inputs.add(toVarnodeRecord(in));
+								}
+							}
+							ops.add(new DecompilerContract.PcodeOpRecord(
+								seq++, op.getMnemonic(), addr, hasAddress,
+								outVn != null, out, inputs));
+						}
+					}
+				}
+			}
+			catch (Exception e) {
+				error = e.getMessage() != null ? e.getMessage() : "pcode extraction failed";
+			}
+		}
+
+		return new DecompilerContract.PcodeRecord(entry, ops, completed,
+			error != null ? error : "", maturity);
+	}
+
+	private static DecompilerContract.VarnodeRecord toVarnodeRecord(Varnode vn) {
+		String space = "";
+		if (vn.getAddress() != null && vn.getAddress().getAddressSpace() != null) {
+			space = vn.getAddress().getAddressSpace().getName();
+		}
+		return new DecompilerContract.VarnodeRecord(space, vn.getOffset(), vn.getSize(),
+			canonicalVarnodeKind(vn, space));
+	}
+
+	// Canonical operand kind from the varnode's address space (register/const/ram/unique/stack -> reg/imm/mem/result/var).
+	private static String canonicalVarnodeKind(Varnode vn, String space) {
+		if (vn.isRegister()) return "reg";
+		if (vn.isConstant()) return "imm";
+		if (vn.isUnique()) return "result";
+		if (vn.isAddress()) return "mem";
+		if ("stack".equalsIgnoreCase(space)) return "var";
+		return space;
 	}
 
 	static String buildDecompileFallback(String functionName, String reason) {

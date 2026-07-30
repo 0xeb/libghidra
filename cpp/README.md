@@ -1,6 +1,6 @@
 # LocalClient API Reference
 
-Reference for the libghidra C++ LocalClient in the `0.0.1` release -- an offline binary analysis engine embedding Ghidra's Sleigh decompiler. No Java, no network, no running Ghidra instance required.
+Reference for the libghidra C++ LocalClient in the `0.0.3` release -- an offline binary analysis engine embedding Ghidra's Sleigh decompiler. No Java, no network, no running Ghidra instance required.
 
 ## Overview
 
@@ -27,7 +27,7 @@ route the call through `HttpClient` against a Ghidra host.
 
 auto client = ghidra::local({});
 
-ghidra::OpenRequest req;
+ghidra::OpenProgramRequest req;
 req.program_path = "/path/to/binary.exe";
 auto r = client->OpenProgram(req);
 if (!r.ok()) { /* handle error */ }
@@ -59,8 +59,8 @@ auto client = ghidra::local({
 
 **Type aliases:**
 - `ghidra::Client` = `IClient`
-- `ghidra::LocalOptions` = `LocalClientOptions`
-- `ghidra::OpenRequest` = `OpenProgramRequest`
+- `ghidra::LocalClientOptions` = `libghidra::client::LocalClientOptions`
+- `ghidra::OpenProgramRequest` = `libghidra::client::OpenProgramRequest`
 - `ghidra::Result<T>` = `StatusOr<T>`
 
 ## Error Handling
@@ -93,7 +93,11 @@ offline backend loads one program database rather than a full Ghidra project.
 For live project workflows, list or import project programs first, then switch
 the active program with `CloseProgram(ShutdownPolicy::kSave)` followed by
 `OpenProgram({.project_path = ..., .project_name = ..., .program_path = "/domain/path"})`.
-See `examples/list_project_files.cpp` and `examples/switch_active_program.cpp`.
+Close the headless host with save enabled to persist the project; later C++,
+Python, Rust, GUI, or ghidrasql sessions can reopen it and select saved programs
+by domain path. See `examples/list_project_files.cpp`,
+`examples/switch_active_program.cpp`, and
+`examples/multi_program_strings.cpp`.
 
 ### OpenProgram
 
@@ -104,7 +108,7 @@ StatusOr<OpenProgramResponse> OpenProgram(const OpenProgramRequest& request)
 Opens a binary for analysis. Must be called before any query methods.
 
 ```cpp
-ghidra::OpenRequest req;
+ghidra::OpenProgramRequest req;
 req.program_path = "/path/to/binary.exe";
 auto r = client->OpenProgram(req);
 // r.value->program_name   -- detected program name
@@ -234,13 +238,25 @@ Batch-decompiles all functions in the address range. Uses the decompiler pool fo
 ```cpp
 auto client = ghidra::local({.pool_size = 4});
 // ... open program ...
-auto ds = client->ListDecompilations(0, 0, 0, 0, 60000);
+auto ds = client->ListDecompilations(0, UINT64_MAX, 0, 0, 60000);
 for (auto& d : ds.value->decompilations) {
     if (d.completed) printf("%s: %zu bytes\n", d.function_name.c_str(), d.pseudocode.size());
 }
 ```
 
-Pass `range_start = 0, range_end = 0` for all functions.
+Pass `range_start = 0, range_end = UINT64_MAX` for all functions.
+
+### GetPcode (HTTP client only)
+
+```cpp
+StatusOr<GetPcodeResponse> GetPcode(
+    uint64_t address, PcodeMaturity maturity, int timeout_ms)
+```
+
+Returns refined SSA or raw per-instruction P-code from the live Java host.
+`PcodeOpRecord::has_address` distinguishes a real source address zero from a
+synthetic op with no machine address. `LocalClient` returns `NOT_SUPPORTED`
+because the offline bridge does not yet expose this contract.
 
 ## Functions
 
@@ -394,7 +410,8 @@ Gets the primary symbol at an address.
 auto s = client->GetSymbol(0x140001000);
 if (s.ok() && s.value->symbol) {
     // s.value->symbol->name, address, type, namespace_name, source
-    // s.value->symbol->is_primary, is_external, is_dynamic, symbol_id
+    // s.value->symbol->is_primary, is_external, is_dynamic,
+    // s.value->symbol->is_external_entry_point, symbol_id
 }
 ```
 
@@ -770,6 +787,18 @@ StatusOr<ListInstructionsResponse> ListInstructions(
 
 Disassembles all instructions in an address range.
 
+#### ListInstructionOperands (HTTP client only)
+
+```cpp
+StatusOr<ListInstructionOperandsResponse> ListInstructionOperands(
+    uint64_t range_start, uint64_t range_end, int limit, int offset)
+```
+
+Returns separate operand records (`address`, `operand_index`, `text`,
+`type_name`, `ref_type`) from the live Java host. `LocalClient` returns
+`NOT_SUPPORTED`; its offline listing bridge currently exposes only combined
+instruction operand text.
+
 ### Comments
 
 #### SetComment
@@ -870,6 +899,8 @@ These methods return `NOT_SUPPORTED` on the LocalClient:
 
 | Method | Reason |
 |--------|--------|
+| `GetPcode` | Live Java host P-code contract is not exposed by the offline bridge |
+| `ListInstructionOperands` | Per-operand Ghidra listing metadata is Java-host-only |
 | `ListSwitchTables` | Live/structural analysis surface not implemented locally |
 | `ListDominators` | Live/structural analysis surface not implemented locally |
 | `ListPostDominators` | Live/structural analysis surface not implemented locally |
@@ -909,6 +940,7 @@ These methods return `NOT_SUPPORTED` on the LocalClient:
 | | `Shutdown` | Yes |
 | **Decompiler** | `GetDecompilation` | Yes |
 | | `ListDecompilations` | Yes (parallel) |
+| | `GetPcode` | No |
 | **Functions** | `GetFunction` | Yes |
 | | `ListFunctions` | Yes |
 | | `RenameFunction` | Yes |
@@ -968,6 +1000,7 @@ These methods return `NOT_SUPPORTED` on the LocalClient:
 | | `ApplyDataType` | Yes |
 | **Listing** | `GetInstruction` | Yes |
 | | `ListInstructions` | Yes |
+| | `ListInstructionOperands` | No |
 | | `GetComments` | Yes |
 | | `SetComment` | Yes |
 | | `DeleteComment` | Yes |
@@ -996,7 +1029,6 @@ All `List*` methods accept `limit` and `offset`:
 
 Range parameters (`range_start`, `range_end`) filter by address:
 - `range_start = 0, range_end = UINT64_MAX` -- entire address space
-- `range_start = 0, range_end = 0` -- also means "all" for some methods (ListDecompilations)
 
 ### Architecture String Format
 

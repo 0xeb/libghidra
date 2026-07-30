@@ -1,9 +1,15 @@
+# Copyright (c) 2024-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+#
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
+
 [project]
 name = "libghidra"
 dynamic = ["version"]
 description = "Python client for the libghidra typed RPC layer"
 requires-python = ">=3.12"
-license = "MPL-2.0"
+license = {file = "LICENSE"}
 authors = [{name = "Elias Bachaalany"}]
 dependencies = ["protobuf>=4.29", "requests>=2.28"]
 

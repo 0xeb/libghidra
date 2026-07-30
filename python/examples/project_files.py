@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
 # project_files: launch a managed headless host, list project programs, then
 # switch the active program with close/open.
@@ -24,17 +24,21 @@ def main() -> int:
     parser.add_argument("binaries", nargs="+")
     args = parser.parse_args()
 
-    opts = ghidra.HeadlessOptions(
+    opts = ghidra.HeadlessProjectOptions(
         ghidra_dir=args.ghidra_dir,
         project_dir=args.project_dir,
         project_name=args.project_name,
-        binary=args.binaries[0],
-        binaries=args.binaries[1:],
         port=0,
         shutdown="save",
     )
 
-    with ghidra.launch_headless(opts) as host:
+    with ghidra.launch_headless_project(opts) as host:
+        for binary in args.binaries:
+            host.import_program(ghidra.ImportProgramRequest(
+                source_path=binary,
+                overwrite=True,
+                analyze=True,
+            ))
         listing = host.list_project_files(
             ghidra.ListProjectFilesRequest(include_folders=True)
         )
@@ -48,7 +52,7 @@ def main() -> int:
 
         host.close_program(ghidra.ShutdownPolicy.SAVE)
         opened = host.open_program(
-            ghidra.OpenRequest(
+            ghidra.OpenProgramRequest(
                 project_path=args.project_dir,
                 project_name=args.project_name,
                 program_path=programs[1].path,

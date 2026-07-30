@@ -48,6 +48,7 @@ inline constexpr SymbolRecord::Impl_::Impl_(
         is_primary_{false},
         is_external_{false},
         is_dynamic_{false},
+        is_external_entry_point_{false},
         _cached_size_{0} {}
 
 template <typename>
@@ -306,6 +307,7 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::libghidra::SymbolRecord, _impl_.is_primary_),
         PROTOBUF_FIELD_OFFSET(::libghidra::SymbolRecord, _impl_.is_external_),
         PROTOBUF_FIELD_OFFSET(::libghidra::SymbolRecord, _impl_.is_dynamic_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SymbolRecord, _impl_.is_external_entry_point_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::GetSymbolRequest, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -391,14 +393,14 @@ const ::uint32_t
 static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::libghidra::SymbolRecord)},
-        {18, -1, -1, sizeof(::libghidra::GetSymbolRequest)},
-        {27, 36, -1, sizeof(::libghidra::GetSymbolResponse)},
-        {37, 47, -1, sizeof(::libghidra::ListSymbolsRequest)},
-        {49, -1, -1, sizeof(::libghidra::ListSymbolsResponse)},
-        {58, -1, -1, sizeof(::libghidra::RenameSymbolRequest)},
-        {68, -1, -1, sizeof(::libghidra::RenameSymbolResponse)},
-        {78, -1, -1, sizeof(::libghidra::DeleteSymbolRequest)},
-        {88, -1, -1, sizeof(::libghidra::DeleteSymbolResponse)},
+        {19, -1, -1, sizeof(::libghidra::GetSymbolRequest)},
+        {28, 37, -1, sizeof(::libghidra::GetSymbolResponse)},
+        {38, 48, -1, sizeof(::libghidra::ListSymbolsRequest)},
+        {50, -1, -1, sizeof(::libghidra::ListSymbolsResponse)},
+        {59, -1, -1, sizeof(::libghidra::RenameSymbolRequest)},
+        {69, -1, -1, sizeof(::libghidra::RenameSymbolResponse)},
+        {79, -1, -1, sizeof(::libghidra::DeleteSymbolRequest)},
+        {89, -1, -1, sizeof(::libghidra::DeleteSymbolResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_SymbolRecord_default_instance_._instance,
@@ -414,34 +416,34 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_libghidra_2fsymbols_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
     "\n\027libghidra/symbols.proto\022\tlibghidra\032\026li"
-    "bghidra/common.proto\"\306\001\n\014SymbolRecord\022\021\n"
+    "bghidra/common.proto\"\347\001\n\014SymbolRecord\022\021\n"
     "\tsymbol_id\030\001 \001(\004\022\017\n\007address\030\002 \001(\004\022\014\n\004nam"
     "e\030\003 \001(\t\022\021\n\tfull_name\030\004 \001(\t\022\014\n\004type\030\005 \001(\t"
     "\022\026\n\016namespace_name\030\006 \001(\t\022\016\n\006source\030\007 \001(\t"
     "\022\022\n\nis_primary\030\010 \001(\010\022\023\n\013is_external\030\t \001("
-    "\010\022\022\n\nis_dynamic\030\n \001(\010\"#\n\020GetSymbolReques"
-    "t\022\017\n\007address\030\002 \001(\004\"<\n\021GetSymbolResponse\022"
-    "\'\n\006symbol\030\001 \001(\0132\027.libghidra.SymbolRecord"
-    "\"a\n\022ListSymbolsRequest\022&\n\005range\030\002 \001(\0132\027."
-    "libghidra.AddressRange\022#\n\004page\030\003 \001(\0132\025.l"
-    "ibghidra.Pagination\"\?\n\023ListSymbolsRespon"
-    "se\022(\n\007symbols\030\001 \003(\0132\027.libghidra.SymbolRe"
-    "cord\"8\n\023RenameSymbolRequest\022\017\n\007address\030\002"
-    " \001(\004\022\020\n\010new_name\030\003 \001(\t\"5\n\024RenameSymbolRe"
-    "sponse\022\017\n\007renamed\030\001 \001(\010\022\014\n\004name\030\002 \001(\t\"4\n"
-    "\023DeleteSymbolRequest\022\017\n\007address\030\002 \001(\004\022\014\n"
-    "\004name\030\003 \001(\t\">\n\024DeleteSymbolResponse\022\017\n\007d"
-    "eleted\030\001 \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\310\002\n\016"
-    "SymbolsService\022F\n\tGetSymbol\022\033.libghidra."
-    "GetSymbolRequest\032\034.libghidra.GetSymbolRe"
-    "sponse\022L\n\013ListSymbols\022\035.libghidra.ListSy"
-    "mbolsRequest\032\036.libghidra.ListSymbolsResp"
-    "onse\022O\n\014RenameSymbol\022\036.libghidra.RenameS"
-    "ymbolRequest\032\037.libghidra.RenameSymbolRes"
-    "ponse\022O\n\014DeleteSymbol\022\036.libghidra.Delete"
-    "SymbolRequest\032\037.libghidra.DeleteSymbolRe"
-    "sponseB\033\n\tlibghidraB\014SymbolsProtoP\001b\006pro"
-    "to3"
+    "\010\022\022\n\nis_dynamic\030\n \001(\010\022\037\n\027is_external_ent"
+    "ry_point\030\013 \001(\010\"#\n\020GetSymbolRequest\022\017\n\007ad"
+    "dress\030\002 \001(\004\"<\n\021GetSymbolResponse\022\'\n\006symb"
+    "ol\030\001 \001(\0132\027.libghidra.SymbolRecord\"a\n\022Lis"
+    "tSymbolsRequest\022&\n\005range\030\002 \001(\0132\027.libghid"
+    "ra.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidr"
+    "a.Pagination\"\?\n\023ListSymbolsResponse\022(\n\007s"
+    "ymbols\030\001 \003(\0132\027.libghidra.SymbolRecord\"8\n"
+    "\023RenameSymbolRequest\022\017\n\007address\030\002 \001(\004\022\020\n"
+    "\010new_name\030\003 \001(\t\"5\n\024RenameSymbolResponse\022"
+    "\017\n\007renamed\030\001 \001(\010\022\014\n\004name\030\002 \001(\t\"4\n\023Delete"
+    "SymbolRequest\022\017\n\007address\030\002 \001(\004\022\014\n\004name\030\003"
+    " \001(\t\">\n\024DeleteSymbolResponse\022\017\n\007deleted\030"
+    "\001 \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\310\002\n\016Symbols"
+    "Service\022F\n\tGetSymbol\022\033.libghidra.GetSymb"
+    "olRequest\032\034.libghidra.GetSymbolResponse\022"
+    "L\n\013ListSymbols\022\035.libghidra.ListSymbolsRe"
+    "quest\032\036.libghidra.ListSymbolsResponse\022O\n"
+    "\014RenameSymbol\022\036.libghidra.RenameSymbolRe"
+    "quest\032\037.libghidra.RenameSymbolResponse\022O"
+    "\n\014DeleteSymbol\022\036.libghidra.DeleteSymbolR"
+    "equest\032\037.libghidra.DeleteSymbolResponseB"
+    "\033\n\tlibghidraB\014SymbolsProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2fsymbols_2eproto_deps[1] =
     {
@@ -451,7 +453,7 @@ static ::absl::once_flag descriptor_table_libghidra_2fsymbols_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fsymbols_2eproto = {
     false,
     false,
-    1123,
+    1156,
     descriptor_table_protodef_libghidra_2fsymbols_2eproto,
     "libghidra/symbols.proto",
     &descriptor_table_libghidra_2fsymbols_2eproto_once,
@@ -507,9 +509,9 @@ SymbolRecord::SymbolRecord(
                offsetof(Impl_, symbol_id_),
            reinterpret_cast<const char *>(&from._impl_) +
                offsetof(Impl_, symbol_id_),
-           offsetof(Impl_, is_dynamic_) -
+           offsetof(Impl_, is_external_entry_point_) -
                offsetof(Impl_, symbol_id_) +
-               sizeof(Impl_::is_dynamic_));
+               sizeof(Impl_::is_external_entry_point_));
 
   // @@protoc_insertion_point(copy_constructor:libghidra.SymbolRecord)
 }
@@ -528,9 +530,9 @@ inline void SymbolRecord::SharedCtor(::_pb::Arena* arena) {
   ::memset(reinterpret_cast<char *>(&_impl_) +
                offsetof(Impl_, symbol_id_),
            0,
-           offsetof(Impl_, is_dynamic_) -
+           offsetof(Impl_, is_external_entry_point_) -
                offsetof(Impl_, symbol_id_) +
-               sizeof(Impl_::is_dynamic_));
+               sizeof(Impl_::is_external_entry_point_));
 }
 SymbolRecord::~SymbolRecord() {
   // @@protoc_insertion_point(destructor:libghidra.SymbolRecord)
@@ -584,15 +586,15 @@ const ::google::protobuf::internal::ClassData* SymbolRecord::GetClassData() cons
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<4, 10, 0, 76, 2> SymbolRecord::_table_ = {
+const ::_pbi::TcParseTable<4, 11, 0, 76, 2> SymbolRecord::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    10, 120,  // max_field_number, fast_idx_mask
+    11, 120,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294966272,  // skipmap
+    4294965248,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    10,  // num_field_entries
+    11,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     _class_data_.base(),
@@ -633,7 +635,9 @@ const ::_pbi::TcParseTable<4, 10, 0, 76, 2> SymbolRecord::_table_ = {
     // bool is_dynamic = 10;
     {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SymbolRecord, _impl_.is_dynamic_), 63>(),
      {80, 63, 0, PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.is_dynamic_)}},
-    {::_pbi::TcParser::MiniParse, {}},
+    // bool is_external_entry_point = 11;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SymbolRecord, _impl_.is_external_entry_point_), 63>(),
+     {88, 63, 0, PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.is_external_entry_point_)}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
@@ -671,6 +675,9 @@ const ::_pbi::TcParseTable<4, 10, 0, 76, 2> SymbolRecord::_table_ = {
     // bool is_dynamic = 10;
     {PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.is_dynamic_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // bool is_external_entry_point = 11;
+    {PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.is_external_entry_point_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
   }},
   // no aux_entries
   {{
@@ -697,8 +704,8 @@ PROTOBUF_NOINLINE void SymbolRecord::Clear() {
   _impl_.namespace_name_.ClearToEmpty();
   _impl_.source_.ClearToEmpty();
   ::memset(&_impl_.symbol_id_, 0, static_cast<::size_t>(
-      reinterpret_cast<char*>(&_impl_.is_dynamic_) -
-      reinterpret_cast<char*>(&_impl_.symbol_id_)) + sizeof(_impl_.is_dynamic_));
+      reinterpret_cast<char*>(&_impl_.is_external_entry_point_) -
+      reinterpret_cast<char*>(&_impl_.symbol_id_)) + sizeof(_impl_.is_external_entry_point_));
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
@@ -792,6 +799,13 @@ PROTOBUF_NOINLINE void SymbolRecord::Clear() {
                 10, this_._internal_is_dynamic(), target);
           }
 
+          // bool is_external_entry_point = 11;
+          if (this_._internal_is_external_entry_point() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                11, this_._internal_is_external_entry_point(), target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -864,6 +878,10 @@ PROTOBUF_NOINLINE void SymbolRecord::Clear() {
             if (this_._internal_is_dynamic() != 0) {
               total_size += 2;
             }
+            // bool is_external_entry_point = 11;
+            if (this_._internal_is_external_entry_point() != 0) {
+              total_size += 2;
+            }
           }
           return this_.MaybeComputeUnknownFieldsSize(total_size,
                                                      &this_._impl_._cached_size_);
@@ -907,6 +925,9 @@ void SymbolRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::go
   if (from._internal_is_dynamic() != 0) {
     _this->_impl_.is_dynamic_ = from._impl_.is_dynamic_;
   }
+  if (from._internal_is_external_entry_point() != 0) {
+    _this->_impl_.is_external_entry_point_ = from._impl_.is_external_entry_point_;
+  }
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -929,8 +950,8 @@ void SymbolRecord::InternalSwap(SymbolRecord* PROTOBUF_RESTRICT other) {
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.namespace_name_, &other->_impl_.namespace_name_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.source_, &other->_impl_.source_, arena);
   ::google::protobuf::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.is_dynamic_)
-      + sizeof(SymbolRecord::_impl_.is_dynamic_)
+      PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.is_external_entry_point_)
+      + sizeof(SymbolRecord::_impl_.is_external_entry_point_)
       - PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.symbol_id_)>(
           reinterpret_cast<char*>(&_impl_.symbol_id_),
           reinterpret_cast<char*>(&other->_impl_.symbol_id_));

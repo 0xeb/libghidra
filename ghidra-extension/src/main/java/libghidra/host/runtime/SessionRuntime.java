@@ -1,9 +1,16 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +26,11 @@ import ghidra.framework.model.ProjectData;
 import ghidra.framework.model.ProjectLocator;
 import ghidra.framework.model.TransactionInfo;
 import ghidra.framework.project.DefaultProjectManager;
+import ghidra.program.model.address.Address;
+import ghidra.program.model.address.AddressIterator;
 import ghidra.program.model.listing.Program;
+import ghidra.program.model.symbol.Symbol;
+import ghidra.program.model.symbol.SymbolTable;
 import ghidra.util.Msg;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.task.TaskMonitor;
@@ -239,7 +250,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 						Program loadedProgram = loaded.getDomainObject(programConsumer);
 						try {
 							if (safeRequest.analyze()) {
-								GhidraProject.analyze(loadedProgram);
+								analyzeImportedProgram(loadedProgram);
 							}
 							DomainFile saved = loaded.save(taskMonitor);
 							String path = ManagedProgramSupport.normalizeProgramPath(saved.getPathname());
@@ -330,6 +341,90 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 					: SessionContract.ShutdownPolicy.UNSPECIFIED;
 			boolean ok = applyShutdownPolicyLocked(policy);
 			return new SessionContract.ShutdownResponse(ok);
+		}
+	}
+
+	@Override
+	public SessionContract.AddPerfBenchmarkResponse addPerfBenchmark(
+			SessionContract.AddPerfBenchmarkRequest request) {
+		try (LockScope ignored = writeLock()) {
+			Program program = requireProgram();
+			SessionContract.PerfBenchmarkRecord record = request != null ? request.record() : null;
+			if (record == null) {
+				throw new SessionRpcException("invalid_argument", "record is required");
+			}
+			if (record.benchId() == null || record.benchId().isBlank()) {
+				throw new SessionRpcException("invalid_argument", "bench_id is required");
+			}
+			int tx = program.startTransaction("libghidra add perf benchmark");
+			boolean commit = false;
+			try {
+				PerfBenchmarkStore.add(program, record);
+				commit = true;
+				return new SessionContract.AddPerfBenchmarkResponse(true);
+			}
+			finally {
+				program.endTransaction(tx, commit);
+				if (commit) {
+					flushProgramEvents(program);
+				}
+			}
+		}
+	}
+
+	@Override
+	public SessionContract.ListPerfBenchmarksResponse listPerfBenchmarks(
+			SessionContract.ListPerfBenchmarksRequest request) {
+		try (LockScope ignored = readLock()) {
+			Program program = requireProgram();
+			return new SessionContract.ListPerfBenchmarksResponse(
+				PerfBenchmarkStore.all(program));
+		}
+	}
+
+	@Override
+	public SessionContract.ClearPerfBenchmarksResponse clearPerfBenchmarks(
+			SessionContract.ClearPerfBenchmarksRequest request) {
+		try (LockScope ignored = writeLock()) {
+			Program program = requireProgram();
+			int tx = program.startTransaction("libghidra clear perf benchmarks");
+			boolean commit = false;
+			try {
+				int removed = PerfBenchmarkStore.clear(program);
+				commit = true;
+				return new SessionContract.ClearPerfBenchmarksResponse(true, removed);
+			}
+			finally {
+				program.endTransaction(tx, commit);
+				if (commit) {
+					flushProgramEvents(program);
+				}
+			}
+		}
+	}
+
+	@Override
+	public SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
+			SessionContract.DeletePerfBenchmarkRequest request) {
+		try (LockScope ignored = writeLock()) {
+			Program program = requireProgram();
+			String benchId = request != null ? request.benchId() : null;
+			if (benchId == null || benchId.isBlank()) {
+				throw new SessionRpcException("invalid_argument", "bench_id is required");
+			}
+			int tx = program.startTransaction("libghidra delete perf benchmark");
+			boolean commit = false;
+			try {
+				int removed = PerfBenchmarkStore.delete(program, benchId);
+				commit = true;
+				return new SessionContract.DeletePerfBenchmarkResponse(removed > 0);
+			}
+			finally {
+				program.endTransaction(tx, commit);
+				if (commit) {
+					flushProgramEvents(program);
+				}
+			}
 		}
 	}
 
@@ -548,19 +643,45 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		if (request.loaderClass() != null && !request.loaderClass().isBlank()) {
 			applyLoaderClass(builder, request.loaderClass().trim());
 		}
-		List<Pair<String, String>> args = new ArrayList<>();
+		// Skip external-library loading/linking by default -- it drives a slow disk
+		// search that loads system DLLs (kernel32, api-ms-win-crt-*) and applies their
+		// exports on every import, which is unwanted for SQL analysis of the target
+		// binary. The disk search is gated by "Perform Library Ordinal Lookup" (default
+		// true); disable it and the link-existing pass. Loader args match by their
+		// command-line argument (ProgramLoader matches Option.getArg()), so use the
+		// "-loader-..." forms; a request may override any of these (e.g. ghidrasql's
+		// --load-libraries re-enables them). Args unsupported by a non-PE loader are
+		// skipped harmlessly.
+		Map<String, String> mergedArgs = new LinkedHashMap<>();
+		mergedArgs.put("-loader-ordinalLookup", "false");
+		mergedArgs.put("-loader-linkExistingProjectLibraries", "false");
+		mergedArgs.put("-loader-loadLibraries", "false");
 		if (request.loaderArgs() != null) {
 			for (SessionContract.LoaderArg arg : request.loaderArgs()) {
 				if (arg == null || arg.name() == null || arg.name().isBlank()) {
 					continue;
 				}
-				args.add(new Pair<>(arg.name(), arg.value() != null ? arg.value() : ""));
+				mergedArgs.put(arg.name().trim(), arg.value() != null ? arg.value() : "");
 			}
 		}
-		if (!args.isEmpty()) {
-			builder.loaderArgs(args);
+		List<Pair<String, String>> args = new ArrayList<>();
+		for (Map.Entry<String, String> entry : mergedArgs.entrySet()) {
+			args.add(new Pair<>(entry.getKey(), entry.getValue()));
 		}
+		builder.loaderArgs(args);
 		return builder;
+	}
+
+	private void analyzeImportedProgram(Program program) {
+		int tx = program.startTransaction("libghidra import analysis");
+		boolean commit = false;
+		try {
+			GhidraProject.analyze(program);
+			commit = true;
+		}
+		finally {
+			program.endTransaction(tx, commit);
+		}
 	}
 
 	private void applyLoaderClass(ProgramLoader.Builder builder, String loaderClass) throws Exception {
@@ -648,7 +769,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 	}
 
 	private SessionContract.OpenProgramResponse emptyProgram() {
-		return new SessionContract.OpenProgramResponse("", "", "", 0L, "", "");
+		return new SessionContract.OpenProgramResponse("", "", "", 0L, "", "", "", 0L, false);
 	}
 
 	private SessionContract.OpenProgramResponse describeCurrentProgram(Program program) {
@@ -660,10 +781,34 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		// imports, so null-guard both into empty strings (proto3 has no null strings).
 		String md5 = nullableString(program.getExecutableMD5());
 		String sha256 = nullableString(program.getExecutableSHA256());
-		return new SessionContract.OpenProgramResponse(name, languageId, compiler, imageBase, md5, sha256);
+		String executableFormat = nullableString(program.getExecutableFormat());
+		// Entry point: prefer the external entry-point symbol named "entry" (the
+		// loader's canonical program entry), else the first external entry point.
+		// 0 is a valid address, so presence is carried by hasEntryPoint.
+		Address entry = null;
+		SymbolTable symbols = program.getSymbolTable();
+		AddressIterator entries = symbols.getExternalEntryPointIterator();
+		while (entries.hasNext()) {
+			Address addr = entries.next();
+			if (entry == null) {
+				entry = addr;
+			}
+			Symbol primary = symbols.getPrimarySymbol(addr);
+			if (primary != null && "entry".equalsIgnoreCase(primary.getName())) {
+				entry = addr;
+				break;
+			}
+		}
+		long entryPoint = entry != null ? entry.getOffset() : 0L;
+		boolean hasEntryPoint = entry != null;
+		return new SessionContract.OpenProgramResponse(name, languageId, compiler, imageBase, md5,
+			sha256, executableFormat, entryPoint, hasEntryPoint);
 	}
 
 	private boolean applyShutdownPolicyLocked(SessionContract.ShutdownPolicy policy) {
+		if (currentProgram() == null) {
+			return true;
+		}
 		SessionContract.ShutdownPolicy resolved = policy != null
 				? policy
 				: SessionContract.ShutdownPolicy.UNSPECIFIED;

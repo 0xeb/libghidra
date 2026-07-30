@@ -1,18 +1,9 @@
-/* ###
- * IP: GHIDRA
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host;
 
 import java.io.IOException;
@@ -304,6 +295,30 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						}
 
 						@Override
+						public SessionContract.AddPerfBenchmarkResponse addPerfBenchmark(
+								SessionContract.AddPerfBenchmarkRequest request) {
+							return sessionHandler.addPerfBenchmark(request);
+						}
+
+						@Override
+						public SessionContract.ListPerfBenchmarksResponse listPerfBenchmarks(
+								SessionContract.ListPerfBenchmarksRequest request) {
+							return sessionHandler.listPerfBenchmarks(request);
+						}
+
+						@Override
+						public SessionContract.ClearPerfBenchmarksResponse clearPerfBenchmarks(
+								SessionContract.ClearPerfBenchmarksRequest request) {
+							return sessionHandler.clearPerfBenchmarks(request);
+						}
+
+						@Override
+						public SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
+								SessionContract.DeletePerfBenchmarkRequest request) {
+							return sessionHandler.deletePerfBenchmark(request);
+						}
+
+						@Override
 						public libghidra.host.contract.MemoryContract.ReadBytesResponse readBytes(
 								libghidra.host.contract.MemoryContract.ReadBytesRequest request) {
 							return memoryHandler.readBytes(request);
@@ -325,6 +340,24 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						public libghidra.host.contract.MemoryContract.ListMemoryBlocksResponse listMemoryBlocks(
 								libghidra.host.contract.MemoryContract.ListMemoryBlocksRequest request) {
 							return memoryHandler.listMemoryBlocks(request);
+						}
+
+						@Override
+						public libghidra.host.contract.MemoryContract.CreateMemoryBlockResponse createMemoryBlock(
+								libghidra.host.contract.MemoryContract.CreateMemoryBlockRequest request) {
+							return memoryHandler.createMemoryBlock(request);
+						}
+
+						@Override
+						public libghidra.host.contract.MemoryContract.RemoveMemoryBlockResponse removeMemoryBlock(
+								libghidra.host.contract.MemoryContract.RemoveMemoryBlockRequest request) {
+							return memoryHandler.removeMemoryBlock(request);
+						}
+
+						@Override
+						public libghidra.host.contract.MemoryContract.MoveMemoryBlockResponse moveMemoryBlock(
+								libghidra.host.contract.MemoryContract.MoveMemoryBlockRequest request) {
+							return memoryHandler.moveMemoryBlock(request);
 						}
 
 						@Override
@@ -415,6 +448,12 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						public FunctionsContract.ListLoopsResponse listLoops(
 								FunctionsContract.ListLoopsRequest request) {
 							return functionsHandler.listLoops(request);
+						}
+
+						@Override
+						public FunctionsContract.ListFunctionFramesResponse listFunctionFrames(
+								FunctionsContract.ListFunctionFramesRequest request) {
+							return functionsHandler.listFunctionFrames(request);
 						}
 
 						@Override
@@ -664,6 +703,12 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						}
 
 						@Override
+						public DecompilerContract.GetPcodeResponse getPcode(
+								DecompilerContract.GetPcodeRequest request) {
+							return decompilerHandler.getPcode(request);
+						}
+
+						@Override
 						public libghidra.host.contract.ListingContract.GetInstructionResponse getInstruction(
 								libghidra.host.contract.ListingContract.GetInstructionRequest request) {
 							return listingHandler.getInstruction(request);
@@ -673,6 +718,12 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						public libghidra.host.contract.ListingContract.ListInstructionsResponse listInstructions(
 								libghidra.host.contract.ListingContract.ListInstructionsRequest request) {
 							return listingHandler.listInstructions(request);
+						}
+
+						@Override
+						public libghidra.host.contract.ListingContract.ListInstructionOperandsResponse listInstructionOperands(
+								libghidra.host.contract.ListingContract.ListInstructionOperandsRequest request) {
+							return listingHandler.listInstructionOperands(request);
 						}
 
 						@Override

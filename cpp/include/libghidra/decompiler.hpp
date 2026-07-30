@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 
@@ -25,6 +24,9 @@ class IDecompilerClient {
                                                                   int limit,
                                                                   int offset,
                                                                   int timeout_ms) = 0;
+  // P-code for one function at the requested maturity rung (High=refined SSA, Raw=per-instr).
+  virtual StatusOr<GetPcodeResponse> GetPcode(std::uint64_t address,
+                                              PcodeMaturity maturity, int timeout_ms) = 0;
 };
 
 }  // namespace libghidra::client

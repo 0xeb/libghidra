@@ -1,3 +1,9 @@
+# Copyright (c) 2024-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+#
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
+
 [package]
 name = "libghidra"
 version = "0.0.3"
@@ -6,7 +12,7 @@ edition = "2021"
 # users add a git dep or `cargo binstall` from the GitHub Releases page.
 # See `[package.metadata.binstall]` below for the release URL template.
 publish = false
-license = "MPL-2.0"
+license-file = "LICENSE"
 description = "Ghidra decompiler client: live (HTTP/RPC) and local (offline, embedded engine) backends"
 repository = "https://github.com/0xeb/libghidra"
 homepage = "https://github.com/0xeb/libghidra"
@@ -137,3 +143,7 @@ path = "examples/function_tags.rs"
 [[example]]
 name = "parse_declarations"
 path = "examples/parse_declarations.rs"
+
+[[example]]
+name = "multi_program_strings"
+path = "examples/multi_program_strings.rs"

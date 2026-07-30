@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 #include "btree.h"
@@ -46,6 +45,14 @@ public:
 
     // Check if a key represents a real code/data address (types 1 or 2)
     bool isMemoryAddress(int64_t key) const;
+
+    // Set the program image-base offset added to RELOCATABLE default-space keys.
+    // Ghidra stores function-symbol address keys image-base-relative (AddressMapDB
+    // RELOCATABLE decode adds baseImageOffset), so the offline reader must apply the
+    // same offset or every decoded function address is image-base-too-low (e.g. a
+    // function at 0x401000 in a 0x400000-based program decodes to 0x1000). Sourced
+    // from the "Image Offset" key in the "Program" options table.
+    void setImageBaseOffset(uint64_t v) { image_base_offset_ = v; }
 
 private:
     // Base addresses indexed by their ID

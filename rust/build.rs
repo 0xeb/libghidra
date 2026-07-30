@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // Build script.
 //
@@ -94,6 +93,30 @@ fn build_proto() {
 fn copy_fallback(fallback: &Path, out_dir: &Path) {
     let dest = out_dir.join("libghidra.rs");
     std::fs::copy(fallback, &dest).expect("failed to copy pre-generated stubs to OUT_DIR");
+}
+
+fn bundled_protobuf_archives(lib_dir: &Path) -> Vec<PathBuf> {
+    let mut archives = std::fs::read_dir(lib_dir)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter_map(|entry| {
+            let path = entry.path();
+            let stem = path.file_stem()?.to_str()?;
+            let extension = path.extension()?.to_str()?;
+            let is_archive =
+                extension.eq_ignore_ascii_case("lib") || extension.eq_ignore_ascii_case("a");
+            let is_dependency = stem == "libprotobuf"
+                || stem.starts_with("absl_")
+                || stem.starts_with("utf8_")
+                || stem.starts_with("libabsl_")
+                || stem.starts_with("libutf8_");
+            (is_archive && is_dependency).then_some(path)
+        })
+        .collect::<Vec<_>>();
+    archives.sort();
+    archives.dedup();
+    archives
 }
 
 // ---------------------------------------------------------------------------
@@ -189,7 +212,7 @@ fn build_local_bridge() {
         );
     }
 
-    // On Debian/Ubuntu the system protobuf-lite static archive lives under
+    // On Debian/Ubuntu the system protobuf archive lives under
     // /usr/lib/<multiarch-triple>/, which rustc does not search by default.
     // Resolve the triple via `gcc -print-multiarch` so this works on every
     // multi-arch system without a hardcoded list.
@@ -243,6 +266,14 @@ fn build_local_bridge() {
     // bfd_arch, etc.) are otherwise dropped because the cxx bridge
     // doesn't directly reference their symbols.
     let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    let bundled_dependencies = lib_dir
+        .as_deref()
+        .map(Path::new)
+        .map(bundled_protobuf_archives)
+        .unwrap_or_default();
+    let has_bundled_protobuf = bundled_dependencies
+        .iter()
+        .any(|path| path.file_stem().and_then(|stem| stem.to_str()) == Some("libprotobuf"));
 
     if let Some(lib_dir_str) = lib_dir.as_deref() {
         if target_os == "windows" {
@@ -252,6 +283,42 @@ fn build_local_bridge() {
             }
             if lib_dir_path.join("libghidra_client.lib").exists() {
                 println!("cargo:rustc-link-lib=static=libghidra_client");
+            }
+
+            // The Windows release bundle is self-contained. libghidra_client
+            // is built against protobuf's bundled Abseil, so linking only the
+            // two libghidra archives leaves hundreds of unresolved protobuf
+            // and absl symbols. Discover the flattened dependency archives
+            // staged beside them by CI. Sorting keeps the emitted link line
+            // deterministic; link.exe resolves archive order transitively.
+            for dependency in &bundled_dependencies {
+                if let Some(stem) = dependency.file_stem().and_then(|stem| stem.to_str()) {
+                    println!("cargo:rustc-link-lib=static={stem}");
+                }
+            }
+
+            // Ghidra's bundled zlib objects use MSVC whole-program
+            // optimization. Enable LTCG in every Rust final link that consumes
+            // libghidra_local so link.exe does not restart with LNK4075.
+            println!("cargo:rustc-link-arg=/LTCG");
+        } else if target_os == "macos" {
+            let abs = |stem: &str| format!("{}/lib{}.a", lib_dir_str, stem);
+
+            // ld64 has no GNU --whole-archive/--start-group flags. Force-load
+            // each SDK archive instead: this preserves Ghidra's registration
+            // initializers and makes the bundled Protobuf/Abseil dependency
+            // graph independent of archive order.
+            for stem in &["libghidra_local", "libghidra_client"] {
+                let path = abs(stem);
+                if std::path::Path::new(&path).exists() {
+                    println!("cargo:rustc-link-arg=-Wl,-force_load,{path}");
+                }
+            }
+            for dependency in &bundled_dependencies {
+                println!(
+                    "cargo:rustc-link-arg=-Wl,-force_load,{}",
+                    dependency.display()
+                );
             }
         } else {
             let abs = |stem: &str| format!("{}/lib{}.a", lib_dir_str, stem);
@@ -266,6 +333,7 @@ fn build_local_bridge() {
             // those DSOs stay alive long enough to satisfy the archives.
             println!("cargo:rustc-link-arg=-Wl,--push-state");
             println!("cargo:rustc-link-arg=-Wl,--no-as-needed");
+            println!("cargo:rustc-link-arg=-Wl,--start-group");
 
             // Whole-archive: pull in every .o so static initializers and the
             // loader code survive the linker's --gc-sections.
@@ -283,6 +351,10 @@ fn build_local_bridge() {
                     println!("cargo:rustc-link-arg=-Wl,{}", path);
                 }
             }
+            for dependency in &bundled_dependencies {
+                println!("cargo:rustc-link-arg=-Wl,{}", dependency.display());
+            }
+            println!("cargo:rustc-link-arg=-Wl,--end-group");
 
             // Re-list dynamic deps after the static archives so their unresolved
             // symbols actually find homes — the earlier -l<name> before the
@@ -333,7 +405,7 @@ fn build_local_bridge() {
 
     if let Ok(link_libs) = std::env::var("LIBGHIDRA_LINK_LIBS") {
         for item in link_libs
-            .split(|c| c == ',' || c == ';')
+            .split([',', ';'])
             .map(str::trim)
             .filter(|s| !s.is_empty())
         {
@@ -363,8 +435,10 @@ fn build_local_bridge() {
     // command line" unless we also list it explicitly.
     let default_dylibs = if target_os == "windows" {
         ""
+    } else if has_bundled_protobuf {
+        "m,z"
     } else {
-        "m,protobuf-lite,z"
+        "m,protobuf,z"
     };
     let dylibs =
         std::env::var("LIBGHIDRA_LINK_DYLIBS").unwrap_or_else(|_| default_dylibs.to_string());
@@ -398,6 +472,7 @@ fn build_local_bridge() {
         }
         "windows" => {
             println!("cargo:rustc-link-lib=dylib=ws2_32");
+            println!("cargo:rustc-link-lib=dylib=crypt32");
         }
         _ => {}
     }

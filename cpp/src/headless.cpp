@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // Launch headless Ghidra via analyzeHeadless, wait for
 // LIBGHIDRA_HEADLESS_READY, then return a connected HttpClient.
@@ -13,8 +12,8 @@
 
 #include <cstdio>
 #include <cstring>
-#include <deque>
 #include <filesystem>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -24,6 +23,7 @@
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #else
+#  include <cerrno>
 #  include <signal.h>
 #  include <sys/wait.h>
 #  include <unistd.h>
@@ -80,30 +80,82 @@ class ProcessHandle {
     si.hStdError = read_pipe;
     si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
-    // CreateProcess needs a mutable buffer
-    cmd_buf_ = cmd_line;
-    // CREATE_SUSPENDED so we can attach to the job before any child
-    // processes are spawned. CREATE_BREAKAWAY_FROM_JOB defends against
-    // inheritance of an outer job that disallows nested jobs (rare in
-    // practice but cheap).
-    DWORD flags = CREATE_NO_WINDOW | CREATE_SUSPENDED |
-                  CREATE_BREAKAWAY_FROM_JOB;
-    BOOL ok = CreateProcessA(
-        nullptr, cmd_buf_.data(), nullptr, nullptr,
-        TRUE,  // inherit handles
-        flags, nullptr, nullptr, &si, &pi_);
-    if (!ok) {
-      // Some environments (Windows Containers, certain Job-controlled
-      // sessions) reject CREATE_BREAKAWAY_FROM_JOB. Retry without it.
-      flags = CREATE_NO_WINDOW | CREATE_SUSPENDED;
-      ok = CreateProcessA(
+    // The whole point of this dance is to guarantee the java.exe descendant
+    // ends up inside *our* Job Object, so JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+    // reaps the whole tree when this process exits or dies. A child that is
+    // NOT in our job becomes a zombie: it broke away from the parent's job
+    // (or never joined ours) and nothing reaps it → leaked JVM holding the
+    // RPC port and project locks.
+    //
+    // Strategy (orphan-risk minimising):
+    //   1. Try CreateProcess WITHOUT CREATE_BREAKAWAY_FROM_JOB. If we are not
+    //      inside a restrictive outer job, the child is naturally created
+    //      inside our job via the default nested-job inheritance, and the
+    //      AssignProcessToJobObject below is a harmless no-op/confirmation.
+    //   2. Only if the subsequent AssignProcessToJobObject fails with
+    //      ERROR_ACCESS_DENIED (the "child is already in a job that disallows
+    //      nesting" condition — a restrictive outer job) do we tear the child
+    //      down and retry the whole create WITH CREATE_BREAKAWAY_FROM_JOB so
+    //      it can leave that outer job and join ours instead.
+    //
+    // In EVERY path: if we cannot prove the child landed in our job, we do
+    // NOT leave it running — we TerminateProcess it and fail the launch,
+    // rather than leak an unmanaged orphan. CREATE_SUSPENDED → assign →
+    // ResumeThread ordering is preserved: assigning before the first thread
+    // runs is what guarantees the child's own descendants inherit the job.
+
+    // Attempt a create with the given flags, then try to assign to our job.
+    // Returns:
+    //   0  = success (child created AND in our job, still suspended)
+    //   1  = created but assign failed with ERROR_ACCESS_DENIED (caller may
+    //        retry with breakaway); child has already been terminated+reaped
+    //  -1  = hard failure (create failed, or assign failed for another reason
+    //        and the orphan was terminated); do not retry
+    auto try_launch = [&](DWORD flags) -> int {
+      cmd_buf_ = cmd_line;  // CreateProcess needs a mutable buffer
+      BOOL ok = CreateProcessA(
           nullptr, cmd_buf_.data(), nullptr, nullptr,
-          TRUE, flags, nullptr, nullptr, &si, &pi_);
-      if (!ok) return false;
+          TRUE,  // inherit handles
+          flags, nullptr, nullptr, &si, &pi_);
+      if (!ok) return -1;
+
+      if (!job_) {
+        // No job object at all (CreateJobObject failed in the ctor). We cannot
+        // guarantee reaping via the job, but this is the same best-effort mode
+        // the code has always fallen back to; keep the child and rely on
+        // terminate()'s TerminateProcess path. Nothing to assign.
+        return 0;
+      }
+
+      if (AssignProcessToJobObject(job_, pi_.hProcess)) {
+        return 0;  // child is safely in our job
+      }
+
+      // Assign failed. The child is now an UNMANAGED ORPHAN candidate: if we
+      // used CREATE_BREAKAWAY_FROM_JOB it has left the parent's job and joined
+      // none; even without breakaway, a failed assign means we can't prove it
+      // is in our job. Either way, never leave it running.
+      DWORD err = GetLastError();
+      TerminateProcess(pi_.hProcess, 1);
+      WaitForSingleObject(pi_.hProcess, 5000);
+      close_handles();
+      pi_ = PROCESS_INFORMATION{};
+      // ERROR_ACCESS_DENIED here means the child is already in an outer job
+      // that disallows nesting → the caller can retry WITH breakaway.
+      return (err == ERROR_ACCESS_DENIED) ? 1 : -1;
+    };
+
+    // Step 1: create WITHOUT breakaway (natural nested-job inheritance).
+    int r = try_launch(CREATE_NO_WINDOW | CREATE_SUSPENDED);
+    if (r == 1) {
+      // Step 2: restrictive outer job → retry WITH breakaway so we can leave
+      // it and join ours. Some sandboxes (Windows Containers) reject breakaway
+      // entirely; that surfaces as a create failure (-1) below.
+      r = try_launch(CREATE_NO_WINDOW | CREATE_SUSPENDED |
+                     CREATE_BREAKAWAY_FROM_JOB);
     }
-    if (job_) {
-      AssignProcessToJobObject(job_, pi_.hProcess);
-    }
+    if (r != 0) return false;  // hard failure; orphan (if any) already killed
+
     ResumeThread(pi_.hThread);
     alive_ = true;
     return true;
@@ -164,7 +216,13 @@ class ProcessHandle {
     pid_ = fork();
     if (pid_ < 0) return false;
     if (pid_ == 0) {
-      // Child
+      // Child. Lead a new process group so the whole tree
+      // (analyzeHeadless -> launch.sh -> java) can be force-killed together
+      // via kill(-pid_) in terminate() -- the POSIX analog of the Windows
+      // Job Object above. Without this, signalling only pid_ orphans the java
+      // grandchild, which keeps holding the HTTP socket and project locks and
+      // defeats force-kill.
+      setpgid(0, 0);
       dup2(write_fd, STDOUT_FILENO);
       dup2(write_fd, STDERR_FILENO);
       close(write_fd);
@@ -174,6 +232,13 @@ class ProcessHandle {
       execvp(argv[0], argv.data());
       _exit(127);
     }
+    // Parent: also make pid_ its own group leader so terminate()'s kill(-pid_)
+    // can never race the child's own setpgid() -- whichever call runs first wins
+    // and both are idempotent. Without this, a terminate() firing in the window
+    // before the child reaches setpgid() would target a group that does not exist
+    // yet (ESRCH) and miss the tree. EACCES here just means the child already
+    // execvp'd and set the group first, which is fine.
+    setpgid(pid_, pid_);
     alive_ = true;
     return true;
   }
@@ -183,17 +248,38 @@ class ProcessHandle {
   int wait(int timeout_ms = -1) {
     if (!alive_) return exit_code_;
     int status = 0;
+    bool reaped = false;
     if (timeout_ms < 0) {
-      waitpid(pid_, &status, 0);
+      int r;
+      do {
+        r = waitpid(pid_, &status, 0);
+      } while (r < 0 && errno == EINTR);
+      if (r < 0) {
+        // waitpid failed for a non-EINTR reason (e.g. ECHILD: the child was
+        // already reaped elsewhere). The child is gone -- mark not-alive and
+        // return so a later terminate() does not kill(-pid_) and then poll
+        // WNOHANG for the full timeout against a process that no longer exists.
+        alive_ = false;
+        return exit_code_;
+      }
+      reaped = (r > 0);
     } else {
       // Poll with timeout
       auto deadline = std::chrono::steady_clock::now() +
                       std::chrono::milliseconds(timeout_ms);
       while (std::chrono::steady_clock::now() < deadline) {
         int r = waitpid(pid_, &status, WNOHANG);
-        if (r > 0) break;
+        if (r > 0) { reaped = true; break; }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
       }
+    }
+    if (!reaped) {
+      // Timed out (or interrupted) without reaping: the child is still
+      // running. Leave alive_ true so callers (e.g. close()) can escalate to
+      // terminate() (force-kill). Mirrors the Windows WAIT_TIMEOUT path, which
+      // returns -1 without clearing alive_. The previous code unconditionally
+      // set alive_ = false here, so force-kill never fired on POSIX.
+      return -1;
     }
     exit_code_ = WIFEXITED(status) ? WEXITSTATUS(status) : -1;
     alive_ = false;
@@ -202,7 +288,13 @@ class ProcessHandle {
 
   void terminate() {
     if (alive_) {
-      kill(pid_, SIGTERM);
+      // Kill the whole process group (analyzeHeadless -> launch.sh -> java),
+      // the POSIX analog of the Windows Job Object. pid_ is its own group
+      // leader (setpgid in launch()), so kill(-pid_) targets the entire tree.
+      // SIGKILL because this is the force path: graceful shutdown was already
+      // attempted via the Shutdown RPC. Killing java closes the HTTP socket,
+      // which unblocks close()'s shutdown/drain joins.
+      kill(-pid_, SIGKILL);
       wait(10000);
     }
   }
@@ -266,9 +358,21 @@ class PipeReader {
 // ---------------------------------------------------------------------------
 
 struct HeadlessClient::Impl {
+  ~Impl() {
+    if (detached) {
+      if (drain_thread.joinable()) drain_thread.detach();
+      return;
+    }
+    if (proc && proc->alive()) {
+      proc->terminate();
+    }
+    if (drain_thread.joinable()) drain_thread.join();
+  }
+
   std::unique_ptr<IClient> client;
   std::unique_ptr<ProcessHandle> proc;
-  std::unique_ptr<PipeReader> pipe;
+  std::shared_ptr<PipeReader> pipe;
+  std::thread drain_thread;
   std::string base_url;
   fs::path project_dir;
   bool owns_project;
@@ -303,7 +407,10 @@ void HeadlessClient::detach() {
 
 int HeadlessClient::wait() {
   if (impl_->detached) return 0;
-  return impl_->proc->wait();
+  int code = impl_->proc->wait();
+  if (impl_->drain_thread.joinable()) impl_->drain_thread.join();
+  impl_->pipe.reset();
+  return code;
 }
 
 int HeadlessClient::close(bool save, std::chrono::milliseconds timeout) {
@@ -312,7 +419,7 @@ int HeadlessClient::close(bool save, std::chrono::milliseconds timeout) {
   // The previous implementation blocked here on two unbounded waits:
   //   (1) client->Shutdown(...) — blocks up to read_timeout (5 min default)
   //       if Java doesn't ack;
-  //   (2) the output-drain loop — blocks until the child closes stdout.
+  //   (2) joining the output-drain thread — blocks until the child closes stdout.
   // If Java was wedged on a stuck decompiler/parser, both waits stalled
   // and the wrapper hung indefinitely with the process tree intact (this
   // matches the symptom in the pain-points report Issue 6).
@@ -325,19 +432,7 @@ int HeadlessClient::close(bool save, std::chrono::milliseconds timeout) {
 
   auto deadline = std::chrono::steady_clock::now() + timeout;
 
-  // Worker 1: drain pipe output until the pipe closes (i.e. child exits).
-  std::thread drain_thread;
-  if (impl_->pipe) {
-    drain_thread = std::thread(
-        [reader = impl_->pipe.get(), on_output = impl_->on_output] {
-          std::string line;
-          while (reader->read_line(line)) {
-            if (!line.empty() && on_output) on_output(line);
-          }
-        });
-  }
-
-  // Worker 2: send the Shutdown RPC. May block on a wedged host; force-kill
+  // Worker: send the Shutdown RPC. May block on a wedged host; force-kill
   // below will close the socket and unblock it.
   std::thread shutdown_thread(
       [client = impl_->client.get(), save] {
@@ -370,7 +465,7 @@ int HeadlessClient::close(bool save, std::chrono::milliseconds timeout) {
   // Both worker threads should now unblock: the drain via pipe EOF, the
   // Shutdown RPC via socket close. Join them before tearing down impl_
   // so the workers don't see freed memory.
-  if (drain_thread.joinable()) drain_thread.join();
+  if (impl_->drain_thread.joinable()) impl_->drain_thread.join();
   if (shutdown_thread.joinable()) shutdown_thread.join();
 
   impl_->pipe.reset();
@@ -406,32 +501,6 @@ static fs::path find_script_dir(const fs::path& ghidra_dir) {
   return d;
 }
 
-static std::string infer_imported_program_name(const fs::path& binary) {
-  auto name = binary.filename().string();
-  if (name.empty()) {
-    throw std::runtime_error("Unable to infer imported program name from " +
-                             binary.string());
-  }
-  return name;
-}
-
-static std::string strip_project_leading_slash(std::string path) {
-  while (!path.empty() && (path.front() == '/' || path.front() == '\\')) {
-    path.erase(path.begin());
-  }
-  return path;
-}
-
-static std::string join_script_list(const std::vector<std::string>& values) {
-  std::string out;
-  for (const auto& value : values) {
-    if (value.empty()) continue;
-    if (!out.empty()) out += ';';
-    out += value;
-  }
-  return out;
-}
-
 #ifdef _WIN32
 static std::string build_command_line(const std::vector<std::string>& args) {
   std::string cmd_line;
@@ -447,109 +516,12 @@ static std::string build_command_line(const std::vector<std::string>& args) {
 }
 #endif
 
-static std::string run_import_stage(
-    const fs::path& launcher, const fs::path& project_dir,
-    const std::string& project_name, const fs::path& binary, bool overwrite,
-    bool analyze, const std::function<void(const std::string&)>& on_output) {
-  std::vector<std::string> args = {
-      launcher.string(),
-      project_dir.string(),
-      project_name,
-      "-import",
-      binary.string(),
-  };
-  if (overwrite) args.push_back("-overwrite");
-  if (!analyze) args.push_back("-noanalysis");
-
-  auto proc = std::make_unique<ProcessHandle>();
-  std::unique_ptr<PipeReader> reader;
-  std::deque<std::string> tail;
-
-#ifdef _WIN32
-  SECURITY_ATTRIBUTES sa{};
-  sa.nLength = sizeof(sa);
-  sa.bInheritHandle = TRUE;
-  HANDLE pipe_read = nullptr, pipe_write = nullptr;
-  if (!CreatePipe(&pipe_read, &pipe_write, &sa, 0))
-    throw std::runtime_error("CreatePipe failed");
-  SetHandleInformation(pipe_read, HANDLE_FLAG_INHERIT, 0);
-
-  std::string cmd_line = build_command_line(args);
-  if (!proc->launch(cmd_line, pipe_write)) {
-    CloseHandle(pipe_read);
-    CloseHandle(pipe_write);
-    throw std::runtime_error("CreateProcess failed");
-  }
-  CloseHandle(pipe_write);
-  reader = std::make_unique<PipeReader>(pipe_read);
-#else
-  int pipefd[2];
-  if (pipe(pipefd) < 0) throw std::runtime_error("pipe() failed");
-  if (!proc->launch(args, pipefd[1])) {
-    ::close(pipefd[0]);
-    ::close(pipefd[1]);
-    throw std::runtime_error("fork() failed");
-  }
-  ::close(pipefd[1]);
-  reader = std::make_unique<PipeReader>(pipefd[0]);
-#endif
-
-  std::string line;
-  while (reader->read_line(line)) {
-    if (!line.empty() && on_output) on_output(line);
-    if (!line.empty()) {
-      if (tail.size() == 200) tail.pop_front();
-      tail.push_back(line);
-    }
-  }
-
-  int exit_code = proc->wait();
-  if (proc->alive()) proc->terminate();
-  if (exit_code != 0) {
-    std::string tail_text;
-    for (const auto& entry : tail) {
-      if (!tail_text.empty()) tail_text += '\n';
-      tail_text += entry;
-    }
-    throw std::runtime_error("Import stage failed with exit code " +
-                             std::to_string(exit_code) + "\n" + tail_text);
-  }
-
-  return infer_imported_program_name(binary);
-}
-
 // ---------------------------------------------------------------------------
-// LaunchHeadless
+// LaunchHeadlessProject
 // ---------------------------------------------------------------------------
 
-HeadlessClient LaunchHeadless(HeadlessOptions opts) {
+HeadlessClient LaunchHeadlessProject(HeadlessProjectOptions opts) {
   auto ghidra_dir = fs::absolute(opts.ghidra_dir);
-
-  std::vector<std::string> binary_inputs;
-  if (!opts.binary.empty()) binary_inputs.push_back(opts.binary);
-  binary_inputs.insert(binary_inputs.end(), opts.binaries.begin(),
-                       opts.binaries.end());
-
-  std::vector<std::string> program_inputs;
-  if (!opts.program.empty()) program_inputs.push_back(opts.program);
-  program_inputs.insert(program_inputs.end(), opts.programs.begin(),
-                        opts.programs.end());
-
-  if (binary_inputs.empty() && program_inputs.empty() &&
-      opts.initial_program.empty()) {
-    throw std::runtime_error(
-        "HeadlessOptions: binary, program, binaries, programs, or "
-        "initial_program must be set");
-  }
-
-  std::vector<fs::path> binaries;
-  binaries.reserve(binary_inputs.size());
-  for (const auto& input : binary_inputs) {
-    auto binary = fs::absolute(input);
-    if (!fs::exists(binary))
-      throw std::runtime_error("Binary not found: " + binary.string());
-    binaries.push_back(std::move(binary));
-  }
 
   auto launcher = find_launcher(ghidra_dir);
   auto script_dir = opts.script_dir.empty()
@@ -557,54 +529,23 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
                         : fs::path(opts.script_dir);
 
   bool owns_project = opts.project_dir.empty();
-  fs::path project_dir =
-      owns_project ? fs::temp_directory_path() / "ghidra_headless_cpp"
-                   : fs::path(opts.project_dir);
+  const auto unique_suffix =
+      std::chrono::steady_clock::now().time_since_epoch().count();
+  fs::path project_dir = owns_project
+      ? fs::temp_directory_path() /
+            ("ghidra_headless_cpp_" + std::to_string(unique_suffix))
+      : fs::path(opts.project_dir);
   fs::create_directories(project_dir);
 
-  std::vector<std::string> imported_programs;
-  for (const auto& binary : binaries) {
-    try {
-      imported_programs.push_back(
-          run_import_stage(launcher, project_dir, opts.project_name, binary,
-                           opts.overwrite, opts.analyze, opts.on_output));
-    } catch (...) {
-      if (owns_project) {
-        std::error_code ec;
-        fs::remove_all(project_dir, ec);
-      }
-      throw;
-    }
-  }
-
-  std::string managed_program;
-  if (!opts.initial_program.empty()) {
-    managed_program = opts.initial_program;
-  } else if (!program_inputs.empty()) {
-    managed_program = program_inputs.front();
-  } else if (!imported_programs.empty()) {
-    managed_program = imported_programs.front();
-  }
-  const std::string process_program = strip_project_leading_slash(managed_program);
-
-  std::vector<std::string> declared_programs = program_inputs;
-  declared_programs.insert(declared_programs.end(), imported_programs.begin(),
-                           imported_programs.end());
-
-  // Build argument list
+  // Build argument list. No -import and no -process: Ghidra creates/opens
+  // the project, runs the server script without an active program, and the
+  // caller drives ImportProgram/OpenProgram explicitly over RPC.
   std::vector<std::string> args = {
       launcher.string(),
       project_dir.string(),
       opts.project_name,
   };
-  args.push_back("-process");
-  args.push_back(process_program);
-  args.push_back("-noanalysis");
-
-  // Pass-through args for analyzeHeadless (from '--' separator).
-  for (const auto& arg : opts.extra_headless_args)
-    args.push_back(arg);
-
+  for (const auto& arg : opts.extra_headless_args) args.push_back(arg);
   args.push_back("-scriptPath");
   args.push_back(script_dir.string());
   args.push_back("-postScript");
@@ -612,11 +553,6 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
   args.push_back("bind=" + opts.bind);
   args.push_back("port=" + std::to_string(opts.port));
   args.push_back("shutdown=" + opts.shutdown);
-  if (!opts.initial_program.empty())
-    args.push_back("initial_program=" + opts.initial_program);
-  const std::string program_list = join_script_list(declared_programs);
-  if (!program_list.empty())
-    args.push_back("program_paths=" + program_list);
   if (!opts.auth_token.empty())
     args.push_back("auth=" + opts.auth_token);
   if (opts.max_runtime_seconds > 0)
@@ -628,7 +564,7 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
 
   // Create pipe
   auto proc = std::make_unique<ProcessHandle>();
-  std::unique_ptr<PipeReader> reader;
+  std::shared_ptr<PipeReader> reader;
 
 #ifdef _WIN32
   SECURITY_ATTRIBUTES sa{};
@@ -648,7 +584,7 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
     throw std::runtime_error("CreateProcess failed");
   }
   CloseHandle(pipe_write);  // parent doesn't write
-  reader = std::make_unique<PipeReader>(pipe_read);
+  reader = std::make_shared<PipeReader>(pipe_read);
 #else
   int pipefd[2];
   if (pipe(pipefd) < 0) throw std::runtime_error("pipe() failed");
@@ -658,7 +594,7 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
     throw std::runtime_error("fork() failed");
   }
   ::close(pipefd[1]);  // parent doesn't write
-  reader = std::make_unique<PipeReader>(pipefd[0]);
+  reader = std::make_shared<PipeReader>(pipefd[0]);
 #endif
 
   // Wait for LIBGHIDRA_HEADLESS_READY
@@ -723,6 +659,13 @@ HeadlessClient LaunchHeadless(HeadlessOptions opts) {
   impl->project_dir = project_dir;
   impl->owns_project = owns_project;
   impl->on_output = std::move(opts.on_output);
+  impl->drain_thread = std::thread(
+      [reader = impl->pipe, on_output = impl->on_output] {
+        std::string output_line;
+        while (reader && reader->read_line(output_line)) {
+          if (!output_line.empty() && on_output) on_output(output_line);
+        }
+      });
 
   return HeadlessClient(std::move(impl));
 }

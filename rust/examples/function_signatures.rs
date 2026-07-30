@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // function_signatures: Inspect and mutate function signatures via the Ghidra API.
 //
@@ -81,7 +80,7 @@ fn main() {
     if let Some(sig) = &sig_resp.signature {
         if let Some(p) = sig.parameters.iter().find(|p| !p.is_auto_parameter) {
             let rename_resp = client
-                .rename_function_parameter(addr, p.ordinal as i32, "renamed_param")
+                .rename_function_parameter(addr, p.ordinal, "renamed_param")
                 .unwrap_or_else(|e| {
                     eprintln!("rename_function_parameter failed: {e}");
                     std::process::exit(1);
@@ -93,7 +92,7 @@ fn main() {
 
             // 6. Change the parameter type
             let retype_resp = client
-                .set_function_parameter_type(addr, p.ordinal as i32, "int")
+                .set_function_parameter_type(addr, p.ordinal, "int")
                 .unwrap_or_else(|e| {
                     eprintln!("set_function_parameter_type failed: {e}");
                     std::process::exit(1);

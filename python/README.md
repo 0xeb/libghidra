@@ -39,7 +39,7 @@ status = client.get_status()
 print(f"Connected: {status.service_name} v{status.service_version}")
 
 # Open a program
-resp = client.open_program(ghidra.OpenRequest(
+resp = client.open_program(ghidra.OpenProgramRequest(
     project_path="C:/ghidra_projects",
     project_name="MyProject",
     program_path="binary.exe",
@@ -64,33 +64,53 @@ client.close_program()
 
 Live/headless hosts expose Ghidra project contents separately from the active
 program. A project can contain many programs, while the normal query/mutation
-methods operate on exactly one active program.
+methods operate on exactly one active program. Import and analyze with Ghidra,
+open one project program, query it, close it, then open the next.
 
 ```python
 import libghidra as ghidra
 
-with ghidra.launch_headless(ghidra.HeadlessOptions(
+with ghidra.launch_headless_project(ghidra.HeadlessProjectOptions(
     ghidra_dir="C:/ghidra_dist/ghidra_12.1_DEV",
     project_dir="C:/work/projects",
     project_name="firmware",
-    binary="C:/samples/loader.elf",
-    binaries=["C:/samples/payload.elf"],
-    initial_program="/loader.elf",
 )) as host:
+    loader = host.import_program(ghidra.ImportProgramRequest(
+        source_path="C:/samples/loader.elf",
+        overwrite=True,
+        analyze=True,
+    ))
+    host.import_program(ghidra.ImportProgramRequest(
+        source_path="C:/samples/payload.elf",
+        overwrite=True,
+        analyze=True,
+    ))
+    host.open_program(ghidra.OpenProgramRequest(
+        project_path="C:/work/projects",
+        project_name="firmware",
+        program_path=loader.primary_program_path,
+    ))
+
     files = host.list_project_files(ghidra.ListProjectFilesRequest(programs_only=True))
     for item in files.files:
         print(item.path)
 
     host.close_program(ghidra.ShutdownPolicy.SAVE)
-    host.open_program(ghidra.OpenRequest(
+    host.open_program(ghidra.OpenProgramRequest(
         project_path="C:/work/projects",
         project_name="firmware",
         program_path="/payload.elf",
     ))
 ```
 
-Use absolute Ghidra domain paths (`/folder/name`) for project programs. See
-[`examples/project_files.py`](examples/project_files.py) for a runnable version.
+Use absolute Ghidra domain paths (`/folder/name`) for project programs. Closing
+the host with save enabled persists the project; a later Python, C++, Rust, GUI,
+or ghidrasql session can reopen the project and select saved programs by domain
+path. See [`examples/project_files.py`](examples/project_files.py) for a compact
+listing/switching example and
+[`examples/multi_program_strings.py`](examples/multi_program_strings.py) for a
+variadic live example that imports multiple binaries, counts strings, saves, and
+shuts headless down.
 
 ## Async Usage
 
@@ -173,6 +193,7 @@ See [`examples/`](examples/) for the full set of Python scripts.
 | [`cfg_analysis.py`](examples/cfg_analysis.py) | Basic blocks and CFG edges |
 | [`session_lifecycle.py`](examples/session_lifecycle.py) | Status, capabilities, revision, save/discard |
 | [`project_files.py`](examples/project_files.py) | List project programs and switch active program |
+| [`multi_program_strings.py`](examples/multi_program_strings.py) | Import/analyze multiple binaries, count strings per program, save project |
 | [`async_explore.py`](examples/async_explore.py) | AsyncGhidraClient with `asyncio` |
 | [`decompile_tokens.py`](examples/decompile_tokens.py) | Pseudocode token records and local metadata |
 | [`end_to_end.py`](examples/end_to_end.py) | Launch headless Ghidra, analyze, enumerate functions/blocks/decompilation, save, shutdown |

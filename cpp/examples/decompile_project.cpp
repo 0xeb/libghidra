@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 // decompile_project: Open a Ghidra project (.gpr) and decompile functions via IClient.
 //
@@ -40,7 +39,7 @@ int main(int argc, char* argv[]) {
   // --- Open via project path ---
   std::cout << "Opening project: " << gpr_path << "\n";
 
-  ghidra::OpenRequest req;
+  ghidra::OpenProgramRequest req;
   req.project_path = gpr_path;
   req.program_path = binary_path;
   auto open_result = client->OpenProgram(req);
@@ -51,7 +50,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Binary loaded and project names applied.\n\n";
 
   // --- List functions ---
-  auto funcs_result = client->ListFunctions(0, 0, 10000, 0);
+  auto funcs_result = client->ListFunctions(0, UINT64_MAX, 10000, 0);
   if (!funcs_result.ok()) {
     std::cerr << "ListFunctions failed: " << funcs_result.status.message << "\n";
     return 1;

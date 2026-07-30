@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host;
 
 import java.io.IOException;
@@ -92,6 +98,24 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			TaskMonitor taskMonitor,
 			String projectPath,
 			String projectName,
+			String bindAddress,
+			int listenPort,
+			String authToken,
+			ShutdownPolicy shutdownPolicy) {
+		this(
+			createManagedRuntimeBundle(project, programConsumer, taskMonitor, projectPath, projectName),
+			bindAddress,
+			listenPort,
+			authToken,
+			shutdownPolicy);
+	}
+
+	public LibGhidraHeadlessHost(
+			Project project,
+			Object programConsumer,
+			TaskMonitor taskMonitor,
+			String projectPath,
+			String projectName,
 			Program program,
 			String programPath,
 			String bindAddress,
@@ -104,7 +128,9 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			listenPort,
 			authToken,
 			shutdownPolicy);
-		runtimes.session().bindProgram(program, "headless", programPath);
+		if (program != null) {
+			runtimes.session().bindProgram(program, "headless", programPath);
+		}
 	}
 
 	private LibGhidraHeadlessHost(
@@ -291,6 +317,30 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			}
 
 			@Override
+			public SessionContract.AddPerfBenchmarkResponse addPerfBenchmark(
+					SessionContract.AddPerfBenchmarkRequest request) {
+				return sessionHandler.addPerfBenchmark(request);
+			}
+
+			@Override
+			public SessionContract.ListPerfBenchmarksResponse listPerfBenchmarks(
+					SessionContract.ListPerfBenchmarksRequest request) {
+				return sessionHandler.listPerfBenchmarks(request);
+			}
+
+			@Override
+			public SessionContract.ClearPerfBenchmarksResponse clearPerfBenchmarks(
+					SessionContract.ClearPerfBenchmarksRequest request) {
+				return sessionHandler.clearPerfBenchmarks(request);
+			}
+
+			@Override
+			public SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
+					SessionContract.DeletePerfBenchmarkRequest request) {
+				return sessionHandler.deletePerfBenchmark(request);
+			}
+
+			@Override
 			public void afterRpcResponse(String methodName) {
 				if ("libghidra.SessionService/Shutdown".equals(methodName) &&
 					shutdownAccepted.compareAndSet(true, false)) {
@@ -320,6 +370,24 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			public libghidra.host.contract.MemoryContract.ListMemoryBlocksResponse listMemoryBlocks(
 					libghidra.host.contract.MemoryContract.ListMemoryBlocksRequest request) {
 				return memoryHandler.listMemoryBlocks(request);
+			}
+
+			@Override
+			public libghidra.host.contract.MemoryContract.CreateMemoryBlockResponse createMemoryBlock(
+					libghidra.host.contract.MemoryContract.CreateMemoryBlockRequest request) {
+				return memoryHandler.createMemoryBlock(request);
+			}
+
+			@Override
+			public libghidra.host.contract.MemoryContract.RemoveMemoryBlockResponse removeMemoryBlock(
+					libghidra.host.contract.MemoryContract.RemoveMemoryBlockRequest request) {
+				return memoryHandler.removeMemoryBlock(request);
+			}
+
+			@Override
+			public libghidra.host.contract.MemoryContract.MoveMemoryBlockResponse moveMemoryBlock(
+					libghidra.host.contract.MemoryContract.MoveMemoryBlockRequest request) {
+				return memoryHandler.moveMemoryBlock(request);
 			}
 
 			@Override
@@ -410,6 +478,12 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			public FunctionsContract.ListLoopsResponse listLoops(
 					FunctionsContract.ListLoopsRequest request) {
 				return functionsHandler.listLoops(request);
+			}
+
+			@Override
+			public FunctionsContract.ListFunctionFramesResponse listFunctionFrames(
+					FunctionsContract.ListFunctionFramesRequest request) {
+				return functionsHandler.listFunctionFrames(request);
 			}
 
 			@Override
@@ -659,6 +733,12 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			}
 
 			@Override
+			public DecompilerContract.GetPcodeResponse getPcode(
+					DecompilerContract.GetPcodeRequest request) {
+				return decompilerHandler.getPcode(request);
+			}
+
+			@Override
 			public libghidra.host.contract.ListingContract.GetInstructionResponse getInstruction(
 					libghidra.host.contract.ListingContract.GetInstructionRequest request) {
 				return listingHandler.getInstruction(request);
@@ -668,6 +748,12 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			public libghidra.host.contract.ListingContract.ListInstructionsResponse listInstructions(
 					libghidra.host.contract.ListingContract.ListInstructionsRequest request) {
 				return listingHandler.listInstructions(request);
+			}
+
+			@Override
+			public libghidra.host.contract.ListingContract.ListInstructionOperandsResponse listInstructionOperands(
+					libghidra.host.contract.ListingContract.ListInstructionOperandsRequest request) {
+				return listingHandler.listInstructionOperands(request);
 			}
 
 			@Override

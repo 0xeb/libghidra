@@ -1,5 +1,5 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
 // list_project_files: import one or more binaries into a Ghidra project,
 // start a managed headless libghidra host, and list project contents.
@@ -19,19 +19,28 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  ghidra::HeadlessOptions opts;
+  ghidra::HeadlessProjectOptions opts;
   opts.ghidra_dir = argv[1];
   opts.project_dir = argv[2];
   opts.project_name = argv[3];
-  opts.binary = argv[4];
-  for (int i = 5; i < argc; ++i) {
-    opts.binaries.emplace_back(argv[i]);
-  }
   opts.port = 0;
   opts.shutdown = "save";
 
   try {
-    auto host = ghidra::launch_headless(std::move(opts));
+    auto host = ghidra::launch_headless_project(std::move(opts));
+
+    for (int i = 4; i < argc; ++i) {
+      ghidra::ImportProgramRequest import;
+      import.source_path = argv[i];
+      import.overwrite = true;
+      import.analyze = false;
+      auto imported = host->ImportProgram(import);
+      if (!imported.ok()) {
+        std::cerr << "ImportProgram failed for " << argv[i] << ": "
+                  << imported.status.message << "\n";
+        return 1;
+      }
+    }
 
     libghidra::client::ListProjectFilesRequest req;
     req.include_folders = true;

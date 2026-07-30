@@ -69,12 +69,27 @@ extern DecompileRecordDefaultTypeInternal _DecompileRecord_default_instance_;
 class DecompileTokenRecord;
 struct DecompileTokenRecordDefaultTypeInternal;
 extern DecompileTokenRecordDefaultTypeInternal _DecompileTokenRecord_default_instance_;
+class GetPcodeRequest;
+struct GetPcodeRequestDefaultTypeInternal;
+extern GetPcodeRequestDefaultTypeInternal _GetPcodeRequest_default_instance_;
+class GetPcodeResponse;
+struct GetPcodeResponseDefaultTypeInternal;
+extern GetPcodeResponseDefaultTypeInternal _GetPcodeResponse_default_instance_;
 class ListDecompilationsRequest;
 struct ListDecompilationsRequestDefaultTypeInternal;
 extern ListDecompilationsRequestDefaultTypeInternal _ListDecompilationsRequest_default_instance_;
 class ListDecompilationsResponse;
 struct ListDecompilationsResponseDefaultTypeInternal;
 extern ListDecompilationsResponseDefaultTypeInternal _ListDecompilationsResponse_default_instance_;
+class PcodeOpRecord;
+struct PcodeOpRecordDefaultTypeInternal;
+extern PcodeOpRecordDefaultTypeInternal _PcodeOpRecord_default_instance_;
+class PcodeRecord;
+struct PcodeRecordDefaultTypeInternal;
+extern PcodeRecordDefaultTypeInternal _PcodeRecord_default_instance_;
+class VarnodeRecord;
+struct VarnodeRecordDefaultTypeInternal;
+extern VarnodeRecordDefaultTypeInternal _VarnodeRecord_default_instance_;
 }  // namespace libghidra
 namespace google {
 namespace protobuf {
@@ -160,10 +175,495 @@ inline bool DecompileTokenKind_Parse(absl::string_view name, DecompileTokenKind*
   return ::google::protobuf::internal::ParseNamedEnum<DecompileTokenKind>(
       DecompileTokenKind_descriptor(), name, value);
 }
+enum PcodeMaturity : int {
+  PCODE_MATURITY_HIGH = 0,
+  PCODE_MATURITY_RAW = 1,
+  PcodeMaturity_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  PcodeMaturity_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool PcodeMaturity_IsValid(int value);
+extern const uint32_t PcodeMaturity_internal_data_[];
+constexpr PcodeMaturity PcodeMaturity_MIN = static_cast<PcodeMaturity>(0);
+constexpr PcodeMaturity PcodeMaturity_MAX = static_cast<PcodeMaturity>(1);
+constexpr int PcodeMaturity_ARRAYSIZE = 1 + 1;
+const ::google::protobuf::EnumDescriptor*
+PcodeMaturity_descriptor();
+template <typename T>
+const std::string& PcodeMaturity_Name(T value) {
+  static_assert(std::is_same<T, PcodeMaturity>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to PcodeMaturity_Name().");
+  return PcodeMaturity_Name(static_cast<PcodeMaturity>(value));
+}
+template <>
+inline const std::string& PcodeMaturity_Name(PcodeMaturity value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<PcodeMaturity_descriptor,
+                                                 0, 1>(
+      static_cast<int>(value));
+}
+inline bool PcodeMaturity_Parse(absl::string_view name, PcodeMaturity* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<PcodeMaturity>(
+      PcodeMaturity_descriptor(), name, value);
+}
 
 // ===================================================================
 
 
+// -------------------------------------------------------------------
+
+class VarnodeRecord final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.VarnodeRecord) */ {
+ public:
+  inline VarnodeRecord() : VarnodeRecord(nullptr) {}
+  ~VarnodeRecord() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(VarnodeRecord* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(VarnodeRecord));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR VarnodeRecord(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline VarnodeRecord(const VarnodeRecord& from) : VarnodeRecord(nullptr, from) {}
+  inline VarnodeRecord(VarnodeRecord&& from) noexcept
+      : VarnodeRecord(nullptr, std::move(from)) {}
+  inline VarnodeRecord& operator=(const VarnodeRecord& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline VarnodeRecord& operator=(VarnodeRecord&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const VarnodeRecord& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const VarnodeRecord* internal_default_instance() {
+    return reinterpret_cast<const VarnodeRecord*>(
+        &_VarnodeRecord_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 7;
+  friend void swap(VarnodeRecord& a, VarnodeRecord& b) { a.Swap(&b); }
+  inline void Swap(VarnodeRecord* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(VarnodeRecord* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  VarnodeRecord* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<VarnodeRecord>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const VarnodeRecord& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const VarnodeRecord& from) { VarnodeRecord::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(VarnodeRecord* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.VarnodeRecord"; }
+
+ protected:
+  explicit VarnodeRecord(::google::protobuf::Arena* arena);
+  VarnodeRecord(::google::protobuf::Arena* arena, const VarnodeRecord& from);
+  VarnodeRecord(::google::protobuf::Arena* arena, VarnodeRecord&& from) noexcept
+      : VarnodeRecord(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kSpaceFieldNumber = 1,
+    kKindFieldNumber = 4,
+    kOffsetFieldNumber = 2,
+    kSizeFieldNumber = 3,
+  };
+  // string space = 1;
+  void clear_space() ;
+  const std::string& space() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_space(Arg_&& arg, Args_... args);
+  std::string* mutable_space();
+  PROTOBUF_NODISCARD std::string* release_space();
+  void set_allocated_space(std::string* value);
+
+  private:
+  const std::string& _internal_space() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_space(
+      const std::string& value);
+  std::string* _internal_mutable_space();
+
+  public:
+  // string kind = 4;
+  void clear_kind() ;
+  const std::string& kind() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_kind(Arg_&& arg, Args_... args);
+  std::string* mutable_kind();
+  PROTOBUF_NODISCARD std::string* release_kind();
+  void set_allocated_kind(std::string* value);
+
+  private:
+  const std::string& _internal_kind() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_kind(
+      const std::string& value);
+  std::string* _internal_mutable_kind();
+
+  public:
+  // uint64 offset = 2;
+  void clear_offset() ;
+  ::uint64_t offset() const;
+  void set_offset(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_offset() const;
+  void _internal_set_offset(::uint64_t value);
+
+  public:
+  // uint32 size = 3;
+  void clear_size() ;
+  ::uint32_t size() const;
+  void set_size(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_size() const;
+  void _internal_set_size(::uint32_t value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.VarnodeRecord)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      2, 4, 0,
+      41, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const VarnodeRecord& from_msg);
+    ::google::protobuf::internal::ArenaStringPtr space_;
+    ::google::protobuf::internal::ArenaStringPtr kind_;
+    ::uint64_t offset_;
+    ::uint32_t size_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fdecompiler_2eproto;
+};
+// -------------------------------------------------------------------
+
+class GetPcodeRequest final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.GetPcodeRequest) */ {
+ public:
+  inline GetPcodeRequest() : GetPcodeRequest(nullptr) {}
+  ~GetPcodeRequest() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(GetPcodeRequest* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(GetPcodeRequest));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR GetPcodeRequest(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline GetPcodeRequest(const GetPcodeRequest& from) : GetPcodeRequest(nullptr, from) {}
+  inline GetPcodeRequest(GetPcodeRequest&& from) noexcept
+      : GetPcodeRequest(nullptr, std::move(from)) {}
+  inline GetPcodeRequest& operator=(const GetPcodeRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline GetPcodeRequest& operator=(GetPcodeRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const GetPcodeRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const GetPcodeRequest* internal_default_instance() {
+    return reinterpret_cast<const GetPcodeRequest*>(
+        &_GetPcodeRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 10;
+  friend void swap(GetPcodeRequest& a, GetPcodeRequest& b) { a.Swap(&b); }
+  inline void Swap(GetPcodeRequest* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(GetPcodeRequest* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  GetPcodeRequest* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<GetPcodeRequest>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const GetPcodeRequest& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const GetPcodeRequest& from) { GetPcodeRequest::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(GetPcodeRequest* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.GetPcodeRequest"; }
+
+ protected:
+  explicit GetPcodeRequest(::google::protobuf::Arena* arena);
+  GetPcodeRequest(::google::protobuf::Arena* arena, const GetPcodeRequest& from);
+  GetPcodeRequest(::google::protobuf::Arena* arena, GetPcodeRequest&& from) noexcept
+      : GetPcodeRequest(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kAddressFieldNumber = 2,
+    kTimeoutMsFieldNumber = 3,
+    kMaturityFieldNumber = 4,
+  };
+  // uint64 address = 2;
+  void clear_address() ;
+  ::uint64_t address() const;
+  void set_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_address() const;
+  void _internal_set_address(::uint64_t value);
+
+  public:
+  // uint32 timeout_ms = 3;
+  void clear_timeout_ms() ;
+  ::uint32_t timeout_ms() const;
+  void set_timeout_ms(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_timeout_ms() const;
+  void _internal_set_timeout_ms(::uint32_t value);
+
+  public:
+  // .libghidra.PcodeMaturity maturity = 4;
+  void clear_maturity() ;
+  ::libghidra::PcodeMaturity maturity() const;
+  void set_maturity(::libghidra::PcodeMaturity value);
+
+  private:
+  ::libghidra::PcodeMaturity _internal_maturity() const;
+  void _internal_set_maturity(::libghidra::PcodeMaturity value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.GetPcodeRequest)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      2, 3, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const GetPcodeRequest& from_msg);
+    ::uint64_t address_;
+    ::uint32_t timeout_ms_;
+    int maturity_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fdecompiler_2eproto;
+};
 // -------------------------------------------------------------------
 
 class DecompileTokenRecord final : public ::google::protobuf::Message
@@ -928,6 +1428,275 @@ class DecompileFunctionRequest final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
+class PcodeOpRecord final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.PcodeOpRecord) */ {
+ public:
+  inline PcodeOpRecord() : PcodeOpRecord(nullptr) {}
+  ~PcodeOpRecord() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PcodeOpRecord* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PcodeOpRecord));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PcodeOpRecord(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PcodeOpRecord(const PcodeOpRecord& from) : PcodeOpRecord(nullptr, from) {}
+  inline PcodeOpRecord(PcodeOpRecord&& from) noexcept
+      : PcodeOpRecord(nullptr, std::move(from)) {}
+  inline PcodeOpRecord& operator=(const PcodeOpRecord& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PcodeOpRecord& operator=(PcodeOpRecord&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PcodeOpRecord& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PcodeOpRecord* internal_default_instance() {
+    return reinterpret_cast<const PcodeOpRecord*>(
+        &_PcodeOpRecord_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 8;
+  friend void swap(PcodeOpRecord& a, PcodeOpRecord& b) { a.Swap(&b); }
+  inline void Swap(PcodeOpRecord* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PcodeOpRecord* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PcodeOpRecord* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PcodeOpRecord>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PcodeOpRecord& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PcodeOpRecord& from) { PcodeOpRecord::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PcodeOpRecord* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.PcodeOpRecord"; }
+
+ protected:
+  explicit PcodeOpRecord(::google::protobuf::Arena* arena);
+  PcodeOpRecord(::google::protobuf::Arena* arena, const PcodeOpRecord& from);
+  PcodeOpRecord(::google::protobuf::Arena* arena, PcodeOpRecord&& from) noexcept
+      : PcodeOpRecord(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kInputsFieldNumber = 5,
+    kOpFieldNumber = 2,
+    kOutputFieldNumber = 4,
+    kSeqFieldNumber = 1,
+    kAddrFieldNumber = 3,
+    kHasAddressFieldNumber = 6,
+  };
+  // repeated .libghidra.VarnodeRecord inputs = 5;
+  int inputs_size() const;
+  private:
+  int _internal_inputs_size() const;
+
+  public:
+  void clear_inputs() ;
+  ::libghidra::VarnodeRecord* mutable_inputs(int index);
+  ::google::protobuf::RepeatedPtrField<::libghidra::VarnodeRecord>* mutable_inputs();
+
+  private:
+  const ::google::protobuf::RepeatedPtrField<::libghidra::VarnodeRecord>& _internal_inputs() const;
+  ::google::protobuf::RepeatedPtrField<::libghidra::VarnodeRecord>* _internal_mutable_inputs();
+  public:
+  const ::libghidra::VarnodeRecord& inputs(int index) const;
+  ::libghidra::VarnodeRecord* add_inputs();
+  const ::google::protobuf::RepeatedPtrField<::libghidra::VarnodeRecord>& inputs() const;
+  // string op = 2;
+  void clear_op() ;
+  const std::string& op() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_op(Arg_&& arg, Args_... args);
+  std::string* mutable_op();
+  PROTOBUF_NODISCARD std::string* release_op();
+  void set_allocated_op(std::string* value);
+
+  private:
+  const std::string& _internal_op() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_op(
+      const std::string& value);
+  std::string* _internal_mutable_op();
+
+  public:
+  // .libghidra.VarnodeRecord output = 4;
+  bool has_output() const;
+  void clear_output() ;
+  const ::libghidra::VarnodeRecord& output() const;
+  PROTOBUF_NODISCARD ::libghidra::VarnodeRecord* release_output();
+  ::libghidra::VarnodeRecord* mutable_output();
+  void set_allocated_output(::libghidra::VarnodeRecord* value);
+  void unsafe_arena_set_allocated_output(::libghidra::VarnodeRecord* value);
+  ::libghidra::VarnodeRecord* unsafe_arena_release_output();
+
+  private:
+  const ::libghidra::VarnodeRecord& _internal_output() const;
+  ::libghidra::VarnodeRecord* _internal_mutable_output();
+
+  public:
+  // uint64 seq = 1;
+  void clear_seq() ;
+  ::uint64_t seq() const;
+  void set_seq(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_seq() const;
+  void _internal_set_seq(::uint64_t value);
+
+  public:
+  // uint64 addr = 3;
+  void clear_addr() ;
+  ::uint64_t addr() const;
+  void set_addr(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_addr() const;
+  void _internal_set_addr(::uint64_t value);
+
+  public:
+  // bool has_address = 6;
+  void clear_has_address() ;
+  bool has_address() const;
+  void set_has_address(bool value);
+
+  private:
+  bool _internal_has_address() const;
+  void _internal_set_has_address(bool value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.PcodeOpRecord)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      3, 6, 2,
+      34, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PcodeOpRecord& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::google::protobuf::RepeatedPtrField< ::libghidra::VarnodeRecord > inputs_;
+    ::google::protobuf::internal::ArenaStringPtr op_;
+    ::libghidra::VarnodeRecord* output_;
+    ::uint64_t seq_;
+    ::uint64_t addr_;
+    bool has_address_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fdecompiler_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ListDecompilationsRequest final : public ::google::protobuf::Message
 /* @@protoc_insertion_point(class_definition:libghidra.ListDecompilationsRequest) */ {
  public:
@@ -1477,6 +2246,257 @@ class DecompileRecord final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
+class PcodeRecord final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.PcodeRecord) */ {
+ public:
+  inline PcodeRecord() : PcodeRecord(nullptr) {}
+  ~PcodeRecord() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PcodeRecord* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PcodeRecord));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PcodeRecord(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PcodeRecord(const PcodeRecord& from) : PcodeRecord(nullptr, from) {}
+  inline PcodeRecord(PcodeRecord&& from) noexcept
+      : PcodeRecord(nullptr, std::move(from)) {}
+  inline PcodeRecord& operator=(const PcodeRecord& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PcodeRecord& operator=(PcodeRecord&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PcodeRecord& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PcodeRecord* internal_default_instance() {
+    return reinterpret_cast<const PcodeRecord*>(
+        &_PcodeRecord_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 9;
+  friend void swap(PcodeRecord& a, PcodeRecord& b) { a.Swap(&b); }
+  inline void Swap(PcodeRecord* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PcodeRecord* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PcodeRecord* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PcodeRecord>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PcodeRecord& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PcodeRecord& from) { PcodeRecord::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PcodeRecord* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.PcodeRecord"; }
+
+ protected:
+  explicit PcodeRecord(::google::protobuf::Arena* arena);
+  PcodeRecord(::google::protobuf::Arena* arena, const PcodeRecord& from);
+  PcodeRecord(::google::protobuf::Arena* arena, PcodeRecord&& from) noexcept
+      : PcodeRecord(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kOpsFieldNumber = 2,
+    kErrorMessageFieldNumber = 4,
+    kFunctionEntryAddressFieldNumber = 1,
+    kCompletedFieldNumber = 3,
+    kMaturityFieldNumber = 5,
+  };
+  // repeated .libghidra.PcodeOpRecord ops = 2;
+  int ops_size() const;
+  private:
+  int _internal_ops_size() const;
+
+  public:
+  void clear_ops() ;
+  ::libghidra::PcodeOpRecord* mutable_ops(int index);
+  ::google::protobuf::RepeatedPtrField<::libghidra::PcodeOpRecord>* mutable_ops();
+
+  private:
+  const ::google::protobuf::RepeatedPtrField<::libghidra::PcodeOpRecord>& _internal_ops() const;
+  ::google::protobuf::RepeatedPtrField<::libghidra::PcodeOpRecord>* _internal_mutable_ops();
+  public:
+  const ::libghidra::PcodeOpRecord& ops(int index) const;
+  ::libghidra::PcodeOpRecord* add_ops();
+  const ::google::protobuf::RepeatedPtrField<::libghidra::PcodeOpRecord>& ops() const;
+  // string error_message = 4;
+  void clear_error_message() ;
+  const std::string& error_message() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_error_message(Arg_&& arg, Args_... args);
+  std::string* mutable_error_message();
+  PROTOBUF_NODISCARD std::string* release_error_message();
+  void set_allocated_error_message(std::string* value);
+
+  private:
+  const std::string& _internal_error_message() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_error_message(
+      const std::string& value);
+  std::string* _internal_mutable_error_message();
+
+  public:
+  // uint64 function_entry_address = 1;
+  void clear_function_entry_address() ;
+  ::uint64_t function_entry_address() const;
+  void set_function_entry_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_function_entry_address() const;
+  void _internal_set_function_entry_address(::uint64_t value);
+
+  public:
+  // bool completed = 3;
+  void clear_completed() ;
+  bool completed() const;
+  void set_completed(bool value);
+
+  private:
+  bool _internal_completed() const;
+  void _internal_set_completed(bool value);
+
+  public:
+  // .libghidra.PcodeMaturity maturity = 5;
+  void clear_maturity() ;
+  ::libghidra::PcodeMaturity maturity() const;
+  void set_maturity(::libghidra::PcodeMaturity value);
+
+  private:
+  ::libghidra::PcodeMaturity _internal_maturity() const;
+  void _internal_set_maturity(::libghidra::PcodeMaturity value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.PcodeRecord)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      3, 5, 1,
+      43, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PcodeRecord& from_msg);
+    ::google::protobuf::RepeatedPtrField< ::libghidra::PcodeOpRecord > ops_;
+    ::google::protobuf::internal::ArenaStringPtr error_message_;
+    ::uint64_t function_entry_address_;
+    bool completed_;
+    int maturity_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fdecompiler_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ListDecompilationsResponse final : public ::google::protobuf::Message
 /* @@protoc_insertion_point(class_definition:libghidra.ListDecompilationsResponse) */ {
  public:
@@ -1863,6 +2883,202 @@ class DecompileFunctionResponse final : public ::google::protobuf::Message
     ::google::protobuf::internal::HasBits<1> _has_bits_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     ::libghidra::DecompileRecord* decompilation_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fdecompiler_2eproto;
+};
+// -------------------------------------------------------------------
+
+class GetPcodeResponse final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.GetPcodeResponse) */ {
+ public:
+  inline GetPcodeResponse() : GetPcodeResponse(nullptr) {}
+  ~GetPcodeResponse() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(GetPcodeResponse* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(GetPcodeResponse));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR GetPcodeResponse(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline GetPcodeResponse(const GetPcodeResponse& from) : GetPcodeResponse(nullptr, from) {}
+  inline GetPcodeResponse(GetPcodeResponse&& from) noexcept
+      : GetPcodeResponse(nullptr, std::move(from)) {}
+  inline GetPcodeResponse& operator=(const GetPcodeResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline GetPcodeResponse& operator=(GetPcodeResponse&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const GetPcodeResponse& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const GetPcodeResponse* internal_default_instance() {
+    return reinterpret_cast<const GetPcodeResponse*>(
+        &_GetPcodeResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 11;
+  friend void swap(GetPcodeResponse& a, GetPcodeResponse& b) { a.Swap(&b); }
+  inline void Swap(GetPcodeResponse* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(GetPcodeResponse* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  GetPcodeResponse* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<GetPcodeResponse>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const GetPcodeResponse& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const GetPcodeResponse& from) { GetPcodeResponse::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(GetPcodeResponse* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.GetPcodeResponse"; }
+
+ protected:
+  explicit GetPcodeResponse(::google::protobuf::Arena* arena);
+  GetPcodeResponse(::google::protobuf::Arena* arena, const GetPcodeResponse& from);
+  GetPcodeResponse(::google::protobuf::Arena* arena, GetPcodeResponse&& from) noexcept
+      : GetPcodeResponse(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kPcodeFieldNumber = 1,
+  };
+  // .libghidra.PcodeRecord pcode = 1;
+  bool has_pcode() const;
+  void clear_pcode() ;
+  const ::libghidra::PcodeRecord& pcode() const;
+  PROTOBUF_NODISCARD ::libghidra::PcodeRecord* release_pcode();
+  ::libghidra::PcodeRecord* mutable_pcode();
+  void set_allocated_pcode(::libghidra::PcodeRecord* value);
+  void unsafe_arena_set_allocated_pcode(::libghidra::PcodeRecord* value);
+  ::libghidra::PcodeRecord* unsafe_arena_release_pcode();
+
+  private:
+  const ::libghidra::PcodeRecord& _internal_pcode() const;
+  ::libghidra::PcodeRecord* _internal_mutable_pcode();
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.GetPcodeResponse)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      0, 1, 1,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const GetPcodeResponse& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::libghidra::PcodeRecord* pcode_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -3152,6 +4368,750 @@ ListDecompilationsResponse::_internal_mutable_decompilations() {
   return &_impl_.decompilations_;
 }
 
+// -------------------------------------------------------------------
+
+// VarnodeRecord
+
+// string space = 1;
+inline void VarnodeRecord::clear_space() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.space_.ClearToEmpty();
+}
+inline const std::string& VarnodeRecord::space() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.VarnodeRecord.space)
+  return _internal_space();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void VarnodeRecord::set_space(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.space_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.VarnodeRecord.space)
+}
+inline std::string* VarnodeRecord::mutable_space() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_space();
+  // @@protoc_insertion_point(field_mutable:libghidra.VarnodeRecord.space)
+  return _s;
+}
+inline const std::string& VarnodeRecord::_internal_space() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.space_.Get();
+}
+inline void VarnodeRecord::_internal_set_space(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.space_.Set(value, GetArena());
+}
+inline std::string* VarnodeRecord::_internal_mutable_space() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.space_.Mutable( GetArena());
+}
+inline std::string* VarnodeRecord::release_space() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.VarnodeRecord.space)
+  return _impl_.space_.Release();
+}
+inline void VarnodeRecord::set_allocated_space(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.space_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.space_.IsDefault()) {
+    _impl_.space_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.VarnodeRecord.space)
+}
+
+// uint64 offset = 2;
+inline void VarnodeRecord::clear_offset() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.offset_ = ::uint64_t{0u};
+}
+inline ::uint64_t VarnodeRecord::offset() const {
+  // @@protoc_insertion_point(field_get:libghidra.VarnodeRecord.offset)
+  return _internal_offset();
+}
+inline void VarnodeRecord::set_offset(::uint64_t value) {
+  _internal_set_offset(value);
+  // @@protoc_insertion_point(field_set:libghidra.VarnodeRecord.offset)
+}
+inline ::uint64_t VarnodeRecord::_internal_offset() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.offset_;
+}
+inline void VarnodeRecord::_internal_set_offset(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.offset_ = value;
+}
+
+// uint32 size = 3;
+inline void VarnodeRecord::clear_size() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.size_ = 0u;
+}
+inline ::uint32_t VarnodeRecord::size() const {
+  // @@protoc_insertion_point(field_get:libghidra.VarnodeRecord.size)
+  return _internal_size();
+}
+inline void VarnodeRecord::set_size(::uint32_t value) {
+  _internal_set_size(value);
+  // @@protoc_insertion_point(field_set:libghidra.VarnodeRecord.size)
+}
+inline ::uint32_t VarnodeRecord::_internal_size() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.size_;
+}
+inline void VarnodeRecord::_internal_set_size(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.size_ = value;
+}
+
+// string kind = 4;
+inline void VarnodeRecord::clear_kind() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.kind_.ClearToEmpty();
+}
+inline const std::string& VarnodeRecord::kind() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.VarnodeRecord.kind)
+  return _internal_kind();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void VarnodeRecord::set_kind(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.kind_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.VarnodeRecord.kind)
+}
+inline std::string* VarnodeRecord::mutable_kind() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_kind();
+  // @@protoc_insertion_point(field_mutable:libghidra.VarnodeRecord.kind)
+  return _s;
+}
+inline const std::string& VarnodeRecord::_internal_kind() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.kind_.Get();
+}
+inline void VarnodeRecord::_internal_set_kind(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.kind_.Set(value, GetArena());
+}
+inline std::string* VarnodeRecord::_internal_mutable_kind() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.kind_.Mutable( GetArena());
+}
+inline std::string* VarnodeRecord::release_kind() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.VarnodeRecord.kind)
+  return _impl_.kind_.Release();
+}
+inline void VarnodeRecord::set_allocated_kind(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.kind_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.kind_.IsDefault()) {
+    _impl_.kind_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.VarnodeRecord.kind)
+}
+
+// -------------------------------------------------------------------
+
+// PcodeOpRecord
+
+// uint64 seq = 1;
+inline void PcodeOpRecord::clear_seq() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.seq_ = ::uint64_t{0u};
+}
+inline ::uint64_t PcodeOpRecord::seq() const {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeOpRecord.seq)
+  return _internal_seq();
+}
+inline void PcodeOpRecord::set_seq(::uint64_t value) {
+  _internal_set_seq(value);
+  // @@protoc_insertion_point(field_set:libghidra.PcodeOpRecord.seq)
+}
+inline ::uint64_t PcodeOpRecord::_internal_seq() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.seq_;
+}
+inline void PcodeOpRecord::_internal_set_seq(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.seq_ = value;
+}
+
+// string op = 2;
+inline void PcodeOpRecord::clear_op() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.op_.ClearToEmpty();
+}
+inline const std::string& PcodeOpRecord::op() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeOpRecord.op)
+  return _internal_op();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PcodeOpRecord::set_op(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.op_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.PcodeOpRecord.op)
+}
+inline std::string* PcodeOpRecord::mutable_op() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_op();
+  // @@protoc_insertion_point(field_mutable:libghidra.PcodeOpRecord.op)
+  return _s;
+}
+inline const std::string& PcodeOpRecord::_internal_op() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.op_.Get();
+}
+inline void PcodeOpRecord::_internal_set_op(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.op_.Set(value, GetArena());
+}
+inline std::string* PcodeOpRecord::_internal_mutable_op() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.op_.Mutable( GetArena());
+}
+inline std::string* PcodeOpRecord::release_op() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.PcodeOpRecord.op)
+  return _impl_.op_.Release();
+}
+inline void PcodeOpRecord::set_allocated_op(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.op_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.op_.IsDefault()) {
+    _impl_.op_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.PcodeOpRecord.op)
+}
+
+// uint64 addr = 3;
+inline void PcodeOpRecord::clear_addr() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.addr_ = ::uint64_t{0u};
+}
+inline ::uint64_t PcodeOpRecord::addr() const {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeOpRecord.addr)
+  return _internal_addr();
+}
+inline void PcodeOpRecord::set_addr(::uint64_t value) {
+  _internal_set_addr(value);
+  // @@protoc_insertion_point(field_set:libghidra.PcodeOpRecord.addr)
+}
+inline ::uint64_t PcodeOpRecord::_internal_addr() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.addr_;
+}
+inline void PcodeOpRecord::_internal_set_addr(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.addr_ = value;
+}
+
+// .libghidra.VarnodeRecord output = 4;
+inline bool PcodeOpRecord::has_output() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.output_ != nullptr);
+  return value;
+}
+inline void PcodeOpRecord::clear_output() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.output_ != nullptr) _impl_.output_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+inline const ::libghidra::VarnodeRecord& PcodeOpRecord::_internal_output() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  const ::libghidra::VarnodeRecord* p = _impl_.output_;
+  return p != nullptr ? *p : reinterpret_cast<const ::libghidra::VarnodeRecord&>(::libghidra::_VarnodeRecord_default_instance_);
+}
+inline const ::libghidra::VarnodeRecord& PcodeOpRecord::output() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeOpRecord.output)
+  return _internal_output();
+}
+inline void PcodeOpRecord::unsafe_arena_set_allocated_output(::libghidra::VarnodeRecord* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.output_);
+  }
+  _impl_.output_ = reinterpret_cast<::libghidra::VarnodeRecord*>(value);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:libghidra.PcodeOpRecord.output)
+}
+inline ::libghidra::VarnodeRecord* PcodeOpRecord::release_output() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::VarnodeRecord* released = _impl_.output_;
+  _impl_.output_ = nullptr;
+  if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
+    auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
+    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    if (GetArena() == nullptr) {
+      delete old;
+    }
+  } else {
+    if (GetArena() != nullptr) {
+      released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    }
+  }
+  return released;
+}
+inline ::libghidra::VarnodeRecord* PcodeOpRecord::unsafe_arena_release_output() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.PcodeOpRecord.output)
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::VarnodeRecord* temp = _impl_.output_;
+  _impl_.output_ = nullptr;
+  return temp;
+}
+inline ::libghidra::VarnodeRecord* PcodeOpRecord::_internal_mutable_output() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.output_ == nullptr) {
+    auto* p = ::google::protobuf::Message::DefaultConstruct<::libghidra::VarnodeRecord>(GetArena());
+    _impl_.output_ = reinterpret_cast<::libghidra::VarnodeRecord*>(p);
+  }
+  return _impl_.output_;
+}
+inline ::libghidra::VarnodeRecord* PcodeOpRecord::mutable_output() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  _impl_._has_bits_[0] |= 0x00000001u;
+  ::libghidra::VarnodeRecord* _msg = _internal_mutable_output();
+  // @@protoc_insertion_point(field_mutable:libghidra.PcodeOpRecord.output)
+  return _msg;
+}
+inline void PcodeOpRecord::set_allocated_output(::libghidra::VarnodeRecord* value) {
+  ::google::protobuf::Arena* message_arena = GetArena();
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (message_arena == nullptr) {
+    delete (_impl_.output_);
+  }
+
+  if (value != nullptr) {
+    ::google::protobuf::Arena* submessage_arena = (value)->GetArena();
+    if (message_arena != submessage_arena) {
+      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
+    }
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+
+  _impl_.output_ = reinterpret_cast<::libghidra::VarnodeRecord*>(value);
+  // @@protoc_insertion_point(field_set_allocated:libghidra.PcodeOpRecord.output)
+}
+
+// repeated .libghidra.VarnodeRecord inputs = 5;
+inline int PcodeOpRecord::_internal_inputs_size() const {
+  return _internal_inputs().size();
+}
+inline int PcodeOpRecord::inputs_size() const {
+  return _internal_inputs_size();
+}
+inline void PcodeOpRecord::clear_inputs() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.inputs_.Clear();
+}
+inline ::libghidra::VarnodeRecord* PcodeOpRecord::mutable_inputs(int index)
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_mutable:libghidra.PcodeOpRecord.inputs)
+  return _internal_mutable_inputs()->Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField<::libghidra::VarnodeRecord>* PcodeOpRecord::mutable_inputs()
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_mutable_list:libghidra.PcodeOpRecord.inputs)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _internal_mutable_inputs();
+}
+inline const ::libghidra::VarnodeRecord& PcodeOpRecord::inputs(int index) const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeOpRecord.inputs)
+  return _internal_inputs().Get(index);
+}
+inline ::libghidra::VarnodeRecord* PcodeOpRecord::add_inputs() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::libghidra::VarnodeRecord* _add = _internal_mutable_inputs()->Add();
+  // @@protoc_insertion_point(field_add:libghidra.PcodeOpRecord.inputs)
+  return _add;
+}
+inline const ::google::protobuf::RepeatedPtrField<::libghidra::VarnodeRecord>& PcodeOpRecord::inputs() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_list:libghidra.PcodeOpRecord.inputs)
+  return _internal_inputs();
+}
+inline const ::google::protobuf::RepeatedPtrField<::libghidra::VarnodeRecord>&
+PcodeOpRecord::_internal_inputs() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.inputs_;
+}
+inline ::google::protobuf::RepeatedPtrField<::libghidra::VarnodeRecord>*
+PcodeOpRecord::_internal_mutable_inputs() {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return &_impl_.inputs_;
+}
+
+// bool has_address = 6;
+inline void PcodeOpRecord::clear_has_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.has_address_ = false;
+}
+inline bool PcodeOpRecord::has_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeOpRecord.has_address)
+  return _internal_has_address();
+}
+inline void PcodeOpRecord::set_has_address(bool value) {
+  _internal_set_has_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.PcodeOpRecord.has_address)
+}
+inline bool PcodeOpRecord::_internal_has_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.has_address_;
+}
+inline void PcodeOpRecord::_internal_set_has_address(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.has_address_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PcodeRecord
+
+// uint64 function_entry_address = 1;
+inline void PcodeRecord::clear_function_entry_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.function_entry_address_ = ::uint64_t{0u};
+}
+inline ::uint64_t PcodeRecord::function_entry_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeRecord.function_entry_address)
+  return _internal_function_entry_address();
+}
+inline void PcodeRecord::set_function_entry_address(::uint64_t value) {
+  _internal_set_function_entry_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.PcodeRecord.function_entry_address)
+}
+inline ::uint64_t PcodeRecord::_internal_function_entry_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.function_entry_address_;
+}
+inline void PcodeRecord::_internal_set_function_entry_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.function_entry_address_ = value;
+}
+
+// repeated .libghidra.PcodeOpRecord ops = 2;
+inline int PcodeRecord::_internal_ops_size() const {
+  return _internal_ops().size();
+}
+inline int PcodeRecord::ops_size() const {
+  return _internal_ops_size();
+}
+inline void PcodeRecord::clear_ops() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.ops_.Clear();
+}
+inline ::libghidra::PcodeOpRecord* PcodeRecord::mutable_ops(int index)
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_mutable:libghidra.PcodeRecord.ops)
+  return _internal_mutable_ops()->Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField<::libghidra::PcodeOpRecord>* PcodeRecord::mutable_ops()
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_mutable_list:libghidra.PcodeRecord.ops)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _internal_mutable_ops();
+}
+inline const ::libghidra::PcodeOpRecord& PcodeRecord::ops(int index) const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeRecord.ops)
+  return _internal_ops().Get(index);
+}
+inline ::libghidra::PcodeOpRecord* PcodeRecord::add_ops() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::libghidra::PcodeOpRecord* _add = _internal_mutable_ops()->Add();
+  // @@protoc_insertion_point(field_add:libghidra.PcodeRecord.ops)
+  return _add;
+}
+inline const ::google::protobuf::RepeatedPtrField<::libghidra::PcodeOpRecord>& PcodeRecord::ops() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_list:libghidra.PcodeRecord.ops)
+  return _internal_ops();
+}
+inline const ::google::protobuf::RepeatedPtrField<::libghidra::PcodeOpRecord>&
+PcodeRecord::_internal_ops() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.ops_;
+}
+inline ::google::protobuf::RepeatedPtrField<::libghidra::PcodeOpRecord>*
+PcodeRecord::_internal_mutable_ops() {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return &_impl_.ops_;
+}
+
+// bool completed = 3;
+inline void PcodeRecord::clear_completed() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.completed_ = false;
+}
+inline bool PcodeRecord::completed() const {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeRecord.completed)
+  return _internal_completed();
+}
+inline void PcodeRecord::set_completed(bool value) {
+  _internal_set_completed(value);
+  // @@protoc_insertion_point(field_set:libghidra.PcodeRecord.completed)
+}
+inline bool PcodeRecord::_internal_completed() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.completed_;
+}
+inline void PcodeRecord::_internal_set_completed(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.completed_ = value;
+}
+
+// string error_message = 4;
+inline void PcodeRecord::clear_error_message() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.error_message_.ClearToEmpty();
+}
+inline const std::string& PcodeRecord::error_message() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeRecord.error_message)
+  return _internal_error_message();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PcodeRecord::set_error_message(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.error_message_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.PcodeRecord.error_message)
+}
+inline std::string* PcodeRecord::mutable_error_message() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_error_message();
+  // @@protoc_insertion_point(field_mutable:libghidra.PcodeRecord.error_message)
+  return _s;
+}
+inline const std::string& PcodeRecord::_internal_error_message() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.error_message_.Get();
+}
+inline void PcodeRecord::_internal_set_error_message(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.error_message_.Set(value, GetArena());
+}
+inline std::string* PcodeRecord::_internal_mutable_error_message() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.error_message_.Mutable( GetArena());
+}
+inline std::string* PcodeRecord::release_error_message() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.PcodeRecord.error_message)
+  return _impl_.error_message_.Release();
+}
+inline void PcodeRecord::set_allocated_error_message(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.error_message_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.error_message_.IsDefault()) {
+    _impl_.error_message_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.PcodeRecord.error_message)
+}
+
+// .libghidra.PcodeMaturity maturity = 5;
+inline void PcodeRecord::clear_maturity() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.maturity_ = 0;
+}
+inline ::libghidra::PcodeMaturity PcodeRecord::maturity() const {
+  // @@protoc_insertion_point(field_get:libghidra.PcodeRecord.maturity)
+  return _internal_maturity();
+}
+inline void PcodeRecord::set_maturity(::libghidra::PcodeMaturity value) {
+  _internal_set_maturity(value);
+  // @@protoc_insertion_point(field_set:libghidra.PcodeRecord.maturity)
+}
+inline ::libghidra::PcodeMaturity PcodeRecord::_internal_maturity() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return static_cast<::libghidra::PcodeMaturity>(_impl_.maturity_);
+}
+inline void PcodeRecord::_internal_set_maturity(::libghidra::PcodeMaturity value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.maturity_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// GetPcodeRequest
+
+// uint64 address = 2;
+inline void GetPcodeRequest::clear_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.address_ = ::uint64_t{0u};
+}
+inline ::uint64_t GetPcodeRequest::address() const {
+  // @@protoc_insertion_point(field_get:libghidra.GetPcodeRequest.address)
+  return _internal_address();
+}
+inline void GetPcodeRequest::set_address(::uint64_t value) {
+  _internal_set_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.GetPcodeRequest.address)
+}
+inline ::uint64_t GetPcodeRequest::_internal_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.address_;
+}
+inline void GetPcodeRequest::_internal_set_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.address_ = value;
+}
+
+// uint32 timeout_ms = 3;
+inline void GetPcodeRequest::clear_timeout_ms() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.timeout_ms_ = 0u;
+}
+inline ::uint32_t GetPcodeRequest::timeout_ms() const {
+  // @@protoc_insertion_point(field_get:libghidra.GetPcodeRequest.timeout_ms)
+  return _internal_timeout_ms();
+}
+inline void GetPcodeRequest::set_timeout_ms(::uint32_t value) {
+  _internal_set_timeout_ms(value);
+  // @@protoc_insertion_point(field_set:libghidra.GetPcodeRequest.timeout_ms)
+}
+inline ::uint32_t GetPcodeRequest::_internal_timeout_ms() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.timeout_ms_;
+}
+inline void GetPcodeRequest::_internal_set_timeout_ms(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.timeout_ms_ = value;
+}
+
+// .libghidra.PcodeMaturity maturity = 4;
+inline void GetPcodeRequest::clear_maturity() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.maturity_ = 0;
+}
+inline ::libghidra::PcodeMaturity GetPcodeRequest::maturity() const {
+  // @@protoc_insertion_point(field_get:libghidra.GetPcodeRequest.maturity)
+  return _internal_maturity();
+}
+inline void GetPcodeRequest::set_maturity(::libghidra::PcodeMaturity value) {
+  _internal_set_maturity(value);
+  // @@protoc_insertion_point(field_set:libghidra.GetPcodeRequest.maturity)
+}
+inline ::libghidra::PcodeMaturity GetPcodeRequest::_internal_maturity() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return static_cast<::libghidra::PcodeMaturity>(_impl_.maturity_);
+}
+inline void GetPcodeRequest::_internal_set_maturity(::libghidra::PcodeMaturity value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.maturity_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// GetPcodeResponse
+
+// .libghidra.PcodeRecord pcode = 1;
+inline bool GetPcodeResponse::has_pcode() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.pcode_ != nullptr);
+  return value;
+}
+inline void GetPcodeResponse::clear_pcode() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.pcode_ != nullptr) _impl_.pcode_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+inline const ::libghidra::PcodeRecord& GetPcodeResponse::_internal_pcode() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  const ::libghidra::PcodeRecord* p = _impl_.pcode_;
+  return p != nullptr ? *p : reinterpret_cast<const ::libghidra::PcodeRecord&>(::libghidra::_PcodeRecord_default_instance_);
+}
+inline const ::libghidra::PcodeRecord& GetPcodeResponse::pcode() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.GetPcodeResponse.pcode)
+  return _internal_pcode();
+}
+inline void GetPcodeResponse::unsafe_arena_set_allocated_pcode(::libghidra::PcodeRecord* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.pcode_);
+  }
+  _impl_.pcode_ = reinterpret_cast<::libghidra::PcodeRecord*>(value);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:libghidra.GetPcodeResponse.pcode)
+}
+inline ::libghidra::PcodeRecord* GetPcodeResponse::release_pcode() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::PcodeRecord* released = _impl_.pcode_;
+  _impl_.pcode_ = nullptr;
+  if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
+    auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
+    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    if (GetArena() == nullptr) {
+      delete old;
+    }
+  } else {
+    if (GetArena() != nullptr) {
+      released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    }
+  }
+  return released;
+}
+inline ::libghidra::PcodeRecord* GetPcodeResponse::unsafe_arena_release_pcode() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.GetPcodeResponse.pcode)
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::PcodeRecord* temp = _impl_.pcode_;
+  _impl_.pcode_ = nullptr;
+  return temp;
+}
+inline ::libghidra::PcodeRecord* GetPcodeResponse::_internal_mutable_pcode() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.pcode_ == nullptr) {
+    auto* p = ::google::protobuf::Message::DefaultConstruct<::libghidra::PcodeRecord>(GetArena());
+    _impl_.pcode_ = reinterpret_cast<::libghidra::PcodeRecord*>(p);
+  }
+  return _impl_.pcode_;
+}
+inline ::libghidra::PcodeRecord* GetPcodeResponse::mutable_pcode() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  _impl_._has_bits_[0] |= 0x00000001u;
+  ::libghidra::PcodeRecord* _msg = _internal_mutable_pcode();
+  // @@protoc_insertion_point(field_mutable:libghidra.GetPcodeResponse.pcode)
+  return _msg;
+}
+inline void GetPcodeResponse::set_allocated_pcode(::libghidra::PcodeRecord* value) {
+  ::google::protobuf::Arena* message_arena = GetArena();
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (message_arena == nullptr) {
+    delete (_impl_.pcode_);
+  }
+
+  if (value != nullptr) {
+    ::google::protobuf::Arena* submessage_arena = (value)->GetArena();
+    if (message_arena != submessage_arena) {
+      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
+    }
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+
+  _impl_.pcode_ = reinterpret_cast<::libghidra::PcodeRecord*>(value);
+  // @@protoc_insertion_point(field_set_allocated:libghidra.GetPcodeResponse.pcode)
+}
+
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif  // __GNUC__
@@ -3174,6 +5134,12 @@ struct is_proto_enum<::libghidra::DecompileTokenKind> : std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor<::libghidra::DecompileTokenKind>() {
   return ::libghidra::DecompileTokenKind_descriptor();
+}
+template <>
+struct is_proto_enum<::libghidra::PcodeMaturity> : std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor<::libghidra::PcodeMaturity>() {
+  return ::libghidra::PcodeMaturity_descriptor();
 }
 
 }  // namespace protobuf

@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 
@@ -92,6 +91,24 @@ class IClient : public IHealthClient,
     return StatusOr<ShutdownResponse>::FromError("NOT_SUPPORTED",
                                                  "not implemented by this backend");
   }
+  StatusOr<AddPerfBenchmarkResponse> AddPerfBenchmark(
+      const PerfBenchmarkRecord&) override {
+    return StatusOr<AddPerfBenchmarkResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<ListPerfBenchmarksResponse> ListPerfBenchmarks() override {
+    return StatusOr<ListPerfBenchmarksResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<ClearPerfBenchmarksResponse> ClearPerfBenchmarks() override {
+    return StatusOr<ClearPerfBenchmarksResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<DeletePerfBenchmarkResponse> DeletePerfBenchmark(
+      const std::string&) override {
+    return StatusOr<DeletePerfBenchmarkResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
 
   // -- IMemoryClient defaults ------------------------------------------------
 
@@ -111,6 +128,20 @@ class IClient : public IHealthClient,
   }
   StatusOr<ListMemoryBlocksResponse> ListMemoryBlocks(int, int) override {
     return StatusOr<ListMemoryBlocksResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<CreateMemoryBlockResponse> CreateMemoryBlock(
+      const CreateMemoryBlockSpec&) override {
+    return StatusOr<CreateMemoryBlockResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<RemoveMemoryBlockResponse> RemoveMemoryBlock(std::uint64_t) override {
+    return StatusOr<RemoveMemoryBlockResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<MoveMemoryBlockResponse> MoveMemoryBlock(std::uint64_t,
+                                                    std::uint64_t) override {
+    return StatusOr<MoveMemoryBlockResponse>::FromError(
         "NOT_SUPPORTED", "not implemented by this backend");
   }
 
@@ -158,6 +189,11 @@ class IClient : public IHealthClient,
   StatusOr<ListLoopsResponse> ListLoops(std::uint64_t, std::uint64_t,
                                         int, int) override {
     return StatusOr<ListLoopsResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<ListFunctionFramesResponse> ListFunctionFrames(std::uint64_t, std::uint64_t,
+                                                          int, int) override {
+    return StatusOr<ListFunctionFramesResponse>::FromError(
         "NOT_SUPPORTED", "not implemented by this backend");
   }
 
@@ -400,6 +436,10 @@ class IClient : public IHealthClient,
     return StatusOr<ListDecompilationsResponse>::FromError(
         "NOT_SUPPORTED", "not implemented by this backend");
   }
+  StatusOr<GetPcodeResponse> GetPcode(std::uint64_t, PcodeMaturity, int) override {
+    return StatusOr<GetPcodeResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
 
   // -- IListingClient defaults -----------------------------------------------
 
@@ -410,6 +450,11 @@ class IClient : public IHealthClient,
   StatusOr<ListInstructionsResponse> ListInstructions(std::uint64_t, std::uint64_t, int,
                                                       int) override {
     return StatusOr<ListInstructionsResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<ListInstructionOperandsResponse> ListInstructionOperands(std::uint64_t, std::uint64_t,
+                                                                    int, int) override {
+    return StatusOr<ListInstructionOperandsResponse>::FromError(
         "NOT_SUPPORTED", "not implemented by this backend");
   }
   StatusOr<GetCommentsResponse> GetComments(std::uint64_t, std::uint64_t, int,

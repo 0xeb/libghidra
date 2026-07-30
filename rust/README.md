@@ -5,7 +5,7 @@ import:
 
 - **`live`** *(default)* — HTTP/RPC client. Lights up when a Ghidra
   Desktop with the `LibGhidraHost` extension is reachable, or when you
-  spawn a headless instance via `launch_headless`.
+  spawn a headless project session via `launch_headless_project`.
 - **`local`** — offline backend. Links the C++ libghidra engine + its
   embedded Sleigh specs via a cxx FFI bridge. **No Ghidra install
   required at runtime.** Mirrors `python/src/libghidra/local.py`.
@@ -68,8 +68,22 @@ The `local` feature pulls in the cxx FFI bridge into
                           -DGHIDRA_SOURCE_DIR=<path/to/ghidra>
    cmake --build build --config Release
 
-   # 4. Tell cargo where it lives
-   export LIBGHIDRA_PREBUILT_DIR=$PWD/sdk-bundle  # or LIBGHIDRA_INCLUDE_DIR + LIBGHIDRA_LIB_DIR
+   # 4. Stage the flat SDK layout expected by build.rs. Keep the vendored
+   #    Protobuf/Abseil archives with the two libghidra archives so their
+   #    versions cannot drift at link time.
+   SDK_BUNDLE=$PWD/sdk-bundle
+   mkdir -p "$SDK_BUNDLE/include" "$SDK_BUNDLE/lib"
+   cp -R cpp/include/* "$SDK_BUNDLE/include/"
+   find build -type f \( \
+     -name 'liblibghidra_*.a' -o -name 'libghidra_*.lib' -o \
+     -name 'liblibghidra_*.lib' -o -name 'libprotobuf.a' -o \
+     -name 'libprotobuf.lib' -o -name 'libabsl_*.a' -o \
+     -name 'absl_*.lib' -o -name 'libutf8_*.a' -o \
+     -name 'utf8_*.lib' \
+   \) -exec cp {} "$SDK_BUNDLE/lib/" \;
+
+   # 5. Tell cargo where it lives
+   export LIBGHIDRA_PREBUILT_DIR=$SDK_BUNDLE
    cargo build --features local
    ```
 
@@ -89,56 +103,21 @@ matrix):
 Other targets (FreeBSD, illumos, etc.) work via the source path; expect
 a multi-minute first compile.
 
-#### System prereqs for the `local` feature
+#### Native dependencies for the `local` feature
 
-The libghidra C++ engine depends on a few system libraries that the
-prebuilt archive does **not** bundle (it ships static `.a` archives for
-the libghidra targets only — protobuf, zlib, bfd come from the host):
+Release prebuilt archives are self-contained: they carry the exact
+Protobuf/Abseil/utf8 archives used to build `libghidra_client`, and Linux
+archives also carry the matching static libbfd and its archive dependencies.
+No Protobuf or binutils development package is needed to consume one.
 
-* **Linux (Debian / Ubuntu / Raspberry Pi OS):**
-  ```bash
-  sudo apt-get install libprotobuf-dev binutils-dev zlib1g-dev
-  ```
-  `binutils-dev` provides `libbfd` (used by the offline loader);
-  `libprotobuf-dev` provides `libprotobuf-lite`. Tested on Debian 13
-  trixie aarch64 (Raspberry Pi 5).
-* **Linux (RHEL / Fedora / CentOS):**
-  ```bash
-  sudo dnf install protobuf-devel binutils-devel zlib-devel
-  ```
-* **macOS (Homebrew):** the `local` feature builds against
-  Homebrew-installed `protobuf` + `zlib`. Set
-  `LIBGHIDRA_EXTRA_LIB_PATHS=/opt/homebrew/lib` (Apple Silicon) or
-  `/usr/local/lib` (Intel) before `cargo build`.
-* **Windows:** prebuilt archive bundles everything it needs; no extra
-  deps to install.
-
-If `cargo build --features local` fails with "could not find native
-static library `protobuf-lite`" (or similar), install the missing
-`-dev` package and re-run. Override the link list entirely with
-`LIBGHIDRA_LINK_LIBS=static=libghidra_local,...` if you have a non-
-standard layout.
-
-#### Known: libbfd ABI mismatch on newer Linux distros
-
-The current prebuilt archives are built in a manylinux_2_28 container
-where `binutils-devel` provides libbfd ≈ 2.30. When you link those
-archives against libbfd 2.44+ (Debian 13 trixie, Ubuntu 24.04,
-Fedora 40+), `read_bytes` and the decompiler will read garbage from
-the loaded image — same archive, same bridge, but BFD's internal
-struct layouts shifted between major versions and the ABI is silent.
-
-Symptom: `local_quickstart` reports the correct language ID
-(`AARCH64:LE:64:v8A` etc.) and `open_program` succeeds, but
-`read_bytes` returns process-memory garbage and the decompiler emits
-`halt_baddata()` warnings.
-
-Workaround until prebuilds bundle a matched libbfd (see issue tracker
-for the open ticket): build the C++ SDK on the same machine you're
-running Rust on, and point `LIBGHIDRA_PREBUILT_DIR` at it instead of
-the downloaded archive. The Python wheel sidesteps this by statically
-embedding libbfd via auditwheel; the Rust archive is intentionally
-leaner and doesn't yet do the same.
+A source build still needs the C++ prerequisites listed in the top-level
+README. On Linux that includes the libbfd headers (`binutils-dev` on
+Debian/Ubuntu, `binutils-devel` on Fedora/RHEL) at CMake build time. A custom
+bundle must retain the fetched Protobuf/Abseil/utf8 archives as shown above;
+otherwise the final Rust link is intentionally fail-closed instead of silently
+mixing incompatible Protobuf versions. `LIBGHIDRA_LINK_LIBS` and
+`LIBGHIDRA_LINK_DYLIBS` remain available for deliberately non-standard SDK
+layouts.
 
 ## Quick start — live (HTTP)
 
@@ -160,8 +139,9 @@ for f in &funcs.functions {
 ### Project files and switching
 
 Live/headless sessions can enumerate and import Ghidra project programs while
-keeping one active program per host. List project programs, close the current
-program, then open the next Ghidra domain path:
+keeping one active program per host. Import and analyze with Ghidra, list
+project programs, close the current program, then open the next Ghidra domain
+path:
 
 ```rust
 use libghidra::{
@@ -185,6 +165,13 @@ client.open_program(OpenProgramRequest {
 })?;
 # Ok::<(), libghidra::Error>(())
 ```
+
+Call `close(true)` or shut down with `ShutdownPolicy::Save` to persist the
+project. Later Rust, Python, C++, GUI, or ghidrasql sessions can reopen the same
+project and select saved programs by domain path. See
+[`examples/multi_program_strings.rs`](examples/multi_program_strings.rs) for a
+variadic live example that imports multiple binaries, counts strings, saves, and
+shuts headless down.
 
 ## Quick start — local (offline)
 
@@ -230,6 +217,7 @@ See [`examples/`](examples/) for the full set.
 | [`cfg_analysis.rs`](examples/cfg_analysis.rs) | live | Basic blocks and CFG edges |
 | [`decompile_tokens.rs`](examples/decompile_tokens.rs) | live | Pseudocode token records and local metadata |
 | [`end_to_end.rs`](examples/end_to_end.rs) | live | Launch headless Ghidra, analyze, enumerate, save, shutdown |
+| [`multi_program_strings.rs`](examples/multi_program_strings.rs) | live | Import/analyze multiple binaries, count strings per program, save project |
 | [`function_tags.rs`](examples/function_tags.rs) | live | Function tag CRUD and mappings |
 | [`parse_declarations.rs`](examples/parse_declarations.rs) | live | Parse C declarations into data types |
 | [`session_lifecycle.rs`](examples/session_lifecycle.rs) | live | Status, capabilities, revision, save/discard |
@@ -281,7 +269,7 @@ Both backends share the same record/response types in
 | Area | Methods |
 |------|---------|
 | Health | `get_status`, `get_capabilities` |
-| Session | `open_program`, `close_program`, `save_program`, `discard_program`, `get_revision`, `shutdown` (live) |
+| Session | `open_project`, `close_project`, `list_project_files`, `import_program`, `open_program`, `close_program`, `save_program`, `discard_program`, `get_revision`, `shutdown` (live) |
 | Memory | `read_bytes`, `write_bytes` (live), `patch_bytes_batch` (live), `list_memory_blocks` |
 | Functions | Function lookup/list/rename, basic blocks, CFG edges, structural analysis (live), function tags (live) |
 | Symbols | `get_symbol`, `list_symbols`, `rename_symbol`, `delete_symbol` (live) |
@@ -335,7 +323,7 @@ are the reference implementations.
 | Local backend | `LocalClient` (nanobind → C++) | `LocalClient` (cxx → C++) |
 | Sleigh specs | embedded in `_libghidra.pyd/.so` | embedded in the prebuilt archive |
 | Format detection | `libghidra.format_detect` | `libghidra::format_detect` |
-| Examples | `python/examples/` (21 scripts) | `rust/examples/` (22 scripts) |
+| Examples | `python/examples/` (25 scripts) | `rust/examples/` (23 scripts) |
 
 If you find behaviour that diverges between the two languages for the
 same backend, please open an issue — that's a bug.

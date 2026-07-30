@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.service;
 
 import libghidra.host.contract.SessionContract;
@@ -87,13 +93,45 @@ public final class SessionServiceHandler {
 		return runtime.getRevision(request);
 	}
 
+	public SessionContract.AddPerfBenchmarkResponse addPerfBenchmark(
+			SessionContract.AddPerfBenchmarkRequest request) {
+		if (request == null) {
+			request = new SessionContract.AddPerfBenchmarkRequest(null);
+		}
+		return runtime.addPerfBenchmark(request);
+	}
+
+	public SessionContract.ListPerfBenchmarksResponse listPerfBenchmarks(
+			SessionContract.ListPerfBenchmarksRequest request) {
+		if (request == null) {
+			request = new SessionContract.ListPerfBenchmarksRequest();
+		}
+		return runtime.listPerfBenchmarks(request);
+	}
+
+	public SessionContract.ClearPerfBenchmarksResponse clearPerfBenchmarks(
+			SessionContract.ClearPerfBenchmarksRequest request) {
+		if (request == null) {
+			request = new SessionContract.ClearPerfBenchmarksRequest();
+		}
+		return runtime.clearPerfBenchmarks(request);
+	}
+
+	public SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
+			SessionContract.DeletePerfBenchmarkRequest request) {
+		if (request == null) {
+			request = new SessionContract.DeletePerfBenchmarkRequest(null);
+		}
+		return runtime.deletePerfBenchmark(request);
+	}
+
 	public SessionContract.ShutdownResponse shutdown(SessionContract.ShutdownRequest request) {
 		if (request == null) {
 			request = new SessionContract.ShutdownRequest(SessionContract.ShutdownPolicy.UNSPECIFIED);
 		}
 		// Test-only wedge hook: when LIBGHIDRA_DEBUG_WEDGE_MS is set, sleep
 		// before delegating to the real shutdown path. This lets the
-		// close-timeout regression test under tests/ghidrasql/private/
+		// close-timeout regression test
 		// drive a deterministic Java-side wedge without depending on
 		// Ghidra parser quirks. Inert when the env var is unset (no cost
 		// on the production path beyond a single getenv() check).

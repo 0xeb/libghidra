@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 #
 # end_to_end: Launch headless Ghidra, analyze a binary, enumerate functions
 # with basic blocks and decompilation, save the project, and shut down.
@@ -94,12 +93,19 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=18080, help="RPC port (default: 18080)")
     args = parser.parse_args()
 
-    with ghidra.launch_headless(ghidra.HeadlessOptions(
+    with ghidra.launch_headless_project(ghidra.HeadlessProjectOptions(
         ghidra_dir=args.ghidra,
-        binary=args.binary,
         port=args.port,
         on_output=lambda line: print(f"  [ghidra] {line}"),
     )) as h:
+        imported = h.import_program(ghidra.ImportProgramRequest(
+            source_path=args.binary,
+            overwrite=True,
+            analyze=True,
+        ))
+        h.open_program(ghidra.OpenProgramRequest(
+            program_path=imported.primary_program_path,
+        ))
         status = h.get_status()
         print(f"\nConnected: {status.service_name} v{status.service_version} "
               f"(mode: {status.host_mode})\n")

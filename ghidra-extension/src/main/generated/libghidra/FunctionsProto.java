@@ -225,6 +225,26 @@ public final class FunctionsProto {
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_ListLoopsResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_StackVariableRecord_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_StackVariableRecord_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_FunctionFrameRecord_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_FunctionFrameRecord_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListFunctionFramesRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListFunctionFramesRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListFunctionFramesResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListFunctionFramesResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -317,41 +337,60 @@ public final class FunctionsProto {
       "\030\002 \001(\0132\027.libghidra.AddressRange\022#\n\004page\030" +
       "\003 \001(\0132\025.libghidra.Pagination\"9\n\021ListLoop" +
       "sResponse\022$\n\005loops\030\001 \003(\0132\025.libghidra.Loo" +
-      "pRecord2\306\n\n\020FunctionsService\022L\n\013GetFunct" +
-      "ion\022\035.libghidra.GetFunctionRequest\032\036.lib" +
-      "ghidra.GetFunctionResponse\022R\n\rListFuncti" +
-      "ons\022\037.libghidra.ListFunctionsRequest\032 .l" +
-      "ibghidra.ListFunctionsResponse\022U\n\016Rename" +
-      "Function\022 .libghidra.RenameFunctionReque" +
-      "st\032!.libghidra.RenameFunctionResponse\022X\n" +
-      "\017ListBasicBlocks\022!.libghidra.ListBasicBl" +
-      "ocksRequest\032\".libghidra.ListBasicBlocksR" +
-      "esponse\022O\n\014ListCFGEdges\022\036.libghidra.List" +
-      "CFGEdgesRequest\032\037.libghidra.ListCFGEdges" +
-      "Response\022[\n\020ListFunctionTags\022\".libghidra" +
-      ".ListFunctionTagsRequest\032#.libghidra.Lis" +
-      "tFunctionTagsResponse\022^\n\021CreateFunctionT" +
-      "ag\022#.libghidra.CreateFunctionTagRequest\032" +
-      "$.libghidra.CreateFunctionTagResponse\022^\n" +
-      "\021DeleteFunctionTag\022#.libghidra.DeleteFun" +
-      "ctionTagRequest\032$.libghidra.DeleteFuncti" +
-      "onTagResponse\022p\n\027ListFunctionTagMappings" +
-      "\022).libghidra.ListFunctionTagMappingsRequ" +
-      "est\032*.libghidra.ListFunctionTagMappingsR" +
-      "esponse\022L\n\013TagFunction\022\035.libghidra.TagFu" +
-      "nctionRequest\032\036.libghidra.TagFunctionRes" +
-      "ponse\022R\n\rUntagFunction\022\037.libghidra.Untag" +
-      "FunctionRequest\032 .libghidra.UntagFunctio" +
-      "nResponse\022[\n\020ListSwitchTables\022\".libghidr" +
-      "a.ListSwitchTablesRequest\032#.libghidra.Li" +
-      "stSwitchTablesResponse\022U\n\016ListDominators" +
-      "\022 .libghidra.ListDominatorsRequest\032!.lib" +
-      "ghidra.ListDominatorsResponse\022a\n\022ListPos" +
-      "tDominators\022$.libghidra.ListPostDominato" +
-      "rsRequest\032%.libghidra.ListPostDominators" +
-      "Response\022F\n\tListLoops\022\033.libghidra.ListLo" +
-      "opsRequest\032\034.libghidra.ListLoopsResponse" +
-      "B\035\n\tlibghidraB\016FunctionsProtoP\001b\006proto3"
+      "pRecord\"\257\001\n\023StackVariableRecord\022\016\n\006var_i" +
+      "d\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\021\n\tdata_type\030\003 \001(\t" +
+      "\022\024\n\014stack_offset\030\004 \001(\003\022\014\n\004size\030\005 \001(\r\022\024\n\014" +
+      "is_parameter\030\006 \001(\010\022\030\n\020first_use_offset\030\007" +
+      " \001(\005\022\023\n\013source_type\030\010 \001(\t\"\227\002\n\023FunctionFr" +
+      "ameRecord\022\026\n\016function_entry\030\001 \001(\004\022\022\n\nfra" +
+      "me_size\030\002 \001(\003\022\022\n\nlocal_size\030\003 \001(\003\022\026\n\016par" +
+      "ameter_size\030\004 \001(\003\022\030\n\020parameter_offset\030\005 " +
+      "\001(\003\022\035\n\025return_address_offset\030\006 \001(\003\022\026\n\016gr" +
+      "ows_negative\030\007 \001(\010\022\036\n\026stack_pointer_regi" +
+      "ster\030\010 \001(\t\0227\n\017stack_variables\030\t \003(\0132\036.li" +
+      "bghidra.StackVariableRecord\"h\n\031ListFunct" +
+      "ionFramesRequest\022&\n\005range\030\002 \001(\0132\027.libghi" +
+      "dra.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghid" +
+      "ra.Pagination\"L\n\032ListFunctionFramesRespo" +
+      "nse\022.\n\006frames\030\001 \003(\0132\036.libghidra.Function" +
+      "FrameRecord2\251\013\n\020FunctionsService\022L\n\013GetF" +
+      "unction\022\035.libghidra.GetFunctionRequest\032\036" +
+      ".libghidra.GetFunctionResponse\022R\n\rListFu" +
+      "nctions\022\037.libghidra.ListFunctionsRequest" +
+      "\032 .libghidra.ListFunctionsResponse\022U\n\016Re" +
+      "nameFunction\022 .libghidra.RenameFunctionR" +
+      "equest\032!.libghidra.RenameFunctionRespons" +
+      "e\022X\n\017ListBasicBlocks\022!.libghidra.ListBas" +
+      "icBlocksRequest\032\".libghidra.ListBasicBlo" +
+      "cksResponse\022O\n\014ListCFGEdges\022\036.libghidra." +
+      "ListCFGEdgesRequest\032\037.libghidra.ListCFGE" +
+      "dgesResponse\022[\n\020ListFunctionTags\022\".libgh" +
+      "idra.ListFunctionTagsRequest\032#.libghidra" +
+      ".ListFunctionTagsResponse\022^\n\021CreateFunct" +
+      "ionTag\022#.libghidra.CreateFunctionTagRequ" +
+      "est\032$.libghidra.CreateFunctionTagRespons" +
+      "e\022^\n\021DeleteFunctionTag\022#.libghidra.Delet" +
+      "eFunctionTagRequest\032$.libghidra.DeleteFu" +
+      "nctionTagResponse\022p\n\027ListFunctionTagMapp" +
+      "ings\022).libghidra.ListFunctionTagMappings" +
+      "Request\032*.libghidra.ListFunctionTagMappi" +
+      "ngsResponse\022L\n\013TagFunction\022\035.libghidra.T" +
+      "agFunctionRequest\032\036.libghidra.TagFunctio" +
+      "nResponse\022R\n\rUntagFunction\022\037.libghidra.U" +
+      "ntagFunctionRequest\032 .libghidra.UntagFun" +
+      "ctionResponse\022[\n\020ListSwitchTables\022\".libg" +
+      "hidra.ListSwitchTablesRequest\032#.libghidr" +
+      "a.ListSwitchTablesResponse\022U\n\016ListDomina" +
+      "tors\022 .libghidra.ListDominatorsRequest\032!" +
+      ".libghidra.ListDominatorsResponse\022a\n\022Lis" +
+      "tPostDominators\022$.libghidra.ListPostDomi" +
+      "natorsRequest\032%.libghidra.ListPostDomina" +
+      "torsResponse\022F\n\tListLoops\022\033.libghidra.Li" +
+      "stLoopsRequest\032\034.libghidra.ListLoopsResp" +
+      "onse\022a\n\022ListFunctionFrames\022$.libghidra.L" +
+      "istFunctionFramesRequest\032%.libghidra.Lis" +
+      "tFunctionFramesResponseB\035\n\tlibghidraB\016Fu" +
+      "nctionsProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -598,6 +637,30 @@ public final class FunctionsProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListLoopsResponse_descriptor,
         new java.lang.String[] { "Loops", });
+    internal_static_libghidra_StackVariableRecord_descriptor =
+      getDescriptor().getMessageTypes().get(40);
+    internal_static_libghidra_StackVariableRecord_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_StackVariableRecord_descriptor,
+        new java.lang.String[] { "VarId", "Name", "DataType", "StackOffset", "Size", "IsParameter", "FirstUseOffset", "SourceType", });
+    internal_static_libghidra_FunctionFrameRecord_descriptor =
+      getDescriptor().getMessageTypes().get(41);
+    internal_static_libghidra_FunctionFrameRecord_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_FunctionFrameRecord_descriptor,
+        new java.lang.String[] { "FunctionEntry", "FrameSize", "LocalSize", "ParameterSize", "ParameterOffset", "ReturnAddressOffset", "GrowsNegative", "StackPointerRegister", "StackVariables", });
+    internal_static_libghidra_ListFunctionFramesRequest_descriptor =
+      getDescriptor().getMessageTypes().get(42);
+    internal_static_libghidra_ListFunctionFramesRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListFunctionFramesRequest_descriptor,
+        new java.lang.String[] { "Range", "Page", });
+    internal_static_libghidra_ListFunctionFramesResponse_descriptor =
+      getDescriptor().getMessageTypes().get(43);
+    internal_static_libghidra_ListFunctionFramesResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListFunctionFramesResponse_descriptor,
+        new java.lang.String[] { "Frames", });
     descriptor.resolveAllFeaturesImmutable();
     libghidra.CommonProto.getDescriptor();
   }

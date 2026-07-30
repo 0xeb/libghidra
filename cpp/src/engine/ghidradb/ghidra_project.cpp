@@ -1,16 +1,17 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #include "ghidra_project.h"
 #include "buffer_file.h"
 #include "db_record.h"
 #include "btree.h"
 #include "address_map.h"
+#include "memory_image.h"
 
+#include <cstdlib>  // std::strtoull (image-base parse)
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -230,6 +231,18 @@ ProjectData GhidraProject::extract() {
                     } else if (option_key.find("Program Name") != std::string::npos) {
                         if (!rec.fields.empty())
                             data.info.program_name = rec.fields[0].asString();
+                    } else if (option_key.find("Image Offset") != std::string::npos) {
+                        // Ghidra stores function-symbol address keys image-base-
+                        // relative; the RELOCATABLE decode adds this base offset
+                        // (AddressMapDB baseImageOffset). Without it every offline
+                        // function address is image-base-too-low. The value is a
+                        // bare hex string (ProgramDB persists Long.toHexString and
+                        // parses it with radix 16), so parse base-16. This runs
+                        // BEFORE the "Symbols" loop decodes address keys with
+                        // addr_dec, so the image base is applied.
+                        if (!rec.fields.empty())
+                            addr_dec.setImageBaseOffset(std::strtoull(
+                                rec.fields[0].asString().c_str(), nullptr, 16));
                     }
                     return true;
                 });
@@ -269,6 +282,18 @@ ProjectData GhidraProject::extract() {
               });
 
     return data;
+}
+
+bool GhidraProject::loadMemoryImage(MemoryImage& out) {
+    if (gbf_path_.empty()) {
+        error_ = "project not opened (no .gbf located)";
+        return false;
+    }
+    if (!out.load(gbf_path_)) {
+        error_ = out.getError();
+        return false;
+    }
+    return true;
 }
 
 } // namespace ghidra_db

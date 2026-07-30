@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 // struct_builder: Struct member operations via the local backend.
 //
 // Usage: struct_builder <binary_path> [ghidra_root] [arch]
@@ -54,7 +60,7 @@ int main(int argc, char* argv[]) {
       .default_arch = arch,
   });
 
-  ghidra::OpenRequest req;
+  ghidra::OpenProgramRequest req;
   req.program_path = binary_path;
   auto open_result = client->OpenProgram(req);
   if (!open_result.ok()) {

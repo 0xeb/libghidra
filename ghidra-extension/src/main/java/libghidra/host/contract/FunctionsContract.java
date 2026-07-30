@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.contract;
 
 import java.util.List;
@@ -175,4 +181,27 @@ public final class FunctionsContract {
 		int depth) {}
 	public record ListLoopsRequest(long rangeStart, long rangeEnd, int limit, int offset) {}
 	public record ListLoopsResponse(List<LoopRecord> loops) {}
+
+	// --- Stack frames (decompiler-free; from Function.getStackFrame()) ---
+	public record StackVariableRecord(
+		String varId,
+		String name,
+		String dataType,
+		long stackOffset,
+		int size,
+		boolean isParameter,
+		int firstUseOffset,
+		String sourceType) {}
+	public record FunctionFrameRecord(
+		long functionEntry,
+		long frameSize,
+		long localSize,
+		long parameterSize,
+		long parameterOffset,
+		long returnAddressOffset,
+		boolean growsNegative,
+		String stackPointerRegister,
+		List<StackVariableRecord> stackVariables) {}
+	public record ListFunctionFramesRequest(long rangeStart, long rangeEnd, int limit, int offset) {}
+	public record ListFunctionFramesResponse(List<FunctionFrameRecord> frames) {}
 }

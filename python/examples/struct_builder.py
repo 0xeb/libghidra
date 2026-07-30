@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 #
 # struct_builder: Create a struct, add/rename/retype/delete members, clean up.
 #
@@ -30,7 +29,7 @@ def main() -> None:
 
     print(f"Connected: {status.service_name} v{status.service_version}")
 
-    struct_name = "/example_config_t"
+    struct_name = "example_config_t"
 
     # 2. Create a struct type
     print(f"\n--- Creating struct '{struct_name}' ---")
@@ -46,7 +45,7 @@ def main() -> None:
     fields = [
         ("flags", "int", 4),
         ("status", "short", 2),
-        ("name", "char[32]", 32),
+        ("name_char", "char", 1),
     ]
     for field_name, field_type, field_size in fields:
         try:
@@ -74,10 +73,10 @@ def main() -> None:
     except ghidra.GhidraError as e:
         print(f"RenameTypeMember failed: {e}", file=sys.stderr)
 
-    # 6. Retype the second member: short -> ushort
-    print("\n--- Retyping member ordinal=1 to 'ushort' ---")
+    # 6. Retype the second member: short -> unsigned short
+    print("\n--- Retyping member ordinal=1 to 'unsigned short' ---")
     try:
-        resp = client.set_type_member_type(struct_name, 1, "ushort")
+        resp = client.set_type_member_type(struct_name, 1, "unsigned short")
         print(f"Retyped: updated={resp.updated}")
     except ghidra.GhidraError as e:
         print(f"SetTypeMemberType failed: {e}", file=sys.stderr)

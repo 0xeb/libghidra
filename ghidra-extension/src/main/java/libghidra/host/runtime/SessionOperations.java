@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import libghidra.host.contract.SessionContract;
@@ -24,4 +30,16 @@ public interface SessionOperations {
 	SessionContract.GetRevisionResponse getRevision(SessionContract.GetRevisionRequest request);
 
 	SessionContract.ShutdownResponse shutdown(SessionContract.ShutdownRequest request);
+
+	SessionContract.AddPerfBenchmarkResponse addPerfBenchmark(
+		SessionContract.AddPerfBenchmarkRequest request);
+
+	SessionContract.ListPerfBenchmarksResponse listPerfBenchmarks(
+		SessionContract.ListPerfBenchmarksRequest request);
+
+	SessionContract.ClearPerfBenchmarksResponse clearPerfBenchmarks(
+		SessionContract.ClearPerfBenchmarksRequest request);
+
+	SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
+		SessionContract.DeletePerfBenchmarkRequest request);
 }

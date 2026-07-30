@@ -1,9 +1,8 @@
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 """Async HTTP client for the libghidra typed RPC layer.
 
@@ -51,10 +50,15 @@ from . import (
 )
 from .client import (
     ClientOptions,
+    _frame_from_pb,
+    _perf_from_pb,
+    _perf_to_pb,
     _to_decompilation,
     _to_function,
     _to_instruction,
+    _to_instruction_operand,
     _to_memory_block,
+    _to_pcode,
     _to_signature,
     _to_symbol,
     _to_type,
@@ -66,6 +70,9 @@ from .models import (
     AddTypeEnumMemberResponse,
     AddTypeMemberResponse,
     ApplyDataTypeResponse,
+    ClearPerfBenchmarksResponse,
+    FunctionFrameRecord,
+    PerfBenchmarkRecord,
     BasicBlockRecord,
     BookmarkRecord,
     BreakpointRecord,
@@ -94,6 +101,8 @@ from .models import (
     DominatorRecord,
     GetCommentsResponse,
     GetDecompilationResponse,
+    GetPcodeResponse,
+    PcodeMaturity,
     GetFunctionResponse,
     GetFunctionSignatureResponse,
     GetInstructionResponse,
@@ -110,9 +119,16 @@ from .models import (
     ListDominatorsResponse,
     ListFunctionsResponse,
     ListFunctionSignaturesResponse,
+    ListInstructionOperandsResponse,
     ListInstructionsResponse,
     ListLoopsResponse,
     ListMemoryBlocksResponse,
+    CreateMemoryBlockSpec,
+    CreateMemoryBlockResponse,
+    RemoveMemoryBlockResponse,
+    MoveMemoryBlockResponse,
+    SetTypeMemberCommentResponse,
+    SetTypeEnumMemberCommentResponse,
     ListPostDominatorsResponse,
     ListSwitchTablesResponse,
     ListSymbolsResponse,
@@ -280,6 +296,12 @@ class AsyncGhidraClient:
 
     @staticmethod
     def _address_range(start: int, end: int) -> common_pb2.AddressRange:
+        # end == 0 is the "list all" sentinel: the host treats range_end as an
+        # exclusive upper bound and an unsigned value, so 0 would select an empty
+        # range. Normalize it to the full 64-bit space (matches the C++ client's
+        # range_end = UINT64_MAX convention).
+        if end == 0:
+            end = 0xFFFFFFFFFFFFFFFF
         return common_pb2.AddressRange(start=start, end=end)
 
     # =========================================================================
@@ -321,6 +343,9 @@ class AsyncGhidraClient:
         return OpenProgramResponse(
             program_name=resp.program_name,
             language_id=resp.language_id, compiler_spec=resp.compiler_spec, image_base=resp.image_base,
+            md5=resp.md5, sha256=resp.sha256,
+            executable_format=resp.executable_format,
+            entry_point=resp.entry_point, has_entry_point=resp.has_entry_point,
         )
 
     async def close_program(self, policy: ShutdownPolicy = ShutdownPolicy.UNSPECIFIED) -> CloseProgramResponse:
@@ -365,6 +390,34 @@ class AsyncGhidraClient:
         )
         return ShutdownResponse(accepted=resp.accepted)
 
+    async def add_perf_benchmark(self, record: PerfBenchmarkRecord) -> bool:
+        req = session_pb2.AddPerfBenchmarkRequest(record=_perf_to_pb(record))
+        resp = await self._call_rpc(
+            "libghidra.SessionService/AddPerfBenchmark", req, session_pb2.AddPerfBenchmarkResponse,
+        )
+        return resp.added
+
+    async def list_perf_benchmarks(self) -> list[PerfBenchmarkRecord]:
+        req = session_pb2.ListPerfBenchmarksRequest()
+        resp = await self._call_rpc(
+            "libghidra.SessionService/ListPerfBenchmarks", req, session_pb2.ListPerfBenchmarksResponse,
+        )
+        return [_perf_from_pb(r) for r in resp.records]
+
+    async def clear_perf_benchmarks(self) -> ClearPerfBenchmarksResponse:
+        req = session_pb2.ClearPerfBenchmarksRequest()
+        resp = await self._call_rpc(
+            "libghidra.SessionService/ClearPerfBenchmarks", req, session_pb2.ClearPerfBenchmarksResponse,
+        )
+        return ClearPerfBenchmarksResponse(cleared=resp.cleared, removed_count=resp.removed_count)
+
+    async def delete_perf_benchmark(self, bench_id: str) -> bool:
+        req = session_pb2.DeletePerfBenchmarkRequest(bench_id=bench_id)
+        resp = await self._call_rpc(
+            "libghidra.SessionService/DeletePerfBenchmark", req, session_pb2.DeletePerfBenchmarkResponse,
+        )
+        return resp.deleted
+
     # =========================================================================
     # Memory
     # =========================================================================
@@ -391,6 +444,31 @@ class AsyncGhidraClient:
         req = memory_pb2.ListMemoryBlocksRequest(page=self._pagination(limit, offset))
         resp = await self._call_rpc("libghidra.MemoryService/ListMemoryBlocks", req, memory_pb2.ListMemoryBlocksResponse)
         return ListMemoryBlocksResponse(blocks=[_to_memory_block(b) for b in resp.blocks])
+
+    async def create_memory_block(self, spec: CreateMemoryBlockSpec) -> CreateMemoryBlockResponse:
+        req = memory_pb2.CreateMemoryBlockRequest(
+            name=spec.name, start_address=spec.start_address, size=spec.size,
+            is_read=spec.is_read, is_write=spec.is_write, is_execute=spec.is_execute,
+            initialized=spec.initialized, overlay=spec.overlay,
+        )
+        resp = await self._call_rpc("libghidra.MemoryService/CreateMemoryBlock", req, memory_pb2.CreateMemoryBlockResponse)
+        return CreateMemoryBlockResponse(
+            created=resp.created,
+            block=_to_memory_block(resp.block) if resp.HasField("block") else None,
+        )
+
+    async def remove_memory_block(self, address: int) -> RemoveMemoryBlockResponse:
+        req = memory_pb2.RemoveMemoryBlockRequest(address=address)
+        resp = await self._call_rpc("libghidra.MemoryService/RemoveMemoryBlock", req, memory_pb2.RemoveMemoryBlockResponse)
+        return RemoveMemoryBlockResponse(removed=resp.removed)
+
+    async def move_memory_block(self, address: int, new_start_address: int) -> MoveMemoryBlockResponse:
+        req = memory_pb2.MoveMemoryBlockRequest(address=address, new_start_address=new_start_address)
+        resp = await self._call_rpc("libghidra.MemoryService/MoveMemoryBlock", req, memory_pb2.MoveMemoryBlockResponse)
+        return MoveMemoryBlockResponse(
+            moved=resp.moved,
+            block=_to_memory_block(resp.block) if resp.HasField("block") else None,
+        )
 
     # =========================================================================
     # Functions
@@ -476,6 +554,13 @@ class AsyncGhidraClient:
             for l in resp.loops
         ])
 
+    async def list_function_frames(self, range_start: int = 0, range_end: int = 0, limit: int = 0, offset: int = 0) -> list[FunctionFrameRecord]:
+        req = functions_pb2.ListFunctionFramesRequest(
+            range=self._address_range(range_start, range_end), page=self._pagination(limit, offset),
+        )
+        resp = await self._call_rpc("libghidra.FunctionsService/ListFunctionFrames", req, functions_pb2.ListFunctionFramesResponse)
+        return [_frame_from_pb(f) for f in resp.frames]
+
     # =========================================================================
     # Symbols
     # =========================================================================
@@ -554,7 +639,7 @@ class AsyncGhidraClient:
         req = types_pb2.ListTypeEnumsRequest(query=query, page=self._pagination(limit, offset))
         resp = await self._call_rpc("libghidra.TypesService/ListTypeEnums", req, types_pb2.ListTypeEnumsResponse)
         return ListTypeEnumsResponse(enums=[
-            TypeEnumRecord(type_id=e.type_id, path_name=e.path_name, name=e.name, width=e.width, is_signed=e.is_signed, declaration=e.declaration)
+            TypeEnumRecord(type_id=e.type_id, path_name=e.path_name, name=e.name, width=e.width, is_signed=e.signed, declaration=e.declaration)
             for e in resp.enums
         ])
 
@@ -699,6 +784,16 @@ class AsyncGhidraClient:
         resp = await self._call_rpc("libghidra.TypesService/SetTypeMemberType", req, types_pb2.SetTypeMemberTypeResponse)
         return SetTypeMemberTypeResponse(updated=resp.updated)
 
+    async def set_type_member_comment(self, parent_type_id_or_path: str, ordinal: int, comment: str) -> SetTypeMemberCommentResponse:
+        req = types_pb2.SetTypeMemberCommentRequest(type=parent_type_id_or_path, ordinal=ordinal, comment=comment)
+        resp = await self._call_rpc("libghidra.TypesService/SetTypeMemberComment", req, types_pb2.SetTypeMemberCommentResponse)
+        return SetTypeMemberCommentResponse(updated=resp.updated)
+
+    async def set_type_enum_member_comment(self, parent_type_id_or_path: str, ordinal: int, comment: str) -> SetTypeEnumMemberCommentResponse:
+        req = types_pb2.SetTypeEnumMemberCommentRequest(type=parent_type_id_or_path, ordinal=ordinal, comment=comment)
+        resp = await self._call_rpc("libghidra.TypesService/SetTypeEnumMemberComment", req, types_pb2.SetTypeEnumMemberCommentResponse)
+        return SetTypeEnumMemberCommentResponse(updated=resp.updated)
+
     # =========================================================================
     # Decompiler
     # =========================================================================
@@ -717,6 +812,25 @@ class AsyncGhidraClient:
         resp = await self._call_rpc("libghidra.DecompilerService/ListDecompilations", req, decompiler_pb2.ListDecompilationsResponse)
         return ListDecompilationsResponse(decompilations=[_to_decompilation(d) for d in resp.decompilations])
 
+    async def get_pcode(
+        self,
+        address: int,
+        maturity: PcodeMaturity = PcodeMaturity.HIGH,
+        timeout_ms: int = 0,
+    ) -> GetPcodeResponse:
+        req = decompiler_pb2.GetPcodeRequest(
+            address=address,
+            timeout_ms=timeout_ms,
+            maturity=(
+                decompiler_pb2.PCODE_MATURITY_RAW
+                if maturity == PcodeMaturity.RAW
+                else decompiler_pb2.PCODE_MATURITY_HIGH
+            ),
+        )
+        resp = await self._call_rpc("libghidra.DecompilerService/GetPcode", req, decompiler_pb2.GetPcodeResponse)
+        pcode = _to_pcode(resp.pcode) if resp.HasField("pcode") else None
+        return GetPcodeResponse(pcode=pcode)
+
     # =========================================================================
     # Listing
     # =========================================================================
@@ -733,6 +847,13 @@ class AsyncGhidraClient:
         )
         resp = await self._call_rpc("libghidra.ListingService/ListInstructions", req, listing_pb2.ListInstructionsResponse)
         return ListInstructionsResponse(instructions=[_to_instruction(i) for i in resp.instructions])
+
+    async def list_instruction_operands(self, range_start: int = 0, range_end: int = 0, limit: int = 0, offset: int = 0) -> ListInstructionOperandsResponse:
+        req = listing_pb2.ListInstructionOperandsRequest(
+            range=self._address_range(range_start, range_end), page=self._pagination(limit, offset),
+        )
+        resp = await self._call_rpc("libghidra.ListingService/ListInstructionOperands", req, listing_pb2.ListInstructionOperandsResponse)
+        return ListInstructionOperandsResponse(operands=[_to_instruction_operand(o) for o in resp.operands])
 
     async def get_comments(self, range_start: int = 0, range_end: int = 0, limit: int = 0, offset: int = 0) -> GetCommentsResponse:
         req = listing_pb2.GetCommentsRequest(

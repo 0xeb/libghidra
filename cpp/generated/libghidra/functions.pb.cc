@@ -158,6 +158,46 @@ struct SwitchCaseRecordDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SwitchCaseRecordDefaultTypeInternal _SwitchCaseRecord_default_instance_;
 
+inline constexpr StackVariableRecord::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : var_id_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        data_type_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        source_type_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        stack_offset_{::int64_t{0}},
+        size_{0u},
+        is_parameter_{false},
+        first_use_offset_{0},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR StackVariableRecord::StackVariableRecord(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct StackVariableRecordDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR StackVariableRecordDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~StackVariableRecordDefaultTypeInternal() {}
+  union {
+    StackVariableRecord _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 StackVariableRecordDefaultTypeInternal _StackVariableRecord_default_instance_;
+
 inline constexpr RenameFunctionResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : name_(
@@ -893,6 +933,32 @@ struct ListFunctionTagMappingsResponseDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListFunctionTagMappingsResponseDefaultTypeInternal _ListFunctionTagMappingsResponse_default_instance_;
 
+inline constexpr ListFunctionFramesRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        range_{nullptr},
+        page_{nullptr} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ListFunctionFramesRequest::ListFunctionFramesRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ListFunctionFramesRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListFunctionFramesRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListFunctionFramesRequestDefaultTypeInternal() {}
+  union {
+    ListFunctionFramesRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListFunctionFramesRequestDefaultTypeInternal _ListFunctionFramesRequest_default_instance_;
+
 inline constexpr ListDominatorsResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : dominators_{},
@@ -1071,6 +1137,41 @@ struct GetFunctionResponseDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 GetFunctionResponseDefaultTypeInternal _GetFunctionResponse_default_instance_;
 
+inline constexpr FunctionFrameRecord::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : stack_variables_{},
+        stack_pointer_register_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        function_entry_{::uint64_t{0u}},
+        frame_size_{::int64_t{0}},
+        local_size_{::int64_t{0}},
+        parameter_size_{::int64_t{0}},
+        parameter_offset_{::int64_t{0}},
+        return_address_offset_{::int64_t{0}},
+        grows_negative_{false},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR FunctionFrameRecord::FunctionFrameRecord(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct FunctionFrameRecordDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR FunctionFrameRecordDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~FunctionFrameRecordDefaultTypeInternal() {}
+  union {
+    FunctionFrameRecord _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 FunctionFrameRecordDefaultTypeInternal _FunctionFrameRecord_default_instance_;
+
 inline constexpr ListSwitchTablesResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : switch_tables_{},
@@ -1095,6 +1196,31 @@ struct ListSwitchTablesResponseDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListSwitchTablesResponseDefaultTypeInternal _ListSwitchTablesResponse_default_instance_;
+
+inline constexpr ListFunctionFramesResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : frames_{},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ListFunctionFramesResponse::ListFunctionFramesResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ListFunctionFramesResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListFunctionFramesResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListFunctionFramesResponseDefaultTypeInternal() {}
+  union {
+    ListFunctionFramesResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListFunctionFramesResponseDefaultTypeInternal _ListFunctionFramesResponse_default_instance_;
 }  // namespace libghidra
 static constexpr const ::_pb::EnumDescriptor**
     file_level_enum_descriptors_libghidra_2ffunctions_2eproto = nullptr;
@@ -1524,6 +1650,60 @@ const ::uint32_t
         ~0u,  // no _split_
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::ListLoopsResponse, _impl_.loops_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::StackVariableRecord, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::StackVariableRecord, _impl_.var_id_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::StackVariableRecord, _impl_.name_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::StackVariableRecord, _impl_.data_type_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::StackVariableRecord, _impl_.stack_offset_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::StackVariableRecord, _impl_.size_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::StackVariableRecord, _impl_.is_parameter_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::StackVariableRecord, _impl_.first_use_offset_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::StackVariableRecord, _impl_.source_type_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _impl_.function_entry_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _impl_.frame_size_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _impl_.local_size_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _impl_.parameter_size_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _impl_.parameter_offset_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _impl_.return_address_offset_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _impl_.grows_negative_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _impl_.stack_pointer_register_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::FunctionFrameRecord, _impl_.stack_variables_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListFunctionFramesRequest, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListFunctionFramesRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListFunctionFramesRequest, _impl_.range_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListFunctionFramesRequest, _impl_.page_),
+        0,
+        1,
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListFunctionFramesResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListFunctionFramesResponse, _impl_.frames_),
 };
 
 static const ::_pbi::MigrationSchema
@@ -1568,6 +1748,10 @@ static const ::_pbi::MigrationSchema
         {386, -1, -1, sizeof(::libghidra::LoopRecord)},
         {400, 410, -1, sizeof(::libghidra::ListLoopsRequest)},
         {412, -1, -1, sizeof(::libghidra::ListLoopsResponse)},
+        {421, -1, -1, sizeof(::libghidra::StackVariableRecord)},
+        {437, -1, -1, sizeof(::libghidra::FunctionFrameRecord)},
+        {454, 464, -1, sizeof(::libghidra::ListFunctionFramesRequest)},
+        {466, -1, -1, sizeof(::libghidra::ListFunctionFramesResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_FunctionRecord_default_instance_._instance,
@@ -1610,6 +1794,10 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_LoopRecord_default_instance_._instance,
     &::libghidra::_ListLoopsRequest_default_instance_._instance,
     &::libghidra::_ListLoopsResponse_default_instance_._instance,
+    &::libghidra::_StackVariableRecord_default_instance_._instance,
+    &::libghidra::_FunctionFrameRecord_default_instance_._instance,
+    &::libghidra::_ListFunctionFramesRequest_default_instance_._instance,
+    &::libghidra::_ListFunctionFramesResponse_default_instance_._instance,
 };
 const char descriptor_table_protodef_libghidra_2ffunctions_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
@@ -1696,41 +1884,60 @@ const char descriptor_table_protodef_libghidra_2ffunctions_2eproto[] ABSL_ATTRIB
     "\030\002 \001(\0132\027.libghidra.AddressRange\022#\n\004page\030"
     "\003 \001(\0132\025.libghidra.Pagination\"9\n\021ListLoop"
     "sResponse\022$\n\005loops\030\001 \003(\0132\025.libghidra.Loo"
-    "pRecord2\306\n\n\020FunctionsService\022L\n\013GetFunct"
-    "ion\022\035.libghidra.GetFunctionRequest\032\036.lib"
-    "ghidra.GetFunctionResponse\022R\n\rListFuncti"
-    "ons\022\037.libghidra.ListFunctionsRequest\032 .l"
-    "ibghidra.ListFunctionsResponse\022U\n\016Rename"
-    "Function\022 .libghidra.RenameFunctionReque"
-    "st\032!.libghidra.RenameFunctionResponse\022X\n"
-    "\017ListBasicBlocks\022!.libghidra.ListBasicBl"
-    "ocksRequest\032\".libghidra.ListBasicBlocksR"
-    "esponse\022O\n\014ListCFGEdges\022\036.libghidra.List"
-    "CFGEdgesRequest\032\037.libghidra.ListCFGEdges"
-    "Response\022[\n\020ListFunctionTags\022\".libghidra"
-    ".ListFunctionTagsRequest\032#.libghidra.Lis"
-    "tFunctionTagsResponse\022^\n\021CreateFunctionT"
-    "ag\022#.libghidra.CreateFunctionTagRequest\032"
-    "$.libghidra.CreateFunctionTagResponse\022^\n"
-    "\021DeleteFunctionTag\022#.libghidra.DeleteFun"
-    "ctionTagRequest\032$.libghidra.DeleteFuncti"
-    "onTagResponse\022p\n\027ListFunctionTagMappings"
-    "\022).libghidra.ListFunctionTagMappingsRequ"
-    "est\032*.libghidra.ListFunctionTagMappingsR"
-    "esponse\022L\n\013TagFunction\022\035.libghidra.TagFu"
-    "nctionRequest\032\036.libghidra.TagFunctionRes"
-    "ponse\022R\n\rUntagFunction\022\037.libghidra.Untag"
-    "FunctionRequest\032 .libghidra.UntagFunctio"
-    "nResponse\022[\n\020ListSwitchTables\022\".libghidr"
-    "a.ListSwitchTablesRequest\032#.libghidra.Li"
-    "stSwitchTablesResponse\022U\n\016ListDominators"
-    "\022 .libghidra.ListDominatorsRequest\032!.lib"
-    "ghidra.ListDominatorsResponse\022a\n\022ListPos"
-    "tDominators\022$.libghidra.ListPostDominato"
-    "rsRequest\032%.libghidra.ListPostDominators"
-    "Response\022F\n\tListLoops\022\033.libghidra.ListLo"
-    "opsRequest\032\034.libghidra.ListLoopsResponse"
-    "B\035\n\tlibghidraB\016FunctionsProtoP\001b\006proto3"
+    "pRecord\"\257\001\n\023StackVariableRecord\022\016\n\006var_i"
+    "d\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\021\n\tdata_type\030\003 \001(\t"
+    "\022\024\n\014stack_offset\030\004 \001(\003\022\014\n\004size\030\005 \001(\r\022\024\n\014"
+    "is_parameter\030\006 \001(\010\022\030\n\020first_use_offset\030\007"
+    " \001(\005\022\023\n\013source_type\030\010 \001(\t\"\227\002\n\023FunctionFr"
+    "ameRecord\022\026\n\016function_entry\030\001 \001(\004\022\022\n\nfra"
+    "me_size\030\002 \001(\003\022\022\n\nlocal_size\030\003 \001(\003\022\026\n\016par"
+    "ameter_size\030\004 \001(\003\022\030\n\020parameter_offset\030\005 "
+    "\001(\003\022\035\n\025return_address_offset\030\006 \001(\003\022\026\n\016gr"
+    "ows_negative\030\007 \001(\010\022\036\n\026stack_pointer_regi"
+    "ster\030\010 \001(\t\0227\n\017stack_variables\030\t \003(\0132\036.li"
+    "bghidra.StackVariableRecord\"h\n\031ListFunct"
+    "ionFramesRequest\022&\n\005range\030\002 \001(\0132\027.libghi"
+    "dra.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghid"
+    "ra.Pagination\"L\n\032ListFunctionFramesRespo"
+    "nse\022.\n\006frames\030\001 \003(\0132\036.libghidra.Function"
+    "FrameRecord2\251\013\n\020FunctionsService\022L\n\013GetF"
+    "unction\022\035.libghidra.GetFunctionRequest\032\036"
+    ".libghidra.GetFunctionResponse\022R\n\rListFu"
+    "nctions\022\037.libghidra.ListFunctionsRequest"
+    "\032 .libghidra.ListFunctionsResponse\022U\n\016Re"
+    "nameFunction\022 .libghidra.RenameFunctionR"
+    "equest\032!.libghidra.RenameFunctionRespons"
+    "e\022X\n\017ListBasicBlocks\022!.libghidra.ListBas"
+    "icBlocksRequest\032\".libghidra.ListBasicBlo"
+    "cksResponse\022O\n\014ListCFGEdges\022\036.libghidra."
+    "ListCFGEdgesRequest\032\037.libghidra.ListCFGE"
+    "dgesResponse\022[\n\020ListFunctionTags\022\".libgh"
+    "idra.ListFunctionTagsRequest\032#.libghidra"
+    ".ListFunctionTagsResponse\022^\n\021CreateFunct"
+    "ionTag\022#.libghidra.CreateFunctionTagRequ"
+    "est\032$.libghidra.CreateFunctionTagRespons"
+    "e\022^\n\021DeleteFunctionTag\022#.libghidra.Delet"
+    "eFunctionTagRequest\032$.libghidra.DeleteFu"
+    "nctionTagResponse\022p\n\027ListFunctionTagMapp"
+    "ings\022).libghidra.ListFunctionTagMappings"
+    "Request\032*.libghidra.ListFunctionTagMappi"
+    "ngsResponse\022L\n\013TagFunction\022\035.libghidra.T"
+    "agFunctionRequest\032\036.libghidra.TagFunctio"
+    "nResponse\022R\n\rUntagFunction\022\037.libghidra.U"
+    "ntagFunctionRequest\032 .libghidra.UntagFun"
+    "ctionResponse\022[\n\020ListSwitchTables\022\".libg"
+    "hidra.ListSwitchTablesRequest\032#.libghidr"
+    "a.ListSwitchTablesResponse\022U\n\016ListDomina"
+    "tors\022 .libghidra.ListDominatorsRequest\032!"
+    ".libghidra.ListDominatorsResponse\022a\n\022Lis"
+    "tPostDominators\022$.libghidra.ListPostDomi"
+    "natorsRequest\032%.libghidra.ListPostDomina"
+    "torsResponse\022F\n\tListLoops\022\033.libghidra.Li"
+    "stLoopsRequest\032\034.libghidra.ListLoopsResp"
+    "onse\022a\n\022ListFunctionFrames\022$.libghidra.L"
+    "istFunctionFramesRequest\032%.libghidra.Lis"
+    "tFunctionFramesResponseB\035\n\tlibghidraB\016Fu"
+    "nctionsProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2ffunctions_2eproto_deps[1] =
     {
@@ -1740,13 +1947,13 @@ static ::absl::once_flag descriptor_table_libghidra_2ffunctions_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2ffunctions_2eproto = {
     false,
     false,
-    4719,
+    5462,
     descriptor_table_protodef_libghidra_2ffunctions_2eproto,
     "libghidra/functions.proto",
     &descriptor_table_libghidra_2ffunctions_2eproto_once,
     descriptor_table_libghidra_2ffunctions_2eproto_deps,
     1,
-    40,
+    44,
     schemas,
     file_default_instances,
     TableStruct_libghidra_2ffunctions_2eproto::offsets,
@@ -12366,6 +12573,1431 @@ void ListLoopsResponse::InternalSwap(ListLoopsResponse* PROTOBUF_RESTRICT other)
 }
 
 ::google::protobuf::Metadata ListLoopsResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class StackVariableRecord::_Internal {
+ public:
+};
+
+StackVariableRecord::StackVariableRecord(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.StackVariableRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE StackVariableRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::StackVariableRecord& from_msg)
+      : var_id_(arena, from.var_id_),
+        name_(arena, from.name_),
+        data_type_(arena, from.data_type_),
+        source_type_(arena, from.source_type_),
+        _cached_size_{0} {}
+
+StackVariableRecord::StackVariableRecord(
+    ::google::protobuf::Arena* arena,
+    const StackVariableRecord& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  StackVariableRecord* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, stack_offset_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, stack_offset_),
+           offsetof(Impl_, first_use_offset_) -
+               offsetof(Impl_, stack_offset_) +
+               sizeof(Impl_::first_use_offset_));
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.StackVariableRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE StackVariableRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : var_id_(arena),
+        name_(arena),
+        data_type_(arena),
+        source_type_(arena),
+        _cached_size_{0} {}
+
+inline void StackVariableRecord::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, stack_offset_),
+           0,
+           offsetof(Impl_, first_use_offset_) -
+               offsetof(Impl_, stack_offset_) +
+               sizeof(Impl_::first_use_offset_));
+}
+StackVariableRecord::~StackVariableRecord() {
+  // @@protoc_insertion_point(destructor:libghidra.StackVariableRecord)
+  SharedDtor(*this);
+}
+inline void StackVariableRecord::SharedDtor(MessageLite& self) {
+  StackVariableRecord& this_ = static_cast<StackVariableRecord&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.var_id_.Destroy();
+  this_._impl_.name_.Destroy();
+  this_._impl_.data_type_.Destroy();
+  this_._impl_.source_type_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* StackVariableRecord::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) StackVariableRecord(arena);
+}
+constexpr auto StackVariableRecord::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(StackVariableRecord),
+                                            alignof(StackVariableRecord));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull StackVariableRecord::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_StackVariableRecord_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &StackVariableRecord::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<StackVariableRecord>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &StackVariableRecord::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<StackVariableRecord>(), &StackVariableRecord::ByteSizeLong,
+            &StackVariableRecord::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_._cached_size_),
+        false,
+    },
+    &StackVariableRecord::kDescriptorMethods,
+    &descriptor_table_libghidra_2ffunctions_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* StackVariableRecord::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 8, 0, 76, 2> StackVariableRecord::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    8, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967040,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    8,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::StackVariableRecord>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // string source_type = 8;
+    {::_pbi::TcParser::FastUS1,
+     {66, 63, 0, PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.source_type_)}},
+    // string var_id = 1;
+    {::_pbi::TcParser::FastUS1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.var_id_)}},
+    // string name = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.name_)}},
+    // string data_type = 3;
+    {::_pbi::TcParser::FastUS1,
+     {26, 63, 0, PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.data_type_)}},
+    // int64 stack_offset = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(StackVariableRecord, _impl_.stack_offset_), 63>(),
+     {32, 63, 0, PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.stack_offset_)}},
+    // uint32 size = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(StackVariableRecord, _impl_.size_), 63>(),
+     {40, 63, 0, PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.size_)}},
+    // bool is_parameter = 6;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(StackVariableRecord, _impl_.is_parameter_), 63>(),
+     {48, 63, 0, PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.is_parameter_)}},
+    // int32 first_use_offset = 7;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(StackVariableRecord, _impl_.first_use_offset_), 63>(),
+     {56, 63, 0, PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.first_use_offset_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // string var_id = 1;
+    {PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.var_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string name = 2;
+    {PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.name_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string data_type = 3;
+    {PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.data_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // int64 stack_offset = 4;
+    {PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.stack_offset_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // uint32 size = 5;
+    {PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.size_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // bool is_parameter = 6;
+    {PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.is_parameter_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // int32 first_use_offset = 7;
+    {PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.first_use_offset_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
+    // string source_type = 8;
+    {PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.source_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\35\6\4\11\0\0\0\0\13\0\0\0\0\0\0\0"
+    "libghidra.StackVariableRecord"
+    "var_id"
+    "name"
+    "data_type"
+    "source_type"
+  }},
+};
+
+PROTOBUF_NOINLINE void StackVariableRecord::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.StackVariableRecord)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.var_id_.ClearToEmpty();
+  _impl_.name_.ClearToEmpty();
+  _impl_.data_type_.ClearToEmpty();
+  _impl_.source_type_.ClearToEmpty();
+  ::memset(&_impl_.stack_offset_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.first_use_offset_) -
+      reinterpret_cast<char*>(&_impl_.stack_offset_)) + sizeof(_impl_.first_use_offset_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* StackVariableRecord::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const StackVariableRecord& this_ = static_cast<const StackVariableRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* StackVariableRecord::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const StackVariableRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.StackVariableRecord)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // string var_id = 1;
+          if (!this_._internal_var_id().empty()) {
+            const std::string& _s = this_._internal_var_id();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.StackVariableRecord.var_id");
+            target = stream->WriteStringMaybeAliased(1, _s, target);
+          }
+
+          // string name = 2;
+          if (!this_._internal_name().empty()) {
+            const std::string& _s = this_._internal_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.StackVariableRecord.name");
+            target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          // string data_type = 3;
+          if (!this_._internal_data_type().empty()) {
+            const std::string& _s = this_._internal_data_type();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.StackVariableRecord.data_type");
+            target = stream->WriteStringMaybeAliased(3, _s, target);
+          }
+
+          // int64 stack_offset = 4;
+          if (this_._internal_stack_offset() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<4>(
+                    stream, this_._internal_stack_offset(), target);
+          }
+
+          // uint32 size = 5;
+          if (this_._internal_size() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                5, this_._internal_size(), target);
+          }
+
+          // bool is_parameter = 6;
+          if (this_._internal_is_parameter() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                6, this_._internal_is_parameter(), target);
+          }
+
+          // int32 first_use_offset = 7;
+          if (this_._internal_first_use_offset() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt32ToArrayWithField<7>(
+                    stream, this_._internal_first_use_offset(), target);
+          }
+
+          // string source_type = 8;
+          if (!this_._internal_source_type().empty()) {
+            const std::string& _s = this_._internal_source_type();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.StackVariableRecord.source_type");
+            target = stream->WriteStringMaybeAliased(8, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.StackVariableRecord)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t StackVariableRecord::ByteSizeLong(const MessageLite& base) {
+          const StackVariableRecord& this_ = static_cast<const StackVariableRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t StackVariableRecord::ByteSizeLong() const {
+          const StackVariableRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.StackVariableRecord)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string var_id = 1;
+            if (!this_._internal_var_id().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_var_id());
+            }
+            // string name = 2;
+            if (!this_._internal_name().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_name());
+            }
+            // string data_type = 3;
+            if (!this_._internal_data_type().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_data_type());
+            }
+            // string source_type = 8;
+            if (!this_._internal_source_type().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_source_type());
+            }
+            // int64 stack_offset = 4;
+            if (this_._internal_stack_offset() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_stack_offset());
+            }
+            // uint32 size = 5;
+            if (this_._internal_size() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_size());
+            }
+            // bool is_parameter = 6;
+            if (this_._internal_is_parameter() != 0) {
+              total_size += 2;
+            }
+            // int32 first_use_offset = 7;
+            if (this_._internal_first_use_offset() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
+                  this_._internal_first_use_offset());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void StackVariableRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<StackVariableRecord*>(&to_msg);
+  auto& from = static_cast<const StackVariableRecord&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.StackVariableRecord)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_var_id().empty()) {
+    _this->_internal_set_var_id(from._internal_var_id());
+  }
+  if (!from._internal_name().empty()) {
+    _this->_internal_set_name(from._internal_name());
+  }
+  if (!from._internal_data_type().empty()) {
+    _this->_internal_set_data_type(from._internal_data_type());
+  }
+  if (!from._internal_source_type().empty()) {
+    _this->_internal_set_source_type(from._internal_source_type());
+  }
+  if (from._internal_stack_offset() != 0) {
+    _this->_impl_.stack_offset_ = from._impl_.stack_offset_;
+  }
+  if (from._internal_size() != 0) {
+    _this->_impl_.size_ = from._impl_.size_;
+  }
+  if (from._internal_is_parameter() != 0) {
+    _this->_impl_.is_parameter_ = from._impl_.is_parameter_;
+  }
+  if (from._internal_first_use_offset() != 0) {
+    _this->_impl_.first_use_offset_ = from._impl_.first_use_offset_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void StackVariableRecord::CopyFrom(const StackVariableRecord& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.StackVariableRecord)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void StackVariableRecord::InternalSwap(StackVariableRecord* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.var_id_, &other->_impl_.var_id_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.data_type_, &other->_impl_.data_type_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.source_type_, &other->_impl_.source_type_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.first_use_offset_)
+      + sizeof(StackVariableRecord::_impl_.first_use_offset_)
+      - PROTOBUF_FIELD_OFFSET(StackVariableRecord, _impl_.stack_offset_)>(
+          reinterpret_cast<char*>(&_impl_.stack_offset_),
+          reinterpret_cast<char*>(&other->_impl_.stack_offset_));
+}
+
+::google::protobuf::Metadata StackVariableRecord::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class FunctionFrameRecord::_Internal {
+ public:
+};
+
+FunctionFrameRecord::FunctionFrameRecord(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.FunctionFrameRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE FunctionFrameRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::FunctionFrameRecord& from_msg)
+      : stack_variables_{visibility, arena, from.stack_variables_},
+        stack_pointer_register_(arena, from.stack_pointer_register_),
+        _cached_size_{0} {}
+
+FunctionFrameRecord::FunctionFrameRecord(
+    ::google::protobuf::Arena* arena,
+    const FunctionFrameRecord& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  FunctionFrameRecord* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, function_entry_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, function_entry_),
+           offsetof(Impl_, grows_negative_) -
+               offsetof(Impl_, function_entry_) +
+               sizeof(Impl_::grows_negative_));
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.FunctionFrameRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE FunctionFrameRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : stack_variables_{visibility, arena},
+        stack_pointer_register_(arena),
+        _cached_size_{0} {}
+
+inline void FunctionFrameRecord::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, function_entry_),
+           0,
+           offsetof(Impl_, grows_negative_) -
+               offsetof(Impl_, function_entry_) +
+               sizeof(Impl_::grows_negative_));
+}
+FunctionFrameRecord::~FunctionFrameRecord() {
+  // @@protoc_insertion_point(destructor:libghidra.FunctionFrameRecord)
+  SharedDtor(*this);
+}
+inline void FunctionFrameRecord::SharedDtor(MessageLite& self) {
+  FunctionFrameRecord& this_ = static_cast<FunctionFrameRecord&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.stack_pointer_register_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* FunctionFrameRecord::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) FunctionFrameRecord(arena);
+}
+constexpr auto FunctionFrameRecord::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.stack_variables_) +
+          decltype(FunctionFrameRecord::_impl_.stack_variables_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::CopyInit(
+        sizeof(FunctionFrameRecord), alignof(FunctionFrameRecord), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&FunctionFrameRecord::PlacementNew_,
+                                 sizeof(FunctionFrameRecord),
+                                 alignof(FunctionFrameRecord));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull FunctionFrameRecord::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_FunctionFrameRecord_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &FunctionFrameRecord::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<FunctionFrameRecord>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &FunctionFrameRecord::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<FunctionFrameRecord>(), &FunctionFrameRecord::ByteSizeLong,
+            &FunctionFrameRecord::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_._cached_size_),
+        false,
+    },
+    &FunctionFrameRecord::kDescriptorMethods,
+    &descriptor_table_libghidra_2ffunctions_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* FunctionFrameRecord::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<4, 9, 1, 68, 2> FunctionFrameRecord::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    9, 120,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294966784,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    9,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::FunctionFrameRecord>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // uint64 function_entry = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(FunctionFrameRecord, _impl_.function_entry_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.function_entry_)}},
+    // int64 frame_size = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(FunctionFrameRecord, _impl_.frame_size_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.frame_size_)}},
+    // int64 local_size = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(FunctionFrameRecord, _impl_.local_size_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.local_size_)}},
+    // int64 parameter_size = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(FunctionFrameRecord, _impl_.parameter_size_), 63>(),
+     {32, 63, 0, PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.parameter_size_)}},
+    // int64 parameter_offset = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(FunctionFrameRecord, _impl_.parameter_offset_), 63>(),
+     {40, 63, 0, PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.parameter_offset_)}},
+    // int64 return_address_offset = 6;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(FunctionFrameRecord, _impl_.return_address_offset_), 63>(),
+     {48, 63, 0, PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.return_address_offset_)}},
+    // bool grows_negative = 7;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(FunctionFrameRecord, _impl_.grows_negative_), 63>(),
+     {56, 63, 0, PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.grows_negative_)}},
+    // string stack_pointer_register = 8;
+    {::_pbi::TcParser::FastUS1,
+     {66, 63, 0, PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.stack_pointer_register_)}},
+    // repeated .libghidra.StackVariableRecord stack_variables = 9;
+    {::_pbi::TcParser::FastMtR1,
+     {74, 63, 0, PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.stack_variables_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint64 function_entry = 1;
+    {PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.function_entry_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // int64 frame_size = 2;
+    {PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.frame_size_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // int64 local_size = 3;
+    {PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.local_size_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // int64 parameter_size = 4;
+    {PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.parameter_size_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // int64 parameter_offset = 5;
+    {PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.parameter_offset_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // int64 return_address_offset = 6;
+    {PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.return_address_offset_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // bool grows_negative = 7;
+    {PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.grows_negative_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // string stack_pointer_register = 8;
+    {PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.stack_pointer_register_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // repeated .libghidra.StackVariableRecord stack_variables = 9;
+    {PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.stack_variables_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::StackVariableRecord>()},
+  }}, {{
+    "\35\0\0\0\0\0\0\0\26\0\0\0\0\0\0\0"
+    "libghidra.FunctionFrameRecord"
+    "stack_pointer_register"
+  }},
+};
+
+PROTOBUF_NOINLINE void FunctionFrameRecord::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.FunctionFrameRecord)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.stack_variables_.Clear();
+  _impl_.stack_pointer_register_.ClearToEmpty();
+  ::memset(&_impl_.function_entry_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.grows_negative_) -
+      reinterpret_cast<char*>(&_impl_.function_entry_)) + sizeof(_impl_.grows_negative_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* FunctionFrameRecord::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const FunctionFrameRecord& this_ = static_cast<const FunctionFrameRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* FunctionFrameRecord::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const FunctionFrameRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.FunctionFrameRecord)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint64 function_entry = 1;
+          if (this_._internal_function_entry() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                1, this_._internal_function_entry(), target);
+          }
+
+          // int64 frame_size = 2;
+          if (this_._internal_frame_size() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<2>(
+                    stream, this_._internal_frame_size(), target);
+          }
+
+          // int64 local_size = 3;
+          if (this_._internal_local_size() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<3>(
+                    stream, this_._internal_local_size(), target);
+          }
+
+          // int64 parameter_size = 4;
+          if (this_._internal_parameter_size() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<4>(
+                    stream, this_._internal_parameter_size(), target);
+          }
+
+          // int64 parameter_offset = 5;
+          if (this_._internal_parameter_offset() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<5>(
+                    stream, this_._internal_parameter_offset(), target);
+          }
+
+          // int64 return_address_offset = 6;
+          if (this_._internal_return_address_offset() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<6>(
+                    stream, this_._internal_return_address_offset(), target);
+          }
+
+          // bool grows_negative = 7;
+          if (this_._internal_grows_negative() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                7, this_._internal_grows_negative(), target);
+          }
+
+          // string stack_pointer_register = 8;
+          if (!this_._internal_stack_pointer_register().empty()) {
+            const std::string& _s = this_._internal_stack_pointer_register();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.FunctionFrameRecord.stack_pointer_register");
+            target = stream->WriteStringMaybeAliased(8, _s, target);
+          }
+
+          // repeated .libghidra.StackVariableRecord stack_variables = 9;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_stack_variables_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_stack_variables().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    9, repfield, repfield.GetCachedSize(),
+                    target, stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.FunctionFrameRecord)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t FunctionFrameRecord::ByteSizeLong(const MessageLite& base) {
+          const FunctionFrameRecord& this_ = static_cast<const FunctionFrameRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t FunctionFrameRecord::ByteSizeLong() const {
+          const FunctionFrameRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.FunctionFrameRecord)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated .libghidra.StackVariableRecord stack_variables = 9;
+            {
+              total_size += 1UL * this_._internal_stack_variables_size();
+              for (const auto& msg : this_._internal_stack_variables()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+          }
+           {
+            // string stack_pointer_register = 8;
+            if (!this_._internal_stack_pointer_register().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_stack_pointer_register());
+            }
+            // uint64 function_entry = 1;
+            if (this_._internal_function_entry() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_function_entry());
+            }
+            // int64 frame_size = 2;
+            if (this_._internal_frame_size() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_frame_size());
+            }
+            // int64 local_size = 3;
+            if (this_._internal_local_size() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_local_size());
+            }
+            // int64 parameter_size = 4;
+            if (this_._internal_parameter_size() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_parameter_size());
+            }
+            // int64 parameter_offset = 5;
+            if (this_._internal_parameter_offset() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_parameter_offset());
+            }
+            // int64 return_address_offset = 6;
+            if (this_._internal_return_address_offset() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_return_address_offset());
+            }
+            // bool grows_negative = 7;
+            if (this_._internal_grows_negative() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void FunctionFrameRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<FunctionFrameRecord*>(&to_msg);
+  auto& from = static_cast<const FunctionFrameRecord&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.FunctionFrameRecord)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_stack_variables()->MergeFrom(
+      from._internal_stack_variables());
+  if (!from._internal_stack_pointer_register().empty()) {
+    _this->_internal_set_stack_pointer_register(from._internal_stack_pointer_register());
+  }
+  if (from._internal_function_entry() != 0) {
+    _this->_impl_.function_entry_ = from._impl_.function_entry_;
+  }
+  if (from._internal_frame_size() != 0) {
+    _this->_impl_.frame_size_ = from._impl_.frame_size_;
+  }
+  if (from._internal_local_size() != 0) {
+    _this->_impl_.local_size_ = from._impl_.local_size_;
+  }
+  if (from._internal_parameter_size() != 0) {
+    _this->_impl_.parameter_size_ = from._impl_.parameter_size_;
+  }
+  if (from._internal_parameter_offset() != 0) {
+    _this->_impl_.parameter_offset_ = from._impl_.parameter_offset_;
+  }
+  if (from._internal_return_address_offset() != 0) {
+    _this->_impl_.return_address_offset_ = from._impl_.return_address_offset_;
+  }
+  if (from._internal_grows_negative() != 0) {
+    _this->_impl_.grows_negative_ = from._impl_.grows_negative_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void FunctionFrameRecord::CopyFrom(const FunctionFrameRecord& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.FunctionFrameRecord)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void FunctionFrameRecord::InternalSwap(FunctionFrameRecord* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.stack_variables_.InternalSwap(&other->_impl_.stack_variables_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.stack_pointer_register_, &other->_impl_.stack_pointer_register_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.grows_negative_)
+      + sizeof(FunctionFrameRecord::_impl_.grows_negative_)
+      - PROTOBUF_FIELD_OFFSET(FunctionFrameRecord, _impl_.function_entry_)>(
+          reinterpret_cast<char*>(&_impl_.function_entry_),
+          reinterpret_cast<char*>(&other->_impl_.function_entry_));
+}
+
+::google::protobuf::Metadata FunctionFrameRecord::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListFunctionFramesRequest::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<ListFunctionFramesRequest>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(ListFunctionFramesRequest, _impl_._has_bits_);
+};
+
+void ListFunctionFramesRequest::clear_range() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.range_ != nullptr) _impl_.range_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+void ListFunctionFramesRequest::clear_page() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.page_ != nullptr) _impl_.page_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000002u;
+}
+ListFunctionFramesRequest::ListFunctionFramesRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListFunctionFramesRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE ListFunctionFramesRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::ListFunctionFramesRequest& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0} {}
+
+ListFunctionFramesRequest::ListFunctionFramesRequest(
+    ::google::protobuf::Arena* arena,
+    const ListFunctionFramesRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListFunctionFramesRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.range_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::AddressRange>(
+                              arena, *from._impl_.range_)
+                        : nullptr;
+  _impl_.page_ = (cached_has_bits & 0x00000002u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::Pagination>(
+                              arena, *from._impl_.page_)
+                        : nullptr;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListFunctionFramesRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE ListFunctionFramesRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void ListFunctionFramesRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, range_),
+           0,
+           offsetof(Impl_, page_) -
+               offsetof(Impl_, range_) +
+               sizeof(Impl_::page_));
+}
+ListFunctionFramesRequest::~ListFunctionFramesRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.ListFunctionFramesRequest)
+  SharedDtor(*this);
+}
+inline void ListFunctionFramesRequest::SharedDtor(MessageLite& self) {
+  ListFunctionFramesRequest& this_ = static_cast<ListFunctionFramesRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  delete this_._impl_.range_;
+  delete this_._impl_.page_;
+  this_._impl_.~Impl_();
+}
+
+inline void* ListFunctionFramesRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListFunctionFramesRequest(arena);
+}
+constexpr auto ListFunctionFramesRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(ListFunctionFramesRequest),
+                                            alignof(ListFunctionFramesRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListFunctionFramesRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListFunctionFramesRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListFunctionFramesRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ListFunctionFramesRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListFunctionFramesRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ListFunctionFramesRequest>(), &ListFunctionFramesRequest::ByteSizeLong,
+            &ListFunctionFramesRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListFunctionFramesRequest, _impl_._cached_size_),
+        false,
+    },
+    &ListFunctionFramesRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2ffunctions_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListFunctionFramesRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 2, 0, 2> ListFunctionFramesRequest::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(ListFunctionFramesRequest, _impl_._has_bits_),
+    0, // no _extensions_
+    3, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967289,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    2,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListFunctionFramesRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // .libghidra.AddressRange range = 2;
+    {::_pbi::TcParser::FastMtS1,
+     {18, 0, 0, PROTOBUF_FIELD_OFFSET(ListFunctionFramesRequest, _impl_.range_)}},
+    // .libghidra.Pagination page = 3;
+    {::_pbi::TcParser::FastMtS1,
+     {26, 1, 1, PROTOBUF_FIELD_OFFSET(ListFunctionFramesRequest, _impl_.page_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // .libghidra.AddressRange range = 2;
+    {PROTOBUF_FIELD_OFFSET(ListFunctionFramesRequest, _impl_.range_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // .libghidra.Pagination page = 3;
+    {PROTOBUF_FIELD_OFFSET(ListFunctionFramesRequest, _impl_.page_), _Internal::kHasBitsOffset + 1, 1,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::AddressRange>()},
+    {::_pbi::TcParser::GetTable<::libghidra::Pagination>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void ListFunctionFramesRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ListFunctionFramesRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      ABSL_DCHECK(_impl_.range_ != nullptr);
+      _impl_.range_->Clear();
+    }
+    if (cached_has_bits & 0x00000002u) {
+      ABSL_DCHECK(_impl_.page_ != nullptr);
+      _impl_.page_->Clear();
+    }
+  }
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ListFunctionFramesRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ListFunctionFramesRequest& this_ = static_cast<const ListFunctionFramesRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ListFunctionFramesRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ListFunctionFramesRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ListFunctionFramesRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // .libghidra.AddressRange range = 2;
+          if (cached_has_bits & 0x00000001u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                2, *this_._impl_.range_, this_._impl_.range_->GetCachedSize(), target,
+                stream);
+          }
+
+          // .libghidra.Pagination page = 3;
+          if (cached_has_bits & 0x00000002u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                3, *this_._impl_.page_, this_._impl_.page_->GetCachedSize(), target,
+                stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ListFunctionFramesRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ListFunctionFramesRequest::ByteSizeLong(const MessageLite& base) {
+          const ListFunctionFramesRequest& this_ = static_cast<const ListFunctionFramesRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ListFunctionFramesRequest::ByteSizeLong() const {
+          const ListFunctionFramesRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ListFunctionFramesRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+          cached_has_bits = this_._impl_._has_bits_[0];
+          if (cached_has_bits & 0x00000003u) {
+            // .libghidra.AddressRange range = 2;
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.range_);
+            }
+            // .libghidra.Pagination page = 3;
+            if (cached_has_bits & 0x00000002u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.page_);
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ListFunctionFramesRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ListFunctionFramesRequest*>(&to_msg);
+  auto& from = static_cast<const ListFunctionFramesRequest&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ListFunctionFramesRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      ABSL_DCHECK(from._impl_.range_ != nullptr);
+      if (_this->_impl_.range_ == nullptr) {
+        _this->_impl_.range_ =
+            ::google::protobuf::Message::CopyConstruct<::libghidra::AddressRange>(arena, *from._impl_.range_);
+      } else {
+        _this->_impl_.range_->MergeFrom(*from._impl_.range_);
+      }
+    }
+    if (cached_has_bits & 0x00000002u) {
+      ABSL_DCHECK(from._impl_.page_ != nullptr);
+      if (_this->_impl_.page_ == nullptr) {
+        _this->_impl_.page_ =
+            ::google::protobuf::Message::CopyConstruct<::libghidra::Pagination>(arena, *from._impl_.page_);
+      } else {
+        _this->_impl_.page_->MergeFrom(*from._impl_.page_);
+      }
+    }
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ListFunctionFramesRequest::CopyFrom(const ListFunctionFramesRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ListFunctionFramesRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ListFunctionFramesRequest::InternalSwap(ListFunctionFramesRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ListFunctionFramesRequest, _impl_.page_)
+      + sizeof(ListFunctionFramesRequest::_impl_.page_)
+      - PROTOBUF_FIELD_OFFSET(ListFunctionFramesRequest, _impl_.range_)>(
+          reinterpret_cast<char*>(&_impl_.range_),
+          reinterpret_cast<char*>(&other->_impl_.range_));
+}
+
+::google::protobuf::Metadata ListFunctionFramesRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListFunctionFramesResponse::_Internal {
+ public:
+};
+
+ListFunctionFramesResponse::ListFunctionFramesResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListFunctionFramesResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListFunctionFramesResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::ListFunctionFramesResponse& from_msg)
+      : frames_{visibility, arena, from.frames_},
+        _cached_size_{0} {}
+
+ListFunctionFramesResponse::ListFunctionFramesResponse(
+    ::google::protobuf::Arena* arena,
+    const ListFunctionFramesResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListFunctionFramesResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListFunctionFramesResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListFunctionFramesResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : frames_{visibility, arena},
+        _cached_size_{0} {}
+
+inline void ListFunctionFramesResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+}
+ListFunctionFramesResponse::~ListFunctionFramesResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.ListFunctionFramesResponse)
+  SharedDtor(*this);
+}
+inline void ListFunctionFramesResponse::SharedDtor(MessageLite& self) {
+  ListFunctionFramesResponse& this_ = static_cast<ListFunctionFramesResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* ListFunctionFramesResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListFunctionFramesResponse(arena);
+}
+constexpr auto ListFunctionFramesResponse::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(ListFunctionFramesResponse, _impl_.frames_) +
+          decltype(ListFunctionFramesResponse::_impl_.frames_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::ZeroInit(
+        sizeof(ListFunctionFramesResponse), alignof(ListFunctionFramesResponse), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&ListFunctionFramesResponse::PlacementNew_,
+                                 sizeof(ListFunctionFramesResponse),
+                                 alignof(ListFunctionFramesResponse));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListFunctionFramesResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListFunctionFramesResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListFunctionFramesResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ListFunctionFramesResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListFunctionFramesResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ListFunctionFramesResponse>(), &ListFunctionFramesResponse::ByteSizeLong,
+            &ListFunctionFramesResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListFunctionFramesResponse, _impl_._cached_size_),
+        false,
+    },
+    &ListFunctionFramesResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2ffunctions_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListFunctionFramesResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 1, 0, 2> ListFunctionFramesResponse::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListFunctionFramesResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // repeated .libghidra.FunctionFrameRecord frames = 1;
+    {::_pbi::TcParser::FastMtR1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(ListFunctionFramesResponse, _impl_.frames_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // repeated .libghidra.FunctionFrameRecord frames = 1;
+    {PROTOBUF_FIELD_OFFSET(ListFunctionFramesResponse, _impl_.frames_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::FunctionFrameRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void ListFunctionFramesResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ListFunctionFramesResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.frames_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ListFunctionFramesResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ListFunctionFramesResponse& this_ = static_cast<const ListFunctionFramesResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ListFunctionFramesResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ListFunctionFramesResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ListFunctionFramesResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // repeated .libghidra.FunctionFrameRecord frames = 1;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_frames_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_frames().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    1, repfield, repfield.GetCachedSize(),
+                    target, stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ListFunctionFramesResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ListFunctionFramesResponse::ByteSizeLong(const MessageLite& base) {
+          const ListFunctionFramesResponse& this_ = static_cast<const ListFunctionFramesResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ListFunctionFramesResponse::ByteSizeLong() const {
+          const ListFunctionFramesResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ListFunctionFramesResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated .libghidra.FunctionFrameRecord frames = 1;
+            {
+              total_size += 1UL * this_._internal_frames_size();
+              for (const auto& msg : this_._internal_frames()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ListFunctionFramesResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ListFunctionFramesResponse*>(&to_msg);
+  auto& from = static_cast<const ListFunctionFramesResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ListFunctionFramesResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_frames()->MergeFrom(
+      from._internal_frames());
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ListFunctionFramesResponse::CopyFrom(const ListFunctionFramesResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ListFunctionFramesResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ListFunctionFramesResponse::InternalSwap(ListFunctionFramesResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.frames_.InternalSwap(&other->_impl_.frames_);
+}
+
+::google::protobuf::Metadata ListFunctionFramesResponse::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // @@protoc_insertion_point(namespace_scope)

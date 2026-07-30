@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // Pure-Rust port of `python/src/libghidra/format_detect.py`. Identifies
 // the binary format (PE / ELF / Mach-O / fat Mach-O / raw) and maps the
@@ -68,8 +67,12 @@ impl From<UnsupportedFormatError> for Error {
 
 /// Detect format and language from a file on disk.
 pub fn detect(path: impl AsRef<Path>) -> Result<DetectedBinary> {
-    let mut f = File::open(path.as_ref())
-        .map_err(|e| Error::new(ErrorCode::ConfigError, format!("{}: {}", path.as_ref().display(), e)))?;
+    let mut f = File::open(path.as_ref()).map_err(|e| {
+        Error::new(
+            ErrorCode::ConfigError,
+            format!("{}: {}", path.as_ref().display(), e),
+        )
+    })?;
     let mut buf = Vec::new();
     let _ = f
         .read_to_end(&mut buf)
@@ -232,9 +235,8 @@ fn detect_pe(data: &[u8]) -> std::result::Result<DetectedBinary, UnsupportedForm
         } else if magic == 0x10B && data.len() >= opt_off + 0x20 {
             // PE32 : ImageBase is u32 at opt_off + 0x1C.
             let ib_off = opt_off + 0x1C;
-            base_address = Some(
-                u32::from_le_bytes(data[ib_off..ib_off + 4].try_into().unwrap()) as u64,
-            );
+            base_address =
+                Some(u32::from_le_bytes(data[ib_off..ib_off + 4].try_into().unwrap()) as u64);
         }
     }
 
@@ -272,11 +274,7 @@ fn elf_machine_lookup(e_machine: u16) -> Option<(&'static str, bool, &'static st
 }
 
 /// `(arch, bits, endian)` → `(language_id, compiler)`. Mirrors `_ELF_SLEIGH`.
-fn elf_sleigh_lookup(
-    arch: &str,
-    bits: u32,
-    endian: &str,
-) -> Option<(&'static str, &'static str)> {
+fn elf_sleigh_lookup(arch: &str, bits: u32, endian: &str) -> Option<(&'static str, &'static str)> {
     Some(match (arch, bits, endian) {
         ("x86", 32, "LE") => ("x86:LE:32:default", "gcc"),
         ("x86", 64, "LE") => ("x86:LE:64:default", "gcc"),
@@ -416,7 +414,11 @@ fn detect_macho_header(
         language_id: language_id.into(),
         compiler_spec_id: compiler.into(),
         bits: bits_from_language(language_id),
-        endian: if language_id.contains(":LE:") { "LE".into() } else { "BE".into() },
+        endian: if language_id.contains(":LE:") {
+            "LE".into()
+        } else {
+            "BE".into()
+        },
         machine: machine.into(),
         base_address: None,
         warnings: warns,
@@ -494,7 +496,9 @@ fn detect_fat_macho(data: &[u8]) -> std::result::Result<DetectedBinary, Unsuppor
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn validated(detected: DetectedBinary) -> std::result::Result<DetectedBinary, UnsupportedFormatError> {
+fn validated(
+    detected: DetectedBinary,
+) -> std::result::Result<DetectedBinary, UnsupportedFormatError> {
     if !known_languages::contains(&detected.language_id) {
         return Err(UnsupportedFormatError(format!(
             "detected language ID '{}' is not embedded",

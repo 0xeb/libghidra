@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 // libghidra_cli: Full CLI tool using the libghidra IClient local backend.
 //
@@ -117,7 +116,7 @@ static std::unique_ptr<ghidra::Client> smart_open(const std::string& binary,
       .default_arch = resolved_arch,
   });
 
-  ghidra::OpenRequest req;
+  ghidra::OpenProgramRequest req;
   req.program_path = binary;
   auto r = client->OpenProgram(req);
   if (!r.ok()) {
@@ -154,7 +153,7 @@ static int cmd_info(int argc, char* argv[]) {
   auto client = smart_open(binary, ghidra_root, arch, state_file, pe);
   if (!client) return 1;
 
-  auto funcs_r = client->ListFunctions(0, 0, 100000, 0);
+  auto funcs_r = client->ListFunctions(0, UINT64_MAX, 100000, 0);
   auto& funcs = funcs_r.value->functions;
 
   std::cout << "Binary:    " << binary << "\n";
@@ -190,7 +189,7 @@ static int cmd_list(int argc, char* argv[]) {
   auto client = smart_open(binary, ghidra_root, arch, state_file, pe);
   if (!client) return 1;
 
-  auto funcs_r = client->ListFunctions(0, 0, 100000, 0);
+  auto funcs_r = client->ListFunctions(0, UINT64_MAX, 100000, 0);
   auto funcs = std::move(funcs_r.value->functions);
 
   std::sort(funcs.begin(), funcs.end(),
@@ -234,7 +233,7 @@ static int cmd_decompile(int argc, char* argv[]) {
       if (file_off != 0) addr = file_off;
     }
   } else {
-    auto funcs_r = client->ListFunctions(0, 0, 100000, 0);
+    auto funcs_r = client->ListFunctions(0, UINT64_MAX, 100000, 0);
     bool found = false;
     for (auto& f : funcs_r.value->functions) {
       if (f.name == target) {
@@ -286,7 +285,7 @@ static int cmd_decompile_all(int argc, char* argv[]) {
   auto client = smart_open(binary, ghidra_root, arch, state_file, pe);
   if (!client) return 1;
 
-  auto funcs_r = client->ListFunctions(0, 0, 100000, 0);
+  auto funcs_r = client->ListFunctions(0, UINT64_MAX, 100000, 0);
   auto funcs = std::move(funcs_r.value->functions);
   std::sort(funcs.begin(), funcs.end(),
             [](const ghidra::Function& a, const ghidra::Function& b) {

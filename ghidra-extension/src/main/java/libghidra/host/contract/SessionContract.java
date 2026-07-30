@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.contract;
 
 public final class SessionContract {
@@ -30,7 +36,10 @@ public final class SessionContract {
 		String compilerSpec,
 		long imageBase,
 		String md5,
-		String sha256) {
+		String sha256,
+		String executableFormat,
+		long entryPoint,
+		boolean hasEntryPoint) {
 	}
 
 	public record OpenProjectRequest(
@@ -126,5 +135,47 @@ public final class SessionContract {
 	}
 
 	public record ShutdownResponse(boolean accepted) {
+	}
+
+	/**
+	 * A performance-benchmark record persisted in the program database. Mirrors
+	 * the ten columns of the ghidrasql {@code perf_benchmarks} SQL table.
+	 */
+	public record PerfBenchmarkRecord(
+		String benchId,
+		String queryFamily,
+		String datasetProfile,
+		double coldMsP50,
+		double coldMsP95,
+		double warmMsP50,
+		double warmMsP95,
+		double throughputQps,
+		double regressionPct,
+		String status) {
+	}
+
+	public record AddPerfBenchmarkRequest(PerfBenchmarkRecord record) {
+	}
+
+	public record AddPerfBenchmarkResponse(boolean added) {
+	}
+
+	public record ListPerfBenchmarksRequest() {
+	}
+
+	public record ListPerfBenchmarksResponse(
+		java.util.List<PerfBenchmarkRecord> records) {
+	}
+
+	public record ClearPerfBenchmarksRequest() {
+	}
+
+	public record ClearPerfBenchmarksResponse(boolean cleared, int removedCount) {
+	}
+
+	public record DeletePerfBenchmarkRequest(String benchId) {
+	}
+
+	public record DeletePerfBenchmarkResponse(boolean deleted) {
 	}
 }

@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 use crate::models;
 use crate::proto::libghidra as pb;
@@ -92,6 +91,7 @@ impl From<pb::SymbolRecord> for models::SymbolRecord {
             is_primary: r.is_primary,
             is_external: r.is_external,
             is_dynamic: r.is_dynamic,
+            is_external_entry_point: r.is_external_entry_point,
         }
     }
 }
@@ -109,6 +109,71 @@ impl From<pb::XrefRecord> for models::XrefRecord {
             is_external: r.is_external,
             is_memory: r.is_memory,
             is_flow: r.is_flow,
+        }
+    }
+}
+
+impl From<pb::StackVariableRecord> for models::StackVariableRecord {
+    fn from(r: pb::StackVariableRecord) -> Self {
+        Self {
+            var_id: r.var_id,
+            name: r.name,
+            data_type: r.data_type,
+            stack_offset: r.stack_offset,
+            size: r.size,
+            is_parameter: r.is_parameter,
+            first_use_offset: r.first_use_offset,
+            source_type: r.source_type,
+        }
+    }
+}
+
+impl From<pb::FunctionFrameRecord> for models::FunctionFrameRecord {
+    fn from(r: pb::FunctionFrameRecord) -> Self {
+        Self {
+            function_entry: r.function_entry,
+            frame_size: r.frame_size,
+            local_size: r.local_size,
+            parameter_size: r.parameter_size,
+            parameter_offset: r.parameter_offset,
+            return_address_offset: r.return_address_offset,
+            grows_negative: r.grows_negative,
+            stack_pointer_register: r.stack_pointer_register,
+            stack_variables: r.stack_variables.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<pb::PerfBenchmarkRecord> for models::PerfBenchmarkRecord {
+    fn from(r: pb::PerfBenchmarkRecord) -> Self {
+        Self {
+            bench_id: r.bench_id,
+            query_family: r.query_family,
+            dataset_profile: r.dataset_profile,
+            cold_ms_p50: r.cold_ms_p50,
+            cold_ms_p95: r.cold_ms_p95,
+            warm_ms_p50: r.warm_ms_p50,
+            warm_ms_p95: r.warm_ms_p95,
+            throughput_qps: r.throughput_qps,
+            regression_pct: r.regression_pct,
+            status: r.status,
+        }
+    }
+}
+
+impl From<models::PerfBenchmarkRecord> for pb::PerfBenchmarkRecord {
+    fn from(r: models::PerfBenchmarkRecord) -> Self {
+        Self {
+            bench_id: r.bench_id,
+            query_family: r.query_family,
+            dataset_profile: r.dataset_profile,
+            cold_ms_p50: r.cold_ms_p50,
+            cold_ms_p95: r.cold_ms_p95,
+            warm_ms_p50: r.warm_ms_p50,
+            warm_ms_p95: r.warm_ms_p95,
+            throughput_qps: r.throughput_qps,
+            regression_pct: r.regression_pct,
+            status: r.status,
         }
     }
 }
@@ -234,6 +299,48 @@ impl From<pb::DecompileRecord> for models::DecompilationRecord {
             error_message: r.error_message,
             locals: r.locals.into_iter().map(Into::into).collect(),
             tokens: r.tokens.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<pb::VarnodeRecord> for models::VarnodeRecord {
+    fn from(r: pb::VarnodeRecord) -> Self {
+        Self {
+            space: r.space,
+            offset: r.offset,
+            size: r.size,
+            kind: r.kind,
+        }
+    }
+}
+
+impl From<pb::PcodeOpRecord> for models::PcodeOpRecord {
+    fn from(r: pb::PcodeOpRecord) -> Self {
+        Self {
+            seq: r.seq,
+            op: r.op,
+            addr: r.addr,
+            has_address: r.has_address,
+            // Message presence: an absent output varnode means the op defines nothing.
+            has_output: r.output.is_some(),
+            output: r.output.map(Into::into).unwrap_or_default(),
+            inputs: r.inputs.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<pb::PcodeRecord> for models::PcodeRecord {
+    fn from(r: pb::PcodeRecord) -> Self {
+        let maturity = match r.maturity() {
+            pb::PcodeMaturity::Raw => models::PcodeMaturity::Raw,
+            _ => models::PcodeMaturity::High,
+        };
+        Self {
+            function_entry_address: r.function_entry_address,
+            ops: r.ops.into_iter().map(Into::into).collect(),
+            completed: r.completed,
+            error_message: r.error_message,
+            maturity,
         }
     }
 }
@@ -369,6 +476,18 @@ impl From<pb::InstructionRecord> for models::InstructionRecord {
     }
 }
 
+impl From<pb::InstructionOperandRecord> for models::InstructionOperandRecord {
+    fn from(r: pb::InstructionOperandRecord) -> Self {
+        Self {
+            address: r.address,
+            operand_index: r.operand_index,
+            text: r.text,
+            type_name: r.type_name,
+            ref_type: r.ref_type,
+        }
+    }
+}
+
 impl From<pb::CommentRecord> for models::CommentRecord {
     fn from(r: pb::CommentRecord) -> Self {
         Self {
@@ -430,6 +549,21 @@ impl From<pb::MemoryBlockRecord> for models::MemoryBlockRecord {
             is_initialized: r.is_initialized,
             source_name: r.source_name,
             comment: r.comment,
+        }
+    }
+}
+
+impl From<models::CreateMemoryBlockSpec> for pb::CreateMemoryBlockRequest {
+    fn from(s: models::CreateMemoryBlockSpec) -> Self {
+        Self {
+            name: s.name,
+            start_address: s.start_address,
+            size: s.size,
+            is_read: s.is_read,
+            is_write: s.is_write,
+            is_execute: s.is_execute,
+            initialized: s.initialized,
+            overlay: s.overlay,
         }
     }
 }

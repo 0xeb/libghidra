@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #pragma once
 
@@ -53,6 +52,12 @@ class HttpClient final : public IClient {
   StatusOr<DiscardProgramResponse> DiscardProgram() override;
   StatusOr<RevisionResponse> GetRevision() override;
   StatusOr<ShutdownResponse> Shutdown(ShutdownPolicy policy) override;
+  StatusOr<AddPerfBenchmarkResponse> AddPerfBenchmark(
+      const PerfBenchmarkRecord& record) override;
+  StatusOr<ListPerfBenchmarksResponse> ListPerfBenchmarks() override;
+  StatusOr<ClearPerfBenchmarksResponse> ClearPerfBenchmarks() override;
+  StatusOr<DeletePerfBenchmarkResponse> DeletePerfBenchmark(
+      const std::string& bench_id) override;
 
   StatusOr<ReadBytesResponse> ReadBytes(std::uint64_t address, std::uint32_t length) override;
   StatusOr<WriteBytesResponse> WriteBytes(std::uint64_t address,
@@ -60,6 +65,11 @@ class HttpClient final : public IClient {
   StatusOr<PatchBytesBatchResponse> PatchBytesBatch(
       const std::vector<BytePatch>& patches) override;
   StatusOr<ListMemoryBlocksResponse> ListMemoryBlocks(int limit, int offset) override;
+  StatusOr<CreateMemoryBlockResponse> CreateMemoryBlock(
+      const CreateMemoryBlockSpec& spec) override;
+  StatusOr<RemoveMemoryBlockResponse> RemoveMemoryBlock(std::uint64_t address) override;
+  StatusOr<MoveMemoryBlockResponse> MoveMemoryBlock(std::uint64_t address,
+                                                    std::uint64_t new_start_address) override;
 
   StatusOr<GetFunctionResponse> GetFunction(std::uint64_t address) override;
   StatusOr<ListFunctionsResponse> ListFunctions(std::uint64_t range_start,
@@ -92,6 +102,10 @@ class HttpClient final : public IClient {
                                          std::uint64_t range_end,
                                          int limit,
                                          int offset) override;
+  StatusOr<ListFunctionFramesResponse> ListFunctionFrames(std::uint64_t range_start,
+                                                           std::uint64_t range_end,
+                                                           int limit,
+                                                           int offset) override;
   StatusOr<ListFunctionTagsResponse> ListFunctionTags() override;
   StatusOr<CreateFunctionTagResponse> CreateFunctionTag(
       const std::string& name, const std::string& comment) override;
@@ -221,12 +235,18 @@ class HttpClient final : public IClient {
                                                           int limit,
                                                           int offset,
                                                           int timeout_ms) override;
+  StatusOr<GetPcodeResponse> GetPcode(std::uint64_t address,
+                                      PcodeMaturity maturity, int timeout_ms) override;
 
   StatusOr<GetInstructionResponse> GetInstruction(std::uint64_t address) override;
   StatusOr<ListInstructionsResponse> ListInstructions(std::uint64_t range_start,
                                                       std::uint64_t range_end,
                                                       int limit,
                                                       int offset) override;
+  StatusOr<ListInstructionOperandsResponse> ListInstructionOperands(std::uint64_t range_start,
+                                                                     std::uint64_t range_end,
+                                                                     int limit,
+                                                                     int offset) override;
   StatusOr<GetCommentsResponse> GetComments(std::uint64_t range_start,
                                             std::uint64_t range_end,
                                             int limit,

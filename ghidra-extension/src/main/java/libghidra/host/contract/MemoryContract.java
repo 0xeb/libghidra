@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.contract;
 
 import java.util.List;
@@ -57,5 +63,46 @@ public final class MemoryContract {
 	}
 
 	public record ListMemoryBlocksResponse(List<MemoryBlockRecord> blocks) {
+	}
+
+	// ---- Writable memory map (create / remove / move blocks) ----
+
+	public record CreateMemoryBlockRequest(
+		String name,
+		long startAddress,
+		long size,
+		boolean isRead,
+		boolean isWrite,
+		boolean isExecute,
+		boolean initialized,
+		boolean overlay) {
+	}
+
+	public record CreateMemoryBlockResponse(
+		boolean created,
+		MemoryBlockRecord block,
+		String errorCode,
+		String errorMessage) {
+	}
+
+	public record RemoveMemoryBlockRequest(long address) {
+	}
+
+	public record RemoveMemoryBlockResponse(
+		boolean removed,
+		String errorCode,
+		String errorMessage) {
+	}
+
+	public record MoveMemoryBlockRequest(
+		long address,
+		long newStartAddress) {
+	}
+
+	public record MoveMemoryBlockResponse(
+		boolean moved,
+		MemoryBlockRecord block,
+		String errorCode,
+		String errorMessage) {
 	}
 }

@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 #
 # type_system: Type system overview -- structs, aliases, enums, and full lifecycle.
 #
@@ -60,7 +59,7 @@ def main() -> None:
         sys.exit(1)
 
     # Verify creation
-    verify = client.get_type(f"/{struct_name}")
+    verify = client.get_type(struct_name)
     if verify.type:
         print(f"  Verified: {verify.type.name} (kind={verify.type.kind}, size={verify.type.length})")
 
@@ -86,7 +85,7 @@ def main() -> None:
     renamed = "ExampleStructRenamed"
     print(f"\nRenaming '{struct_name}' -> '{renamed}'...")
     try:
-        ren_resp = client.rename_type(f"/{struct_name}", renamed)
+        ren_resp = client.rename_type(struct_name, renamed)
         print(f"  updated={ren_resp.updated}  name={ren_resp.name}")
     except ghidra.GhidraError as e:
         print(f"  rename_type failed: {e}", file=sys.stderr)
@@ -128,21 +127,21 @@ def main() -> None:
 
     # Delete alias first (depends on struct)
     try:
-        client.delete_type_alias(f"/{alias_name}")
+        client.delete_type_alias(alias_name)
         print(f"  Deleted alias '{alias_name}'")
     except ghidra.GhidraError as e:
         print(f"  delete alias failed: {e}", file=sys.stderr)
 
     # Delete enum
     try:
-        client.delete_type_enum(f"/{enum_name}")
+        client.delete_type_enum(enum_name)
         print(f"  Deleted enum '{enum_name}'")
     except ghidra.GhidraError as e:
         print(f"  delete enum failed: {e}", file=sys.stderr)
 
     # Delete struct (renamed)
     try:
-        client.delete_type(f"/{renamed}")
+        client.delete_type(renamed)
         print(f"  Deleted struct '{renamed}'")
     except ghidra.GhidraError as e:
         print(f"  delete struct failed: {e}", file=sys.stderr)

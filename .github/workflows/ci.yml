@@ -1,3 +1,9 @@
+# Copyright (c) 2024-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+#
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
+
 name: ci
 
 on:
@@ -347,7 +353,17 @@ jobs:
           cp -R cpp/include/* "$BUNDLE/include/"
           # The static archives are named differently per platform/generator.
           # On multi-config (Visual Studio) builds they live under Release/.
-          find build/cpp -type f \( -name 'liblibghidra_*.a' -o -name 'libghidra_*.lib' -o -name 'liblibghidra_*.lib' \) -print -exec cp {} "$BUNDLE/lib/" \;
+          find build/cpp -type f \( \
+            -name 'liblibghidra_*.a' -o \
+            -name 'libghidra_*.lib' -o \
+            -name 'liblibghidra_*.lib' -o \
+            -name 'libprotobuf.lib' -o \
+            -name 'absl_*.lib' -o \
+            -name 'utf8_*.lib' -o \
+            -name 'libprotobuf.a' -o \
+            -name 'libabsl_*.a' -o \
+            -name 'libutf8_*.a' \
+          \) -print -exec cp {} "$BUNDLE/lib/" \;
           # On Linux, also bundle libbfd.a + transitive deps from binutils-devel
           # so users on newer distros (Debian 13, Ubuntu 24.04, Fedora 40+)
           # don't hit ABI mismatches with a system libbfd that has different
@@ -371,20 +387,11 @@ jobs:
 
       - name: Build Rust crate against prebuilt SDK
         shell: bash
-        # cargo build will fail to link unless every transitive dep of
-        # libghidra_local is present in the bundle. For now we accept that
-        # the link may fail on some matrix entries — the artifact is still
-        # useful for downstream cxx-bridge consumers who can supply their
-        # own LIBGHIDRA_LINK_LIBS override.
-        continue-on-error: true
         run: |
           set -euo pipefail
           cd rust
           cargo check --features local
-          # Best-effort link; treat failure as a soft warning while the
-          # transitive dep list is being finalised in build.rs.
-          cargo build --release --features local || \
-            echo "::warning::cargo build --features local did not link cleanly on ${{ matrix.id }}; check LIBGHIDRA_LINK_LIBS"
+          cargo build --release --features local
 
       - name: Package Rust prebuilt archive
         shell: bash

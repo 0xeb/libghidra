@@ -1,16 +1,15 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //! Launch headless Ghidra and return a connected [`GhidraClient`].
 
-use std::collections::VecDeque;
 use std::io::BufRead;
 use std::path::{Path, PathBuf};
-use std::process::{Child, Command, Stdio};
-use std::time::{Duration, Instant};
+use std::process::{Child, ChildStdout, Command, Stdio};
+use std::thread::JoinHandle;
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use crate::client::{ClientOptions, GhidraClient};
 use crate::error::{Error, ErrorCode};
@@ -31,23 +30,17 @@ fn clean_canonicalize(p: &str) -> std::io::Result<PathBuf> {
     Ok(canon)
 }
 
-/// Options for launching headless Ghidra.
-pub struct HeadlessOptions {
+/// A sink for a headless host's stdout lines (progress/log streaming).
+pub type OutputCallback = Box<dyn Fn(&str) + Send>;
+
+/// Options for launching a project-scoped headless Ghidra RPC host.
+pub struct HeadlessProjectOptions {
     pub ghidra_dir: String,
-    pub binary: String,
-    pub binaries: Vec<String>,
-    /// Reopen an existing program.
-    pub program: String,
-    pub programs: Vec<String>,
-    /// Active project program for the live RPC host.
-    pub initial_program: String,
     pub port: u16,
     /// Bind address for the headless server.
     pub bind: String,
     pub project_dir: String,
     pub project_name: String,
-    pub analyze: bool,
-    pub overwrite: bool,
     /// Shutdown policy: "save", "discard", or "none".
     pub shutdown: String,
     /// Bearer auth token.
@@ -59,24 +52,18 @@ pub struct HeadlessOptions {
     pub read_timeout: Duration,
     pub script_dir: String,
     pub extra_script_args: Vec<String>,
-    pub on_output: Option<Box<dyn Fn(&str) + Send>>,
+    pub extra_headless_args: Vec<String>,
+    pub on_output: Option<OutputCallback>,
 }
 
-impl Default for HeadlessOptions {
+impl Default for HeadlessProjectOptions {
     fn default() -> Self {
         Self {
             ghidra_dir: String::new(),
-            binary: String::new(),
-            binaries: Vec::new(),
-            program: String::new(),
-            programs: Vec::new(),
-            initial_program: String::new(),
             port: 18080,
             bind: "127.0.0.1".to_string(),
             project_dir: String::new(),
             project_name: "HeadlessProject".to_string(),
-            analyze: true,
-            overwrite: true,
             shutdown: "save".to_string(),
             auth_token: String::new(),
             max_runtime_seconds: 0,
@@ -85,6 +72,7 @@ impl Default for HeadlessOptions {
             read_timeout: Duration::from_secs(300),
             script_dir: String::new(),
             extra_script_args: Vec::new(),
+            extra_headless_args: Vec::new(),
             on_output: None,
         }
     }
@@ -94,10 +82,10 @@ impl Default for HeadlessOptions {
 pub struct HeadlessClient {
     client: GhidraClient,
     child: Option<Child>,
+    output_thread: Option<JoinHandle<()>>,
     base_url: String,
     project_dir: PathBuf,
     owns_project_dir: bool,
-    on_output: Option<Box<dyn Fn(&str) + Send>>,
 }
 
 impl HeadlessClient {
@@ -120,6 +108,7 @@ impl HeadlessClient {
     /// After detach(), Drop and close() become no-ops for the process.
     pub fn detach(&mut self) {
         let _ = self.child.take();
+        let _ = self.output_thread.take();
         self.owns_project_dir = false;
     }
 
@@ -132,9 +121,6 @@ impl HeadlessClient {
         };
         let _ = self.client.shutdown(policy);
 
-        // Drain remaining output
-        self.drain_output();
-
         let code = match self.child.take() {
             Some(mut c) => match c.wait() {
                 Ok(s) => s.code().unwrap_or(-1),
@@ -143,26 +129,14 @@ impl HeadlessClient {
             None => 0,
         };
 
+        if let Some(output_thread) = self.output_thread.take() {
+            let _ = output_thread.join();
+        }
+
         if self.owns_project_dir {
             let _ = std::fs::remove_dir_all(&self.project_dir);
         }
         code
-    }
-
-    fn drain_output(&mut self) {
-        if let Some(ref mut child) = self.child {
-            if let Some(stdout) = child.stdout.take() {
-                let reader = std::io::BufReader::new(stdout);
-                for line in reader.lines().map_while(|l| l.ok()) {
-                    let trimmed = line.trim().to_string();
-                    if !trimmed.is_empty() {
-                        if let Some(ref cb) = self.on_output {
-                            cb(&trimmed);
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -185,10 +159,36 @@ impl Drop for HeadlessClient {
             let _ = child.kill();
             let _ = child.wait();
         }
+        if let Some(output_thread) = self.output_thread.take() {
+            let _ = output_thread.join();
+        }
         if self.owns_project_dir {
             let _ = std::fs::remove_dir_all(&self.project_dir);
         }
     }
+}
+
+fn emit_output_line(line: &str, on_output: Option<&(dyn Fn(&str) + Send)>) {
+    let trimmed = line.trim();
+    if !trimmed.is_empty() {
+        if let Some(cb) = on_output {
+            cb(trimmed);
+        }
+    }
+}
+
+fn start_output_drainer(
+    stdout: ChildStdout,
+    on_output: Option<OutputCallback>,
+) -> std::io::Result<JoinHandle<()>> {
+    std::thread::Builder::new()
+        .name("libghidra-headless-output".to_string())
+        .spawn(move || {
+            let reader = std::io::BufReader::new(stdout);
+            for line in reader.lines().map_while(|l| l.ok()) {
+                emit_output_line(&line, on_output.as_deref());
+            }
+        })
 }
 
 fn find_launcher(ghidra_dir: &Path) -> Result<PathBuf, Error> {
@@ -230,164 +230,23 @@ fn find_script_dir(ghidra_dir: &Path) -> Result<PathBuf, Error> {
     }
 }
 
-fn infer_imported_program_name(binary: &Path) -> Result<String, Error> {
-    binary
-        .file_name()
-        .and_then(|name| name.to_str())
-        .map(|name| name.to_string())
-        .ok_or_else(|| {
-            Error::new(
-                ErrorCode::ConfigError,
-                format!(
-                    "Unable to infer imported program name from {}",
-                    binary.display()
-                ),
-            )
-        })
-}
-
-fn strip_project_leading_slash(path: &str) -> String {
-    path.trim_start_matches(&['/', '\\'][..]).to_string()
-}
-
-fn run_import_stage(
-    launcher: &Path,
-    project_dir: &Path,
-    project_name: &str,
-    binary: &Path,
-    overwrite: bool,
-    analyze: bool,
-    timeout: Duration,
-    on_output: Option<&Box<dyn Fn(&str) + Send>>,
-) -> Result<String, Error> {
-    let mut cmd = Command::new(launcher);
-    let _ = cmd
-        .arg(project_dir)
-        .arg(project_name)
-        .arg("-import")
-        .arg(binary);
-    if overwrite {
-        let _ = cmd.arg("-overwrite");
-    }
-    if !analyze {
-        let _ = cmd.arg("-noanalysis");
-    }
-    let _ = cmd.stdout(Stdio::piped()).stderr(Stdio::inherit());
-
-    let mut child = cmd.spawn().map_err(|e| {
-        Error::new(
-            ErrorCode::TransportError,
-            format!("Failed to launch import stage: {e}"),
-        )
-    })?;
-    let stdout = child
-        .stdout
-        .take()
-        .ok_or_else(|| Error::new(ErrorCode::TransportError, "Failed to capture import stdout"))?;
-    let mut reader = std::io::BufReader::new(stdout);
-    let deadline = Instant::now() + timeout;
-    let mut tail: VecDeque<String> = VecDeque::with_capacity(200);
-    let mut line_buf = String::new();
-
-    while Instant::now() < deadline {
-        line_buf.clear();
-        match reader.read_line(&mut line_buf) {
-            Ok(0) => break,
-            Ok(_) => {
-                let trimmed = line_buf.trim().to_string();
-                if trimmed.is_empty() {
-                    continue;
-                }
-                if tail.len() == 200 {
-                    let _ = tail.pop_front();
-                }
-                tail.push_back(trimmed.clone());
-                if let Some(cb) = on_output {
-                    cb(&trimmed);
-                }
-            }
-            Err(_) => std::thread::sleep(Duration::from_millis(100)),
-        }
-    }
-
-    let status = child.wait().map_err(|e| {
-        Error::new(
-            ErrorCode::TransportError,
-            format!("Failed waiting for import stage: {e}"),
-        )
-    })?;
-    if !status.success() {
-        let tail_text = tail
-            .iter()
-            .rev()
-            .take(20)
-            .cloned()
-            .collect::<Vec<_>>()
-            .into_iter()
-            .rev()
-            .collect::<Vec<_>>()
-            .join("\n");
-        return Err(Error::new(
-            ErrorCode::TransportError,
-            format!(
-                "Import stage failed with exit code {}\n{}",
-                status.code().unwrap_or(-1),
-                tail_text
-            ),
-        ));
-    }
-
-    infer_imported_program_name(binary)
-}
-
-/// Launch headless Ghidra, wait for readiness, return a connected client.
+/// Launch a project-scoped headless Ghidra host and return a connected client.
 ///
 /// ```no_run
 /// use libghidra as ghidra;
-/// let mut h = ghidra::launch_headless(ghidra::HeadlessOptions {
+/// let mut h = ghidra::launch_headless_project(ghidra::HeadlessProjectOptions {
 ///     ghidra_dir: "/path/to/ghidra_dist".into(),
-///     binary: "/path/to/target.exe".into(),
 ///     ..Default::default()
 /// }).unwrap();
-/// let funcs = h.list_functions(0, u64::MAX, 0, 0).unwrap();
 /// h.close(true);
 /// ```
-pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
+pub fn launch_headless_project(opts: HeadlessProjectOptions) -> Result<HeadlessClient, Error> {
     let ghidra_dir = clean_canonicalize(&opts.ghidra_dir).map_err(|e| {
         Error::new(
             ErrorCode::NotFound,
             format!("Ghidra dir not found: {}: {e}", opts.ghidra_dir),
         )
     })?;
-
-    let mut binary_inputs = Vec::new();
-    if !opts.binary.is_empty() {
-        binary_inputs.push(opts.binary.clone());
-    }
-    binary_inputs.extend(opts.binaries.iter().cloned());
-
-    let mut program_inputs = Vec::new();
-    if !opts.program.is_empty() {
-        program_inputs.push(opts.program.clone());
-    }
-    program_inputs.extend(opts.programs.iter().cloned());
-
-    if binary_inputs.is_empty() && program_inputs.is_empty() && opts.initial_program.is_empty() {
-        return Err(Error::new(
-            ErrorCode::ConfigError,
-            "HeadlessOptions: binary, program, binaries, programs, or initial_program must be set"
-                .to_string(),
-        ));
-    }
-
-    let binaries = binary_inputs
-        .iter()
-        .map(|path| {
-            clean_canonicalize(path).map_err(|e| {
-                Error::new(ErrorCode::NotFound, format!("Binary not found: {path}: {e}"))
-            })
-        })
-        .collect::<Result<Vec<_>, _>>()?;
 
     let launcher = find_launcher(&ghidra_dir)?;
     let script_dir = if opts.script_dir.is_empty() {
@@ -398,7 +257,11 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
 
     let owns_project_dir = opts.project_dir.is_empty();
     let project_dir = if owns_project_dir {
-        std::env::temp_dir().join("ghidra_headless_rust")
+        let suffix = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
+        std::env::temp_dir().join(format!("ghidra_headless_rust_{suffix}"))
     } else {
         PathBuf::from(&opts.project_dir)
     };
@@ -412,44 +275,14 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
         )
     })?;
 
-    let mut imported_programs = Vec::new();
-    for bin in &binaries {
-        match run_import_stage(
-            &launcher,
-            &project_dir,
-            &opts.project_name,
-            bin,
-            opts.overwrite,
-            opts.analyze,
-            opts.startup_timeout.max(opts.read_timeout),
-            opts.on_output.as_ref(),
-        ) {
-            Ok(program_name) => imported_programs.push(program_name),
-            Err(e) => {
-                if owns_project_dir {
-                    let _ = std::fs::remove_dir_all(&project_dir);
-                }
-                return Err(e);
-            }
-        }
-    }
-
-    let managed_program = if !opts.initial_program.is_empty() {
-        opts.initial_program.clone()
-    } else if let Some(program) = program_inputs.first() {
-        program.clone()
-    } else {
-        imported_programs.first().cloned().unwrap_or_default()
-    };
-    let process_program = strip_project_leading_slash(&managed_program);
-    let mut declared_programs = program_inputs.clone();
-    declared_programs.extend(imported_programs.iter().cloned());
-
-    // Build command
+    // Build command. No -import and no -process: Ghidra creates/opens
+    // the project, runs the server script without an active program, and
+    // callers drive ImportProgram/OpenProgram explicitly over RPC.
     let mut cmd = Command::new(&launcher);
     let _ = cmd.arg(&project_dir).arg(&opts.project_name);
-    let _ = cmd.arg("-process").arg(&process_program).arg("-noanalysis");
-
+    for arg in &opts.extra_headless_args {
+        let _ = cmd.arg(arg);
+    }
     let _ = cmd
         .arg("-scriptPath")
         .arg(&script_dir)
@@ -458,12 +291,6 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
         .arg(format!("bind={}", opts.bind))
         .arg(format!("port={}", opts.port))
         .arg(format!("shutdown={}", opts.shutdown));
-    if !opts.initial_program.is_empty() {
-        let _ = cmd.arg(format!("initial_program={}", opts.initial_program));
-    }
-    if !declared_programs.is_empty() {
-        let _ = cmd.arg(format!("program_paths={}", declared_programs.join(";")));
-    }
     if !opts.auth_token.is_empty() {
         let _ = cmd.arg(format!("auth={}", opts.auth_token));
     }
@@ -501,7 +328,6 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
     let mut reader = std::io::BufReader::new(stdout);
     let mut actual_port = opts.port;
     let mut found = false;
-    let on_output = &opts.on_output;
     let mut line_buf = String::new();
 
     while Instant::now() < deadline {
@@ -517,11 +343,7 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
             }
             Ok(_) => {
                 let trimmed = line_buf.trim().to_string();
-                if !trimmed.is_empty() {
-                    if let Some(ref cb) = on_output {
-                        cb(&trimmed);
-                    }
-                }
+                emit_output_line(&trimmed, opts.on_output.as_deref());
                 if trimmed.contains(READY_BANNER) {
                     for part in trimmed.split_whitespace() {
                         if let Some(val) = part.strip_prefix("port=") {
@@ -555,8 +377,20 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
         ));
     }
 
-    // Return stdout to the child for drain_output later
-    child.stdout = Some(reader.into_inner());
+    let output_thread = match start_output_drainer(reader.into_inner(), opts.on_output) {
+        Ok(thread) => thread,
+        Err(e) => {
+            let _ = child.kill();
+            let _ = child.wait();
+            if owns_project_dir {
+                let _ = std::fs::remove_dir_all(&project_dir);
+            }
+            return Err(Error::new(
+                ErrorCode::TransportError,
+                format!("Failed to start headless output drainer: {e}"),
+            ));
+        }
+    };
 
     // Connect
     let base_url = format!("http://{}:{actual_port}", opts.bind);
@@ -570,9 +404,62 @@ pub fn launch_headless(opts: HeadlessOptions) -> Result<HeadlessClient, Error> {
     Ok(HeadlessClient {
         client,
         child: Some(child),
+        output_thread: Some(output_thread),
         base_url,
         project_dir,
         owns_project_dir,
-        on_output: opts.on_output,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::process::{Command, Stdio};
+    use std::sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    };
+
+    #[test]
+    fn output_drainer_consumes_child_stdout_until_eof() {
+        const LINE_COUNT: usize = 10_000;
+
+        let mut cmd = output_flood_command(LINE_COUNT);
+        let _ = cmd.stdout(Stdio::piped()).stderr(Stdio::null());
+        let mut child = cmd.spawn().expect("spawn stdout writer");
+        let stdout = child.stdout.take().expect("capture child stdout");
+
+        let seen = Arc::new(AtomicUsize::new(0));
+        let seen_by_callback = Arc::clone(&seen);
+        let output_thread = start_output_drainer(
+            stdout,
+            Some(Box::new(move |_| {
+                let _ = seen_by_callback.fetch_add(1, Ordering::Relaxed);
+            })),
+        )
+        .expect("start output drainer");
+
+        let status = child.wait().expect("wait for stdout writer");
+        assert!(status.success(), "stdout writer failed: {status:?}");
+        output_thread.join().expect("join output drainer");
+        assert_eq!(seen.load(Ordering::Relaxed), LINE_COUNT);
+    }
+
+    #[cfg(windows)]
+    fn output_flood_command(line_count: usize) -> Command {
+        let mut cmd = Command::new("cmd");
+        let _ = cmd
+            .arg("/C")
+            .arg(format!("for /L %i in (1,1,{line_count}) do @echo line%i"));
+        cmd
+    }
+
+    #[cfg(not(windows))]
+    fn output_flood_command(line_count: usize) -> Command {
+        let mut cmd = Command::new("sh");
+        let _ = cmd.arg("-c").arg(format!(
+            "i=1; while [ $i -le {line_count} ]; do echo line$i; i=$((i+1)); done"
+        ));
+        cmd
+    }
 }

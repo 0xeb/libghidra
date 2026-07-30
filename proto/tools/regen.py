@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 """
 Regenerate all protobuf stubs from proto source files.
 
@@ -33,6 +32,7 @@ Output directories (relative to libghidra/):
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -60,6 +60,13 @@ PYTHON_OUT = LIBGHIDRA_ROOT / "python" / "src"
 
 ALL_LANGUAGES = ["cpp", "java", "rust", "python"]
 
+# The protobuf release family the committed stubs (and the pinned protobuf-java
+# 4.29.3 / generated C++ 5.29.3 gencode) require. protoc release 29.3 reports
+# itself as `libprotoc 29.3` — the Java "4.29.3" and C++ "5.29.3" gencode both
+# map to protoc release 29.x. Regenerating with any other train silently
+# produces stubs the pinned runtimes cannot compile.
+REQUIRED_PROTOC_MAJOR = 29
+
 
 def find_protoc(args_protoc: str | None) -> Path:
     """Resolve protoc binary from --protoc arg, PROTOC env, or PATH."""
@@ -83,6 +90,43 @@ def find_protoc(args_protoc: str | None) -> Path:
     raise FileNotFoundError(
         "protoc not found. Pass --protoc, set PROTOC env var, or add protoc to PATH."
     )
+
+
+def check_protoc_version(protoc: Path) -> None:
+    """Require protoc to be from the compatible release family (major 29).
+
+    Runs `protoc --version` and parses the release major. Modern protoc prints
+    `libprotoc 29.3`; very old protoc prints three components with major 3
+    (e.g. `libprotoc 3.21.12`). Anything but the required major exits non-zero.
+    """
+    try:
+        out = subprocess.run(
+            [str(protoc), "--version"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    except (subprocess.CalledProcessError, OSError) as e:
+        raise RuntimeError(f"failed to run '{protoc} --version': {e}") from e
+
+    m = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", out)
+    if not m:
+        raise RuntimeError(f"could not parse protoc version from '{out}' ({protoc})")
+
+    major = int(m.group(1))
+    if major != REQUIRED_PROTOC_MAJOR:
+        raise RuntimeError(
+            f"incompatible protoc.\n"
+            f"  found:    {out} ({protoc})\n"
+            f"  required: protoc release {REQUIRED_PROTOC_MAJOR}.x "
+            f"(matches the pinned protobuf-java 4.{REQUIRED_PROTOC_MAJOR}.3 and "
+            f"the C++ 5.{REQUIRED_PROTOC_MAJOR}.3 gencode)\n"
+            f"The committed stubs already match this train, so a normal build does\n"
+            f"NOT need protoc. To regenerate, install protoc {REQUIRED_PROTOC_MAJOR}.3 from\n"
+            f"  https://github.com/protocolbuffers/protobuf/releases "
+            f"(tag v{REQUIRED_PROTOC_MAJOR}.3)."
+        )
+    print(f"protoc version: {out} (release {REQUIRED_PROTOC_MAJOR}.x, accepted)")
 
 
 def find_wkt_include(args_wkt: str | None) -> Path | None:
@@ -236,6 +280,7 @@ def main() -> None:
 
     protoc = find_protoc(args.protoc)
     print(f"protoc: {protoc}")
+    check_protoc_version(protoc)
 
     wkt = find_wkt_include(args.wkt_include)
     if wkt:

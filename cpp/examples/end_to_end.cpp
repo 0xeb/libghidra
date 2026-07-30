@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // end_to_end: Launch headless Ghidra, analyze a binary, enumerate functions
 // with basic blocks and decompilation, save the project, and shut down.
@@ -28,7 +27,7 @@
 // ---------------------------------------------------------------------------
 
 static void analyze(ghidra::Client& client) {
-  auto funcs_resp = client.ListFunctions(0, INT64_MAX, 0, 0);
+  auto funcs_resp = client.ListFunctions(0, UINT64_MAX, 0, 0);
   if (!funcs_resp.ok()) {
     fprintf(stderr, "ListFunctions failed: %s\n",
             funcs_resp.status.message.c_str());
@@ -126,14 +125,32 @@ int main(int argc, char* argv[]) {
   }
 
   try {
-    auto h = ghidra::launch_headless({
-        .ghidra_dir = ghidra_dir,
-        .binary = binary_path,
-        .port = port,
-        .on_output = [](const std::string& line) {
-          printf("  [ghidra] %s\n", line.c_str());
-        },
-    });
+    ghidra::HeadlessProjectOptions opts;
+    opts.ghidra_dir = ghidra_dir;
+    opts.port = port;
+    opts.on_output = [](const std::string& line) {
+      printf("  [ghidra] %s\n", line.c_str());
+    };
+    auto h = ghidra::launch_headless_project(std::move(opts));
+
+    ghidra::ImportProgramRequest import;
+    import.source_path = binary_path;
+    import.overwrite = true;
+    import.analyze = true;
+    auto imported = h->ImportProgram(import);
+    if (!imported.ok()) {
+      fprintf(stderr, "Import failed: %s\n", imported.status.message.c_str());
+      return 1;
+    }
+
+    ghidra::OpenProgramRequest open;
+    open.program_path = imported.value->primary_program_path;
+    open.analyze = false;
+    auto opened = h->OpenProgram(open);
+    if (!opened.ok()) {
+      fprintf(stderr, "Open failed: %s\n", opened.status.message.c_str());
+      return 1;
+    }
 
     auto status = h->GetStatus();
     if (!status.ok()) {

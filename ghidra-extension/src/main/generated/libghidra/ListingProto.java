@@ -51,6 +51,21 @@ public final class ListingProto {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_ListInstructionsResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_InstructionOperandRecord_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_InstructionOperandRecord_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListInstructionOperandsRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListInstructionOperandsRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListInstructionOperandsResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListInstructionOperandsResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_CommentRecord_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -275,7 +290,15 @@ public final class ListingProto {
       "t\022&\n\005range\030\002 \001(\0132\027.libghidra.AddressRang" +
       "e\022#\n\004page\030\003 \001(\0132\025.libghidra.Pagination\"N" +
       "\n\030ListInstructionsResponse\0222\n\014instructio" +
-      "ns\030\001 \003(\0132\034.libghidra.InstructionRecord\"T" +
+      "ns\030\001 \003(\0132\034.libghidra.InstructionRecord\"u" +
+      "\n\030InstructionOperandRecord\022\017\n\007address\030\001 " +
+      "\001(\004\022\025\n\roperand_index\030\002 \001(\r\022\014\n\004text\030\003 \001(\t" +
+      "\022\021\n\ttype_name\030\004 \001(\t\022\020\n\010ref_type\030\005 \001(\t\"m\n" +
+      "\036ListInstructionOperandsRequest\022&\n\005range" +
+      "\030\002 \001(\0132\027.libghidra.AddressRange\022#\n\004page\030" +
+      "\003 \001(\0132\025.libghidra.Pagination\"X\n\037ListInst" +
+      "ructionOperandsResponse\0225\n\010operands\030\001 \003(" +
+      "\0132#.libghidra.InstructionOperandRecord\"T" +
       "\n\rCommentRecord\022\017\n\007address\030\001 \001(\004\022$\n\004kind" +
       "\030\002 \001(\0162\026.libghidra.CommentKind\022\014\n\004text\030\003" +
       " \001(\t\"a\n\022GetCommentsRequest\022&\n\005range\030\002 \001(" +
@@ -354,54 +377,56 @@ public final class ListingProto {
       "\n\030COMMENT_KIND_UNSPECIFIED\020\000\022\024\n\020COMMENT_" +
       "KIND_EOL\020\001\022\024\n\020COMMENT_KIND_PRE\020\002\022\025\n\021COMM" +
       "ENT_KIND_POST\020\003\022\026\n\022COMMENT_KIND_PLATE\020\004\022" +
-      "\033\n\027COMMENT_KIND_REPEATABLE\020\0052\225\016\n\016Listing" +
+      "\033\n\027COMMENT_KIND_REPEATABLE\020\0052\207\017\n\016Listing" +
       "Service\022U\n\016GetInstruction\022 .libghidra.Ge" +
       "tInstructionRequest\032!.libghidra.GetInstr" +
       "uctionResponse\022[\n\020ListInstructions\022\".lib" +
       "ghidra.ListInstructionsRequest\032#.libghid" +
-      "ra.ListInstructionsResponse\022L\n\013GetCommen" +
-      "ts\022\035.libghidra.GetCommentsRequest\032\036.libg" +
-      "hidra.GetCommentsResponse\022I\n\nSetComment\022" +
-      "\034.libghidra.SetCommentRequest\032\035.libghidr" +
-      "a.SetCommentResponse\022R\n\rDeleteComment\022\037." +
-      "libghidra.DeleteCommentRequest\032 .libghid" +
-      "ra.DeleteCommentResponse\022U\n\016RenameDataIt" +
-      "em\022 .libghidra.RenameDataItemRequest\032!.l" +
-      "ibghidra.RenameDataItemResponse\022U\n\016Delet" +
-      "eDataItem\022 .libghidra.DeleteDataItemRequ" +
-      "est\032!.libghidra.DeleteDataItemResponse\022R" +
-      "\n\rListDataItems\022\037.libghidra.ListDataItem" +
-      "sRequest\032 .libghidra.ListDataItemsRespon" +
-      "se\022R\n\rListBookmarks\022\037.libghidra.ListBook" +
-      "marksRequest\032 .libghidra.ListBookmarksRe" +
-      "sponse\022L\n\013AddBookmark\022\035.libghidra.AddBoo" +
-      "kmarkRequest\032\036.libghidra.AddBookmarkResp" +
-      "onse\022U\n\016DeleteBookmark\022 .libghidra.Delet" +
-      "eBookmarkRequest\032!.libghidra.DeleteBookm" +
-      "arkResponse\022X\n\017ListBreakpoints\022!.libghid" +
-      "ra.ListBreakpointsRequest\032\".libghidra.Li" +
-      "stBreakpointsResponse\022R\n\rAddBreakpoint\022\037" +
-      ".libghidra.AddBreakpointRequest\032 .libghi" +
-      "dra.AddBreakpointResponse\022g\n\024SetBreakpoi" +
-      "ntEnabled\022&.libghidra.SetBreakpointEnabl" +
-      "edRequest\032\'.libghidra.SetBreakpointEnabl" +
-      "edResponse\022^\n\021SetBreakpointKind\022#.libghi" +
-      "dra.SetBreakpointKindRequest\032$.libghidra" +
-      ".SetBreakpointKindResponse\022^\n\021SetBreakpo" +
-      "intSize\022#.libghidra.SetBreakpointSizeReq" +
-      "uest\032$.libghidra.SetBreakpointSizeRespon" +
-      "se\022m\n\026SetBreakpointCondition\022(.libghidra" +
-      ".SetBreakpointConditionRequest\032).libghid" +
-      "ra.SetBreakpointConditionResponse\022a\n\022Set" +
-      "BreakpointGroup\022$.libghidra.SetBreakpoin" +
-      "tGroupRequest\032%.libghidra.SetBreakpointG" +
-      "roupResponse\022[\n\020DeleteBreakpoint\022\".libgh" +
-      "idra.DeleteBreakpointRequest\032#.libghidra" +
-      ".DeleteBreakpointResponse\022a\n\022ListDefined" +
-      "Strings\022$.libghidra.ListDefinedStringsRe" +
-      "quest\032%.libghidra.ListDefinedStringsResp" +
-      "onseB\033\n\tlibghidraB\014ListingProtoP\001b\006proto" +
-      "3"
+      "ra.ListInstructionsResponse\022p\n\027ListInstr" +
+      "uctionOperands\022).libghidra.ListInstructi" +
+      "onOperandsRequest\032*.libghidra.ListInstru" +
+      "ctionOperandsResponse\022L\n\013GetComments\022\035.l" +
+      "ibghidra.GetCommentsRequest\032\036.libghidra." +
+      "GetCommentsResponse\022I\n\nSetComment\022\034.libg" +
+      "hidra.SetCommentRequest\032\035.libghidra.SetC" +
+      "ommentResponse\022R\n\rDeleteComment\022\037.libghi" +
+      "dra.DeleteCommentRequest\032 .libghidra.Del" +
+      "eteCommentResponse\022U\n\016RenameDataItem\022 .l" +
+      "ibghidra.RenameDataItemRequest\032!.libghid" +
+      "ra.RenameDataItemResponse\022U\n\016DeleteDataI" +
+      "tem\022 .libghidra.DeleteDataItemRequest\032!." +
+      "libghidra.DeleteDataItemResponse\022R\n\rList" +
+      "DataItems\022\037.libghidra.ListDataItemsReque" +
+      "st\032 .libghidra.ListDataItemsResponse\022R\n\r" +
+      "ListBookmarks\022\037.libghidra.ListBookmarksR" +
+      "equest\032 .libghidra.ListBookmarksResponse" +
+      "\022L\n\013AddBookmark\022\035.libghidra.AddBookmarkR" +
+      "equest\032\036.libghidra.AddBookmarkResponse\022U" +
+      "\n\016DeleteBookmark\022 .libghidra.DeleteBookm" +
+      "arkRequest\032!.libghidra.DeleteBookmarkRes" +
+      "ponse\022X\n\017ListBreakpoints\022!.libghidra.Lis" +
+      "tBreakpointsRequest\032\".libghidra.ListBrea" +
+      "kpointsResponse\022R\n\rAddBreakpoint\022\037.libgh" +
+      "idra.AddBreakpointRequest\032 .libghidra.Ad" +
+      "dBreakpointResponse\022g\n\024SetBreakpointEnab" +
+      "led\022&.libghidra.SetBreakpointEnabledRequ" +
+      "est\032\'.libghidra.SetBreakpointEnabledResp" +
+      "onse\022^\n\021SetBreakpointKind\022#.libghidra.Se" +
+      "tBreakpointKindRequest\032$.libghidra.SetBr" +
+      "eakpointKindResponse\022^\n\021SetBreakpointSiz" +
+      "e\022#.libghidra.SetBreakpointSizeRequest\032$" +
+      ".libghidra.SetBreakpointSizeResponse\022m\n\026" +
+      "SetBreakpointCondition\022(.libghidra.SetBr" +
+      "eakpointConditionRequest\032).libghidra.Set" +
+      "BreakpointConditionResponse\022a\n\022SetBreakp" +
+      "ointGroup\022$.libghidra.SetBreakpointGroup" +
+      "Request\032%.libghidra.SetBreakpointGroupRe" +
+      "sponse\022[\n\020DeleteBreakpoint\022\".libghidra.D" +
+      "eleteBreakpointRequest\032#.libghidra.Delet" +
+      "eBreakpointResponse\022a\n\022ListDefinedString" +
+      "s\022$.libghidra.ListDefinedStringsRequest\032" +
+      "%.libghidra.ListDefinedStringsResponseB\033" +
+      "\n\tlibghidraB\014ListingProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -438,248 +463,266 @@ public final class ListingProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListInstructionsResponse_descriptor,
         new java.lang.String[] { "Instructions", });
-    internal_static_libghidra_CommentRecord_descriptor =
+    internal_static_libghidra_InstructionOperandRecord_descriptor =
       getDescriptor().getMessageTypes().get(5);
+    internal_static_libghidra_InstructionOperandRecord_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_InstructionOperandRecord_descriptor,
+        new java.lang.String[] { "Address", "OperandIndex", "Text", "TypeName", "RefType", });
+    internal_static_libghidra_ListInstructionOperandsRequest_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_libghidra_ListInstructionOperandsRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListInstructionOperandsRequest_descriptor,
+        new java.lang.String[] { "Range", "Page", });
+    internal_static_libghidra_ListInstructionOperandsResponse_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_libghidra_ListInstructionOperandsResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListInstructionOperandsResponse_descriptor,
+        new java.lang.String[] { "Operands", });
+    internal_static_libghidra_CommentRecord_descriptor =
+      getDescriptor().getMessageTypes().get(8);
     internal_static_libghidra_CommentRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_CommentRecord_descriptor,
         new java.lang.String[] { "Address", "Kind", "Text", });
     internal_static_libghidra_GetCommentsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_libghidra_GetCommentsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_GetCommentsRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_GetCommentsResponse_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_libghidra_GetCommentsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_GetCommentsResponse_descriptor,
         new java.lang.String[] { "Comments", });
     internal_static_libghidra_SetCommentRequest_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_libghidra_SetCommentRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetCommentRequest_descriptor,
         new java.lang.String[] { "Address", "Kind", "Text", });
     internal_static_libghidra_SetCommentResponse_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_libghidra_SetCommentResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetCommentResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_DeleteCommentRequest_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_libghidra_DeleteCommentRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteCommentRequest_descriptor,
         new java.lang.String[] { "Address", "Kind", });
     internal_static_libghidra_DeleteCommentResponse_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_libghidra_DeleteCommentResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteCommentResponse_descriptor,
         new java.lang.String[] { "Deleted", });
     internal_static_libghidra_RenameDataItemRequest_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_libghidra_RenameDataItemRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_RenameDataItemRequest_descriptor,
         new java.lang.String[] { "Address", "NewName", });
     internal_static_libghidra_RenameDataItemResponse_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_libghidra_RenameDataItemResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_RenameDataItemResponse_descriptor,
         new java.lang.String[] { "Updated", "Name", });
     internal_static_libghidra_DeleteDataItemRequest_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_libghidra_DeleteDataItemRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteDataItemRequest_descriptor,
         new java.lang.String[] { "Address", });
     internal_static_libghidra_DeleteDataItemResponse_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_libghidra_DeleteDataItemResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteDataItemResponse_descriptor,
         new java.lang.String[] { "Deleted", });
     internal_static_libghidra_DataItemRecord_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_libghidra_DataItemRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DataItemRecord_descriptor,
         new java.lang.String[] { "Address", "EndAddress", "Name", "DataType", "Size", "ValueRepr", });
     internal_static_libghidra_ListDataItemsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_libghidra_ListDataItemsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListDataItemsRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_ListDataItemsResponse_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_libghidra_ListDataItemsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListDataItemsResponse_descriptor,
         new java.lang.String[] { "DataItems", });
     internal_static_libghidra_BookmarkRecord_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_libghidra_BookmarkRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_BookmarkRecord_descriptor,
         new java.lang.String[] { "Address", "Type", "Category", "Comment", });
     internal_static_libghidra_ListBookmarksRequest_descriptor =
-      getDescriptor().getMessageTypes().get(20);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_libghidra_ListBookmarksRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListBookmarksRequest_descriptor,
         new java.lang.String[] { "Range", "Page", "TypeFilter", "CategoryFilter", });
     internal_static_libghidra_ListBookmarksResponse_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(24);
     internal_static_libghidra_ListBookmarksResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListBookmarksResponse_descriptor,
         new java.lang.String[] { "Bookmarks", });
     internal_static_libghidra_AddBookmarkRequest_descriptor =
-      getDescriptor().getMessageTypes().get(22);
+      getDescriptor().getMessageTypes().get(25);
     internal_static_libghidra_AddBookmarkRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_AddBookmarkRequest_descriptor,
         new java.lang.String[] { "Address", "Type", "Category", "Comment", });
     internal_static_libghidra_AddBookmarkResponse_descriptor =
-      getDescriptor().getMessageTypes().get(23);
+      getDescriptor().getMessageTypes().get(26);
     internal_static_libghidra_AddBookmarkResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_AddBookmarkResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_DeleteBookmarkRequest_descriptor =
-      getDescriptor().getMessageTypes().get(24);
+      getDescriptor().getMessageTypes().get(27);
     internal_static_libghidra_DeleteBookmarkRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteBookmarkRequest_descriptor,
         new java.lang.String[] { "Address", "Type", "Category", });
     internal_static_libghidra_DeleteBookmarkResponse_descriptor =
-      getDescriptor().getMessageTypes().get(25);
+      getDescriptor().getMessageTypes().get(28);
     internal_static_libghidra_DeleteBookmarkResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteBookmarkResponse_descriptor,
         new java.lang.String[] { "Deleted", });
     internal_static_libghidra_BreakpointRecord_descriptor =
-      getDescriptor().getMessageTypes().get(26);
+      getDescriptor().getMessageTypes().get(29);
     internal_static_libghidra_BreakpointRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_BreakpointRecord_descriptor,
         new java.lang.String[] { "Address", "Enabled", "Kind", "Size", "Condition", "Group", });
     internal_static_libghidra_ListBreakpointsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(27);
+      getDescriptor().getMessageTypes().get(30);
     internal_static_libghidra_ListBreakpointsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListBreakpointsRequest_descriptor,
         new java.lang.String[] { "Range", "Page", "KindFilter", "GroupFilter", });
     internal_static_libghidra_ListBreakpointsResponse_descriptor =
-      getDescriptor().getMessageTypes().get(28);
+      getDescriptor().getMessageTypes().get(31);
     internal_static_libghidra_ListBreakpointsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListBreakpointsResponse_descriptor,
         new java.lang.String[] { "Breakpoints", });
     internal_static_libghidra_AddBreakpointRequest_descriptor =
-      getDescriptor().getMessageTypes().get(29);
+      getDescriptor().getMessageTypes().get(32);
     internal_static_libghidra_AddBreakpointRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_AddBreakpointRequest_descriptor,
         new java.lang.String[] { "Address", "Kind", "Size", "Enabled", "Condition", "Group", });
     internal_static_libghidra_AddBreakpointResponse_descriptor =
-      getDescriptor().getMessageTypes().get(30);
+      getDescriptor().getMessageTypes().get(33);
     internal_static_libghidra_AddBreakpointResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_AddBreakpointResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_SetBreakpointEnabledRequest_descriptor =
-      getDescriptor().getMessageTypes().get(31);
+      getDescriptor().getMessageTypes().get(34);
     internal_static_libghidra_SetBreakpointEnabledRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointEnabledRequest_descriptor,
         new java.lang.String[] { "Address", "Enabled", });
     internal_static_libghidra_SetBreakpointEnabledResponse_descriptor =
-      getDescriptor().getMessageTypes().get(32);
+      getDescriptor().getMessageTypes().get(35);
     internal_static_libghidra_SetBreakpointEnabledResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointEnabledResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_SetBreakpointKindRequest_descriptor =
-      getDescriptor().getMessageTypes().get(33);
+      getDescriptor().getMessageTypes().get(36);
     internal_static_libghidra_SetBreakpointKindRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointKindRequest_descriptor,
         new java.lang.String[] { "Address", "Kind", });
     internal_static_libghidra_SetBreakpointKindResponse_descriptor =
-      getDescriptor().getMessageTypes().get(34);
+      getDescriptor().getMessageTypes().get(37);
     internal_static_libghidra_SetBreakpointKindResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointKindResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_SetBreakpointSizeRequest_descriptor =
-      getDescriptor().getMessageTypes().get(35);
+      getDescriptor().getMessageTypes().get(38);
     internal_static_libghidra_SetBreakpointSizeRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointSizeRequest_descriptor,
         new java.lang.String[] { "Address", "Size", });
     internal_static_libghidra_SetBreakpointSizeResponse_descriptor =
-      getDescriptor().getMessageTypes().get(36);
+      getDescriptor().getMessageTypes().get(39);
     internal_static_libghidra_SetBreakpointSizeResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointSizeResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_SetBreakpointConditionRequest_descriptor =
-      getDescriptor().getMessageTypes().get(37);
+      getDescriptor().getMessageTypes().get(40);
     internal_static_libghidra_SetBreakpointConditionRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointConditionRequest_descriptor,
         new java.lang.String[] { "Address", "Condition", });
     internal_static_libghidra_SetBreakpointConditionResponse_descriptor =
-      getDescriptor().getMessageTypes().get(38);
+      getDescriptor().getMessageTypes().get(41);
     internal_static_libghidra_SetBreakpointConditionResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointConditionResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_SetBreakpointGroupRequest_descriptor =
-      getDescriptor().getMessageTypes().get(39);
+      getDescriptor().getMessageTypes().get(42);
     internal_static_libghidra_SetBreakpointGroupRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointGroupRequest_descriptor,
         new java.lang.String[] { "Address", "Group", });
     internal_static_libghidra_SetBreakpointGroupResponse_descriptor =
-      getDescriptor().getMessageTypes().get(40);
+      getDescriptor().getMessageTypes().get(43);
     internal_static_libghidra_SetBreakpointGroupResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SetBreakpointGroupResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_DeleteBreakpointRequest_descriptor =
-      getDescriptor().getMessageTypes().get(41);
+      getDescriptor().getMessageTypes().get(44);
     internal_static_libghidra_DeleteBreakpointRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteBreakpointRequest_descriptor,
         new java.lang.String[] { "Address", });
     internal_static_libghidra_DeleteBreakpointResponse_descriptor =
-      getDescriptor().getMessageTypes().get(42);
+      getDescriptor().getMessageTypes().get(45);
     internal_static_libghidra_DeleteBreakpointResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteBreakpointResponse_descriptor,
         new java.lang.String[] { "Deleted", });
     internal_static_libghidra_DefinedStringRecord_descriptor =
-      getDescriptor().getMessageTypes().get(43);
+      getDescriptor().getMessageTypes().get(46);
     internal_static_libghidra_DefinedStringRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DefinedStringRecord_descriptor,
         new java.lang.String[] { "Address", "Value", "Length", "DataType", "Encoding", });
     internal_static_libghidra_ListDefinedStringsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(44);
+      getDescriptor().getMessageTypes().get(47);
     internal_static_libghidra_ListDefinedStringsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListDefinedStringsRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_ListDefinedStringsResponse_descriptor =
-      getDescriptor().getMessageTypes().get(45);
+      getDescriptor().getMessageTypes().get(48);
     internal_static_libghidra_ListDefinedStringsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListDefinedStringsResponse_descriptor,

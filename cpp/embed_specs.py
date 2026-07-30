@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# Copyright (c) 2024-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+#
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 """Generate C++ source with embedded Ghidra processor spec files.
 
 Walks the Ghidra Processors directory and converts .sla, .pspec, .cspec,
@@ -86,11 +91,10 @@ def write_python_language_index(languages: dict[str, tuple[str, ...]], output_pa
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write('# Copyright (c) 2024-2026 Elias Bachaalany\n')
-        f.write('# SPDX-License-Identifier: MPL-2.0\n')
+        f.write('# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0\n')
         f.write('#\n')
-        f.write('# This Source Code Form is subject to the terms of the Mozilla Public\n')
-        f.write('# License, v. 2.0. If a copy of the MPL was not distributed with this\n')
-        f.write('# file, You can obtain one at https://mozilla.org/MPL/2.0/.\n\n')
+        f.write('# This file is licensed under the Human-Origin Source License v1.0.\n')
+        f.write('# See LICENSE.\n\n')
         f.write('"""Known Ghidra language and compiler IDs embedded with libghidra."""\n\n')
         f.write('from __future__ import annotations\n\n')
         f.write('# Generated from Ghidra processor *.ldefs files by cpp/embed_specs.py.\n')

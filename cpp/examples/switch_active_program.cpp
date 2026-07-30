@@ -1,5 +1,5 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
 // switch_active_program: import two binaries into one Ghidra project, query
 // the first active program, close it, then open the second project program.
@@ -19,17 +19,28 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  ghidra::HeadlessOptions opts;
+  ghidra::HeadlessProjectOptions opts;
   opts.ghidra_dir = argv[1];
   opts.project_dir = argv[2];
   opts.project_name = argv[3];
-  opts.binary = argv[4];
-  opts.binaries = {argv[5]};
   opts.port = 0;
   opts.shutdown = "save";
 
   try {
-    auto host = ghidra::launch_headless(std::move(opts));
+    auto host = ghidra::launch_headless_project(std::move(opts));
+
+    for (int i = 4; i <= 5; ++i) {
+      libghidra::client::ImportProgramRequest import;
+      import.source_path = argv[i];
+      import.overwrite = true;
+      import.analyze = false;
+      auto imported = host->ImportProgram(import);
+      if (!imported.ok()) {
+        std::cerr << "ImportProgram failed for " << argv[i] << ": "
+                  << imported.status.message << "\n";
+        return 1;
+      }
+    }
 
     libghidra::client::ListProjectFilesRequest list_req;
     list_req.programs_only = true;

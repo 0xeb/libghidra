@@ -1,18 +1,8 @@
-/* ###
- * IP: GHIDRA
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 // Standalone extension build — requires GHIDRA_INSTALL_DIR pointing at a Ghidra distribution.
 //
@@ -45,36 +35,107 @@ sourceSets {
 }
 
 // ---------------------------------------------------------------------------
-// Auto-regenerate Java protobuf stubs when .proto files change.
-// Finds protoc via: -PPROTOC project property, PROTOC env var, or PATH.
-// Best-effort: logs a warning and uses pre-generated stubs if protoc is
-// not available.
+// Java protobuf stubs.
+//
+// The generated Java stubs under src/main/generated are COMMITTED to the tree
+// and are gencode for protobuf 4.29.3 — the same release train pinned by the
+// protobuf-java dependency above (4.29.3) and by the generated C++ SDK
+// (gencode 5.29.3, hard-checked with `#if PROTOBUF_VERSION != 5029003`). A
+// normal build never needs protoc: it compiles the committed stubs as-is.
+//
+// Regenerating the stubs with a protoc from a DIFFERENT release train silently
+// produces gencode that the pinned protobuf-java runtime cannot compile (e.g.
+// "cannot find symbol getMessageType(int)"), so regeneration is:
+//   - OFF by default — a protoc on PATH is IGNORED and the committed stubs win;
+//   - OPT-IN via -PREGEN_PROTO=true;
+//   - version-GUARDED — even when opted in, protoc must be from the required
+//     29.x release family (the -PPROTOC escape hatch selects WHICH protoc, it
+//     does not bypass the guard).
+//
+// protoc naming note: protoc release 29.3 reports itself as `libprotoc 29.3`
+// (the Java gencode "4.29.3" and C++ "5.29.3" both map to protoc release 29.x).
 // ---------------------------------------------------------------------------
-def protocBin = null
-if (hasProperty('PROTOC')) {
-    protocBin = file(PROTOC)
-} else if (System.getenv('PROTOC')) {
-    protocBin = file(System.getenv('PROTOC'))
-} else {
-    // Try to find protoc on PATH
-    def pathDirs = System.getenv('PATH')?.split(File.pathSeparator) ?: []
-    def exeName = org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'protoc.exe' : 'protoc'
-    for (dir in pathDirs) {
-        def candidate = new File(dir, exeName)
-        if (candidate.isFile() && candidate.canExecute()) {
-            protocBin = candidate
-            break
-        }
-    }
-}
+
+// The protobuf release family the committed stubs (and the pinned protobuf-java
+// / generated C++ SDK) require. protoc reports this as `libprotoc <MAJOR>.<n>`.
+def requiredProtocMajor = 29
 
 def protoRoot = file("${projectDir}/../proto")
 def protoDir = file("${protoRoot}/libghidra")
 def generatedDir = file("${projectDir}/src/main/generated")
 
-if (protocBin != null && protocBin.isFile()) {
+def regenRequested = hasProperty('REGEN_PROTO') && REGEN_PROTO.toString().equalsIgnoreCase('true')
+
+// Locate a protoc binary via -PPROTOC → PROTOC env var → PATH scan.
+// Returns null if none is found.
+def resolveProtoc = {
+    if (hasProperty('PROTOC')) {
+        return file(PROTOC)
+    }
+    if (System.getenv('PROTOC')) {
+        return file(System.getenv('PROTOC'))
+    }
+    def pathDirs = System.getenv('PATH')?.split(File.pathSeparator) ?: []
+    def exeName = org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'protoc.exe' : 'protoc'
+    for (dir in pathDirs) {
+        def candidate = new File(dir, exeName)
+        if (candidate.isFile() && candidate.canExecute()) {
+            return candidate
+        }
+    }
+    return null
+}
+
+// Run `protoc --version`, parse the release major, and fail unless it matches
+// the required family. Modern protoc prints `libprotoc 29.3`; very old protoc
+// prints three components with major 3 (e.g. `libprotoc 3.21.12`) — both the
+// two- and three-component forms are handled, and anything but the required
+// major aborts.
+def assertProtocVersion = { File protoc ->
+    // Plain process spawn: this runs at configuration time, where
+    // project.exec {} is unavailable on current Gradle.
+    def proc = [protoc.absolutePath, '--version'].execute()
+    def versionLine = proc.inputStream.text.trim()
+    proc.waitFor()
+    if (proc.exitValue() != 0) {
+        throw new GradleException(
+            "libghidra: '${protoc} --version' failed (exit ${proc.exitValue()}).")
+    }
+    def m = (versionLine =~ /(\d+)\.(\d+)(?:\.(\d+))?/)
+    if (!m.find()) {
+        throw new GradleException(
+            "libghidra: could not parse protoc version from '${versionLine}' (${protoc}).")
+    }
+    def major = m.group(1).toInteger()
+    if (major != requiredProtocMajor) {
+        throw new GradleException(
+            "libghidra: refusing to regenerate Java stubs with an incompatible protoc.\n" +
+            "  found:    ${versionLine} (${protoc})\n" +
+            "  required: protoc release ${requiredProtocMajor}.x " +
+            "(matches the pinned protobuf-java 4.${requiredProtocMajor}.3 and the C++ 5.${requiredProtocMajor}.3 gencode)\n" +
+            "The committed stubs under src/main/generated already match this train, so a\n" +
+            "normal build does NOT need protoc — omit -PREGEN_PROTO to use them as-is.\n" +
+            "To regenerate, install protoc ${requiredProtocMajor}.3 from\n" +
+            "  https://github.com/protocolbuffers/protobuf/releases (tag v${requiredProtocMajor}.3)\n" +
+            "and re-run with -PREGEN_PROTO=true (optionally -PPROTOC=<path-to-protoc>).")
+    }
+    logger.lifecycle("libghidra: protoc ${versionLine} accepted (release ${requiredProtocMajor}.x).")
+}
+
+if (regenRequested) {
+    def protocBin = resolveProtoc()
+    if (protocBin == null || !protocBin.isFile()) {
+        throw new GradleException(
+            'libghidra: -PREGEN_PROTO=true was requested but no protoc was found. ' +
+            'Pass -PPROTOC=<path>, set the PROTOC env var, or add protoc to PATH ' +
+            "(protoc ${requiredProtocMajor}.3 from " +
+            'https://github.com/protocolbuffers/protobuf/releases).')
+    }
+    assertProtocVersion(protocBin)
+
     task generateProto(type: Exec) {
-        description = 'Regenerate Java protobuf stubs from .proto files'
+        description = 'Regenerate Java protobuf stubs from .proto files (requires -PREGEN_PROTO=true)'
+        group = 'ghidra'
         inputs.dir(protoDir)
         outputs.dir(generatedDir)
 
@@ -88,18 +149,57 @@ if (protocBin != null && protocBin.isFile()) {
 
     compileJava.dependsOn generateProto
 } else {
+    // Default path: never regenerate; compile the committed stubs.
     def generatedJavaStubs = fileTree(generatedDir).matching { include '**/*.java' }
     if (generatedJavaStubs.isEmpty()) {
-        throw new GradleException('libghidra: protoc not found and no pre-generated Java stubs are available. ' +
-            'Set PROTOC env var or -PPROTOC=<path> to enable regeneration.')
+        throw new GradleException(
+            'libghidra: the committed Java protobuf stubs under src/main/generated are missing. ' +
+            'The source tree looks corrupt — restore them with ' +
+            '`git checkout -- src/main/generated`, or regenerate with a compatible protoc via ' +
+            "-PREGEN_PROTO=true (protoc ${requiredProtocMajor}.3 from " +
+            'https://github.com/protocolbuffers/protobuf/releases).')
     }
-    logger.lifecycle('libghidra: protoc not found — using pre-generated Java stubs.')
+    if (resolveProtoc() != null) {
+        logger.info('libghidra: using committed Java protobuf stubs (a protoc is on PATH but ' +
+            'is ignored; pass -PREGEN_PROTO=true to regenerate).')
+    } else {
+        logger.info('libghidra: using committed Java protobuf stubs.')
+    }
+}
+
+// ---------------------------------------------------------------------------
+// The extension name — used both as the install directory basename and as a
+// safety guard before any recursive delete.
+// ---------------------------------------------------------------------------
+def extensionName = 'LibGhidraHost'
+
+// ---------------------------------------------------------------------------
+// Keep the repo-tree staging lib/ from accumulating stale dependency jars.
+//
+// Ghidra's buildExtension `copyDependencies` copies runtime deps into the
+// repo-tree lib/ directory and explicitly skips jars already present there, so
+// an upgraded dependency (e.g. a new protobuf-java version) is ADDED alongside
+// the old one rather than replacing it. Wiping lib/ before each build forces a
+// clean copy of exactly the current dependency set.
+// ---------------------------------------------------------------------------
+def stagingLibDir = file("${projectDir}/lib")
+if (tasks.findByName('copyDependencies')) {
+    tasks.named('copyDependencies').configure {
+        doFirst {
+            if (stagingLibDir.exists()) {
+                logger.lifecycle("libghidra: clearing staging lib/ (${stagingLibDir}) before dependency copy.")
+                delete stagingLibDir
+            }
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
 // Install extension into the Ghidra distribution.
 // Builds the ZIP (via buildExtension), then extracts it into
 // <GHIDRA_INSTALL_DIR>/Ghidra/Extensions/LibGhidraHost/.
+// The previous install is fully purged first so version-suffixed dependency
+// jars (e.g. protobuf-java-<ver>.jar) cannot accumulate across installs.
 // ---------------------------------------------------------------------------
 task installExtension {
     dependsOn buildExtension
@@ -114,8 +214,17 @@ task installExtension {
         }
         def zipFile = zips.max { it.lastModified() }
 
-        def installDir = file("${GHIDRA_INSTALL_DIR}/Ghidra/Extensions/LibGhidraHost")
+        def installDir = file("${GHIDRA_INSTALL_DIR}/Ghidra/Extensions/${extensionName}")
+
+        // Safety guard: only ever delete a path that actually ends with the
+        // extension name — never a bare/parent directory.
+        if (installDir.name != extensionName) {
+            throw new GradleException(
+                "libghidra: refusing to delete '${installDir}' — resolved install path does " +
+                "not end with the extension name '${extensionName}'.")
+        }
         if (installDir.exists()) {
+            logger.lifecycle("libghidra: removing previous install at ${installDir}.")
             delete installDir
         }
         installDir.mkdirs()
@@ -136,6 +245,19 @@ task installExtension {
                 }
             }
             includeEmptyDirs = false
+        }
+
+        // Assert the installed lib/ carries exactly one protobuf-java jar. More
+        // than one means stale jars leaked in (an incompatible-version clash at
+        // runtime); zero means the dependency failed to package.
+        def installedLibDir = new File(installDir, 'lib')
+        def protobufJars = installedLibDir.exists() ?
+            (installedLibDir.listFiles()?.findAll { it.name ==~ /protobuf-java-.*\.jar/ } ?: []) : []
+        if (protobufJars.size() != 1) {
+            throw new GradleException(
+                "libghidra: expected exactly one protobuf-java-*.jar in ${installedLibDir}, " +
+                "found ${protobufJars.size()}: ${protobufJars.collect { it.name }}. " +
+                "Stale dependency jars accumulated — remove the extras and reinstall.")
         }
 
         println "\nInstalled to ${installDir}:"

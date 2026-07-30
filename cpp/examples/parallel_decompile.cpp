@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 // parallel_decompile: Batch decompilation using the decompiler pool.
 //
@@ -48,7 +47,7 @@ int main(int argc, char* argv[]) {
       .pool_size = pool_size,
   });
 
-  ghidra::OpenRequest req;
+  ghidra::OpenProgramRequest req;
   req.program_path = binary_path;
   auto open_result = client->OpenProgram(req);
   if (!open_result.ok()) {
@@ -61,7 +60,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Load time: " << load_ms << " ms\n";
 
   // List all functions
-  auto funcs = client->ListFunctions(0, 0, 0, 0);
+  auto funcs = client->ListFunctions(0, UINT64_MAX, 0, 0);
   if (!funcs.ok()) {
     std::cerr << "ListFunctions failed: " << funcs.status.message << "\n";
     return 1;
@@ -77,7 +76,7 @@ int main(int argc, char* argv[]) {
 
   // Batch decompile all functions via ListDecompilations (uses pool)
   auto t2 = std::chrono::steady_clock::now();
-  auto decomps = client->ListDecompilations(0, 0, 0, 0, 60000);
+  auto decomps = client->ListDecompilations(0, UINT64_MAX, 0, 0, 60000);
   auto t3 = std::chrono::steady_clock::now();
 
   if (!decomps.ok()) {

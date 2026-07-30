@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // session_lifecycle: Check status, capabilities, and revision; mutate; observe; discard.
 //
@@ -53,7 +52,10 @@ fn main() {
         eprintln!("get_revision failed: {e}");
         std::process::exit(1);
     });
-    println!("\nRevision before mutation: {}", rev_before.modification_number);
+    println!(
+        "\nRevision before mutation: {}",
+        rev_before.modification_number
+    );
 
     // 4. Make a mutation: rename the first function
     let funcs = client
@@ -90,7 +92,10 @@ fn main() {
         eprintln!("get_revision (after) failed: {e}");
         std::process::exit(1);
     });
-    println!("\nRevision after mutation: {}", rev_after.modification_number);
+    println!(
+        "\nRevision after mutation: {}",
+        rev_after.modification_number
+    );
     if rev_after.modification_number > rev_before.modification_number {
         println!(
             "Revision advanced by {}",

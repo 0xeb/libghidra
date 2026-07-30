@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 //
 // nanobind bindings for libghidra LocalClient.
 // Exposes the offline decompiler backend to Python as libghidra._libghidra.
@@ -61,6 +60,7 @@ static nb::dict to_dict(const SymbolRecord& r) {
   d["is_primary"] = r.is_primary;
   d["is_external"] = r.is_external;
   d["is_dynamic"] = r.is_dynamic;
+  d["is_external_entry_point"] = r.is_external_entry_point;
   return d;
 }
 

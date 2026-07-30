@@ -47,7 +47,7 @@ opts = ClientOptions(
     base_url="http://127.0.0.1:18080",
     auth_token="",              # Bearer token for authenticated hosts
     connect_timeout=3.0,        # seconds
-    read_timeout=15.0,          # seconds
+    read_timeout=120.0,         # seconds
     max_retries=0,              # 0 = no retry
     initial_backoff=0.1,        # seconds, doubled each retry
     max_backoff=5.0,            # seconds
@@ -108,16 +108,65 @@ for c in caps:
 
 ---
 
-## Session (6 methods)
+## Session (10 methods)
+
+### `open_project(request) -> OpenProjectResponse`
+
+Open or create a Ghidra project.
+
+```python
+resp = client.open_project(ghidra.OpenProjectRequest(
+    project_path="C:/ghidra_projects",
+    project_name="firmware",
+    create=True,
+))
+print(f"Project: {resp.project_name}, created={resp.created}")
+```
+
+### `close_project(policy=ShutdownPolicy.UNSPECIFIED) -> CloseProjectResponse`
+
+Close the active project.
+
+```python
+resp = client.close_project(ghidra.ShutdownPolicy.SAVE)
+assert resp.closed
+```
+
+### `list_project_files(request=None) -> ListProjectFilesResponse`
+
+List files in the active project.
+
+```python
+files = client.list_project_files(
+    ghidra.ListProjectFilesRequest(programs_only=True)
+)
+for item in files.files:
+    print(item.path)
+```
+
+### `import_program(request) -> ImportProgramResponse`
+
+Import a binary into the active project. This does not automatically make it
+the active program; call `open_program` with the returned project path.
+
+```python
+imported = client.import_program(ghidra.ImportProgramRequest(
+    source_path="C:/samples/picture_decoder.pe",
+    overwrite=True,
+    analyze=True,
+))
+print(imported.primary_program_path)
+```
 
 ### `open_program(request) -> OpenProgramResponse`
 
 Open a program in the host.
 
 ```python
-resp = client.open_program(ghidra.OpenRequest(
+resp = client.open_program(ghidra.OpenProgramRequest(
     project_path="C:/ghidra_projects",
-    program_path="binary.exe",
+    project_name="firmware",
+    program_path="/picture_decoder.pe",
     analyze=True,
 ))
 print(f"Opened: {resp.program_name} (base=0x{resp.image_base:x})")
@@ -176,7 +225,7 @@ resp = client.shutdown(ghidra.ShutdownPolicy.SAVE)
 
 ---
 
-## Decompiler (2 methods)
+## Decompiler (3 methods)
 
 ### `get_decompilation(address, timeout_ms=0) -> GetDecompilationResponse`
 
@@ -199,6 +248,29 @@ resp = client.list_decompilations(limit=50, timeout_ms=60000)
 for d in resp.decompilations:
     print(f"{d.function_name}: {'OK' if d.completed else 'FAIL'}")
 ```
+
+### `get_pcode(address, maturity=PcodeMaturity.HIGH, timeout_ms=0) -> GetPcodeResponse`
+
+Return one function's refined SSA P-code (`HIGH`) or per-instruction P-code
+(`RAW`).
+
+```python
+resp = client.get_pcode(
+    0x140001000,
+    maturity=ghidra.PcodeMaturity.RAW,
+    timeout_ms=30000,
+)
+if resp.pcode and resp.pcode.completed:
+    for op in resp.pcode.ops:
+        source = f"0x{op.addr:x}" if op.has_address else "<synthetic>"
+        print(op.seq, source, op.op)
+```
+
+`PcodeRecord` carries `function_entry_address`, `ops`, `completed`,
+`error_message`, and the returned `maturity`. Each `PcodeOpRecord` carries
+`seq`, `op`, `addr`, `has_address`, `has_output`, `output`, and `inputs`.
+`has_address` distinguishes a real source address zero from an op with no
+machine address.
 
 ---
 
@@ -332,7 +404,7 @@ if resp.symbol:
     print(f"{resp.symbol.name} ({resp.symbol.type})")
 ```
 
-**Returns:** `GetSymbolResponse` with `symbol: SymbolRecord | None`. Fields: `symbol_id: int`, `address: int`, `name: str`, `full_name: str`, `type: str`, `namespace_name: str`, `source: str`, `is_primary: bool`, `is_external: bool`, `is_dynamic: bool`.
+**Returns:** `GetSymbolResponse` with `symbol: SymbolRecord | None`. Fields: `symbol_id: int`, `address: int`, `name: str`, `full_name: str`, `type: str`, `namespace_name: str`, `source: str`, `is_primary: bool`, `is_external: bool`, `is_dynamic: bool`, `is_external_entry_point: bool`.
 
 ### `list_symbols(range_start=0, range_end=0, limit=0, offset=0) -> ListSymbolsResponse`
 
@@ -617,9 +689,9 @@ resp = client.apply_data_type(0x140010000, "dword")
 
 ---
 
-## Listing (20 methods)
+## Listing (21 methods)
 
-### Instructions (2)
+### Instructions (3)
 
 #### `get_instruction(address) -> GetInstructionResponse`
 
@@ -645,6 +717,22 @@ instrs = client.list_instructions(
     limit=20,
 )
 ```
+
+#### `list_instruction_operands(range_start=0, range_end=0, limit=0, offset=0) -> ListInstructionOperandsResponse`
+
+List each decoded operand separately.
+
+```python
+resp = client.list_instruction_operands(
+    range_start=func.start_address,
+    range_end=func.end_address,
+)
+for operand in resp.operands:
+    print(operand.address, operand.operand_index, operand.text)
+```
+
+Each `InstructionOperandRecord` carries `address`, `operand_index`, `text`,
+`type_name`, and `ref_type`.
 
 ### Comments (3)
 
@@ -784,7 +872,7 @@ for x in xrefs.xrefs:
 
 ## Async Client
 
-The `AsyncGhidraClient` mirrors the sync API surface with async counterparts. Requires `aiohttp` (`pip install -e ".[async]"`).
+The `AsyncGhidraClient` mirrors the sync API surface with async counterparts. Requires `aiohttp` (`pip install -e "python[async]"` from the repository root).
 
 ```python
 import asyncio
@@ -843,7 +931,6 @@ The package exports short aliases for common record types:
 | `TypeEnumMember` | `TypeEnumMemberRecord` |
 | `TypeAlias` | `TypeAliasRecord` |
 | `TypeUnion` | `TypeUnionRecord` |
-| `OpenRequest` | `OpenProgramRequest` |
 
 ### Pagination
 
@@ -856,6 +943,24 @@ page1 = client.list_functions(limit=100, offset=0)
 # Next page
 page2 = client.list_functions(limit=100, offset=100)
 ```
+
+### Address ranges
+
+List methods that accept `range_start` / `range_end` filter results to the half-open
+interval `[range_start, range_end)`. `range_end` is an **exclusive** upper bound and is
+treated as an unsigned 64-bit value.
+
+`range_end = 0` is the **"all addresses"** sentinel: the client normalizes it to the full
+64-bit space (`UINT64_MAX`), so the defaults (`range_start=0, range_end=0`) list every
+matching item. To filter, pass a real range:
+
+```python
+all_funcs = client.list_functions()                    # range_end=0 -> all addresses
+in_range  = client.list_functions(range_start=0x140001000, range_end=0x140002000)
+```
+
+> A literal `range_end` that is not the full-space sentinel selects exactly `[start, end)`.
+> Because `0` means "all", you cannot request an empty range by passing `range_end=0`.
 
 ### ShutdownPolicy
 

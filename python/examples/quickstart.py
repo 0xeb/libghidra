@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 #
 # quickstart: Connect to a running LibGhidraHost, list functions, decompile one.
 #
@@ -34,7 +33,7 @@ def main() -> None:
     # 2. Open a program (if project path provided on command line)
     if len(sys.argv) >= 4:
         try:
-            resp = client.open_program(ghidra.OpenRequest(
+            resp = client.open_program(ghidra.OpenProgramRequest(
                 project_path=sys.argv[2],
                 program_path=sys.argv[3],
             ))

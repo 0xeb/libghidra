@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.util.ArrayList;
@@ -18,12 +24,9 @@ public final class XrefsRuntime extends RuntimeSupport implements XrefsOperation
 	@Override
 	public XrefsContract.ListXrefsResponse listXrefs(XrefsContract.ListXrefsRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new XrefsContract.ListXrefsResponse(List.of());
-			}
+			Program program = requireProgram();
 			try {
-				long defaultStart = program.getMinAddress().getOffset();
+				long defaultStart = programMinOffset(program);
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
 				long endOffset = request != null ? request.rangeEnd() : -1L;
 				if (startOffset == 0) {

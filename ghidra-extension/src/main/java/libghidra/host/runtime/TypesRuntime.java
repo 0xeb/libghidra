@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.io.ByteArrayInputStream;
@@ -24,6 +30,7 @@ import ghidra.program.model.listing.Listing;
 import ghidra.program.model.listing.Parameter;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.listing.Variable;
+import ghidra.program.model.mem.Memory;
 import ghidra.program.model.symbol.SourceType;
 import ghidra.util.Msg;
 import ghidra.util.exception.CancelledException;
@@ -65,10 +72,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	@Override
 	public TypesContract.ListTypesResponse listTypes(TypesContract.ListTypesRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new TypesContract.ListTypesResponse(List.of());
-			}
+			Program program = requireProgram();
 			DataTypeManager manager = program.getDataTypeManager();
 			String query = request != null && request.query() != null ? request.query().trim() : "";
 			String queryLower = query.toLowerCase(Locale.ROOT);
@@ -102,10 +106,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.ListTypeAliasesResponse listTypeAliases(
 			TypesContract.ListTypeAliasesRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new TypesContract.ListTypeAliasesResponse(List.of());
-			}
+			Program program = requireProgram();
 			DataTypeManager manager = program.getDataTypeManager();
 			String query = request != null && request.query() != null ? request.query().trim() : "";
 			String queryLower = query.toLowerCase(Locale.ROOT);
@@ -139,10 +140,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.ListTypeUnionsResponse listTypeUnions(
 			TypesContract.ListTypeUnionsRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new TypesContract.ListTypeUnionsResponse(List.of());
-			}
+			Program program = requireProgram();
 			DataTypeManager manager = program.getDataTypeManager();
 			String query = request != null && request.query() != null ? request.query().trim() : "";
 			String queryLower = query.toLowerCase(Locale.ROOT);
@@ -176,10 +174,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.ListTypeEnumsResponse listTypeEnums(
 			TypesContract.ListTypeEnumsRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new TypesContract.ListTypeEnumsResponse(List.of());
-			}
+			Program program = requireProgram();
 			DataTypeManager manager = program.getDataTypeManager();
 			String query = request != null && request.query() != null ? request.query().trim() : "";
 			String queryLower = query.toLowerCase(Locale.ROOT);
@@ -216,10 +211,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.ListTypeEnumMembersResponse listTypeEnumMembers(
 			TypesContract.ListTypeEnumMembersRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new TypesContract.ListTypeEnumMembersResponse(List.of());
-			}
+			Program program = requireProgram();
 			DataTypeManager manager = program.getDataTypeManager();
 			String typeFilter = request != null && request.type() != null ? request.type().trim() : "";
 			int offset = request != null ? Math.max(0, request.offset()) : 0;
@@ -270,10 +262,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.ListTypeMembersResponse listTypeMembers(
 			TypesContract.ListTypeMembersRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new TypesContract.ListTypeMembersResponse(List.of());
-			}
+			Program program = requireProgram();
 			DataTypeManager manager = program.getDataTypeManager();
 			String typeFilter = request != null && request.type() != null ? request.type().trim() : "";
 			int offset = request != null ? Math.max(0, request.offset()) : 0;
@@ -343,12 +332,9 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.ListFunctionSignaturesResponse listFunctionSignatures(
 			TypesContract.ListFunctionSignaturesRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new TypesContract.ListFunctionSignaturesResponse(List.of());
-			}
+			Program program = requireProgram();
 			try {
-				long defaultStart = program.getMinAddress().getOffset();
+				long defaultStart = programMinOffset(program);
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
 				long endOffset = request != null ? request.rangeEnd() : -1L;
 				if (startOffset == 0) {
@@ -375,7 +361,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					if (Long.compareUnsigned(address, startOffset) < 0) {
 						continue;
 					}
-					if (Long.compareUnsigned(address, endOffset) > 0) {
+					if (Long.compareUnsigned(address, endOffset) >= 0) {
 						break;
 					}
 					if (seen++ < offset) {
@@ -603,6 +589,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 			try {
 				if (localId.startsWith("local:")) {
 					boolean renamed = FunctionVariableMutationSupport.decompileAndRenameHighVariable(
+						state,
 						program,
 						request.address(),
 						localId,
@@ -626,6 +613,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				}
 				if (!localId.startsWith("local:")) {
 					boolean renamed = FunctionVariableMutationSupport.decompileAndRenameHighVariable(
+						state,
 						program,
 						request.address(),
 						localId,
@@ -692,6 +680,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				}
 				if (localId.startsWith("local:")) {
 					String appliedType = FunctionVariableMutationSupport.decompileAndRetypeHighVariable(
+						state,
 						program,
 						request.address(),
 						localId,
@@ -721,6 +710,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				}
 				if (!localId.startsWith("local:")) {
 					String appliedType = FunctionVariableMutationSupport.decompileAndRetypeHighVariable(
+						state,
 						program,
 						request.address(),
 						localId,
@@ -773,16 +763,29 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 			boolean commit = false;
 			try {
 				Address address = toAddress(program, request.address());
-				Listing listing = program.getListing();
-				Data data = listing.getDataAt(address);
-				if (data == null) {
+				// applyDataType backs BOTH the data_items UPDATE(data_type) path (retype
+				// an item that already starts here — getDataAt != null) AND the
+				// data_items INSERT/create path (create an item at an address that is
+				// currently undefined OR sits INSIDE a larger defined item, e.g. the
+				// reserved-pad uchar[4096]). For the create case getDataAt(address) is
+				// null even though the address is perfectly valid — bailing there made
+				// every create_data_item at a non-boundary address fail. There must be a
+				// real memory block behind the address, though: refuse addresses with no
+				// backing block so a bogus create is still a clean error.
+				Memory memory = program.getMemory();
+				if (memory.getBlock(address) == null) {
 					return new TypesContract.ApplyDataTypeResponse(false, "");
 				}
+				Listing listing = program.getListing();
+				Data data = listing.getDataAt(address);
 				DataType parsed = DataTypeSupport.resolveWritableDataType(program, requestedType);
 				if (parsed == null) {
 					return new TypesContract.ApplyDataTypeResponse(false, "");
 				}
-				Address clearEnd = data.getMaxAddress();
+				// Clear span: for a retype start from the existing item's end; for a
+				// create there is no existing item, so start from the address itself and
+				// let the requested type's length extend it.
+				Address clearEnd = data != null ? data.getMaxAddress() : address;
 				int parsedLength = parsed.getLength();
 				if (parsedLength > 0) {
 					Address parsedEnd = address.addNoWrap(parsedLength - 1L);
@@ -877,9 +880,11 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				if (dataType == null) {
 					return new TypesContract.DeleteTypeResponse(false);
 				}
-				dtm.remove(dataType);
-				commit = true;
-				return new TypesContract.DeleteTypeResponse(true);
+				// remove() returns false when the type did not actually exist /
+				// was not removed; report that honestly instead of a false success.
+				boolean removed = dtm.remove(dataType);
+				commit = removed;
+				return new TypesContract.DeleteTypeResponse(removed);
 			}
 			catch (Exception e) {
 				Msg.error(this, "deleteType failed: " + e.getMessage(), e);
@@ -978,9 +983,9 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				if (!(dataType instanceof TypeDef)) {
 					return new TypesContract.DeleteTypeAliasResponse(false);
 				}
-				dtm.remove(dataType);
-				commit = true;
-				return new TypesContract.DeleteTypeAliasResponse(true);
+				boolean removed = dtm.remove(dataType);
+				commit = removed;
+				return new TypesContract.DeleteTypeAliasResponse(removed);
 			}
 			catch (Exception e) {
 				Msg.error(this, "deleteTypeAlias failed: " + e.getMessage(), e);
@@ -1092,9 +1097,9 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				if (!(dataType instanceof ghidra.program.model.data.Enum)) {
 					return new TypesContract.DeleteTypeEnumResponse(false);
 				}
-				dtm.remove(dataType);
-				commit = true;
-				return new TypesContract.DeleteTypeEnumResponse(true);
+				boolean removed = dtm.remove(dataType);
+				commit = removed;
+				return new TypesContract.DeleteTypeEnumResponse(removed);
 			}
 			catch (Exception e) {
 				Msg.error(this, "deleteTypeEnum failed: " + e.getMessage(), e);
@@ -1557,7 +1562,12 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 		if (sourceText == null || sourceText.isBlank()) {
 			return new TypesContract.ParseDeclarationsResponse(0, List.of(), List.of("empty source text"));
 		}
-		try {
+		// Mutating the program's DataTypeManager (parser.parse below) must hold
+		// the host write lock so a concurrent reader (e.g. getAllDataTypes under
+		// readLock) cannot race the newly parsed types. CParser manages its own
+		// Ghidra DB transaction; this is the orthogonal host read/write lock that
+		// every other mutator wraps its body in.
+		try (LockScope ignored = writeLock()) {
 			DataTypeManager dtm = program.getDataTypeManager();
 			List<DataType> beforeTypes = new ArrayList<>();
 			dtm.getAllDataTypes(beforeTypes);
@@ -1584,8 +1594,6 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 			}
 
 			int created = afterTypes.size() - beforeCount;
-			try (LockScope ignored = writeLock()) {
-			}
 			return new TypesContract.ParseDeclarationsResponse(
 				Math.max(0, created),
 				newTypeNames,

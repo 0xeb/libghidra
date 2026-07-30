@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 """pagination: demonstrate fetching every page of a paginated list RPC.
 
 Mirrors rust/examples/pagination.rs. The Python client doesn't ship a
@@ -46,7 +45,7 @@ def main() -> int:
     print("=== fetch_all: all functions ===\n")
     all_funcs = fetch_all(
         lambda limit, offset: client.list_functions(
-            range_start=0, range_end=2**63 - 1, limit=limit, offset=offset
+            range_start=0, range_end=2**64 - 1, limit=limit, offset=offset
         ).functions
     )
     print(f"Total functions: {len(all_funcs)}")
@@ -61,7 +60,7 @@ def main() -> int:
     offset = 0
     while page_num < 5:
         items = client.list_symbols(
-            range_start=0, range_end=2**63 - 1, limit=25, offset=offset
+            range_start=0, range_end=2**64 - 1, limit=25, offset=offset
         ).symbols
         if not items:
             break
@@ -78,7 +77,7 @@ def main() -> int:
     print("\n=== fetch_all: all function signatures ===\n")
     all_sigs = fetch_all(
         lambda limit, offset: client.list_function_signatures(
-            range_start=0, range_end=2**63 - 1, limit=limit, offset=offset
+            range_start=0, range_end=2**64 - 1, limit=limit, offset=offset
         ).signatures
     )
     print(f"Total signatures: {len(all_sigs)}")

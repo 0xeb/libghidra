@@ -135,6 +135,70 @@ pub struct ListDecompilationsResponse {
     #[prost(message, repeated, tag = "1")]
     pub decompilations: ::prost::alloc::vec::Vec<DecompileRecord>,
 }
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct VarnodeRecord {
+    /// address space name (register / const / ram / unique / stack)
+    #[prost(string, tag = "1")]
+    pub space: ::prost::alloc::string::String,
+    #[prost(uint64, tag = "2")]
+    pub offset: u64,
+    #[prost(uint32, tag = "3")]
+    pub size: u32,
+    /// canonical operand kind: reg / imm / mem / result / var
+    #[prost(string, tag = "4")]
+    pub kind: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PcodeOpRecord {
+    /// sequential index within the function
+    #[prost(uint64, tag = "1")]
+    pub seq: u64,
+    /// PcodeOp mnemonic (COPY, INT_ADD, LOAD, CALL, MULTIEQUAL, ...)
+    #[prost(string, tag = "2")]
+    pub op: ::prost::alloc::string::String,
+    /// source machine address
+    #[prost(uint64, tag = "3")]
+    pub addr: u64,
+    /// output varnode (presence: has_output())
+    #[prost(message, optional, tag = "4")]
+    pub output: ::core::option::Option<VarnodeRecord>,
+    /// input varnodes
+    #[prost(message, repeated, tag = "5")]
+    pub inputs: ::prost::alloc::vec::Vec<VarnodeRecord>,
+    /// false when the op has no source machine address
+    #[prost(bool, tag = "6")]
+    pub has_address: bool,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PcodeRecord {
+    #[prost(uint64, tag = "1")]
+    pub function_entry_address: u64,
+    #[prost(message, repeated, tag = "2")]
+    pub ops: ::prost::alloc::vec::Vec<PcodeOpRecord>,
+    #[prost(bool, tag = "3")]
+    pub completed: bool,
+    #[prost(string, tag = "4")]
+    pub error_message: ::prost::alloc::string::String,
+    /// the rung actually produced (echoed for honesty)
+    #[prost(enumeration = "PcodeMaturity", tag = "5")]
+    pub maturity: i32,
+}
+/// Field 1 reserved for future common request context.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct GetPcodeRequest {
+    #[prost(uint64, tag = "2")]
+    pub address: u64,
+    #[prost(uint32, tag = "3")]
+    pub timeout_ms: u32,
+    /// requested rung (default HIGH)
+    #[prost(enumeration = "PcodeMaturity", tag = "4")]
+    pub maturity: i32,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetPcodeResponse {
+    #[prost(message, optional, tag = "1")]
+    pub pcode: ::core::option::Option<PcodeRecord>,
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum DecompileLocalKind {
@@ -223,6 +287,37 @@ impl DecompileTokenKind {
         }
     }
 }
+/// P-code — the register-transfer IR. Two maturity rungs: HIGH (refined, SSA, via
+/// HighFunction.getPcodeOps()) and RAW (per-instruction, non-SSA, via
+/// Instruction.getPcode()). The Ghidra leg of the cross-tool low-level IR.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum PcodeMaturity {
+    /// default — refined SSA p-code (getPcodeOps)
+    High = 0,
+    /// raw per-instruction p-code (getPcode), non-SSA
+    Raw = 1,
+}
+impl PcodeMaturity {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Self::High => "PCODE_MATURITY_HIGH",
+            Self::Raw => "PCODE_MATURITY_RAW",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "PCODE_MATURITY_HIGH" => Some(Self::High),
+            "PCODE_MATURITY_RAW" => Some(Self::Raw),
+            _ => None,
+        }
+    }
+}
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FunctionRecord {
     #[prost(uint64, tag = "1")]
@@ -231,6 +326,7 @@ pub struct FunctionRecord {
     pub name: ::prost::alloc::string::String,
     #[prost(uint64, tag = "3")]
     pub start_address: u64,
+    /// end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
     #[prost(uint64, tag = "4")]
     pub end_address: u64,
     #[prost(uint64, tag = "5")]
@@ -289,6 +385,7 @@ pub struct BasicBlockRecord {
     pub function_entry: u64,
     #[prost(uint64, tag = "2")]
     pub start_address: u64,
+    /// end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
     #[prost(uint64, tag = "3")]
     pub end_address: u64,
     #[prost(uint32, tag = "4")]
@@ -533,6 +630,61 @@ pub struct ListLoopsResponse {
     #[prost(message, repeated, tag = "1")]
     pub loops: ::prost::alloc::vec::Vec<LoopRecord>,
 }
+/// Stack variable — from the listing-layer StackFrame (no decompiler).
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct StackVariableRecord {
+    #[prost(string, tag = "1")]
+    pub var_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub data_type: ::prost::alloc::string::String,
+    #[prost(int64, tag = "4")]
+    pub stack_offset: i64,
+    #[prost(uint32, tag = "5")]
+    pub size: u32,
+    #[prost(bool, tag = "6")]
+    pub is_parameter: bool,
+    #[prost(int32, tag = "7")]
+    pub first_use_offset: i32,
+    #[prost(string, tag = "8")]
+    pub source_type: ::prost::alloc::string::String,
+}
+/// Function stack frame — from Function.getStackFrame() (no decompiler).
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FunctionFrameRecord {
+    #[prost(uint64, tag = "1")]
+    pub function_entry: u64,
+    #[prost(int64, tag = "2")]
+    pub frame_size: i64,
+    #[prost(int64, tag = "3")]
+    pub local_size: i64,
+    #[prost(int64, tag = "4")]
+    pub parameter_size: i64,
+    #[prost(int64, tag = "5")]
+    pub parameter_offset: i64,
+    #[prost(int64, tag = "6")]
+    pub return_address_offset: i64,
+    #[prost(bool, tag = "7")]
+    pub grows_negative: bool,
+    #[prost(string, tag = "8")]
+    pub stack_pointer_register: ::prost::alloc::string::String,
+    #[prost(message, repeated, tag = "9")]
+    pub stack_variables: ::prost::alloc::vec::Vec<StackVariableRecord>,
+}
+/// Field 1 reserved for future common request context.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct ListFunctionFramesRequest {
+    #[prost(message, optional, tag = "2")]
+    pub range: ::core::option::Option<AddressRange>,
+    #[prost(message, optional, tag = "3")]
+    pub page: ::core::option::Option<Pagination>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListFunctionFramesResponse {
+    #[prost(message, repeated, tag = "1")]
+    pub frames: ::prost::alloc::vec::Vec<FunctionFrameRecord>,
+}
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct HealthStatusRequest {}
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -602,6 +754,41 @@ pub struct ListInstructionsRequest {
 pub struct ListInstructionsResponse {
     #[prost(message, repeated, tag = "1")]
     pub instructions: ::prost::alloc::vec::Vec<InstructionRecord>,
+}
+/// One decoded operand of an instruction. The Java host computes text/type_name/
+/// ref_type from Ghidra's Instruction operand API (getDefaultOperandRepresentation,
+/// getOperandType decoded via OperandType, getOperandRefType). Consumers derive
+/// function ownership by range-mapping `address` into the function list.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct InstructionOperandRecord {
+    /// instruction address
+    #[prost(uint64, tag = "1")]
+    pub address: u64,
+    /// 0-based operand position
+    #[prost(uint32, tag = "2")]
+    pub operand_index: u32,
+    /// rendered per-operand representation
+    #[prost(string, tag = "3")]
+    pub text: ::prost::alloc::string::String,
+    /// register / immediate / memory / address / ...
+    #[prost(string, tag = "4")]
+    pub type_name: ::prost::alloc::string::String,
+    /// RefType (READ / WRITE / READ_WRITE / DATA / ...)
+    #[prost(string, tag = "5")]
+    pub ref_type: ::prost::alloc::string::String,
+}
+/// Field 1 reserved for future common request context.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct ListInstructionOperandsRequest {
+    #[prost(message, optional, tag = "2")]
+    pub range: ::core::option::Option<AddressRange>,
+    #[prost(message, optional, tag = "3")]
+    pub page: ::core::option::Option<Pagination>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListInstructionOperandsResponse {
+    #[prost(message, repeated, tag = "1")]
+    pub operands: ::prost::alloc::vec::Vec<InstructionOperandRecord>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CommentRecord {
@@ -683,6 +870,7 @@ pub struct DeleteDataItemResponse {
 pub struct DataItemRecord {
     #[prost(uint64, tag = "1")]
     pub address: u64,
+    /// end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
     #[prost(uint64, tag = "2")]
     pub end_address: u64,
     #[prost(string, tag = "3")]
@@ -1012,6 +1200,7 @@ pub struct MemoryBlockRecord {
     pub name: ::prost::alloc::string::String,
     #[prost(uint64, tag = "2")]
     pub start_address: u64,
+    /// end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
     #[prost(uint64, tag = "3")]
     pub end_address: u64,
     #[prost(uint64, tag = "4")]
@@ -1041,6 +1230,63 @@ pub struct ListMemoryBlocksRequest {
 pub struct ListMemoryBlocksResponse {
     #[prost(message, repeated, tag = "1")]
     pub blocks: ::prost::alloc::vec::Vec<MemoryBlockRecord>,
+}
+/// Field 1 reserved for future common request context.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateMemoryBlockRequest {
+    #[prost(string, tag = "2")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(uint64, tag = "3")]
+    pub start_address: u64,
+    #[prost(uint64, tag = "4")]
+    pub size: u64,
+    #[prost(bool, tag = "5")]
+    pub is_read: bool,
+    #[prost(bool, tag = "6")]
+    pub is_write: bool,
+    #[prost(bool, tag = "7")]
+    pub is_execute: bool,
+    /// true: zero-filled initialized block; false: uninitialized (e.g. SRAM)
+    #[prost(bool, tag = "8")]
+    pub initialized: bool,
+    #[prost(bool, tag = "9")]
+    pub overlay: bool,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateMemoryBlockResponse {
+    #[prost(bool, tag = "1")]
+    pub created: bool,
+    #[prost(message, optional, tag = "2")]
+    pub block: ::core::option::Option<MemoryBlockRecord>,
+}
+/// Field 1 reserved for future common request context.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct RemoveMemoryBlockRequest {
+    /// any address within the target block
+    #[prost(uint64, tag = "2")]
+    pub address: u64,
+}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct RemoveMemoryBlockResponse {
+    #[prost(bool, tag = "1")]
+    pub removed: bool,
+}
+/// Field 1 reserved for future common request context.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct MoveMemoryBlockRequest {
+    /// any address within the target block
+    #[prost(uint64, tag = "2")]
+    pub address: u64,
+    /// rebase target
+    #[prost(uint64, tag = "3")]
+    pub new_start_address: u64,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MoveMemoryBlockResponse {
+    #[prost(bool, tag = "1")]
+    pub moved: bool,
+    #[prost(message, optional, tag = "2")]
+    pub block: ::core::option::Option<MemoryBlockRecord>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RpcRequest {
@@ -1093,6 +1339,20 @@ pub struct OpenProgramResponse {
     pub compiler_spec: ::prost::alloc::string::String,
     #[prost(uint64, tag = "5")]
     pub image_base: u64,
+    #[prost(string, tag = "6")]
+    pub md5: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub sha256: ::prost::alloc::string::String,
+    /// Executable container format as reported by the loader (e.g.
+    /// "Portable Executable (PE)"); empty when the loader reports none.
+    #[prost(string, tag = "8")]
+    pub executable_format: ::prost::alloc::string::String,
+    /// Program entry point address; only meaningful when has_entry_point is true
+    /// (0 is a valid address, so presence needs its own flag).
+    #[prost(uint64, tag = "9")]
+    pub entry_point: u64,
+    #[prost(bool, tag = "10")]
+    pub has_entry_point: bool,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OpenProjectRequest {
@@ -1240,6 +1500,67 @@ pub struct ShutdownResponse {
     #[prost(bool, tag = "1")]
     pub accepted: bool,
 }
+/// A performance-benchmark record persisted in the program database: three string
+/// identifiers, six double-valued timing/throughput metrics, and a status string.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PerfBenchmarkRecord {
+    #[prost(string, tag = "1")]
+    pub bench_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub query_family: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub dataset_profile: ::prost::alloc::string::String,
+    #[prost(double, tag = "4")]
+    pub cold_ms_p50: f64,
+    #[prost(double, tag = "5")]
+    pub cold_ms_p95: f64,
+    #[prost(double, tag = "6")]
+    pub warm_ms_p50: f64,
+    #[prost(double, tag = "7")]
+    pub warm_ms_p95: f64,
+    #[prost(double, tag = "8")]
+    pub throughput_qps: f64,
+    #[prost(double, tag = "9")]
+    pub regression_pct: f64,
+    #[prost(string, tag = "10")]
+    pub status: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AddPerfBenchmarkRequest {
+    #[prost(message, optional, tag = "1")]
+    pub record: ::core::option::Option<PerfBenchmarkRecord>,
+}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct AddPerfBenchmarkResponse {
+    #[prost(bool, tag = "1")]
+    pub added: bool,
+}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct ListPerfBenchmarksRequest {}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListPerfBenchmarksResponse {
+    #[prost(message, repeated, tag = "1")]
+    pub records: ::prost::alloc::vec::Vec<PerfBenchmarkRecord>,
+}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct ClearPerfBenchmarksRequest {}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct ClearPerfBenchmarksResponse {
+    #[prost(bool, tag = "1")]
+    pub cleared: bool,
+    #[prost(uint32, tag = "2")]
+    pub removed_count: u32,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeletePerfBenchmarkRequest {
+    #[prost(string, tag = "1")]
+    pub bench_id: ::prost::alloc::string::String,
+}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct DeletePerfBenchmarkResponse {
+    #[prost(bool, tag = "1")]
+    pub deleted: bool,
+}
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SymbolRecord {
     #[prost(uint64, tag = "1")]
@@ -1262,6 +1583,8 @@ pub struct SymbolRecord {
     pub is_external: bool,
     #[prost(bool, tag = "10")]
     pub is_dynamic: bool,
+    #[prost(bool, tag = "11")]
+    pub is_external_entry_point: bool,
 }
 /// Field 1 reserved for future common request context.
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]

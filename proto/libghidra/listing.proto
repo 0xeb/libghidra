@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 syntax = "proto3";
 
@@ -49,6 +48,28 @@ message ListInstructionsRequest {
 
 message ListInstructionsResponse {
   repeated InstructionRecord instructions = 1;
+}
+
+// One decoded operand of an instruction. The Java host computes text/type_name/
+// ref_type from Ghidra's Instruction operand API (getDefaultOperandRepresentation,
+// getOperandType decoded via OperandType, getOperandRefType). Consumers derive
+// function ownership by range-mapping `address` into the function list.
+message InstructionOperandRecord {
+  uint64 address = 1;         // instruction address
+  uint32 operand_index = 2;   // 0-based operand position
+  string text = 3;            // rendered per-operand representation
+  string type_name = 4;       // register / immediate / memory / address / ...
+  string ref_type = 5;        // RefType (READ / WRITE / READ_WRITE / DATA / ...)
+}
+
+// Field 1 reserved for future common request context.
+message ListInstructionOperandsRequest {
+  AddressRange range = 2;
+  Pagination page = 3;
+}
+
+message ListInstructionOperandsResponse {
+  repeated InstructionOperandRecord operands = 1;
 }
 
 message CommentRecord {
@@ -110,6 +131,7 @@ message DeleteDataItemResponse {
 
 message DataItemRecord {
   uint64 address = 1;
+  // end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
   uint64 end_address = 2;
   string name = 3;
   string data_type = 4;
@@ -284,6 +306,7 @@ message ListDefinedStringsResponse {
 service ListingService {
   rpc GetInstruction(GetInstructionRequest) returns (GetInstructionResponse);
   rpc ListInstructions(ListInstructionsRequest) returns (ListInstructionsResponse);
+  rpc ListInstructionOperands(ListInstructionOperandsRequest) returns (ListInstructionOperandsResponse);
   rpc GetComments(GetCommentsRequest) returns (GetCommentsResponse);
   rpc SetComment(SetCommentRequest) returns (SetCommentResponse);
   rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse);

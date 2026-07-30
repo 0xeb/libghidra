@@ -16,6 +16,10 @@ public interface DataItemRecordOrBuilder extends
   long getAddress();
 
   /**
+   * <pre>
+   * end_address is INCLUSIVE (Ghidra maxAddress — the last byte of the item).
+   * </pre>
+   *
    * <code>uint64 end_address = 2;</code>
    * @return The endAddress.
    */

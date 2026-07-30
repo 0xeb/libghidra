@@ -1,9 +1,17 @@
+#
+# Copyright (c) 2024-2026 Elias Bachaalany
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+#
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
+#
+
 # cpp/CMakeLists.txt
 # Defines two targets from a single directory:
 #   libghidra_client — IClient interface + models + StatusOr + HTTP backend + protobuf stubs
 #   libghidra_local  — Adds local/offline backend (decompiler engine, project reader)
 
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.26)
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../VERSION" LIBGHIDRA_VERSION)
 string(STRIP "${LIBGHIDRA_VERSION}" LIBGHIDRA_VERSION)
 project(libghidra_cpp VERSION ${LIBGHIDRA_VERSION} LANGUAGES CXX C)
@@ -58,6 +66,9 @@ include(FetchContent)
 
 set(LIBGHIDRA_HTTPLIB_INCLUDE_DIR "")
 if(NOT TARGET httplib::httplib)
+    # cpp-httplib is compiled into libghidra_client and is not part of the
+    # installed SDK's public interface.
+    set(HTTPLIB_INSTALL OFF CACHE BOOL "" FORCE)
     FetchContent_Declare(
         cpp_httplib
         GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
@@ -71,10 +82,21 @@ endif()
 set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_CONFORMANCE OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+# Protobuf is an implementation dependency of this build, not part of the
+# libghidra CMake SDK. Registering its install rules makes `cmake --install`
+# require every optional Abseil archive, including targets that the normal
+# libghidra build never produces. The exported package resolves a consumer's
+# Protobuf normally through find_dependency(Protobuf).
+set(protobuf_INSTALL OFF CACHE BOOL "" FORCE)
+set(ABSL_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+set(utf8_range_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
 set(ABSL_PROPAGATE_CXX_STD ON CACHE BOOL "" FORCE)
 set(protobuf_BUILD_PROTOBUF_BINARIES ON CACHE BOOL "" FORCE)
 set(protobuf_BUILD_LIBUPB OFF CACHE BOOL "" FORCE)
 set(protobuf_DISABLE_RTTI OFF CACHE BOOL "" FORCE)
+# libghidra does not use protobuf's gzip stream wrappers. Keep the bundled
+# runtime self-contained instead of probing for an optional system zlib.
+set(protobuf_WITH_ZLIB OFF CACHE BOOL "" FORCE)
 if(MSVC)
     # Protobuf exposes a single CRT mode toggle, so follow the top-level MSVC
     # runtime selection.  When CMAKE_MSVC_RUNTIME_LIBRARY is not set, MSVC
@@ -90,14 +112,44 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/protocolbuffers/protobuf.git
     GIT_TAG v29.3
     GIT_SHALLOW TRUE
+    PATCH_COMMAND
+        ${CMAKE_COMMAND}
+        "-DLIBGHIDRA_PROTOBUF_SOURCE_DIR=<SOURCE_DIR>"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/PatchProtobufCMake.cmake"
 )
 FetchContent_MakeAvailable(protobuf)
+
+# Protobuf 29.3 is warning-clean on the supported Clang/GCC builds, but its
+# bundled utf8_range and generator sources trigger two MSVC diagnostics:
+# redundant inline specifiers (C4141), and exhaustive enum switches whose
+# fail-fast tail is not recognized as returning (C4715). Keep these suppressions
+# private to the third-party targets; libghidra sources retain the full warning
+# policy of their consumer.
+if(MSVC)
+    foreach(_libghidra_protobuf_target
+        libprotobuf
+        libprotobuf-lite
+        utf8_range
+        utf8_validity
+    )
+        if(TARGET ${_libghidra_protobuf_target})
+            target_compile_options(${_libghidra_protobuf_target} PRIVATE /wd4141)
+        endif()
+    endforeach()
+    if(TARGET libprotoc)
+        target_compile_options(libprotoc PRIVATE /wd4715)
+    endif()
+endif()
 
 # Protobuf v29.3 ships abseil-cpp 20240722.0, whose AbseilConfigureCopts.cmake
 # misdetects the arch on macOS Apple Silicon and pins -msse4.1/-maes onto the
 # random_internal_randen_hwaes* targets, which clang rejects when targeting
 # arm64. Strip those x86-only flags so the targets build (the sources have
 # preprocessor guards that cleanly fall back without HW AES).
+#
+# Forward exit: once the bundled protobuf is bumped to a release carrying
+# abseil >= 20250127 (which emits one -Xarch_x86_64 per HW-AES flag, so arm64
+# is never tagged with x86 SIMD), this APPLE block can be deleted.
 if(APPLE)
     foreach(_libghidra_absl_target
         random_internal_randen_hwaes
@@ -191,23 +243,18 @@ else()
     message(FATAL_ERROR "libghidra: missing protobuf target (expected protobuf::libprotobuf or libprotobuf)")
 endif()
 
-set(LIBGHIDRA_PROTOBUF_LITE_TARGET "")
-if(TARGET protobuf::libprotobuf-lite)
-    set(LIBGHIDRA_PROTOBUF_LITE_TARGET protobuf::libprotobuf-lite)
-elseif(TARGET libprotobuf-lite)
-    set(LIBGHIDRA_PROTOBUF_LITE_TARGET libprotobuf-lite)
-endif()
-
-target_link_libraries(libghidra_client PUBLIC ${LIBGHIDRA_PROTOBUF_TARGET})
+target_link_libraries(libghidra_client PRIVATE
+    "$<BUILD_LOCAL_INTERFACE:${LIBGHIDRA_PROTOBUF_TARGET}>"
+)
+target_link_libraries(libghidra_client INTERFACE
+    "$<INSTALL_INTERFACE:libghidra::_protobuf>"
+)
 if(TARGET httplib::httplib)
-    target_link_libraries(libghidra_client PRIVATE httplib::httplib)
+    target_link_libraries(libghidra_client PRIVATE
+        "$<BUILD_LOCAL_INTERFACE:httplib::httplib>"
+    )
 elseif(NOT LIBGHIDRA_HTTPLIB_INCLUDE_DIR)
     message(FATAL_ERROR "libghidra: missing cpp-httplib include source/target")
-endif()
-
-if(LIBGHIDRA_PROTOBUF_LITE_TARGET
-   AND NOT LIBGHIDRA_PROTOBUF_LITE_TARGET STREQUAL LIBGHIDRA_PROTOBUF_TARGET)
-    target_link_libraries(libghidra_client PUBLIC ${LIBGHIDRA_PROTOBUF_LITE_TARGET})
 endif()
 
 # ============================================================================
@@ -238,6 +285,7 @@ if(LIBGHIDRA_WITH_LOCAL)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/btree.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/address_map.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/ghidra_project.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/memory_image.cpp
         ${EMBEDDED_SPECS_SOURCES}
     )
 
@@ -266,6 +314,12 @@ if(LIBGHIDRA_WITH_LOCAL)
         ${GHIDRA_ZLIB_SRC}
         ${EMBEDDED_SPECS_DIR}
     )
+
+    if(MSVC)
+        # std::getenv in ghidra_cpp_init.cpp is read-only and copied
+        # immediately; silence MSVC's C4996 advisory like the sibling tools do.
+        target_compile_definitions(libghidra_local PRIVATE _CRT_SECURE_NO_WARNINGS)
+    endif()
 
     # PUBLIC link to libghidra_client for IClient, models, status
     target_link_libraries(libghidra_local PUBLIC libghidra_client)
@@ -322,7 +376,17 @@ if(LIBGHIDRA_WITH_LOCAL)
     target_compile_definitions(libghidra_local PRIVATE LOCAL_ZLIB)
 
     if(MSVC)
-        target_compile_options(libghidra_local PRIVATE /EHsc /W3 /O2)
+        # Ghidra's fspec.hh forward-declares ParameterPieces and
+        # PrototypePieces as classes before defining them as structs. This is
+        # harmless C++, but MSVC diagnoses the upstream headers with C4099 in
+        # every local-backend consumer.
+        target_compile_options(libghidra_local PRIVATE /EHsc /W3 /O2 /wd4099)
+        # Ghidra's bundled zlib objects are built with /GL. Every final binary
+        # that consumes this static archive must enable LTCG; otherwise
+        # link.exe restarts the link and emits a performance diagnostic.
+        target_link_options(libghidra_local INTERFACE
+            "$<$<CONFIG:Release>:/LTCG>"
+        )
         target_compile_definitions(libghidra_local PRIVATE
             _SECURE_SCL=0
             _HAS_ITERATOR_DEBUGGING=0
@@ -368,7 +432,7 @@ endif()
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/libghidra"
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/generated/libghidra"
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/generated/libghidra/"
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libghidra
     FILES_MATCHING PATTERN "*.h"
 )

@@ -432,6 +432,41 @@ struct InstructionRecordDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 InstructionRecordDefaultTypeInternal _InstructionRecord_default_instance_;
 
+inline constexpr InstructionOperandRecord::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : text_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        type_name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        ref_type_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        address_{::uint64_t{0u}},
+        operand_index_{0u},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR InstructionOperandRecord::InstructionOperandRecord(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct InstructionOperandRecordDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR InstructionOperandRecordDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~InstructionOperandRecordDefaultTypeInternal() {}
+  union {
+    InstructionOperandRecord _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 InstructionOperandRecordDefaultTypeInternal _InstructionOperandRecord_default_instance_;
+
 inline constexpr GetInstructionRequest::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : address_{::uint64_t{0u}},
@@ -1005,6 +1040,57 @@ struct ListInstructionsRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListInstructionsRequestDefaultTypeInternal _ListInstructionsRequest_default_instance_;
 
+inline constexpr ListInstructionOperandsResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : operands_{},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ListInstructionOperandsResponse::ListInstructionOperandsResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ListInstructionOperandsResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListInstructionOperandsResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListInstructionOperandsResponseDefaultTypeInternal() {}
+  union {
+    ListInstructionOperandsResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListInstructionOperandsResponseDefaultTypeInternal _ListInstructionOperandsResponse_default_instance_;
+
+inline constexpr ListInstructionOperandsRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        range_{nullptr},
+        page_{nullptr} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ListInstructionOperandsRequest::ListInstructionOperandsRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ListInstructionOperandsRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListInstructionOperandsRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListInstructionOperandsRequestDefaultTypeInternal() {}
+  union {
+    ListInstructionOperandsRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListInstructionOperandsRequestDefaultTypeInternal _ListInstructionOperandsRequest_default_instance_;
+
 inline constexpr ListDefinedStringsResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : strings_{},
@@ -1356,6 +1442,40 @@ const ::uint32_t
         ~0u,  // no _split_
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::ListInstructionsResponse, _impl_.instructions_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::InstructionOperandRecord, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::InstructionOperandRecord, _impl_.address_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::InstructionOperandRecord, _impl_.operand_index_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::InstructionOperandRecord, _impl_.text_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::InstructionOperandRecord, _impl_.type_name_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::InstructionOperandRecord, _impl_.ref_type_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListInstructionOperandsRequest, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListInstructionOperandsRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListInstructionOperandsRequest, _impl_.range_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListInstructionOperandsRequest, _impl_.page_),
+        0,
+        1,
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListInstructionOperandsResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListInstructionOperandsResponse, _impl_.operands_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::CommentRecord, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -1796,47 +1916,50 @@ static const ::_pbi::MigrationSchema
         {22, 31, -1, sizeof(::libghidra::GetInstructionResponse)},
         {32, 42, -1, sizeof(::libghidra::ListInstructionsRequest)},
         {44, -1, -1, sizeof(::libghidra::ListInstructionsResponse)},
-        {53, -1, -1, sizeof(::libghidra::CommentRecord)},
-        {64, 74, -1, sizeof(::libghidra::GetCommentsRequest)},
-        {76, -1, -1, sizeof(::libghidra::GetCommentsResponse)},
-        {85, -1, -1, sizeof(::libghidra::SetCommentRequest)},
-        {96, -1, -1, sizeof(::libghidra::SetCommentResponse)},
-        {105, -1, -1, sizeof(::libghidra::DeleteCommentRequest)},
-        {115, -1, -1, sizeof(::libghidra::DeleteCommentResponse)},
-        {124, -1, -1, sizeof(::libghidra::RenameDataItemRequest)},
-        {134, -1, -1, sizeof(::libghidra::RenameDataItemResponse)},
-        {144, -1, -1, sizeof(::libghidra::DeleteDataItemRequest)},
-        {153, -1, -1, sizeof(::libghidra::DeleteDataItemResponse)},
-        {162, -1, -1, sizeof(::libghidra::DataItemRecord)},
-        {176, 186, -1, sizeof(::libghidra::ListDataItemsRequest)},
-        {188, -1, -1, sizeof(::libghidra::ListDataItemsResponse)},
-        {197, -1, -1, sizeof(::libghidra::BookmarkRecord)},
-        {209, 221, -1, sizeof(::libghidra::ListBookmarksRequest)},
-        {225, -1, -1, sizeof(::libghidra::ListBookmarksResponse)},
-        {234, -1, -1, sizeof(::libghidra::AddBookmarkRequest)},
-        {246, -1, -1, sizeof(::libghidra::AddBookmarkResponse)},
-        {255, -1, -1, sizeof(::libghidra::DeleteBookmarkRequest)},
-        {266, -1, -1, sizeof(::libghidra::DeleteBookmarkResponse)},
-        {275, -1, -1, sizeof(::libghidra::BreakpointRecord)},
-        {289, 301, -1, sizeof(::libghidra::ListBreakpointsRequest)},
-        {305, -1, -1, sizeof(::libghidra::ListBreakpointsResponse)},
-        {314, -1, -1, sizeof(::libghidra::AddBreakpointRequest)},
-        {328, -1, -1, sizeof(::libghidra::AddBreakpointResponse)},
-        {337, -1, -1, sizeof(::libghidra::SetBreakpointEnabledRequest)},
-        {347, -1, -1, sizeof(::libghidra::SetBreakpointEnabledResponse)},
-        {356, -1, -1, sizeof(::libghidra::SetBreakpointKindRequest)},
-        {366, -1, -1, sizeof(::libghidra::SetBreakpointKindResponse)},
-        {375, -1, -1, sizeof(::libghidra::SetBreakpointSizeRequest)},
-        {385, -1, -1, sizeof(::libghidra::SetBreakpointSizeResponse)},
-        {394, -1, -1, sizeof(::libghidra::SetBreakpointConditionRequest)},
-        {404, -1, -1, sizeof(::libghidra::SetBreakpointConditionResponse)},
-        {413, -1, -1, sizeof(::libghidra::SetBreakpointGroupRequest)},
-        {423, -1, -1, sizeof(::libghidra::SetBreakpointGroupResponse)},
-        {432, -1, -1, sizeof(::libghidra::DeleteBreakpointRequest)},
-        {441, -1, -1, sizeof(::libghidra::DeleteBreakpointResponse)},
-        {450, -1, -1, sizeof(::libghidra::DefinedStringRecord)},
-        {463, 473, -1, sizeof(::libghidra::ListDefinedStringsRequest)},
-        {475, -1, -1, sizeof(::libghidra::ListDefinedStringsResponse)},
+        {53, -1, -1, sizeof(::libghidra::InstructionOperandRecord)},
+        {66, 76, -1, sizeof(::libghidra::ListInstructionOperandsRequest)},
+        {78, -1, -1, sizeof(::libghidra::ListInstructionOperandsResponse)},
+        {87, -1, -1, sizeof(::libghidra::CommentRecord)},
+        {98, 108, -1, sizeof(::libghidra::GetCommentsRequest)},
+        {110, -1, -1, sizeof(::libghidra::GetCommentsResponse)},
+        {119, -1, -1, sizeof(::libghidra::SetCommentRequest)},
+        {130, -1, -1, sizeof(::libghidra::SetCommentResponse)},
+        {139, -1, -1, sizeof(::libghidra::DeleteCommentRequest)},
+        {149, -1, -1, sizeof(::libghidra::DeleteCommentResponse)},
+        {158, -1, -1, sizeof(::libghidra::RenameDataItemRequest)},
+        {168, -1, -1, sizeof(::libghidra::RenameDataItemResponse)},
+        {178, -1, -1, sizeof(::libghidra::DeleteDataItemRequest)},
+        {187, -1, -1, sizeof(::libghidra::DeleteDataItemResponse)},
+        {196, -1, -1, sizeof(::libghidra::DataItemRecord)},
+        {210, 220, -1, sizeof(::libghidra::ListDataItemsRequest)},
+        {222, -1, -1, sizeof(::libghidra::ListDataItemsResponse)},
+        {231, -1, -1, sizeof(::libghidra::BookmarkRecord)},
+        {243, 255, -1, sizeof(::libghidra::ListBookmarksRequest)},
+        {259, -1, -1, sizeof(::libghidra::ListBookmarksResponse)},
+        {268, -1, -1, sizeof(::libghidra::AddBookmarkRequest)},
+        {280, -1, -1, sizeof(::libghidra::AddBookmarkResponse)},
+        {289, -1, -1, sizeof(::libghidra::DeleteBookmarkRequest)},
+        {300, -1, -1, sizeof(::libghidra::DeleteBookmarkResponse)},
+        {309, -1, -1, sizeof(::libghidra::BreakpointRecord)},
+        {323, 335, -1, sizeof(::libghidra::ListBreakpointsRequest)},
+        {339, -1, -1, sizeof(::libghidra::ListBreakpointsResponse)},
+        {348, -1, -1, sizeof(::libghidra::AddBreakpointRequest)},
+        {362, -1, -1, sizeof(::libghidra::AddBreakpointResponse)},
+        {371, -1, -1, sizeof(::libghidra::SetBreakpointEnabledRequest)},
+        {381, -1, -1, sizeof(::libghidra::SetBreakpointEnabledResponse)},
+        {390, -1, -1, sizeof(::libghidra::SetBreakpointKindRequest)},
+        {400, -1, -1, sizeof(::libghidra::SetBreakpointKindResponse)},
+        {409, -1, -1, sizeof(::libghidra::SetBreakpointSizeRequest)},
+        {419, -1, -1, sizeof(::libghidra::SetBreakpointSizeResponse)},
+        {428, -1, -1, sizeof(::libghidra::SetBreakpointConditionRequest)},
+        {438, -1, -1, sizeof(::libghidra::SetBreakpointConditionResponse)},
+        {447, -1, -1, sizeof(::libghidra::SetBreakpointGroupRequest)},
+        {457, -1, -1, sizeof(::libghidra::SetBreakpointGroupResponse)},
+        {466, -1, -1, sizeof(::libghidra::DeleteBreakpointRequest)},
+        {475, -1, -1, sizeof(::libghidra::DeleteBreakpointResponse)},
+        {484, -1, -1, sizeof(::libghidra::DefinedStringRecord)},
+        {497, 507, -1, sizeof(::libghidra::ListDefinedStringsRequest)},
+        {509, -1, -1, sizeof(::libghidra::ListDefinedStringsResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_InstructionRecord_default_instance_._instance,
@@ -1844,6 +1967,9 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_GetInstructionResponse_default_instance_._instance,
     &::libghidra::_ListInstructionsRequest_default_instance_._instance,
     &::libghidra::_ListInstructionsResponse_default_instance_._instance,
+    &::libghidra::_InstructionOperandRecord_default_instance_._instance,
+    &::libghidra::_ListInstructionOperandsRequest_default_instance_._instance,
+    &::libghidra::_ListInstructionOperandsResponse_default_instance_._instance,
     &::libghidra::_CommentRecord_default_instance_._instance,
     &::libghidra::_GetCommentsRequest_default_instance_._instance,
     &::libghidra::_GetCommentsResponse_default_instance_._instance,
@@ -1899,7 +2025,15 @@ const char descriptor_table_protodef_libghidra_2flisting_2eproto[] ABSL_ATTRIBUT
     "t\022&\n\005range\030\002 \001(\0132\027.libghidra.AddressRang"
     "e\022#\n\004page\030\003 \001(\0132\025.libghidra.Pagination\"N"
     "\n\030ListInstructionsResponse\0222\n\014instructio"
-    "ns\030\001 \003(\0132\034.libghidra.InstructionRecord\"T"
+    "ns\030\001 \003(\0132\034.libghidra.InstructionRecord\"u"
+    "\n\030InstructionOperandRecord\022\017\n\007address\030\001 "
+    "\001(\004\022\025\n\roperand_index\030\002 \001(\r\022\014\n\004text\030\003 \001(\t"
+    "\022\021\n\ttype_name\030\004 \001(\t\022\020\n\010ref_type\030\005 \001(\t\"m\n"
+    "\036ListInstructionOperandsRequest\022&\n\005range"
+    "\030\002 \001(\0132\027.libghidra.AddressRange\022#\n\004page\030"
+    "\003 \001(\0132\025.libghidra.Pagination\"X\n\037ListInst"
+    "ructionOperandsResponse\0225\n\010operands\030\001 \003("
+    "\0132#.libghidra.InstructionOperandRecord\"T"
     "\n\rCommentRecord\022\017\n\007address\030\001 \001(\004\022$\n\004kind"
     "\030\002 \001(\0162\026.libghidra.CommentKind\022\014\n\004text\030\003"
     " \001(\t\"a\n\022GetCommentsRequest\022&\n\005range\030\002 \001("
@@ -1978,54 +2112,56 @@ const char descriptor_table_protodef_libghidra_2flisting_2eproto[] ABSL_ATTRIBUT
     "\n\030COMMENT_KIND_UNSPECIFIED\020\000\022\024\n\020COMMENT_"
     "KIND_EOL\020\001\022\024\n\020COMMENT_KIND_PRE\020\002\022\025\n\021COMM"
     "ENT_KIND_POST\020\003\022\026\n\022COMMENT_KIND_PLATE\020\004\022"
-    "\033\n\027COMMENT_KIND_REPEATABLE\020\0052\225\016\n\016Listing"
+    "\033\n\027COMMENT_KIND_REPEATABLE\020\0052\207\017\n\016Listing"
     "Service\022U\n\016GetInstruction\022 .libghidra.Ge"
     "tInstructionRequest\032!.libghidra.GetInstr"
     "uctionResponse\022[\n\020ListInstructions\022\".lib"
     "ghidra.ListInstructionsRequest\032#.libghid"
-    "ra.ListInstructionsResponse\022L\n\013GetCommen"
-    "ts\022\035.libghidra.GetCommentsRequest\032\036.libg"
-    "hidra.GetCommentsResponse\022I\n\nSetComment\022"
-    "\034.libghidra.SetCommentRequest\032\035.libghidr"
-    "a.SetCommentResponse\022R\n\rDeleteComment\022\037."
-    "libghidra.DeleteCommentRequest\032 .libghid"
-    "ra.DeleteCommentResponse\022U\n\016RenameDataIt"
-    "em\022 .libghidra.RenameDataItemRequest\032!.l"
-    "ibghidra.RenameDataItemResponse\022U\n\016Delet"
-    "eDataItem\022 .libghidra.DeleteDataItemRequ"
-    "est\032!.libghidra.DeleteDataItemResponse\022R"
-    "\n\rListDataItems\022\037.libghidra.ListDataItem"
-    "sRequest\032 .libghidra.ListDataItemsRespon"
-    "se\022R\n\rListBookmarks\022\037.libghidra.ListBook"
-    "marksRequest\032 .libghidra.ListBookmarksRe"
-    "sponse\022L\n\013AddBookmark\022\035.libghidra.AddBoo"
-    "kmarkRequest\032\036.libghidra.AddBookmarkResp"
-    "onse\022U\n\016DeleteBookmark\022 .libghidra.Delet"
-    "eBookmarkRequest\032!.libghidra.DeleteBookm"
-    "arkResponse\022X\n\017ListBreakpoints\022!.libghid"
-    "ra.ListBreakpointsRequest\032\".libghidra.Li"
-    "stBreakpointsResponse\022R\n\rAddBreakpoint\022\037"
-    ".libghidra.AddBreakpointRequest\032 .libghi"
-    "dra.AddBreakpointResponse\022g\n\024SetBreakpoi"
-    "ntEnabled\022&.libghidra.SetBreakpointEnabl"
-    "edRequest\032\'.libghidra.SetBreakpointEnabl"
-    "edResponse\022^\n\021SetBreakpointKind\022#.libghi"
-    "dra.SetBreakpointKindRequest\032$.libghidra"
-    ".SetBreakpointKindResponse\022^\n\021SetBreakpo"
-    "intSize\022#.libghidra.SetBreakpointSizeReq"
-    "uest\032$.libghidra.SetBreakpointSizeRespon"
-    "se\022m\n\026SetBreakpointCondition\022(.libghidra"
-    ".SetBreakpointConditionRequest\032).libghid"
-    "ra.SetBreakpointConditionResponse\022a\n\022Set"
-    "BreakpointGroup\022$.libghidra.SetBreakpoin"
-    "tGroupRequest\032%.libghidra.SetBreakpointG"
-    "roupResponse\022[\n\020DeleteBreakpoint\022\".libgh"
-    "idra.DeleteBreakpointRequest\032#.libghidra"
-    ".DeleteBreakpointResponse\022a\n\022ListDefined"
-    "Strings\022$.libghidra.ListDefinedStringsRe"
-    "quest\032%.libghidra.ListDefinedStringsResp"
-    "onseB\033\n\tlibghidraB\014ListingProtoP\001b\006proto"
-    "3"
+    "ra.ListInstructionsResponse\022p\n\027ListInstr"
+    "uctionOperands\022).libghidra.ListInstructi"
+    "onOperandsRequest\032*.libghidra.ListInstru"
+    "ctionOperandsResponse\022L\n\013GetComments\022\035.l"
+    "ibghidra.GetCommentsRequest\032\036.libghidra."
+    "GetCommentsResponse\022I\n\nSetComment\022\034.libg"
+    "hidra.SetCommentRequest\032\035.libghidra.SetC"
+    "ommentResponse\022R\n\rDeleteComment\022\037.libghi"
+    "dra.DeleteCommentRequest\032 .libghidra.Del"
+    "eteCommentResponse\022U\n\016RenameDataItem\022 .l"
+    "ibghidra.RenameDataItemRequest\032!.libghid"
+    "ra.RenameDataItemResponse\022U\n\016DeleteDataI"
+    "tem\022 .libghidra.DeleteDataItemRequest\032!."
+    "libghidra.DeleteDataItemResponse\022R\n\rList"
+    "DataItems\022\037.libghidra.ListDataItemsReque"
+    "st\032 .libghidra.ListDataItemsResponse\022R\n\r"
+    "ListBookmarks\022\037.libghidra.ListBookmarksR"
+    "equest\032 .libghidra.ListBookmarksResponse"
+    "\022L\n\013AddBookmark\022\035.libghidra.AddBookmarkR"
+    "equest\032\036.libghidra.AddBookmarkResponse\022U"
+    "\n\016DeleteBookmark\022 .libghidra.DeleteBookm"
+    "arkRequest\032!.libghidra.DeleteBookmarkRes"
+    "ponse\022X\n\017ListBreakpoints\022!.libghidra.Lis"
+    "tBreakpointsRequest\032\".libghidra.ListBrea"
+    "kpointsResponse\022R\n\rAddBreakpoint\022\037.libgh"
+    "idra.AddBreakpointRequest\032 .libghidra.Ad"
+    "dBreakpointResponse\022g\n\024SetBreakpointEnab"
+    "led\022&.libghidra.SetBreakpointEnabledRequ"
+    "est\032\'.libghidra.SetBreakpointEnabledResp"
+    "onse\022^\n\021SetBreakpointKind\022#.libghidra.Se"
+    "tBreakpointKindRequest\032$.libghidra.SetBr"
+    "eakpointKindResponse\022^\n\021SetBreakpointSiz"
+    "e\022#.libghidra.SetBreakpointSizeRequest\032$"
+    ".libghidra.SetBreakpointSizeResponse\022m\n\026"
+    "SetBreakpointCondition\022(.libghidra.SetBr"
+    "eakpointConditionRequest\032).libghidra.Set"
+    "BreakpointConditionResponse\022a\n\022SetBreakp"
+    "ointGroup\022$.libghidra.SetBreakpointGroup"
+    "Request\032%.libghidra.SetBreakpointGroupRe"
+    "sponse\022[\n\020DeleteBreakpoint\022\".libghidra.D"
+    "eleteBreakpointRequest\032#.libghidra.Delet"
+    "eBreakpointResponse\022a\n\022ListDefinedString"
+    "s\022$.libghidra.ListDefinedStringsRequest\032"
+    "%.libghidra.ListDefinedStringsResponseB\033"
+    "\n\tlibghidraB\014ListingProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2flisting_2eproto_deps[1] =
     {
@@ -2035,13 +2171,13 @@ static ::absl::once_flag descriptor_table_libghidra_2flisting_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2flisting_2eproto = {
     false,
     false,
-    5481,
+    5915,
     descriptor_table_protodef_libghidra_2flisting_2eproto,
     "libghidra/listing.proto",
     &descriptor_table_libghidra_2flisting_2eproto_once,
     descriptor_table_libghidra_2flisting_2eproto_deps,
     1,
-    46,
+    49,
     schemas,
     file_default_instances,
     TableStruct_libghidra_2flisting_2eproto::offsets,
@@ -3421,6 +3557,914 @@ void ListInstructionsResponse::InternalSwap(ListInstructionsResponse* PROTOBUF_R
 }
 
 ::google::protobuf::Metadata ListInstructionsResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class InstructionOperandRecord::_Internal {
+ public:
+};
+
+InstructionOperandRecord::InstructionOperandRecord(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.InstructionOperandRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE InstructionOperandRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::InstructionOperandRecord& from_msg)
+      : text_(arena, from.text_),
+        type_name_(arena, from.type_name_),
+        ref_type_(arena, from.ref_type_),
+        _cached_size_{0} {}
+
+InstructionOperandRecord::InstructionOperandRecord(
+    ::google::protobuf::Arena* arena,
+    const InstructionOperandRecord& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  InstructionOperandRecord* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, address_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, address_),
+           offsetof(Impl_, operand_index_) -
+               offsetof(Impl_, address_) +
+               sizeof(Impl_::operand_index_));
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.InstructionOperandRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE InstructionOperandRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : text_(arena),
+        type_name_(arena),
+        ref_type_(arena),
+        _cached_size_{0} {}
+
+inline void InstructionOperandRecord::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, address_),
+           0,
+           offsetof(Impl_, operand_index_) -
+               offsetof(Impl_, address_) +
+               sizeof(Impl_::operand_index_));
+}
+InstructionOperandRecord::~InstructionOperandRecord() {
+  // @@protoc_insertion_point(destructor:libghidra.InstructionOperandRecord)
+  SharedDtor(*this);
+}
+inline void InstructionOperandRecord::SharedDtor(MessageLite& self) {
+  InstructionOperandRecord& this_ = static_cast<InstructionOperandRecord&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.text_.Destroy();
+  this_._impl_.type_name_.Destroy();
+  this_._impl_.ref_type_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* InstructionOperandRecord::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) InstructionOperandRecord(arena);
+}
+constexpr auto InstructionOperandRecord::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(InstructionOperandRecord),
+                                            alignof(InstructionOperandRecord));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull InstructionOperandRecord::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_InstructionOperandRecord_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &InstructionOperandRecord::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<InstructionOperandRecord>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &InstructionOperandRecord::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<InstructionOperandRecord>(), &InstructionOperandRecord::ByteSizeLong,
+            &InstructionOperandRecord::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_._cached_size_),
+        false,
+    },
+    &InstructionOperandRecord::kDescriptorMethods,
+    &descriptor_table_libghidra_2flisting_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* InstructionOperandRecord::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 5, 0, 64, 2> InstructionOperandRecord::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    5, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967264,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    5,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::InstructionOperandRecord>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // uint64 address = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(InstructionOperandRecord, _impl_.address_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.address_)}},
+    // uint32 operand_index = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(InstructionOperandRecord, _impl_.operand_index_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.operand_index_)}},
+    // string text = 3;
+    {::_pbi::TcParser::FastUS1,
+     {26, 63, 0, PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.text_)}},
+    // string type_name = 4;
+    {::_pbi::TcParser::FastUS1,
+     {34, 63, 0, PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.type_name_)}},
+    // string ref_type = 5;
+    {::_pbi::TcParser::FastUS1,
+     {42, 63, 0, PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.ref_type_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint64 address = 1;
+    {PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.address_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // uint32 operand_index = 2;
+    {PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.operand_index_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // string text = 3;
+    {PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.text_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string type_name = 4;
+    {PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.type_name_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string ref_type = 5;
+    {PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.ref_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\42\0\0\4\11\10\0\0"
+    "libghidra.InstructionOperandRecord"
+    "text"
+    "type_name"
+    "ref_type"
+  }},
+};
+
+PROTOBUF_NOINLINE void InstructionOperandRecord::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.InstructionOperandRecord)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.text_.ClearToEmpty();
+  _impl_.type_name_.ClearToEmpty();
+  _impl_.ref_type_.ClearToEmpty();
+  ::memset(&_impl_.address_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.operand_index_) -
+      reinterpret_cast<char*>(&_impl_.address_)) + sizeof(_impl_.operand_index_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* InstructionOperandRecord::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const InstructionOperandRecord& this_ = static_cast<const InstructionOperandRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* InstructionOperandRecord::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const InstructionOperandRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.InstructionOperandRecord)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint64 address = 1;
+          if (this_._internal_address() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                1, this_._internal_address(), target);
+          }
+
+          // uint32 operand_index = 2;
+          if (this_._internal_operand_index() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                2, this_._internal_operand_index(), target);
+          }
+
+          // string text = 3;
+          if (!this_._internal_text().empty()) {
+            const std::string& _s = this_._internal_text();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.InstructionOperandRecord.text");
+            target = stream->WriteStringMaybeAliased(3, _s, target);
+          }
+
+          // string type_name = 4;
+          if (!this_._internal_type_name().empty()) {
+            const std::string& _s = this_._internal_type_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.InstructionOperandRecord.type_name");
+            target = stream->WriteStringMaybeAliased(4, _s, target);
+          }
+
+          // string ref_type = 5;
+          if (!this_._internal_ref_type().empty()) {
+            const std::string& _s = this_._internal_ref_type();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.InstructionOperandRecord.ref_type");
+            target = stream->WriteStringMaybeAliased(5, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.InstructionOperandRecord)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t InstructionOperandRecord::ByteSizeLong(const MessageLite& base) {
+          const InstructionOperandRecord& this_ = static_cast<const InstructionOperandRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t InstructionOperandRecord::ByteSizeLong() const {
+          const InstructionOperandRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.InstructionOperandRecord)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string text = 3;
+            if (!this_._internal_text().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_text());
+            }
+            // string type_name = 4;
+            if (!this_._internal_type_name().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_type_name());
+            }
+            // string ref_type = 5;
+            if (!this_._internal_ref_type().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_ref_type());
+            }
+            // uint64 address = 1;
+            if (this_._internal_address() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_address());
+            }
+            // uint32 operand_index = 2;
+            if (this_._internal_operand_index() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_operand_index());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void InstructionOperandRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<InstructionOperandRecord*>(&to_msg);
+  auto& from = static_cast<const InstructionOperandRecord&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.InstructionOperandRecord)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_text().empty()) {
+    _this->_internal_set_text(from._internal_text());
+  }
+  if (!from._internal_type_name().empty()) {
+    _this->_internal_set_type_name(from._internal_type_name());
+  }
+  if (!from._internal_ref_type().empty()) {
+    _this->_internal_set_ref_type(from._internal_ref_type());
+  }
+  if (from._internal_address() != 0) {
+    _this->_impl_.address_ = from._impl_.address_;
+  }
+  if (from._internal_operand_index() != 0) {
+    _this->_impl_.operand_index_ = from._impl_.operand_index_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void InstructionOperandRecord::CopyFrom(const InstructionOperandRecord& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.InstructionOperandRecord)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void InstructionOperandRecord::InternalSwap(InstructionOperandRecord* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.text_, &other->_impl_.text_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.type_name_, &other->_impl_.type_name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.ref_type_, &other->_impl_.ref_type_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.operand_index_)
+      + sizeof(InstructionOperandRecord::_impl_.operand_index_)
+      - PROTOBUF_FIELD_OFFSET(InstructionOperandRecord, _impl_.address_)>(
+          reinterpret_cast<char*>(&_impl_.address_),
+          reinterpret_cast<char*>(&other->_impl_.address_));
+}
+
+::google::protobuf::Metadata InstructionOperandRecord::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListInstructionOperandsRequest::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<ListInstructionOperandsRequest>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(ListInstructionOperandsRequest, _impl_._has_bits_);
+};
+
+void ListInstructionOperandsRequest::clear_range() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.range_ != nullptr) _impl_.range_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+void ListInstructionOperandsRequest::clear_page() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.page_ != nullptr) _impl_.page_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000002u;
+}
+ListInstructionOperandsRequest::ListInstructionOperandsRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListInstructionOperandsRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE ListInstructionOperandsRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::ListInstructionOperandsRequest& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0} {}
+
+ListInstructionOperandsRequest::ListInstructionOperandsRequest(
+    ::google::protobuf::Arena* arena,
+    const ListInstructionOperandsRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListInstructionOperandsRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.range_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::AddressRange>(
+                              arena, *from._impl_.range_)
+                        : nullptr;
+  _impl_.page_ = (cached_has_bits & 0x00000002u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::Pagination>(
+                              arena, *from._impl_.page_)
+                        : nullptr;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListInstructionOperandsRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE ListInstructionOperandsRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void ListInstructionOperandsRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, range_),
+           0,
+           offsetof(Impl_, page_) -
+               offsetof(Impl_, range_) +
+               sizeof(Impl_::page_));
+}
+ListInstructionOperandsRequest::~ListInstructionOperandsRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.ListInstructionOperandsRequest)
+  SharedDtor(*this);
+}
+inline void ListInstructionOperandsRequest::SharedDtor(MessageLite& self) {
+  ListInstructionOperandsRequest& this_ = static_cast<ListInstructionOperandsRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  delete this_._impl_.range_;
+  delete this_._impl_.page_;
+  this_._impl_.~Impl_();
+}
+
+inline void* ListInstructionOperandsRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListInstructionOperandsRequest(arena);
+}
+constexpr auto ListInstructionOperandsRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(ListInstructionOperandsRequest),
+                                            alignof(ListInstructionOperandsRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListInstructionOperandsRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListInstructionOperandsRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListInstructionOperandsRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ListInstructionOperandsRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListInstructionOperandsRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ListInstructionOperandsRequest>(), &ListInstructionOperandsRequest::ByteSizeLong,
+            &ListInstructionOperandsRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListInstructionOperandsRequest, _impl_._cached_size_),
+        false,
+    },
+    &ListInstructionOperandsRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2flisting_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListInstructionOperandsRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 2, 0, 2> ListInstructionOperandsRequest::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(ListInstructionOperandsRequest, _impl_._has_bits_),
+    0, // no _extensions_
+    3, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967289,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    2,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListInstructionOperandsRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // .libghidra.AddressRange range = 2;
+    {::_pbi::TcParser::FastMtS1,
+     {18, 0, 0, PROTOBUF_FIELD_OFFSET(ListInstructionOperandsRequest, _impl_.range_)}},
+    // .libghidra.Pagination page = 3;
+    {::_pbi::TcParser::FastMtS1,
+     {26, 1, 1, PROTOBUF_FIELD_OFFSET(ListInstructionOperandsRequest, _impl_.page_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // .libghidra.AddressRange range = 2;
+    {PROTOBUF_FIELD_OFFSET(ListInstructionOperandsRequest, _impl_.range_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // .libghidra.Pagination page = 3;
+    {PROTOBUF_FIELD_OFFSET(ListInstructionOperandsRequest, _impl_.page_), _Internal::kHasBitsOffset + 1, 1,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::AddressRange>()},
+    {::_pbi::TcParser::GetTable<::libghidra::Pagination>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void ListInstructionOperandsRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ListInstructionOperandsRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      ABSL_DCHECK(_impl_.range_ != nullptr);
+      _impl_.range_->Clear();
+    }
+    if (cached_has_bits & 0x00000002u) {
+      ABSL_DCHECK(_impl_.page_ != nullptr);
+      _impl_.page_->Clear();
+    }
+  }
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ListInstructionOperandsRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ListInstructionOperandsRequest& this_ = static_cast<const ListInstructionOperandsRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ListInstructionOperandsRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ListInstructionOperandsRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ListInstructionOperandsRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // .libghidra.AddressRange range = 2;
+          if (cached_has_bits & 0x00000001u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                2, *this_._impl_.range_, this_._impl_.range_->GetCachedSize(), target,
+                stream);
+          }
+
+          // .libghidra.Pagination page = 3;
+          if (cached_has_bits & 0x00000002u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                3, *this_._impl_.page_, this_._impl_.page_->GetCachedSize(), target,
+                stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ListInstructionOperandsRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ListInstructionOperandsRequest::ByteSizeLong(const MessageLite& base) {
+          const ListInstructionOperandsRequest& this_ = static_cast<const ListInstructionOperandsRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ListInstructionOperandsRequest::ByteSizeLong() const {
+          const ListInstructionOperandsRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ListInstructionOperandsRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+          cached_has_bits = this_._impl_._has_bits_[0];
+          if (cached_has_bits & 0x00000003u) {
+            // .libghidra.AddressRange range = 2;
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.range_);
+            }
+            // .libghidra.Pagination page = 3;
+            if (cached_has_bits & 0x00000002u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.page_);
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ListInstructionOperandsRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ListInstructionOperandsRequest*>(&to_msg);
+  auto& from = static_cast<const ListInstructionOperandsRequest&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ListInstructionOperandsRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      ABSL_DCHECK(from._impl_.range_ != nullptr);
+      if (_this->_impl_.range_ == nullptr) {
+        _this->_impl_.range_ =
+            ::google::protobuf::Message::CopyConstruct<::libghidra::AddressRange>(arena, *from._impl_.range_);
+      } else {
+        _this->_impl_.range_->MergeFrom(*from._impl_.range_);
+      }
+    }
+    if (cached_has_bits & 0x00000002u) {
+      ABSL_DCHECK(from._impl_.page_ != nullptr);
+      if (_this->_impl_.page_ == nullptr) {
+        _this->_impl_.page_ =
+            ::google::protobuf::Message::CopyConstruct<::libghidra::Pagination>(arena, *from._impl_.page_);
+      } else {
+        _this->_impl_.page_->MergeFrom(*from._impl_.page_);
+      }
+    }
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ListInstructionOperandsRequest::CopyFrom(const ListInstructionOperandsRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ListInstructionOperandsRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ListInstructionOperandsRequest::InternalSwap(ListInstructionOperandsRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ListInstructionOperandsRequest, _impl_.page_)
+      + sizeof(ListInstructionOperandsRequest::_impl_.page_)
+      - PROTOBUF_FIELD_OFFSET(ListInstructionOperandsRequest, _impl_.range_)>(
+          reinterpret_cast<char*>(&_impl_.range_),
+          reinterpret_cast<char*>(&other->_impl_.range_));
+}
+
+::google::protobuf::Metadata ListInstructionOperandsRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListInstructionOperandsResponse::_Internal {
+ public:
+};
+
+ListInstructionOperandsResponse::ListInstructionOperandsResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListInstructionOperandsResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListInstructionOperandsResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::ListInstructionOperandsResponse& from_msg)
+      : operands_{visibility, arena, from.operands_},
+        _cached_size_{0} {}
+
+ListInstructionOperandsResponse::ListInstructionOperandsResponse(
+    ::google::protobuf::Arena* arena,
+    const ListInstructionOperandsResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListInstructionOperandsResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListInstructionOperandsResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListInstructionOperandsResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : operands_{visibility, arena},
+        _cached_size_{0} {}
+
+inline void ListInstructionOperandsResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+}
+ListInstructionOperandsResponse::~ListInstructionOperandsResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.ListInstructionOperandsResponse)
+  SharedDtor(*this);
+}
+inline void ListInstructionOperandsResponse::SharedDtor(MessageLite& self) {
+  ListInstructionOperandsResponse& this_ = static_cast<ListInstructionOperandsResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* ListInstructionOperandsResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListInstructionOperandsResponse(arena);
+}
+constexpr auto ListInstructionOperandsResponse::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(ListInstructionOperandsResponse, _impl_.operands_) +
+          decltype(ListInstructionOperandsResponse::_impl_.operands_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::ZeroInit(
+        sizeof(ListInstructionOperandsResponse), alignof(ListInstructionOperandsResponse), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&ListInstructionOperandsResponse::PlacementNew_,
+                                 sizeof(ListInstructionOperandsResponse),
+                                 alignof(ListInstructionOperandsResponse));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListInstructionOperandsResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListInstructionOperandsResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListInstructionOperandsResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ListInstructionOperandsResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListInstructionOperandsResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ListInstructionOperandsResponse>(), &ListInstructionOperandsResponse::ByteSizeLong,
+            &ListInstructionOperandsResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListInstructionOperandsResponse, _impl_._cached_size_),
+        false,
+    },
+    &ListInstructionOperandsResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2flisting_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListInstructionOperandsResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 1, 0, 2> ListInstructionOperandsResponse::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListInstructionOperandsResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // repeated .libghidra.InstructionOperandRecord operands = 1;
+    {::_pbi::TcParser::FastMtR1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(ListInstructionOperandsResponse, _impl_.operands_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // repeated .libghidra.InstructionOperandRecord operands = 1;
+    {PROTOBUF_FIELD_OFFSET(ListInstructionOperandsResponse, _impl_.operands_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::InstructionOperandRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void ListInstructionOperandsResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ListInstructionOperandsResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.operands_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ListInstructionOperandsResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ListInstructionOperandsResponse& this_ = static_cast<const ListInstructionOperandsResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ListInstructionOperandsResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ListInstructionOperandsResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ListInstructionOperandsResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // repeated .libghidra.InstructionOperandRecord operands = 1;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_operands_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_operands().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    1, repfield, repfield.GetCachedSize(),
+                    target, stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ListInstructionOperandsResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ListInstructionOperandsResponse::ByteSizeLong(const MessageLite& base) {
+          const ListInstructionOperandsResponse& this_ = static_cast<const ListInstructionOperandsResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ListInstructionOperandsResponse::ByteSizeLong() const {
+          const ListInstructionOperandsResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ListInstructionOperandsResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated .libghidra.InstructionOperandRecord operands = 1;
+            {
+              total_size += 1UL * this_._internal_operands_size();
+              for (const auto& msg : this_._internal_operands()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ListInstructionOperandsResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ListInstructionOperandsResponse*>(&to_msg);
+  auto& from = static_cast<const ListInstructionOperandsResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ListInstructionOperandsResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_operands()->MergeFrom(
+      from._internal_operands());
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ListInstructionOperandsResponse::CopyFrom(const ListInstructionOperandsResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ListInstructionOperandsResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ListInstructionOperandsResponse::InternalSwap(ListInstructionOperandsResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.operands_.InternalSwap(&other->_impl_.operands_);
+}
+
+::google::protobuf::Metadata ListInstructionOperandsResponse::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // ===================================================================

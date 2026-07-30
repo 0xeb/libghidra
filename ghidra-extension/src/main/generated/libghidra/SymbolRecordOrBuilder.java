@@ -98,4 +98,10 @@ public interface SymbolRecordOrBuilder extends
    * @return The isDynamic.
    */
   boolean getIsDynamic();
+
+  /**
+   * <code>bool is_external_entry_point = 11;</code>
+   * @return The isExternalEntryPoint.
+   */
+  boolean getIsExternalEntryPoint();
 }

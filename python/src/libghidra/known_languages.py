@@ -1,9 +1,8 @@
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 """Known Ghidra language and compiler IDs embedded with libghidra."""
 
@@ -23,13 +22,14 @@ LANGUAGE_COMPILERS: dict[str, tuple[str, ...]] = {
     '80390:BE:24:default': ('default',),
     '8048:LE:16:default': ('default',),
     '8051:BE:16:default': ('Archimedes', 'default',),
+    '8051:BE:24:cip-51': ('default',),
     '8051:BE:24:mx51': ('default',),
     '8085:LE:16:default': ('default',),
     'AARCH64:BE:32:ilp32': ('default', 'golang',),
     'AARCH64:BE:64:v8A': ('default', 'golang',),
     'AARCH64:LE:32:ilp32': ('default', 'golang',),
-    'AARCH64:LE:64:AppleSilicon': ('default', 'golang', 'swift',),
-    'AARCH64:LE:64:v8A': ('default', 'golang', 'swift', 'windows',),
+    'AARCH64:LE:64:AppleSilicon': ('default', 'golang',),
+    'AARCH64:LE:64:v8A': ('default', 'golang', 'windows',),
     'ARM:BE:32:Cortex': ('apcs', 'default',),
     'ARM:BE:32:v4': ('apcs', 'default',),
     'ARM:BE:32:v4t': ('apcs', 'default',),
@@ -91,18 +91,22 @@ LANGUAGE_COMPILERS: dict[str, tuple[str, ...]] = {
     'M16C/80:LE:16:default': ('default',),
     'M8C:BE:16:default': ('default',),
     'MCS96:LE:16:default': ('default',),
+    'MIPS:BE:32:16e': ('default', 'eabi', 'windows',),
     'MIPS:BE:32:R6': ('default',),
     'MIPS:BE:32:default': ('default', 'eabi', 'windows',),
     'MIPS:BE:32:micro': ('default',),
+    'MIPS:BE:64:16e': ('default',),
     'MIPS:BE:64:64-32R6addr': ('default', 'n32', 'o32', 'o64',),
     'MIPS:BE:64:64-32addr': ('default', 'n32', 'o32', 'o64',),
     'MIPS:BE:64:R6': ('default',),
     'MIPS:BE:64:default': ('default',),
     'MIPS:BE:64:micro': ('default',),
     'MIPS:BE:64:micro64-32addr': ('default', 'n32', 'o32', 'o64',),
+    'MIPS:LE:32:16e': ('default', 'eabi', 'windows',),
     'MIPS:LE:32:R6': ('default',),
     'MIPS:LE:32:default': ('default', 'eabi', 'windows',),
     'MIPS:LE:32:micro': ('default', 'windows',),
+    'MIPS:LE:64:16e': ('default', 'windows',),
     'MIPS:LE:64:64-32R6addr': ('default', 'n32', 'o32', 'o64', 'windows',),
     'MIPS:LE:64:64-32addr': ('default', 'n32', 'o32', 'o64', 'windows',),
     'MIPS:LE:64:R6': ('default', 'windows',),
@@ -192,7 +196,7 @@ LANGUAGE_COMPILERS: dict[str, tuple[str, ...]] = {
     'x86:LE:32:System Management Mode': ('default',),
     'x86:LE:32:default': ('borlandcpp', 'borlanddelphi', 'clangwindows', 'gcc', 'golang', 'windows',),
     'x86:LE:64:compat32': ('gcc', 'windows',),
-    'x86:LE:64:default': ('clangwindows', 'gcc', 'golang', 'swift', 'windows',),
+    'x86:LE:64:default': ('clangwindows', 'gcc', 'golang', 'windows',),
     'z180:LE:16:default': ('default',),
     'z182:LE:16:default': ('default',),
     'z80:LE:16:default': ('default',),

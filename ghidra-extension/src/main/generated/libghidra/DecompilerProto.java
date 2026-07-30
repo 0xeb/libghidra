@@ -60,6 +60,31 @@ public final class DecompilerProto {
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_ListDecompilationsResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_VarnodeRecord_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_VarnodeRecord_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_PcodeOpRecord_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_PcodeOpRecord_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_PcodeRecord_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_PcodeRecord_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_GetPcodeRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_GetPcodeRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_GetPcodeResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_GetPcodeResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -94,28 +119,46 @@ public final class DecompilerProto {
       "AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra.P" +
       "agination\022\022\n\ntimeout_ms\030\004 \001(\r\"P\n\032ListDec" +
       "ompilationsResponse\0222\n\016decompilations\030\001 " +
-      "\003(\0132\032.libghidra.DecompileRecord*\231\001\n\022Deco" +
-      "mpileLocalKind\022$\n DECOMPILE_LOCAL_KIND_U" +
-      "NSPECIFIED\020\000\022\036\n\032DECOMPILE_LOCAL_KIND_PAR" +
-      "AM\020\001\022\036\n\032DECOMPILE_LOCAL_KIND_LOCAL\020\002\022\035\n\031" +
-      "DECOMPILE_LOCAL_KIND_TEMP\020\003*\254\003\n\022Decompil" +
-      "eTokenKind\022$\n DECOMPILE_TOKEN_KIND_UNSPE" +
-      "CIFIED\020\000\022 \n\034DECOMPILE_TOKEN_KIND_KEYWORD" +
-      "\020\001\022 \n\034DECOMPILE_TOKEN_KIND_COMMENT\020\002\022\035\n\031" +
-      "DECOMPILE_TOKEN_KIND_TYPE\020\003\022!\n\035DECOMPILE" +
-      "_TOKEN_KIND_FUNCTION\020\004\022!\n\035DECOMPILE_TOKE" +
-      "N_KIND_VARIABLE\020\005\022\036\n\032DECOMPILE_TOKEN_KIN" +
-      "D_CONST\020\006\022\"\n\036DECOMPILE_TOKEN_KIND_PARAME" +
-      "TER\020\007\022\037\n\033DECOMPILE_TOKEN_KIND_GLOBAL\020\010\022 " +
-      "\n\034DECOMPILE_TOKEN_KIND_DEFAULT\020\t\022\036\n\032DECO" +
-      "MPILE_TOKEN_KIND_ERROR\020\n\022 \n\034DECOMPILE_TO" +
-      "KEN_KIND_SPECIAL\020\0132\326\001\n\021DecompilerService" +
-      "\022^\n\021DecompileFunction\022#.libghidra.Decomp" +
-      "ileFunctionRequest\032$.libghidra.Decompile" +
-      "FunctionResponse\022a\n\022ListDecompilations\022$" +
-      ".libghidra.ListDecompilationsRequest\032%.l" +
-      "ibghidra.ListDecompilationsResponseB\036\n\tl" +
-      "ibghidraB\017DecompilerProtoP\001b\006proto3"
+      "\003(\0132\032.libghidra.DecompileRecord\"J\n\rVarno" +
+      "deRecord\022\r\n\005space\030\001 \001(\t\022\016\n\006offset\030\002 \001(\004\022" +
+      "\014\n\004size\030\003 \001(\r\022\014\n\004kind\030\004 \001(\t\"\237\001\n\rPcodeOpR" +
+      "ecord\022\013\n\003seq\030\001 \001(\004\022\n\n\002op\030\002 \001(\t\022\014\n\004addr\030\003" +
+      " \001(\004\022(\n\006output\030\004 \001(\0132\030.libghidra.Varnode" +
+      "Record\022(\n\006inputs\030\005 \003(\0132\030.libghidra.Varno" +
+      "deRecord\022\023\n\013has_address\030\006 \001(\010\"\252\001\n\013PcodeR" +
+      "ecord\022\036\n\026function_entry_address\030\001 \001(\004\022%\n" +
+      "\003ops\030\002 \003(\0132\030.libghidra.PcodeOpRecord\022\021\n\t" +
+      "completed\030\003 \001(\010\022\025\n\rerror_message\030\004 \001(\t\022*" +
+      "\n\010maturity\030\005 \001(\0162\030.libghidra.PcodeMaturi" +
+      "ty\"b\n\017GetPcodeRequest\022\017\n\007address\030\002 \001(\004\022\022" +
+      "\n\ntimeout_ms\030\003 \001(\r\022*\n\010maturity\030\004 \001(\0162\030.l" +
+      "ibghidra.PcodeMaturity\"9\n\020GetPcodeRespon" +
+      "se\022%\n\005pcode\030\001 \001(\0132\026.libghidra.PcodeRecor" +
+      "d*\231\001\n\022DecompileLocalKind\022$\n DECOMPILE_LO" +
+      "CAL_KIND_UNSPECIFIED\020\000\022\036\n\032DECOMPILE_LOCA" +
+      "L_KIND_PARAM\020\001\022\036\n\032DECOMPILE_LOCAL_KIND_L" +
+      "OCAL\020\002\022\035\n\031DECOMPILE_LOCAL_KIND_TEMP\020\003*\254\003" +
+      "\n\022DecompileTokenKind\022$\n DECOMPILE_TOKEN_" +
+      "KIND_UNSPECIFIED\020\000\022 \n\034DECOMPILE_TOKEN_KI" +
+      "ND_KEYWORD\020\001\022 \n\034DECOMPILE_TOKEN_KIND_COM" +
+      "MENT\020\002\022\035\n\031DECOMPILE_TOKEN_KIND_TYPE\020\003\022!\n" +
+      "\035DECOMPILE_TOKEN_KIND_FUNCTION\020\004\022!\n\035DECO" +
+      "MPILE_TOKEN_KIND_VARIABLE\020\005\022\036\n\032DECOMPILE" +
+      "_TOKEN_KIND_CONST\020\006\022\"\n\036DECOMPILE_TOKEN_K" +
+      "IND_PARAMETER\020\007\022\037\n\033DECOMPILE_TOKEN_KIND_" +
+      "GLOBAL\020\010\022 \n\034DECOMPILE_TOKEN_KIND_DEFAULT" +
+      "\020\t\022\036\n\032DECOMPILE_TOKEN_KIND_ERROR\020\n\022 \n\034DE" +
+      "COMPILE_TOKEN_KIND_SPECIAL\020\013*@\n\rPcodeMat" +
+      "urity\022\027\n\023PCODE_MATURITY_HIGH\020\000\022\026\n\022PCODE_" +
+      "MATURITY_RAW\020\0012\233\002\n\021DecompilerService\022^\n\021" +
+      "DecompileFunction\022#.libghidra.DecompileF" +
+      "unctionRequest\032$.libghidra.DecompileFunc" +
+      "tionResponse\022a\n\022ListDecompilations\022$.lib" +
+      "ghidra.ListDecompilationsRequest\032%.libgh" +
+      "idra.ListDecompilationsResponse\022C\n\010GetPc" +
+      "ode\022\032.libghidra.GetPcodeRequest\032\033.libghi" +
+      "dra.GetPcodeResponseB\036\n\tlibghidraB\017Decom" +
+      "pilerProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -164,6 +207,36 @@ public final class DecompilerProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListDecompilationsResponse_descriptor,
         new java.lang.String[] { "Decompilations", });
+    internal_static_libghidra_VarnodeRecord_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_libghidra_VarnodeRecord_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_VarnodeRecord_descriptor,
+        new java.lang.String[] { "Space", "Offset", "Size", "Kind", });
+    internal_static_libghidra_PcodeOpRecord_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_libghidra_PcodeOpRecord_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_PcodeOpRecord_descriptor,
+        new java.lang.String[] { "Seq", "Op", "Addr", "Output", "Inputs", "HasAddress", });
+    internal_static_libghidra_PcodeRecord_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_libghidra_PcodeRecord_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_PcodeRecord_descriptor,
+        new java.lang.String[] { "FunctionEntryAddress", "Ops", "Completed", "ErrorMessage", "Maturity", });
+    internal_static_libghidra_GetPcodeRequest_descriptor =
+      getDescriptor().getMessageTypes().get(10);
+    internal_static_libghidra_GetPcodeRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_GetPcodeRequest_descriptor,
+        new java.lang.String[] { "Address", "TimeoutMs", "Maturity", });
+    internal_static_libghidra_GetPcodeResponse_descriptor =
+      getDescriptor().getMessageTypes().get(11);
+    internal_static_libghidra_GetPcodeResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_GetPcodeResponse_descriptor,
+        new java.lang.String[] { "Pcode", });
     descriptor.resolveAllFeaturesImmutable();
     libghidra.CommonProto.getDescriptor();
   }

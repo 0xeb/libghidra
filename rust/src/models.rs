@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 // Enums
 
@@ -158,6 +157,11 @@ pub struct OpenProgramResponse {
     pub language_id: String,
     pub compiler_spec: String,
     pub image_base: u64,
+    pub md5: String,
+    pub sha256: String,
+    pub executable_format: String,
+    pub entry_point: u64,
+    pub has_entry_point: bool,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -232,6 +236,53 @@ pub struct ListMemoryBlocksResponse {
     pub blocks: Vec<MemoryBlockRecord>,
 }
 
+/// Spec for creating a new memory block (the writable memory map). Mirrors the
+/// C++ `CreateMemoryBlockSpec`; `Default` yields a readable+writable,
+/// non-executable, uninitialized, non-overlay block.
+#[derive(Debug, Clone)]
+pub struct CreateMemoryBlockSpec {
+    pub name: String,
+    pub start_address: u64,
+    pub size: u64,
+    pub is_read: bool,
+    pub is_write: bool,
+    pub is_execute: bool,
+    pub initialized: bool,
+    pub overlay: bool,
+}
+
+impl Default for CreateMemoryBlockSpec {
+    fn default() -> Self {
+        Self {
+            name: String::new(),
+            start_address: 0,
+            size: 0,
+            is_read: true,
+            is_write: true,
+            is_execute: false,
+            initialized: false,
+            overlay: false,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CreateMemoryBlockResponse {
+    pub created: bool,
+    pub block: Option<MemoryBlockRecord>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct RemoveMemoryBlockResponse {
+    pub removed: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct MoveMemoryBlockResponse {
+    pub moved: bool,
+    pub block: Option<MemoryBlockRecord>,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct FunctionRecord {
     pub entry_address: u64,
@@ -300,6 +351,7 @@ pub struct SymbolRecord {
     pub is_primary: bool,
     pub is_external: bool,
     pub is_dynamic: bool,
+    pub is_external_entry_point: bool,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -341,6 +393,51 @@ pub struct XrefRecord {
 #[derive(Debug, Clone, Default)]
 pub struct ListXrefsResponse {
     pub xrefs: Vec<XrefRecord>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct StackVariableRecord {
+    pub var_id: String,
+    pub name: String,
+    pub data_type: String,
+    pub stack_offset: i64,
+    pub size: u32,
+    pub is_parameter: bool,
+    pub first_use_offset: i32,
+    pub source_type: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FunctionFrameRecord {
+    pub function_entry: u64,
+    pub frame_size: i64,
+    pub local_size: i64,
+    pub parameter_size: i64,
+    pub parameter_offset: i64,
+    pub return_address_offset: i64,
+    pub grows_negative: bool,
+    pub stack_pointer_register: String,
+    pub stack_variables: Vec<StackVariableRecord>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct PerfBenchmarkRecord {
+    pub bench_id: String,
+    pub query_family: String,
+    pub dataset_profile: String,
+    pub cold_ms_p50: f64,
+    pub cold_ms_p95: f64,
+    pub warm_ms_p50: f64,
+    pub warm_ms_p95: f64,
+    pub throughput_qps: f64,
+    pub regression_pct: f64,
+    pub status: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ClearPerfBenchmarksResponse {
+    pub cleared: bool,
+    pub removed_count: u32,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -594,6 +691,16 @@ pub struct SetTypeMemberTypeResponse {
 }
 
 #[derive(Debug, Clone, Default)]
+pub struct SetTypeMemberCommentResponse {
+    pub updated: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SetTypeEnumMemberCommentResponse {
+    pub updated: bool,
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct DecompileLocalRecord {
     pub local_id: String,
     pub kind: DecompileLocalKind,
@@ -635,6 +742,57 @@ pub struct GetDecompilationResponse {
 #[derive(Debug, Clone, Default)]
 pub struct ListDecompilationsResponse {
     pub decompilations: Vec<DecompilationRecord>,
+}
+
+/// A single P-code varnode (operand). `kind` is the canonical operand kind:
+/// `reg` / `imm` / `mem` / `result` / `var`.
+#[derive(Debug, Clone, Default)]
+pub struct VarnodeRecord {
+    pub space: String,
+    pub offset: u64,
+    pub size: u32,
+    pub kind: String,
+}
+
+/// A single high P-code (SSA) op. `op` is the canonical P-code mnemonic
+/// (COPY, INT_ADD, LOAD, CALL, MULTIEQUAL, ...). `has_address` distinguishes a
+/// real address zero from an op with no source address. `has_output` is false
+/// when the op defines no varnode (RETURN, STORE, ...), in which case `output`
+/// is default.
+#[derive(Debug, Clone, Default)]
+pub struct PcodeOpRecord {
+    pub seq: u64,
+    pub op: String,
+    pub addr: u64,
+    pub has_address: bool,
+    pub has_output: bool,
+    pub output: VarnodeRecord,
+    pub inputs: Vec<VarnodeRecord>,
+}
+
+/// P-code maturity rung: `High` (refined SSA, `getPcodeOps`) or `Raw`
+/// (per-instruction, non-SSA, `getPcode`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum PcodeMaturity {
+    #[default]
+    High,
+    Raw,
+}
+
+/// A function's P-code op stream (the Ghidra leg of the cross-tool low-IR).
+#[derive(Debug, Clone, Default)]
+pub struct PcodeRecord {
+    pub function_entry_address: u64,
+    pub ops: Vec<PcodeOpRecord>,
+    pub completed: bool,
+    pub error_message: String,
+    /// The rung actually produced (echoed by the host).
+    pub maturity: PcodeMaturity,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct GetPcodeResponse {
+    pub pcode: Option<PcodeRecord>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -717,6 +875,21 @@ pub struct GetInstructionResponse {
 #[derive(Debug, Clone, Default)]
 pub struct ListInstructionsResponse {
     pub instructions: Vec<InstructionRecord>,
+}
+
+/// One decoded operand of an instruction (the operand leg of the low-IR).
+#[derive(Debug, Clone, Default)]
+pub struct InstructionOperandRecord {
+    pub address: u64,
+    pub operand_index: u32,
+    pub text: String,
+    pub type_name: String,
+    pub ref_type: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ListInstructionOperandsResponse {
+    pub operands: Vec<InstructionOperandRecord>,
 }
 
 #[derive(Debug, Clone, Default)]

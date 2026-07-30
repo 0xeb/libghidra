@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import java.util.ArrayList;
@@ -63,12 +69,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.ListInstructionsResponse listInstructions(
 			ListingContract.ListInstructionsRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new ListingContract.ListInstructionsResponse(List.of());
-			}
+			Program program = requireProgram();
 			try {
-				long defaultStart = program.getMinAddress().getOffset();
+				long defaultStart = programMinOffset(program);
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
 				long endOffset = request != null ? request.rangeEnd() : -1L;
 				if (startOffset == 0) {
@@ -91,6 +94,8 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					if (Long.compareUnsigned(address, startOffset) < 0) {
 						continue;
 					}
+					// Inclusive end, consistent with the rest of this handler and the
+					// C++ client's [addr, addr] point-query convention.
 					if (Long.compareUnsigned(address, endOffset) > 0) {
 						break;
 					}
@@ -111,14 +116,64 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	}
 
 	@Override
+	public ListingContract.ListInstructionOperandsResponse listInstructionOperands(
+			ListingContract.ListInstructionOperandsRequest request) {
+		try (LockScope ignored = readLock()) {
+			Program program = requireProgram();
+			try {
+				long defaultStart = programMinOffset(program);
+				long startOffset = request != null ? request.rangeStart() : defaultStart;
+				long endOffset = request != null ? request.rangeEnd() : -1L;
+				if (startOffset == 0) {
+					startOffset = defaultStart;
+				}
+				if (Long.compareUnsigned(endOffset, startOffset) < 0) {
+					return new ListingContract.ListInstructionOperandsResponse(List.of());
+				}
+
+				int offset = request != null ? Math.max(0, request.offset()) : 0;
+				int limit = request != null && request.limit() > 0 ? request.limit() : 4096;
+
+				Address start = toAddress(program, startOffset);
+				InstructionIterator it = program.getListing().getInstructions(start, true);
+				List<ListingContract.InstructionOperandRecord> rows = new ArrayList<>();
+				int seen = 0;
+				outer:
+				while (it.hasNext()) {
+					Instruction instruction = it.next();
+					long address = instruction.getAddress().getOffset();
+					if (Long.compareUnsigned(address, startOffset) < 0) {
+						continue;
+					}
+					// Inclusive end, matching listInstructions / the C++ [addr, addr] point query.
+					if (Long.compareUnsigned(address, endOffset) > 0) {
+						break;
+					}
+					int numOperands = instruction.getNumOperands();
+					for (int i = 0; i < numOperands; i++) {
+						if (seen++ < offset) {
+							continue;
+						}
+						rows.add(RuntimeMappers.toInstructionOperandRecord(instruction, i));
+						if (rows.size() >= limit) {
+							break outer;
+						}
+					}
+				}
+				return new ListingContract.ListInstructionOperandsResponse(rows);
+			}
+			catch (IllegalArgumentException e) {
+				return new ListingContract.ListInstructionOperandsResponse(List.of());
+			}
+		}
+	}
+
+	@Override
 	public ListingContract.GetCommentsResponse getComments(ListingContract.GetCommentsRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new ListingContract.GetCommentsResponse(List.of());
-			}
+			Program program = requireProgram();
 			try {
-				long defaultStart = program.getMinAddress().getOffset();
+				long defaultStart = programMinOffset(program);
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
 				long endOffset = request != null ? request.rangeEnd() : -1L;
 				if (startOffset == 0) {
@@ -132,7 +187,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 
 				// Fast path: exact-address query (start == end, both nonzero).
 				// O(1) lookup instead of range iteration — prevents lock convoy.
-				if (startOffset > 0 && startOffset == endOffset) {
+				// Unsigned compare so a top-bit-set address (negative when signed)
+				// still takes the O(1) fast path, like the rest of this method.
+				if (Long.compareUnsigned(startOffset, 0) > 0 && startOffset == endOffset) {
 					Address addr = toAddress(program, startOffset);
 					CodeUnit codeUnit = listing.getCodeUnitAt(addr);
 					if (codeUnit == null) {
@@ -371,12 +428,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.ListDataItemsResponse listDataItems(
 			ListingContract.ListDataItemsRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new ListingContract.ListDataItemsResponse(List.of());
-			}
+			Program program = requireProgram();
 			try {
-				long defaultStart = program.getMinAddress().getOffset();
+				long defaultStart = programMinOffset(program);
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
 				long endOffset = request != null ? request.rangeEnd() : -1L;
 				if (startOffset == 0) {
@@ -399,6 +453,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					}
 					Address address = data.getAddress();
 					long addressOffset = address.getOffset();
+					// Inclusive [start, end] to match the C++ client's point-query
+					// convention [addr, addr] (read_data_items_at) — an exclusive end
+					// dropped the exact address.
 					if (Long.compareUnsigned(addressOffset, startOffset) < 0 || Long.compareUnsigned(addressOffset, endOffset) > 0) {
 						continue;
 					}
@@ -438,12 +495,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.ListBookmarksResponse listBookmarks(
 			ListingContract.ListBookmarksRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new ListingContract.ListBookmarksResponse(List.of());
-			}
+			Program program = requireProgram();
 			try {
-				long defaultStart = program.getMinAddress().getOffset();
+				long defaultStart = programMinOffset(program);
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
 				long endOffset = request != null ? request.rangeEnd() : -1L;
 				if (startOffset == 0) {
@@ -471,6 +525,11 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 						continue;
 					}
 					long address = bookmark.getAddress().getOffset();
+					// Inclusive [start, end]: the C++ client issues point queries as
+					// [addr, addr] (read_bookmarks_at / find_bookmark) and full scans as
+					// [0, MAX]. An exclusive end (address >= endOffset) dropped the exact
+					// address on a point query, so every filtered bookmark read and every
+					// set_bookmark_* find-existing came back empty.
 					if (Long.compareUnsigned(address, startOffset) < 0 || Long.compareUnsigned(address, endOffset) > 0) {
 						continue;
 					}
@@ -509,7 +568,10 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			}
 			String type = request.type() != null ? request.type().trim() : "";
 			String category = request.category() != null ? request.category().trim() : "";
-			if (type.isEmpty() || category.isEmpty()) {
+			// Only `type` is required. An empty `category` is valid in native Ghidra
+			// (BookmarkManager.setBookmark accepts an empty category sub-label), so do
+			// not reject it here.
+			if (type.isEmpty()) {
 				return new ListingContract.AddBookmarkResponse(false);
 			}
 			int tx = program.startTransaction("libghidra add bookmark");
@@ -548,7 +610,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			}
 			String type = request.type() != null ? request.type().trim() : "";
 			String category = request.category() != null ? request.category().trim() : "";
-			if (type.isEmpty() || category.isEmpty()) {
+			// Only `type` is required; an empty `category` is valid (mirrors addBookmark
+			// and native Ghidra's getBookmark, which matches an empty category sub-label).
+			if (type.isEmpty()) {
 				return new ListingContract.DeleteBookmarkResponse(false);
 			}
 			int tx = program.startTransaction("libghidra delete bookmark");
@@ -581,12 +645,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.ListBreakpointsResponse listBreakpoints(
 			ListingContract.ListBreakpointsRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new ListingContract.ListBreakpointsResponse(List.of());
-			}
+			Program program = requireProgram();
 			try {
-				long defaultStart = program.getMinAddress().getOffset();
+				long defaultStart = programMinOffset(program);
 				long startOffset = request != null ? request.rangeStart() : defaultStart;
 				long endOffset = request != null ? request.rangeEnd() : -1L;
 				if (startOffset == 0) {
@@ -611,6 +672,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				for (Bookmark bookmark : BreakpointBookmarkStore.all(manager)) {
 					BreakpointBookmarkStore.BreakpointRecord row =
 						BreakpointBookmarkStore.fromBookmark(bookmark);
+					// Inclusive [start, end] to match the C++ client's point-query
+					// convention [addr, addr] (read_breakpoints_at) — an exclusive end
+					// dropped the exact address.
 					if (Long.compareUnsigned(row.address, startOffset) < 0 || Long.compareUnsigned(row.address, endOffset) > 0) {
 						continue;
 					}
@@ -829,12 +893,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.ListDefinedStringsResponse listDefinedStrings(
 			ListingContract.ListDefinedStringsRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new ListingContract.ListDefinedStringsResponse(List.of());
-			}
+			Program program = requireProgram();
 			try {
-				long defaultStart = program.getMinAddress().getOffset();
+				long defaultStart = programMinOffset(program);
 				long startOff = request != null ? request.rangeStart() : defaultStart;
 				long endOff = request != null ? request.rangeEnd() : -1L;
 				if (startOff == 0) {
@@ -852,6 +913,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					if (Long.compareUnsigned(addr, startOff) < 0) {
 						continue;
 					}
+					// Inclusive end to match the C++ client's point-query convention
+					// [addr, addr] (read_strings_at) — an exclusive end dropped the
+					// exact address. Iteration is ascending, so break past the end.
 					if (Long.compareUnsigned(addr, endOff) > 0) {
 						break;
 					}

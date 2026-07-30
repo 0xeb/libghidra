@@ -1,6 +1,6 @@
 # Rust Client API Reference
 
-Comprehensive reference for the `libghidra-client` Rust crate -- a synchronous HTTP client for Ghidra program databases via the LibGhidraHost RPC layer.
+Comprehensive reference for the `libghidra` Rust crate -- a synchronous HTTP client for Ghidra program databases via the LibGhidraHost RPC layer.
 
 Comprehensive method coverage across 9 service areas, plus auto-pagination helpers.
 
@@ -36,7 +36,7 @@ Add to `Cargo.toml`:
 
 ```toml
 [dependencies]
-libghidra-client = { path = "../libghidra/rust" }
+libghidra = { path = "../libghidra/rust" }
 ```
 
 Requires a running LibGhidraHost instance.
@@ -119,14 +119,60 @@ for c in &caps {
 
 ---
 
-## Session (6 methods)
+## Session (10 methods)
+
+### `fn open_project(&self, request: &OpenProjectRequest) -> Result<OpenProjectResponse>`
+
+```rust
+let resp = client.open_project(&ghidra::OpenProjectRequest {
+    project_path: "C:/ghidra_projects".into(),
+    project_name: "firmware".into(),
+    create: true,
+    ..Default::default()
+})?;
+println!("Project: {} created={}", resp.project_name, resp.created);
+```
+
+### `fn close_project(&self, policy: ShutdownPolicy) -> Result<CloseProjectResponse>`
+
+```rust
+client.close_project(ghidra::ShutdownPolicy::Save)?;
+```
+
+### `fn list_project_files(&self, request: ListProjectFilesRequest) -> Result<ListProjectFilesResponse>`
+
+```rust
+let files = client.list_project_files(ghidra::ListProjectFilesRequest {
+    programs_only: true,
+    ..Default::default()
+})?;
+for file in &files.files {
+    println!("{}", file.path);
+}
+```
+
+### `fn import_program(&self, request: &ImportProgramRequest) -> Result<ImportProgramResponse>`
+
+Import a binary into the active project. This does not automatically make it
+the active program; call `open_program` with the returned project path.
+
+```rust
+let imported = client.import_program(&ghidra::ImportProgramRequest {
+    source_path: "C:/samples/picture_decoder.pe".into(),
+    overwrite: true,
+    analyze: true,
+    ..Default::default()
+})?;
+println!("{}", imported.primary_program_path);
+```
 
 ### `fn open_program(&self, request: &OpenProgramRequest) -> Result<OpenProgramResponse>`
 
 ```rust
-let req = ghidra::OpenRequest {
-    project_path: "/path/to/project".into(),
-    program_path: "binary.exe".into(),
+let req = ghidra::OpenProgramRequest {
+    project_path: "C:/ghidra_projects".into(),
+    project_name: "firmware".into(),
+    program_path: "/picture_decoder.pe".into(),
     analyze: true,
     ..Default::default()
 };
@@ -170,7 +216,7 @@ client.shutdown(ghidra::ShutdownPolicy::Save)?;
 
 ---
 
-## Decompiler (2 methods)
+## Decompiler (3 methods)
 
 ### `fn get_decompilation(&self, address: u64, timeout_ms: u32) -> Result<GetDecompilationResponse>`
 
@@ -190,6 +236,28 @@ if let Some(d) = &resp.decompilation {
 ```rust
 let resp = client.list_decompilations(0, u64::MAX, 50, 0, 60000)?;
 ```
+
+### `fn get_pcode(&self, address: u64, maturity: PcodeMaturity, timeout_ms: u32) -> Result<GetPcodeResponse>`
+
+```rust
+let resp = client.get_pcode(
+    0x140001000,
+    ghidra::models::PcodeMaturity::Raw,
+    30000,
+)?;
+if let Some(pcode) = &resp.pcode {
+    for op in &pcode.ops {
+        println!("{} {} @ {}", op.seq, op.op,
+            if op.has_address { format!("{:#x}", op.addr) } else { "<synthetic>".into() });
+    }
+}
+```
+
+`PcodeRecord` carries `function_entry_address`, `ops`, `completed`,
+`error_message`, and the returned `maturity`. Each `PcodeOpRecord` carries
+`seq`, `op`, `addr`, `has_address`, `has_output`, `output`, and `inputs`.
+`has_address` distinguishes a real source address zero from an op with no
+machine address.
 
 ---
 
@@ -301,7 +369,7 @@ if let Some(s) = &resp.symbol {
 }
 ```
 
-**Returns:** `SymbolRecord { symbol_id, address, name, full_name, r#type, namespace_name, source, is_primary, is_external, is_dynamic }`.
+**Returns:** `SymbolRecord { symbol_id, address, name, full_name, r#type, namespace_name, source, is_primary, is_external, is_dynamic, is_external_entry_point }`.
 
 ### `fn list_symbols(&self, range_start: u64, range_end: u64, limit: i32, offset: i32) -> Result<ListSymbolsResponse>`
 
@@ -457,9 +525,9 @@ client.apply_data_type(0x140010000, "dword")?;
 
 ---
 
-## Listing (20 methods)
+## Listing (21 methods)
 
-### Instructions (2)
+### Instructions (3)
 
 #### `fn get_instruction(&self, address: u64) -> Result<GetInstructionResponse>`
 
@@ -473,6 +541,11 @@ if let Some(i) = &resp.instruction {
 **Returns:** `InstructionRecord { address, mnemonic, operand_text, disassembly, length }`.
 
 #### `fn list_instructions(&self, range_start: u64, range_end: u64, limit: i32, offset: i32) -> Result<ListInstructionsResponse>`
+
+#### `fn list_instruction_operands(&self, range_start: u64, range_end: u64, limit: i32, offset: i32) -> Result<ListInstructionOperandsResponse>`
+
+Returns per-operand records with `address`, `operand_index`, `text`,
+`type_name`, and `ref_type`.
 
 ### Comments (3)
 
@@ -629,7 +702,6 @@ The crate exports short aliases for common types:
 | `TypeEnumMember` | `TypeEnumMemberRecord` |
 | `TypeAlias` | `TypeAliasRecord` |
 | `TypeUnion` | `TypeUnionRecord` |
-| `OpenRequest` | `OpenProgramRequest` |
 | `Client` | `GhidraClient` |
 | `ConnectOptions` | `ClientOptions` |
 

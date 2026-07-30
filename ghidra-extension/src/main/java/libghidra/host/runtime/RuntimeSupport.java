@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.runtime;
 
 import ghidra.program.model.address.Address;
@@ -27,6 +33,32 @@ abstract class RuntimeSupport {
 
 	protected final Program currentProgram() {
 		return state.getCurrentProgram();
+	}
+
+	/**
+	 * Returns the current program, or throws a {@code not_loaded} RPC error when no
+	 * program is open. Data-query handlers use this so a query issued with no open
+	 * program surfaces a clean error to the client (RpcResponse.success=false)
+	 * rather than a silent empty-but-success result — matching the host contract
+	 * "query with no open program -> clean error".
+	 */
+	protected final Program requireProgram() {
+		Program program = state.getCurrentProgram();
+		if (program == null) {
+			throw new SessionRpcException("not_loaded", "no current program");
+		}
+		return program;
+	}
+
+	/**
+	 * The program's minimum address offset, or 0 when the program has no memory
+	 * blocks. A blockless program (freshly created, or with every block removed)
+	 * returns null from {@link Program#getMinAddress()}; handlers use this as a
+	 * default pagination lower bound and must not NPE on that program.
+	 */
+	protected static long programMinOffset(Program program) {
+		var min = program.getMinAddress();
+		return min != null ? min.getOffset() : 0L;
 	}
 
 	protected final String hostMode() {

@@ -1,9 +1,8 @@
 // Copyright (c) 2024-2026 Elias Bachaalany
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 //
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
 
 #include "decompiler_pool.hpp"
 
@@ -66,9 +65,11 @@ DecompilerPool::DecompilerPool(std::size_t pool_size,
 DecompilerPool::~DecompilerPool() = default;
 
 bool DecompilerPool::loadBinary(const std::string& path,
-                                const std::string& arch) {
+                                const std::string& arch,
+                                std::uint64_t base_address,
+                                const std::string& format) {
   for (auto& slot : slots_) {
-    if (!slot.decomp->loadBinary(path, arch)) return false;
+    if (!slot.decomp->loadBinary(path, arch, base_address, format)) return false;
   }
   rebuildAdapters();
   return true;
@@ -152,15 +153,18 @@ std::vector<DecompilationRecord> DecompilerPool::decompileMany(
   if (slots_.size() <= 1) {
     // Single slot — decompile sequentially (no threading overhead)
     for (std::size_t i = 0; i < addresses.size(); i++) {
-      std::string code = slots_[0].decomp->decompileAt(addresses[i]);
+      auto dl = slots_[0].adapter->decompileWithLocals(addresses[i]);
       results[i].function_entry_address = addresses[i];
       if (i < names.size()) results[i].function_name = names[i];
-      if (!code.empty()) {
-        results[i].pseudocode = std::move(code);
+      if (dl.ok) {
+        results[i].pseudocode = std::move(dl.pseudocode);
+        results[i].locals = std::move(dl.locals);
         results[i].completed = true;
       } else {
         results[i].completed = false;
-        results[i].error_message = slots_[0].decomp->getError();
+        // Offline decompile bypasses Decompiler::decompileAt, so its getError()
+        // is stale/empty — carry the accurate reason from the result itself.
+        results[i].error_message = dl.error;
       }
     }
     return results;
@@ -174,16 +178,17 @@ std::vector<DecompilationRecord> DecompilerPool::decompileMany(
   for (std::size_t i = 0; i < addresses.size(); i++) {
     futures.push_back(std::async(std::launch::async, [&, i] {
       auto lease = acquire();
-      std::string code = lease.decomp().decompileAt(addresses[i]);
+      auto dl = lease.adapter().decompileWithLocals(addresses[i]);
 
       results[i].function_entry_address = addresses[i];
       if (i < names.size()) results[i].function_name = names[i];
-      if (!code.empty()) {
-        results[i].pseudocode = std::move(code);
+      if (dl.ok) {
+        results[i].pseudocode = std::move(dl.pseudocode);
+        results[i].locals = std::move(dl.locals);
         results[i].completed = true;
       } else {
         results[i].completed = false;
-        results[i].error_message = lease.decomp().getError();
+        results[i].error_message = dl.error;
       }
     }));
   }
@@ -194,6 +199,104 @@ std::vector<DecompilationRecord> DecompilerPool::decompileMany(
   }
 
   return results;
+}
+
+// Reserve every slot (wait until all idle), run \p apply on each adapter, then
+// release. Serializes the mutation against any concurrent lease/decompile so a
+// batch decompile can never race the scope edit. Returns true only if every
+// slot reports success.
+bool DecompilerPool::applyToAllSlots(
+    const std::function<bool(ArchAdapter&)>& apply) {
+  {
+    std::unique_lock lock(mu_);
+    cv_.wait(lock, [this] {
+      return std::all_of(slots_.begin(), slots_.end(),
+                         [](const Slot& s) { return s.available; });
+    });
+    for (auto& s : slots_) s.available = false;
+  }
+  // RAII: release every slot on ANY exit path -- including an exception thrown
+  // by apply(). Without this, a throwing apply() would leave all slots marked
+  // busy and never signal cv_, permanently wedging acquire()/applyToAllSlots.
+  struct SlotReleaser {
+    DecompilerPool* pool;
+    ~SlotReleaser() {
+      {
+        std::lock_guard lock(pool->mu_);
+        for (auto& s : pool->slots_) s.available = true;
+      }
+      pool->cv_.notify_all();
+    }
+  } releaser{this};
+
+  bool all_ok = true;
+  for (std::size_t i = 0; i < slots_.size(); i++) {
+    bool ok = apply(*slots_[i].adapter);
+    if (!ok) all_ok = false;
+  }
+  return all_ok;
+}
+
+// Decompiler-level sibling of applyToAllSlots: some mutations (function rename,
+// prototype, struct/enum define, global name, byte write) live on the Decompiler
+// rather than on ArchAdapter. Same reserve-all / RAII-release-all semantics, so a
+// throwing apply() can never wedge the pool. Slot 0 (the primary) is applied
+// first, so getError() (which reads slot 0) still reflects a primary failure.
+bool DecompilerPool::applyDecompilerToAllSlots(
+    const std::function<bool(ghidra_standalone::Decompiler&)>& apply) {
+  {
+    std::unique_lock lock(mu_);
+    cv_.wait(lock, [this] {
+      return std::all_of(slots_.begin(), slots_.end(),
+                         [](const Slot& s) { return s.available; });
+    });
+    for (auto& s : slots_) s.available = false;
+  }
+  struct SlotReleaser {
+    DecompilerPool* pool;
+    ~SlotReleaser() {
+      {
+        std::lock_guard lock(pool->mu_);
+        for (auto& s : pool->slots_) s.available = true;
+      }
+      pool->cv_.notify_all();
+    }
+  } releaser{this};
+
+  bool all_ok = true;
+  for (std::size_t i = 0; i < slots_.size(); i++) {
+    bool ok = apply(*slots_[i].decomp);
+    if (!ok) all_ok = false;
+  }
+  return all_ok;
+}
+
+LocalMutationStatus DecompilerPool::applyLocalRenameAllSlots(
+    std::uint64_t func_entry, const std::string& local_id,
+    const std::string& new_name) {
+  LocalMutationStatus result = LocalMutationStatus::kOk;
+  applyToAllSlots([&](ArchAdapter& a) {
+    LocalMutationStatus st = a.applyLocalRename(func_entry, local_id, new_name);
+    if (st != LocalMutationStatus::kOk && result == LocalMutationStatus::kOk) {
+      result = st;
+    }
+    return st == LocalMutationStatus::kOk;
+  });
+  return result;
+}
+
+LocalMutationStatus DecompilerPool::applyLocalRetypeAllSlots(
+    std::uint64_t func_entry, const std::string& local_id,
+    const std::string& new_type) {
+  LocalMutationStatus result = LocalMutationStatus::kOk;
+  applyToAllSlots([&](ArchAdapter& a) {
+    LocalMutationStatus st = a.applyLocalRetype(func_entry, local_id, new_type);
+    if (st != LocalMutationStatus::kOk && result == LocalMutationStatus::kOk) {
+      result = st;
+    }
+    return st == LocalMutationStatus::kOk;
+  });
+  return result;
 }
 
 }  // namespace libghidra::client::detail

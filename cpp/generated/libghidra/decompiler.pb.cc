@@ -26,6 +26,65 @@ namespace _pbi = ::google::protobuf::internal;
 namespace _fl = ::google::protobuf::internal::field_layout;
 namespace libghidra {
 
+inline constexpr VarnodeRecord::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : space_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        kind_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        offset_{::uint64_t{0u}},
+        size_{0u},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR VarnodeRecord::VarnodeRecord(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct VarnodeRecordDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR VarnodeRecordDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~VarnodeRecordDefaultTypeInternal() {}
+  union {
+    VarnodeRecord _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 VarnodeRecordDefaultTypeInternal _VarnodeRecord_default_instance_;
+
+inline constexpr GetPcodeRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : address_{::uint64_t{0u}},
+        timeout_ms_{0u},
+        maturity_{static_cast< ::libghidra::PcodeMaturity >(0)},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR GetPcodeRequest::GetPcodeRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct GetPcodeRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR GetPcodeRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~GetPcodeRequestDefaultTypeInternal() {}
+  union {
+    GetPcodeRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 GetPcodeRequestDefaultTypeInternal _GetPcodeRequest_default_instance_;
+
 inline constexpr DecompileTokenRecord::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : text_(
@@ -129,6 +188,38 @@ struct DecompileFunctionRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DecompileFunctionRequestDefaultTypeInternal _DecompileFunctionRequest_default_instance_;
 
+inline constexpr PcodeOpRecord::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        inputs_{},
+        op_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        output_{nullptr},
+        seq_{::uint64_t{0u}},
+        addr_{::uint64_t{0u}},
+        has_address_{false} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR PcodeOpRecord::PcodeOpRecord(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct PcodeOpRecordDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PcodeOpRecordDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PcodeOpRecordDefaultTypeInternal() {}
+  union {
+    PcodeOpRecord _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PcodeOpRecordDefaultTypeInternal _PcodeOpRecord_default_instance_;
+
 inline constexpr ListDecompilationsRequest::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : _cached_size_{0},
@@ -197,6 +288,37 @@ struct DecompileRecordDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DecompileRecordDefaultTypeInternal _DecompileRecord_default_instance_;
 
+inline constexpr PcodeRecord::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : ops_{},
+        error_message_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        function_entry_address_{::uint64_t{0u}},
+        completed_{false},
+        maturity_{static_cast< ::libghidra::PcodeMaturity >(0)},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR PcodeRecord::PcodeRecord(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct PcodeRecordDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PcodeRecordDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PcodeRecordDefaultTypeInternal() {}
+  union {
+    PcodeRecord _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PcodeRecordDefaultTypeInternal _PcodeRecord_default_instance_;
+
 inline constexpr ListDecompilationsResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : decompilations_{},
@@ -246,8 +368,33 @@ struct DecompileFunctionResponseDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DecompileFunctionResponseDefaultTypeInternal _DecompileFunctionResponse_default_instance_;
+
+inline constexpr GetPcodeResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        pcode_{nullptr} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR GetPcodeResponse::GetPcodeResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct GetPcodeResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR GetPcodeResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~GetPcodeResponseDefaultTypeInternal() {}
+  union {
+    GetPcodeResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 GetPcodeResponseDefaultTypeInternal _GetPcodeResponse_default_instance_;
 }  // namespace libghidra
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_libghidra_2fdecompiler_2eproto[2];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_libghidra_2fdecompiler_2eproto[3];
 static constexpr const ::_pb::ServiceDescriptor**
     file_level_service_descriptors_libghidra_2fdecompiler_2eproto = nullptr;
 const ::uint32_t
@@ -342,6 +489,72 @@ const ::uint32_t
         ~0u,  // no _split_
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::ListDecompilationsResponse, _impl_.decompilations_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::VarnodeRecord, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::VarnodeRecord, _impl_.space_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::VarnodeRecord, _impl_.offset_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::VarnodeRecord, _impl_.size_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::VarnodeRecord, _impl_.kind_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeOpRecord, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeOpRecord, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeOpRecord, _impl_.seq_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeOpRecord, _impl_.op_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeOpRecord, _impl_.addr_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeOpRecord, _impl_.output_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeOpRecord, _impl_.inputs_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeOpRecord, _impl_.has_address_),
+        ~0u,
+        ~0u,
+        ~0u,
+        0,
+        ~0u,
+        ~0u,
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeRecord, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeRecord, _impl_.function_entry_address_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeRecord, _impl_.ops_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeRecord, _impl_.completed_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeRecord, _impl_.error_message_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::PcodeRecord, _impl_.maturity_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::GetPcodeRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::GetPcodeRequest, _impl_.address_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::GetPcodeRequest, _impl_.timeout_ms_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::GetPcodeRequest, _impl_.maturity_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::GetPcodeResponse, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::GetPcodeResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::GetPcodeResponse, _impl_.pcode_),
+        0,
 };
 
 static const ::_pbi::MigrationSchema
@@ -353,6 +566,11 @@ static const ::_pbi::MigrationSchema
         {56, 65, -1, sizeof(::libghidra::DecompileFunctionResponse)},
         {66, 77, -1, sizeof(::libghidra::ListDecompilationsRequest)},
         {80, -1, -1, sizeof(::libghidra::ListDecompilationsResponse)},
+        {89, -1, -1, sizeof(::libghidra::VarnodeRecord)},
+        {101, 115, -1, sizeof(::libghidra::PcodeOpRecord)},
+        {121, -1, -1, sizeof(::libghidra::PcodeRecord)},
+        {134, -1, -1, sizeof(::libghidra::GetPcodeRequest)},
+        {145, 154, -1, sizeof(::libghidra::GetPcodeResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_DecompileLocalRecord_default_instance_._instance,
@@ -362,6 +580,11 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_DecompileFunctionResponse_default_instance_._instance,
     &::libghidra::_ListDecompilationsRequest_default_instance_._instance,
     &::libghidra::_ListDecompilationsResponse_default_instance_._instance,
+    &::libghidra::_VarnodeRecord_default_instance_._instance,
+    &::libghidra::_PcodeOpRecord_default_instance_._instance,
+    &::libghidra::_PcodeRecord_default_instance_._instance,
+    &::libghidra::_GetPcodeRequest_default_instance_._instance,
+    &::libghidra::_GetPcodeResponse_default_instance_._instance,
 };
 const char descriptor_table_protodef_libghidra_2fdecompiler_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
@@ -390,28 +613,46 @@ const char descriptor_table_protodef_libghidra_2fdecompiler_2eproto[] ABSL_ATTRI
     "AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra.P"
     "agination\022\022\n\ntimeout_ms\030\004 \001(\r\"P\n\032ListDec"
     "ompilationsResponse\0222\n\016decompilations\030\001 "
-    "\003(\0132\032.libghidra.DecompileRecord*\231\001\n\022Deco"
-    "mpileLocalKind\022$\n DECOMPILE_LOCAL_KIND_U"
-    "NSPECIFIED\020\000\022\036\n\032DECOMPILE_LOCAL_KIND_PAR"
-    "AM\020\001\022\036\n\032DECOMPILE_LOCAL_KIND_LOCAL\020\002\022\035\n\031"
-    "DECOMPILE_LOCAL_KIND_TEMP\020\003*\254\003\n\022Decompil"
-    "eTokenKind\022$\n DECOMPILE_TOKEN_KIND_UNSPE"
-    "CIFIED\020\000\022 \n\034DECOMPILE_TOKEN_KIND_KEYWORD"
-    "\020\001\022 \n\034DECOMPILE_TOKEN_KIND_COMMENT\020\002\022\035\n\031"
-    "DECOMPILE_TOKEN_KIND_TYPE\020\003\022!\n\035DECOMPILE"
-    "_TOKEN_KIND_FUNCTION\020\004\022!\n\035DECOMPILE_TOKE"
-    "N_KIND_VARIABLE\020\005\022\036\n\032DECOMPILE_TOKEN_KIN"
-    "D_CONST\020\006\022\"\n\036DECOMPILE_TOKEN_KIND_PARAME"
-    "TER\020\007\022\037\n\033DECOMPILE_TOKEN_KIND_GLOBAL\020\010\022 "
-    "\n\034DECOMPILE_TOKEN_KIND_DEFAULT\020\t\022\036\n\032DECO"
-    "MPILE_TOKEN_KIND_ERROR\020\n\022 \n\034DECOMPILE_TO"
-    "KEN_KIND_SPECIAL\020\0132\326\001\n\021DecompilerService"
-    "\022^\n\021DecompileFunction\022#.libghidra.Decomp"
-    "ileFunctionRequest\032$.libghidra.Decompile"
-    "FunctionResponse\022a\n\022ListDecompilations\022$"
-    ".libghidra.ListDecompilationsRequest\032%.l"
-    "ibghidra.ListDecompilationsResponseB\036\n\tl"
-    "ibghidraB\017DecompilerProtoP\001b\006proto3"
+    "\003(\0132\032.libghidra.DecompileRecord\"J\n\rVarno"
+    "deRecord\022\r\n\005space\030\001 \001(\t\022\016\n\006offset\030\002 \001(\004\022"
+    "\014\n\004size\030\003 \001(\r\022\014\n\004kind\030\004 \001(\t\"\237\001\n\rPcodeOpR"
+    "ecord\022\013\n\003seq\030\001 \001(\004\022\n\n\002op\030\002 \001(\t\022\014\n\004addr\030\003"
+    " \001(\004\022(\n\006output\030\004 \001(\0132\030.libghidra.Varnode"
+    "Record\022(\n\006inputs\030\005 \003(\0132\030.libghidra.Varno"
+    "deRecord\022\023\n\013has_address\030\006 \001(\010\"\252\001\n\013PcodeR"
+    "ecord\022\036\n\026function_entry_address\030\001 \001(\004\022%\n"
+    "\003ops\030\002 \003(\0132\030.libghidra.PcodeOpRecord\022\021\n\t"
+    "completed\030\003 \001(\010\022\025\n\rerror_message\030\004 \001(\t\022*"
+    "\n\010maturity\030\005 \001(\0162\030.libghidra.PcodeMaturi"
+    "ty\"b\n\017GetPcodeRequest\022\017\n\007address\030\002 \001(\004\022\022"
+    "\n\ntimeout_ms\030\003 \001(\r\022*\n\010maturity\030\004 \001(\0162\030.l"
+    "ibghidra.PcodeMaturity\"9\n\020GetPcodeRespon"
+    "se\022%\n\005pcode\030\001 \001(\0132\026.libghidra.PcodeRecor"
+    "d*\231\001\n\022DecompileLocalKind\022$\n DECOMPILE_LO"
+    "CAL_KIND_UNSPECIFIED\020\000\022\036\n\032DECOMPILE_LOCA"
+    "L_KIND_PARAM\020\001\022\036\n\032DECOMPILE_LOCAL_KIND_L"
+    "OCAL\020\002\022\035\n\031DECOMPILE_LOCAL_KIND_TEMP\020\003*\254\003"
+    "\n\022DecompileTokenKind\022$\n DECOMPILE_TOKEN_"
+    "KIND_UNSPECIFIED\020\000\022 \n\034DECOMPILE_TOKEN_KI"
+    "ND_KEYWORD\020\001\022 \n\034DECOMPILE_TOKEN_KIND_COM"
+    "MENT\020\002\022\035\n\031DECOMPILE_TOKEN_KIND_TYPE\020\003\022!\n"
+    "\035DECOMPILE_TOKEN_KIND_FUNCTION\020\004\022!\n\035DECO"
+    "MPILE_TOKEN_KIND_VARIABLE\020\005\022\036\n\032DECOMPILE"
+    "_TOKEN_KIND_CONST\020\006\022\"\n\036DECOMPILE_TOKEN_K"
+    "IND_PARAMETER\020\007\022\037\n\033DECOMPILE_TOKEN_KIND_"
+    "GLOBAL\020\010\022 \n\034DECOMPILE_TOKEN_KIND_DEFAULT"
+    "\020\t\022\036\n\032DECOMPILE_TOKEN_KIND_ERROR\020\n\022 \n\034DE"
+    "COMPILE_TOKEN_KIND_SPECIAL\020\013*@\n\rPcodeMat"
+    "urity\022\027\n\023PCODE_MATURITY_HIGH\020\000\022\026\n\022PCODE_"
+    "MATURITY_RAW\020\0012\233\002\n\021DecompilerService\022^\n\021"
+    "DecompileFunction\022#.libghidra.DecompileF"
+    "unctionRequest\032$.libghidra.DecompileFunc"
+    "tionResponse\022a\n\022ListDecompilations\022$.lib"
+    "ghidra.ListDecompilationsRequest\032%.libgh"
+    "idra.ListDecompilationsResponse\022C\n\010GetPc"
+    "ode\022\032.libghidra.GetPcodeRequest\032\033.libghi"
+    "dra.GetPcodeResponseB\036\n\tlibghidraB\017Decom"
+    "pilerProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2fdecompiler_2eproto_deps[1] =
     {
@@ -421,13 +662,13 @@ static ::absl::once_flag descriptor_table_libghidra_2fdecompiler_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fdecompiler_2eproto = {
     false,
     false,
-    1875,
+    2580,
     descriptor_table_protodef_libghidra_2fdecompiler_2eproto,
     "libghidra/decompiler.proto",
     &descriptor_table_libghidra_2fdecompiler_2eproto_once,
     descriptor_table_libghidra_2fdecompiler_2eproto_deps,
     1,
-    7,
+    12,
     schemas,
     file_default_instances,
     TableStruct_libghidra_2fdecompiler_2eproto::offsets,
@@ -452,6 +693,15 @@ PROTOBUF_CONSTINIT const uint32_t DecompileTokenKind_internal_data_[] = {
     786432u, 0u, };
 bool DecompileTokenKind_IsValid(int value) {
   return 0 <= value && value <= 11;
+}
+const ::google::protobuf::EnumDescriptor* PcodeMaturity_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&descriptor_table_libghidra_2fdecompiler_2eproto);
+  return file_level_enum_descriptors_libghidra_2fdecompiler_2eproto[2];
+}
+PROTOBUF_CONSTINIT const uint32_t PcodeMaturity_internal_data_[] = {
+    131072u, 0u, };
+bool PcodeMaturity_IsValid(int value) {
+  return 0 <= value && value <= 1;
 }
 // ===================================================================
 
@@ -2790,6 +3040,1622 @@ void ListDecompilationsResponse::InternalSwap(ListDecompilationsResponse* PROTOB
 }
 
 ::google::protobuf::Metadata ListDecompilationsResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class VarnodeRecord::_Internal {
+ public:
+};
+
+VarnodeRecord::VarnodeRecord(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.VarnodeRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE VarnodeRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::VarnodeRecord& from_msg)
+      : space_(arena, from.space_),
+        kind_(arena, from.kind_),
+        _cached_size_{0} {}
+
+VarnodeRecord::VarnodeRecord(
+    ::google::protobuf::Arena* arena,
+    const VarnodeRecord& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  VarnodeRecord* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, offset_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, offset_),
+           offsetof(Impl_, size_) -
+               offsetof(Impl_, offset_) +
+               sizeof(Impl_::size_));
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.VarnodeRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE VarnodeRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : space_(arena),
+        kind_(arena),
+        _cached_size_{0} {}
+
+inline void VarnodeRecord::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, offset_),
+           0,
+           offsetof(Impl_, size_) -
+               offsetof(Impl_, offset_) +
+               sizeof(Impl_::size_));
+}
+VarnodeRecord::~VarnodeRecord() {
+  // @@protoc_insertion_point(destructor:libghidra.VarnodeRecord)
+  SharedDtor(*this);
+}
+inline void VarnodeRecord::SharedDtor(MessageLite& self) {
+  VarnodeRecord& this_ = static_cast<VarnodeRecord&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.space_.Destroy();
+  this_._impl_.kind_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* VarnodeRecord::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) VarnodeRecord(arena);
+}
+constexpr auto VarnodeRecord::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(VarnodeRecord),
+                                            alignof(VarnodeRecord));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull VarnodeRecord::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_VarnodeRecord_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &VarnodeRecord::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<VarnodeRecord>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &VarnodeRecord::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<VarnodeRecord>(), &VarnodeRecord::ByteSizeLong,
+            &VarnodeRecord::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_._cached_size_),
+        false,
+    },
+    &VarnodeRecord::kDescriptorMethods,
+    &descriptor_table_libghidra_2fdecompiler_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* VarnodeRecord::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 4, 0, 41, 2> VarnodeRecord::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    4, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967280,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    4,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::VarnodeRecord>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // string kind = 4;
+    {::_pbi::TcParser::FastUS1,
+     {34, 63, 0, PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.kind_)}},
+    // string space = 1;
+    {::_pbi::TcParser::FastUS1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.space_)}},
+    // uint64 offset = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(VarnodeRecord, _impl_.offset_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.offset_)}},
+    // uint32 size = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(VarnodeRecord, _impl_.size_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.size_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // string space = 1;
+    {PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.space_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // uint64 offset = 2;
+    {PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.offset_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // uint32 size = 3;
+    {PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.size_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // string kind = 4;
+    {PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.kind_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\27\5\0\0\4\0\0\0"
+    "libghidra.VarnodeRecord"
+    "space"
+    "kind"
+  }},
+};
+
+PROTOBUF_NOINLINE void VarnodeRecord::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.VarnodeRecord)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.space_.ClearToEmpty();
+  _impl_.kind_.ClearToEmpty();
+  ::memset(&_impl_.offset_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.size_) -
+      reinterpret_cast<char*>(&_impl_.offset_)) + sizeof(_impl_.size_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* VarnodeRecord::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const VarnodeRecord& this_ = static_cast<const VarnodeRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* VarnodeRecord::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const VarnodeRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.VarnodeRecord)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // string space = 1;
+          if (!this_._internal_space().empty()) {
+            const std::string& _s = this_._internal_space();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.VarnodeRecord.space");
+            target = stream->WriteStringMaybeAliased(1, _s, target);
+          }
+
+          // uint64 offset = 2;
+          if (this_._internal_offset() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                2, this_._internal_offset(), target);
+          }
+
+          // uint32 size = 3;
+          if (this_._internal_size() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                3, this_._internal_size(), target);
+          }
+
+          // string kind = 4;
+          if (!this_._internal_kind().empty()) {
+            const std::string& _s = this_._internal_kind();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.VarnodeRecord.kind");
+            target = stream->WriteStringMaybeAliased(4, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.VarnodeRecord)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t VarnodeRecord::ByteSizeLong(const MessageLite& base) {
+          const VarnodeRecord& this_ = static_cast<const VarnodeRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t VarnodeRecord::ByteSizeLong() const {
+          const VarnodeRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.VarnodeRecord)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string space = 1;
+            if (!this_._internal_space().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_space());
+            }
+            // string kind = 4;
+            if (!this_._internal_kind().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_kind());
+            }
+            // uint64 offset = 2;
+            if (this_._internal_offset() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_offset());
+            }
+            // uint32 size = 3;
+            if (this_._internal_size() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_size());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void VarnodeRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<VarnodeRecord*>(&to_msg);
+  auto& from = static_cast<const VarnodeRecord&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.VarnodeRecord)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_space().empty()) {
+    _this->_internal_set_space(from._internal_space());
+  }
+  if (!from._internal_kind().empty()) {
+    _this->_internal_set_kind(from._internal_kind());
+  }
+  if (from._internal_offset() != 0) {
+    _this->_impl_.offset_ = from._impl_.offset_;
+  }
+  if (from._internal_size() != 0) {
+    _this->_impl_.size_ = from._impl_.size_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void VarnodeRecord::CopyFrom(const VarnodeRecord& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.VarnodeRecord)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void VarnodeRecord::InternalSwap(VarnodeRecord* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.space_, &other->_impl_.space_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.kind_, &other->_impl_.kind_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.size_)
+      + sizeof(VarnodeRecord::_impl_.size_)
+      - PROTOBUF_FIELD_OFFSET(VarnodeRecord, _impl_.offset_)>(
+          reinterpret_cast<char*>(&_impl_.offset_),
+          reinterpret_cast<char*>(&other->_impl_.offset_));
+}
+
+::google::protobuf::Metadata VarnodeRecord::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class PcodeOpRecord::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<PcodeOpRecord>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_._has_bits_);
+};
+
+PcodeOpRecord::PcodeOpRecord(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.PcodeOpRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE PcodeOpRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::PcodeOpRecord& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        inputs_{visibility, arena, from.inputs_},
+        op_(arena, from.op_) {}
+
+PcodeOpRecord::PcodeOpRecord(
+    ::google::protobuf::Arena* arena,
+    const PcodeOpRecord& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  PcodeOpRecord* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.output_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::VarnodeRecord>(
+                              arena, *from._impl_.output_)
+                        : nullptr;
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, seq_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, seq_),
+           offsetof(Impl_, has_address_) -
+               offsetof(Impl_, seq_) +
+               sizeof(Impl_::has_address_));
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.PcodeOpRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE PcodeOpRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        inputs_{visibility, arena},
+        op_(arena) {}
+
+inline void PcodeOpRecord::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, output_),
+           0,
+           offsetof(Impl_, has_address_) -
+               offsetof(Impl_, output_) +
+               sizeof(Impl_::has_address_));
+}
+PcodeOpRecord::~PcodeOpRecord() {
+  // @@protoc_insertion_point(destructor:libghidra.PcodeOpRecord)
+  SharedDtor(*this);
+}
+inline void PcodeOpRecord::SharedDtor(MessageLite& self) {
+  PcodeOpRecord& this_ = static_cast<PcodeOpRecord&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.op_.Destroy();
+  delete this_._impl_.output_;
+  this_._impl_.~Impl_();
+}
+
+inline void* PcodeOpRecord::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) PcodeOpRecord(arena);
+}
+constexpr auto PcodeOpRecord::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.inputs_) +
+          decltype(PcodeOpRecord::_impl_.inputs_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::CopyInit(
+        sizeof(PcodeOpRecord), alignof(PcodeOpRecord), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&PcodeOpRecord::PlacementNew_,
+                                 sizeof(PcodeOpRecord),
+                                 alignof(PcodeOpRecord));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull PcodeOpRecord::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_PcodeOpRecord_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &PcodeOpRecord::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<PcodeOpRecord>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &PcodeOpRecord::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<PcodeOpRecord>(), &PcodeOpRecord::ByteSizeLong,
+            &PcodeOpRecord::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_._cached_size_),
+        false,
+    },
+    &PcodeOpRecord::kDescriptorMethods,
+    &descriptor_table_libghidra_2fdecompiler_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* PcodeOpRecord::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 6, 2, 34, 2> PcodeOpRecord::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_._has_bits_),
+    0, // no _extensions_
+    6, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967232,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    6,  // num_field_entries
+    2,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::PcodeOpRecord>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // uint64 seq = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PcodeOpRecord, _impl_.seq_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.seq_)}},
+    // string op = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.op_)}},
+    // uint64 addr = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PcodeOpRecord, _impl_.addr_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.addr_)}},
+    // .libghidra.VarnodeRecord output = 4;
+    {::_pbi::TcParser::FastMtS1,
+     {34, 0, 0, PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.output_)}},
+    // repeated .libghidra.VarnodeRecord inputs = 5;
+    {::_pbi::TcParser::FastMtR1,
+     {42, 63, 1, PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.inputs_)}},
+    // bool has_address = 6;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(PcodeOpRecord, _impl_.has_address_), 63>(),
+     {48, 63, 0, PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.has_address_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint64 seq = 1;
+    {PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.seq_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // string op = 2;
+    {PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.op_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // uint64 addr = 3;
+    {PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.addr_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // .libghidra.VarnodeRecord output = 4;
+    {PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.output_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // repeated .libghidra.VarnodeRecord inputs = 5;
+    {PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.inputs_), -1, 1,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+    // bool has_address = 6;
+    {PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.has_address_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::VarnodeRecord>()},
+    {::_pbi::TcParser::GetTable<::libghidra::VarnodeRecord>()},
+  }}, {{
+    "\27\0\2\0\0\0\0\0"
+    "libghidra.PcodeOpRecord"
+    "op"
+  }},
+};
+
+PROTOBUF_NOINLINE void PcodeOpRecord::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.PcodeOpRecord)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.inputs_.Clear();
+  _impl_.op_.ClearToEmpty();
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(_impl_.output_ != nullptr);
+    _impl_.output_->Clear();
+  }
+  ::memset(&_impl_.seq_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.has_address_) -
+      reinterpret_cast<char*>(&_impl_.seq_)) + sizeof(_impl_.has_address_));
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* PcodeOpRecord::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const PcodeOpRecord& this_ = static_cast<const PcodeOpRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* PcodeOpRecord::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const PcodeOpRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.PcodeOpRecord)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint64 seq = 1;
+          if (this_._internal_seq() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                1, this_._internal_seq(), target);
+          }
+
+          // string op = 2;
+          if (!this_._internal_op().empty()) {
+            const std::string& _s = this_._internal_op();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.PcodeOpRecord.op");
+            target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          // uint64 addr = 3;
+          if (this_._internal_addr() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                3, this_._internal_addr(), target);
+          }
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // .libghidra.VarnodeRecord output = 4;
+          if (cached_has_bits & 0x00000001u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                4, *this_._impl_.output_, this_._impl_.output_->GetCachedSize(), target,
+                stream);
+          }
+
+          // repeated .libghidra.VarnodeRecord inputs = 5;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_inputs_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_inputs().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    5, repfield, repfield.GetCachedSize(),
+                    target, stream);
+          }
+
+          // bool has_address = 6;
+          if (this_._internal_has_address() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                6, this_._internal_has_address(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.PcodeOpRecord)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t PcodeOpRecord::ByteSizeLong(const MessageLite& base) {
+          const PcodeOpRecord& this_ = static_cast<const PcodeOpRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t PcodeOpRecord::ByteSizeLong() const {
+          const PcodeOpRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.PcodeOpRecord)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated .libghidra.VarnodeRecord inputs = 5;
+            {
+              total_size += 1UL * this_._internal_inputs_size();
+              for (const auto& msg : this_._internal_inputs()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+          }
+           {
+            // string op = 2;
+            if (!this_._internal_op().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_op());
+            }
+          }
+           {
+            // .libghidra.VarnodeRecord output = 4;
+            cached_has_bits = this_._impl_._has_bits_[0];
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.output_);
+            }
+          }
+           {
+            // uint64 seq = 1;
+            if (this_._internal_seq() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_seq());
+            }
+            // uint64 addr = 3;
+            if (this_._internal_addr() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_addr());
+            }
+            // bool has_address = 6;
+            if (this_._internal_has_address() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void PcodeOpRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<PcodeOpRecord*>(&to_msg);
+  auto& from = static_cast<const PcodeOpRecord&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.PcodeOpRecord)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_inputs()->MergeFrom(
+      from._internal_inputs());
+  if (!from._internal_op().empty()) {
+    _this->_internal_set_op(from._internal_op());
+  }
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(from._impl_.output_ != nullptr);
+    if (_this->_impl_.output_ == nullptr) {
+      _this->_impl_.output_ =
+          ::google::protobuf::Message::CopyConstruct<::libghidra::VarnodeRecord>(arena, *from._impl_.output_);
+    } else {
+      _this->_impl_.output_->MergeFrom(*from._impl_.output_);
+    }
+  }
+  if (from._internal_seq() != 0) {
+    _this->_impl_.seq_ = from._impl_.seq_;
+  }
+  if (from._internal_addr() != 0) {
+    _this->_impl_.addr_ = from._impl_.addr_;
+  }
+  if (from._internal_has_address() != 0) {
+    _this->_impl_.has_address_ = from._impl_.has_address_;
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void PcodeOpRecord::CopyFrom(const PcodeOpRecord& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.PcodeOpRecord)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void PcodeOpRecord::InternalSwap(PcodeOpRecord* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  _impl_.inputs_.InternalSwap(&other->_impl_.inputs_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.op_, &other->_impl_.op_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.has_address_)
+      + sizeof(PcodeOpRecord::_impl_.has_address_)
+      - PROTOBUF_FIELD_OFFSET(PcodeOpRecord, _impl_.output_)>(
+          reinterpret_cast<char*>(&_impl_.output_),
+          reinterpret_cast<char*>(&other->_impl_.output_));
+}
+
+::google::protobuf::Metadata PcodeOpRecord::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class PcodeRecord::_Internal {
+ public:
+};
+
+PcodeRecord::PcodeRecord(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.PcodeRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE PcodeRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::PcodeRecord& from_msg)
+      : ops_{visibility, arena, from.ops_},
+        error_message_(arena, from.error_message_),
+        _cached_size_{0} {}
+
+PcodeRecord::PcodeRecord(
+    ::google::protobuf::Arena* arena,
+    const PcodeRecord& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  PcodeRecord* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, function_entry_address_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, function_entry_address_),
+           offsetof(Impl_, maturity_) -
+               offsetof(Impl_, function_entry_address_) +
+               sizeof(Impl_::maturity_));
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.PcodeRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE PcodeRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : ops_{visibility, arena},
+        error_message_(arena),
+        _cached_size_{0} {}
+
+inline void PcodeRecord::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, function_entry_address_),
+           0,
+           offsetof(Impl_, maturity_) -
+               offsetof(Impl_, function_entry_address_) +
+               sizeof(Impl_::maturity_));
+}
+PcodeRecord::~PcodeRecord() {
+  // @@protoc_insertion_point(destructor:libghidra.PcodeRecord)
+  SharedDtor(*this);
+}
+inline void PcodeRecord::SharedDtor(MessageLite& self) {
+  PcodeRecord& this_ = static_cast<PcodeRecord&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.error_message_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* PcodeRecord::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) PcodeRecord(arena);
+}
+constexpr auto PcodeRecord::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.ops_) +
+          decltype(PcodeRecord::_impl_.ops_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::CopyInit(
+        sizeof(PcodeRecord), alignof(PcodeRecord), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&PcodeRecord::PlacementNew_,
+                                 sizeof(PcodeRecord),
+                                 alignof(PcodeRecord));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull PcodeRecord::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_PcodeRecord_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &PcodeRecord::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<PcodeRecord>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &PcodeRecord::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<PcodeRecord>(), &PcodeRecord::ByteSizeLong,
+            &PcodeRecord::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_._cached_size_),
+        false,
+    },
+    &PcodeRecord::kDescriptorMethods,
+    &descriptor_table_libghidra_2fdecompiler_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* PcodeRecord::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 5, 1, 43, 2> PcodeRecord::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    5, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967264,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    5,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::PcodeRecord>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // uint64 function_entry_address = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PcodeRecord, _impl_.function_entry_address_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.function_entry_address_)}},
+    // repeated .libghidra.PcodeOpRecord ops = 2;
+    {::_pbi::TcParser::FastMtR1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.ops_)}},
+    // bool completed = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(PcodeRecord, _impl_.completed_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.completed_)}},
+    // string error_message = 4;
+    {::_pbi::TcParser::FastUS1,
+     {34, 63, 0, PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.error_message_)}},
+    // .libghidra.PcodeMaturity maturity = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PcodeRecord, _impl_.maturity_), 63>(),
+     {40, 63, 0, PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.maturity_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint64 function_entry_address = 1;
+    {PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.function_entry_address_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // repeated .libghidra.PcodeOpRecord ops = 2;
+    {PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.ops_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+    // bool completed = 3;
+    {PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.completed_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // string error_message = 4;
+    {PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.error_message_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // .libghidra.PcodeMaturity maturity = 5;
+    {PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.maturity_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kOpenEnum)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::PcodeOpRecord>()},
+  }}, {{
+    "\25\0\0\0\15\0\0\0"
+    "libghidra.PcodeRecord"
+    "error_message"
+  }},
+};
+
+PROTOBUF_NOINLINE void PcodeRecord::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.PcodeRecord)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.ops_.Clear();
+  _impl_.error_message_.ClearToEmpty();
+  ::memset(&_impl_.function_entry_address_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.maturity_) -
+      reinterpret_cast<char*>(&_impl_.function_entry_address_)) + sizeof(_impl_.maturity_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* PcodeRecord::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const PcodeRecord& this_ = static_cast<const PcodeRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* PcodeRecord::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const PcodeRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.PcodeRecord)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint64 function_entry_address = 1;
+          if (this_._internal_function_entry_address() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                1, this_._internal_function_entry_address(), target);
+          }
+
+          // repeated .libghidra.PcodeOpRecord ops = 2;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_ops_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_ops().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    2, repfield, repfield.GetCachedSize(),
+                    target, stream);
+          }
+
+          // bool completed = 3;
+          if (this_._internal_completed() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                3, this_._internal_completed(), target);
+          }
+
+          // string error_message = 4;
+          if (!this_._internal_error_message().empty()) {
+            const std::string& _s = this_._internal_error_message();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.PcodeRecord.error_message");
+            target = stream->WriteStringMaybeAliased(4, _s, target);
+          }
+
+          // .libghidra.PcodeMaturity maturity = 5;
+          if (this_._internal_maturity() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteEnumToArray(
+                5, this_._internal_maturity(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.PcodeRecord)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t PcodeRecord::ByteSizeLong(const MessageLite& base) {
+          const PcodeRecord& this_ = static_cast<const PcodeRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t PcodeRecord::ByteSizeLong() const {
+          const PcodeRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.PcodeRecord)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated .libghidra.PcodeOpRecord ops = 2;
+            {
+              total_size += 1UL * this_._internal_ops_size();
+              for (const auto& msg : this_._internal_ops()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+          }
+           {
+            // string error_message = 4;
+            if (!this_._internal_error_message().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_error_message());
+            }
+            // uint64 function_entry_address = 1;
+            if (this_._internal_function_entry_address() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_function_entry_address());
+            }
+            // bool completed = 3;
+            if (this_._internal_completed() != 0) {
+              total_size += 2;
+            }
+            // .libghidra.PcodeMaturity maturity = 5;
+            if (this_._internal_maturity() != 0) {
+              total_size += 1 +
+                            ::_pbi::WireFormatLite::EnumSize(this_._internal_maturity());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void PcodeRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<PcodeRecord*>(&to_msg);
+  auto& from = static_cast<const PcodeRecord&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.PcodeRecord)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_ops()->MergeFrom(
+      from._internal_ops());
+  if (!from._internal_error_message().empty()) {
+    _this->_internal_set_error_message(from._internal_error_message());
+  }
+  if (from._internal_function_entry_address() != 0) {
+    _this->_impl_.function_entry_address_ = from._impl_.function_entry_address_;
+  }
+  if (from._internal_completed() != 0) {
+    _this->_impl_.completed_ = from._impl_.completed_;
+  }
+  if (from._internal_maturity() != 0) {
+    _this->_impl_.maturity_ = from._impl_.maturity_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void PcodeRecord::CopyFrom(const PcodeRecord& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.PcodeRecord)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void PcodeRecord::InternalSwap(PcodeRecord* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.ops_.InternalSwap(&other->_impl_.ops_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.error_message_, &other->_impl_.error_message_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.maturity_)
+      + sizeof(PcodeRecord::_impl_.maturity_)
+      - PROTOBUF_FIELD_OFFSET(PcodeRecord, _impl_.function_entry_address_)>(
+          reinterpret_cast<char*>(&_impl_.function_entry_address_),
+          reinterpret_cast<char*>(&other->_impl_.function_entry_address_));
+}
+
+::google::protobuf::Metadata PcodeRecord::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class GetPcodeRequest::_Internal {
+ public:
+};
+
+GetPcodeRequest::GetPcodeRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.GetPcodeRequest)
+}
+GetPcodeRequest::GetPcodeRequest(
+    ::google::protobuf::Arena* arena, const GetPcodeRequest& from)
+    : GetPcodeRequest(arena) {
+  MergeFrom(from);
+}
+inline PROTOBUF_NDEBUG_INLINE GetPcodeRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void GetPcodeRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, address_),
+           0,
+           offsetof(Impl_, maturity_) -
+               offsetof(Impl_, address_) +
+               sizeof(Impl_::maturity_));
+}
+GetPcodeRequest::~GetPcodeRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.GetPcodeRequest)
+  SharedDtor(*this);
+}
+inline void GetPcodeRequest::SharedDtor(MessageLite& self) {
+  GetPcodeRequest& this_ = static_cast<GetPcodeRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* GetPcodeRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) GetPcodeRequest(arena);
+}
+constexpr auto GetPcodeRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(GetPcodeRequest),
+                                            alignof(GetPcodeRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull GetPcodeRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_GetPcodeRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &GetPcodeRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<GetPcodeRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &GetPcodeRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<GetPcodeRequest>(), &GetPcodeRequest::ByteSizeLong,
+            &GetPcodeRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(GetPcodeRequest, _impl_._cached_size_),
+        false,
+    },
+    &GetPcodeRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fdecompiler_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* GetPcodeRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 3, 0, 0, 2> GetPcodeRequest::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    4, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967281,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    3,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::GetPcodeRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // .libghidra.PcodeMaturity maturity = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(GetPcodeRequest, _impl_.maturity_), 63>(),
+     {32, 63, 0, PROTOBUF_FIELD_OFFSET(GetPcodeRequest, _impl_.maturity_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    // uint64 address = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(GetPcodeRequest, _impl_.address_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(GetPcodeRequest, _impl_.address_)}},
+    // uint32 timeout_ms = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(GetPcodeRequest, _impl_.timeout_ms_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(GetPcodeRequest, _impl_.timeout_ms_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint64 address = 2;
+    {PROTOBUF_FIELD_OFFSET(GetPcodeRequest, _impl_.address_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // uint32 timeout_ms = 3;
+    {PROTOBUF_FIELD_OFFSET(GetPcodeRequest, _impl_.timeout_ms_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // .libghidra.PcodeMaturity maturity = 4;
+    {PROTOBUF_FIELD_OFFSET(GetPcodeRequest, _impl_.maturity_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kOpenEnum)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+PROTOBUF_NOINLINE void GetPcodeRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.GetPcodeRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&_impl_.address_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.maturity_) -
+      reinterpret_cast<char*>(&_impl_.address_)) + sizeof(_impl_.maturity_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* GetPcodeRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const GetPcodeRequest& this_ = static_cast<const GetPcodeRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* GetPcodeRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const GetPcodeRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.GetPcodeRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint64 address = 2;
+          if (this_._internal_address() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                2, this_._internal_address(), target);
+          }
+
+          // uint32 timeout_ms = 3;
+          if (this_._internal_timeout_ms() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                3, this_._internal_timeout_ms(), target);
+          }
+
+          // .libghidra.PcodeMaturity maturity = 4;
+          if (this_._internal_maturity() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteEnumToArray(
+                4, this_._internal_maturity(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.GetPcodeRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t GetPcodeRequest::ByteSizeLong(const MessageLite& base) {
+          const GetPcodeRequest& this_ = static_cast<const GetPcodeRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t GetPcodeRequest::ByteSizeLong() const {
+          const GetPcodeRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.GetPcodeRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // uint64 address = 2;
+            if (this_._internal_address() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_address());
+            }
+            // uint32 timeout_ms = 3;
+            if (this_._internal_timeout_ms() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_timeout_ms());
+            }
+            // .libghidra.PcodeMaturity maturity = 4;
+            if (this_._internal_maturity() != 0) {
+              total_size += 1 +
+                            ::_pbi::WireFormatLite::EnumSize(this_._internal_maturity());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void GetPcodeRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<GetPcodeRequest*>(&to_msg);
+  auto& from = static_cast<const GetPcodeRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.GetPcodeRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_address() != 0) {
+    _this->_impl_.address_ = from._impl_.address_;
+  }
+  if (from._internal_timeout_ms() != 0) {
+    _this->_impl_.timeout_ms_ = from._impl_.timeout_ms_;
+  }
+  if (from._internal_maturity() != 0) {
+    _this->_impl_.maturity_ = from._impl_.maturity_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void GetPcodeRequest::CopyFrom(const GetPcodeRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.GetPcodeRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void GetPcodeRequest::InternalSwap(GetPcodeRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(GetPcodeRequest, _impl_.maturity_)
+      + sizeof(GetPcodeRequest::_impl_.maturity_)
+      - PROTOBUF_FIELD_OFFSET(GetPcodeRequest, _impl_.address_)>(
+          reinterpret_cast<char*>(&_impl_.address_),
+          reinterpret_cast<char*>(&other->_impl_.address_));
+}
+
+::google::protobuf::Metadata GetPcodeRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class GetPcodeResponse::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<GetPcodeResponse>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(GetPcodeResponse, _impl_._has_bits_);
+};
+
+GetPcodeResponse::GetPcodeResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.GetPcodeResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE GetPcodeResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::GetPcodeResponse& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0} {}
+
+GetPcodeResponse::GetPcodeResponse(
+    ::google::protobuf::Arena* arena,
+    const GetPcodeResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  GetPcodeResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.pcode_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::PcodeRecord>(
+                              arena, *from._impl_.pcode_)
+                        : nullptr;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.GetPcodeResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE GetPcodeResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void GetPcodeResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.pcode_ = {};
+}
+GetPcodeResponse::~GetPcodeResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.GetPcodeResponse)
+  SharedDtor(*this);
+}
+inline void GetPcodeResponse::SharedDtor(MessageLite& self) {
+  GetPcodeResponse& this_ = static_cast<GetPcodeResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  delete this_._impl_.pcode_;
+  this_._impl_.~Impl_();
+}
+
+inline void* GetPcodeResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) GetPcodeResponse(arena);
+}
+constexpr auto GetPcodeResponse::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(GetPcodeResponse),
+                                            alignof(GetPcodeResponse));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull GetPcodeResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_GetPcodeResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &GetPcodeResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<GetPcodeResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &GetPcodeResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<GetPcodeResponse>(), &GetPcodeResponse::ByteSizeLong,
+            &GetPcodeResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(GetPcodeResponse, _impl_._cached_size_),
+        false,
+    },
+    &GetPcodeResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fdecompiler_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* GetPcodeResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 1, 0, 2> GetPcodeResponse::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(GetPcodeResponse, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::GetPcodeResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // .libghidra.PcodeRecord pcode = 1;
+    {::_pbi::TcParser::FastMtS1,
+     {10, 0, 0, PROTOBUF_FIELD_OFFSET(GetPcodeResponse, _impl_.pcode_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // .libghidra.PcodeRecord pcode = 1;
+    {PROTOBUF_FIELD_OFFSET(GetPcodeResponse, _impl_.pcode_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::PcodeRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void GetPcodeResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.GetPcodeResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(_impl_.pcode_ != nullptr);
+    _impl_.pcode_->Clear();
+  }
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* GetPcodeResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const GetPcodeResponse& this_ = static_cast<const GetPcodeResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* GetPcodeResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const GetPcodeResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.GetPcodeResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // .libghidra.PcodeRecord pcode = 1;
+          if (cached_has_bits & 0x00000001u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                1, *this_._impl_.pcode_, this_._impl_.pcode_->GetCachedSize(), target,
+                stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.GetPcodeResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t GetPcodeResponse::ByteSizeLong(const MessageLite& base) {
+          const GetPcodeResponse& this_ = static_cast<const GetPcodeResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t GetPcodeResponse::ByteSizeLong() const {
+          const GetPcodeResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.GetPcodeResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+           {
+            // .libghidra.PcodeRecord pcode = 1;
+            cached_has_bits = this_._impl_._has_bits_[0];
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.pcode_);
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void GetPcodeResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<GetPcodeResponse*>(&to_msg);
+  auto& from = static_cast<const GetPcodeResponse&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.GetPcodeResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(from._impl_.pcode_ != nullptr);
+    if (_this->_impl_.pcode_ == nullptr) {
+      _this->_impl_.pcode_ =
+          ::google::protobuf::Message::CopyConstruct<::libghidra::PcodeRecord>(arena, *from._impl_.pcode_);
+    } else {
+      _this->_impl_.pcode_->MergeFrom(*from._impl_.pcode_);
+    }
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void GetPcodeResponse::CopyFrom(const GetPcodeResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.GetPcodeResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void GetPcodeResponse::InternalSwap(GetPcodeResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  swap(_impl_.pcode_, other->_impl_.pcode_);
+}
+
+::google::protobuf::Metadata GetPcodeResponse::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // @@protoc_insertion_point(namespace_scope)

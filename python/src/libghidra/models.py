@@ -1,9 +1,8 @@
 # Copyright (c) 2024-2026 Elias Bachaalany
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
 #
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# This file is licensed under the Human-Origin Source License v1.0.
+# See LICENSE.
 
 """Typed model classes for the libghidra Python client.
 
@@ -40,6 +39,14 @@ class DecompileLocalKind(IntEnum):
     PARAM = 1
     LOCAL = 2
     TEMP = 3
+
+
+class PcodeMaturity(IntEnum):
+    """P-code maturity rung: HIGH (refined SSA, getPcodeOps) or RAW
+    (per-instruction, non-SSA, getPcode)."""
+
+    HIGH = 0
+    RAW = 1
 
 
 class DecompileTokenKind(IntEnum):
@@ -163,6 +170,11 @@ class OpenProgramResponse:
     language_id: str = ""
     compiler_spec: str = ""
     image_base: int = 0
+    md5: str = ""
+    sha256: str = ""
+    executable_format: str = ""
+    entry_point: int = 0
+    has_entry_point: bool = False
 
 
 @dataclass
@@ -238,6 +250,38 @@ class ListMemoryBlocksResponse:
 
 
 @dataclass
+class CreateMemoryBlockSpec:
+    """Spec for creating a new memory block (the writable memory map). Mirrors the
+    C++/Rust CreateMemoryBlockSpec: a new block is readable+writable,
+    non-executable, uninitialized, non-overlay by default."""
+    name: str = ""
+    start_address: int = 0
+    size: int = 0
+    is_read: bool = True
+    is_write: bool = True
+    is_execute: bool = False
+    initialized: bool = False
+    overlay: bool = False
+
+
+@dataclass
+class CreateMemoryBlockResponse:
+    created: bool = False
+    block: MemoryBlockRecord | None = None
+
+
+@dataclass
+class RemoveMemoryBlockResponse:
+    removed: bool = False
+
+
+@dataclass
+class MoveMemoryBlockResponse:
+    moved: bool = False
+    block: MemoryBlockRecord | None = None
+
+
+@dataclass
 class FunctionRecord:
     entry_address: int = 0
     name: str = ""
@@ -305,6 +349,7 @@ class SymbolRecord:
     is_primary: bool = False
     is_external: bool = False
     is_dynamic: bool = False
+    is_external_entry_point: bool = False
 
 
 @dataclass
@@ -599,6 +644,16 @@ class SetTypeMemberTypeResponse:
 
 
 @dataclass
+class SetTypeMemberCommentResponse:
+    updated: bool = False
+
+
+@dataclass
+class SetTypeEnumMemberCommentResponse:
+    updated: bool = False
+
+
+@dataclass
 class DecompileLocalRecord:
     local_id: str = ""
     kind: DecompileLocalKind = DecompileLocalKind.UNSPECIFIED
@@ -640,6 +695,50 @@ class GetDecompilationResponse:
 @dataclass
 class ListDecompilationsResponse:
     decompilations: list[DecompilationRecord] = field(default_factory=list)
+
+
+@dataclass
+class VarnodeRecord:
+    """A single P-code varnode (operand). `kind` is the canonical operand kind:
+    reg / imm / mem / result / var."""
+
+    space: str = ""
+    offset: int = 0
+    size: int = 0
+    kind: str = ""
+
+
+@dataclass
+class PcodeOpRecord:
+    """A single high P-code (SSA) op. `op` is the canonical P-code mnemonic
+    (COPY, INT_ADD, LOAD, CALL, MULTIEQUAL, ...). `has_address` distinguishes a
+    real address zero from an op with no source address. `has_output` is False
+    when the op defines no varnode, in which case `output` is a default
+    VarnodeRecord."""
+
+    seq: int = 0
+    op: str = ""
+    addr: int = 0
+    has_address: bool = False
+    has_output: bool = False
+    output: VarnodeRecord = field(default_factory=VarnodeRecord)
+    inputs: list[VarnodeRecord] = field(default_factory=list)
+
+
+@dataclass
+class PcodeRecord:
+    """A function's P-code op stream (the Ghidra leg of the cross-tool low-IR)."""
+
+    function_entry_address: int = 0
+    ops: list[PcodeOpRecord] = field(default_factory=list)
+    completed: bool = False
+    error_message: str = ""
+    maturity: PcodeMaturity = PcodeMaturity.HIGH
+
+
+@dataclass
+class GetPcodeResponse:
+    pcode: PcodeRecord | None = None
 
 
 @dataclass
@@ -722,6 +821,22 @@ class GetInstructionResponse:
 @dataclass
 class ListInstructionsResponse:
     instructions: list[InstructionRecord] = field(default_factory=list)
+
+
+@dataclass
+class InstructionOperandRecord:
+    """One decoded operand of an instruction (the operand leg of the low-IR)."""
+
+    address: int = 0
+    operand_index: int = 0
+    text: str = ""
+    type_name: str = ""
+    ref_type: str = ""
+
+
+@dataclass
+class ListInstructionOperandsResponse:
+    operands: list[InstructionOperandRecord] = field(default_factory=list)
 
 
 @dataclass
@@ -906,3 +1021,48 @@ class ParseDeclarationsResponse:
     types_created: int = 0
     type_names: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
+
+
+@dataclass
+class StackVariableRecord:
+    var_id: str = ""
+    name: str = ""
+    data_type: str = ""
+    stack_offset: int = 0
+    size: int = 0
+    is_parameter: bool = False
+    first_use_offset: int = 0
+    source_type: str = ""
+
+
+@dataclass
+class FunctionFrameRecord:
+    function_entry: int = 0
+    frame_size: int = 0
+    local_size: int = 0
+    parameter_size: int = 0
+    parameter_offset: int = 0
+    return_address_offset: int = 0
+    grows_negative: bool = False
+    stack_pointer_register: str = ""
+    stack_variables: list[StackVariableRecord] = field(default_factory=list)
+
+
+@dataclass
+class PerfBenchmarkRecord:
+    bench_id: str = ""
+    query_family: str = ""
+    dataset_profile: str = ""
+    cold_ms_p50: float = 0.0
+    cold_ms_p95: float = 0.0
+    warm_ms_p50: float = 0.0
+    warm_ms_p95: float = 0.0
+    throughput_qps: float = 0.0
+    regression_pct: float = 0.0
+    status: str = ""
+
+
+@dataclass
+class ClearPerfBenchmarksResponse:
+    cleared: bool = False
+    removed_count: int = 0

@@ -44,7 +44,7 @@ and structured annotation writes.
   - if you have the local Ghidra source tree, you can also drive the extension build with `ghidra/gradlew.bat`
 - `protoc` is optional for normal extension builds; pre-generated Java protobuf stubs are included in-tree
 - C++20 compiler (Visual Studio 2022, GCC 12+, or Clang 15+) -- only if using the C++ SDK
-- CMake 3.20+ -- only if using the C++ SDK
+- CMake 3.26+ -- only if using the C++ SDK
 
 ### 1. Install the libghidra host extension
 
@@ -90,40 +90,57 @@ set GHIDRA_GUI_JAVA_OPTIONS=-Dlibghidra.host.bind=127.0.0.1 -Dlibghidra.host.por
 C:\ghidra_dist\ghidra_12.1_DEV\ghidraRun.bat
 ```
 
-**Option B -- Headless (no GUI):**
+**Option B -- Headless project session (no GUI):**
 ```bash
 /path/to/ghidra_dist/support/analyzeHeadless \
-  ./myproject MyProject -import target.exe \
-  -postScript LibGhidraHeadlessServer.java port=18080
+  ./myproject MyProject \
+  -scriptPath /path/to/ghidra_dist/Ghidra/Extensions/LibGhidraHost/ghidra_scripts \
+  -postScript LibGhidraHeadlessServer.java port=18080 shutdown=save
 ```
 
-The headless command must also use the Ghidra distribution root that contains `support/analyzeHeadless`.
+The headless command must also use the Ghidra distribution root that contains
+`support/analyzeHeadless`. In this mode the host starts without importing a
+binary; clients drive project operations explicitly with `import_program`,
+`open_program`, queries, `close_program`, and final shutdown.
 
 ### Project files and active-program switching
 
 A Ghidra project may contain many domain files and many programs, but a
 libghidra host intentionally has one active `Program` at a time. Use the
-project RPCs to list or import project contents, then switch the active program
-with an explicit close/open sequence:
+live/headless project RPCs to list or import project contents, then switch the
+active program with an explicit close/open sequence:
 
 ```python
 import libghidra as ghidra
 
-with ghidra.launch_headless(ghidra.HeadlessOptions(
+with ghidra.launch_headless_project(ghidra.HeadlessProjectOptions(
     ghidra_dir="C:/ghidra_dist/ghidra_12.1_DEV",
     project_dir="C:/work/projects",
     project_name="firmware",
-    binary="C:/samples/loader.elf",
-    binaries=["C:/samples/payload.elf"],
-    initial_program="/loader.elf",
     shutdown="save",
 )) as host:
+    loader = host.import_program(ghidra.ImportProgramRequest(
+        source_path="C:/samples/loader.elf",
+        overwrite=True,
+        analyze=True,
+    ))
+    host.import_program(ghidra.ImportProgramRequest(
+        source_path="C:/samples/payload.elf",
+        overwrite=True,
+        analyze=True,
+    ))
+    host.open_program(ghidra.OpenProgramRequest(
+        project_path="C:/work/projects",
+        project_name="firmware",
+        program_path=loader.primary_program_path,
+    ))
+
     files = host.list_project_files(ghidra.ListProjectFilesRequest(programs_only=True))
     for item in files.files:
         print(item.path)
 
     host.close_program(ghidra.ShutdownPolicy.SAVE)
-    host.open_program(ghidra.OpenRequest(
+    host.open_program(ghidra.OpenProgramRequest(
         project_path="C:/work/projects",
         project_name="firmware",
         program_path="/payload.elf",
@@ -134,6 +151,12 @@ with ghidra.launch_headless(ghidra.HeadlessOptions(
 `/payload.elf` or `/firmware/payload.elf` when `project_path` and
 `project_name` are set. Existing program-scoped APIs such as functions, memory,
 types, decompiler, and comments always read or mutate the active program only.
+Close the host with save enabled to persist the project; a later GUI, Python,
+C++, Rust, or ghidrasql session can reopen the same project and select any saved
+program path. See `python/examples/multi_program_strings.py`,
+`cpp/examples/multi_program_strings.cpp`, and
+`rust/examples/multi_program_strings.rs` for runnable live examples that import
+multiple binaries, count strings, save, and shut down cleanly.
 
 ### 3. Query the API
 
@@ -166,7 +189,7 @@ pip install -e "python[cli]"                # adds pefile/capstone for CLI offli
 pip install -e "python[local]"              # adds local ELF/PE/Mach-O detection helpers
 ```
 
-Building the offline local backend from source additionally needs CMake 3.24+, a C++20 compiler, and a local Ghidra source tree — see [Building the C++ SDK](#building-the-c-sdk).
+Building the offline local backend from source additionally needs CMake 3.26+, a C++20 compiler, and a local Ghidra source tree — see [Building the C++ SDK](#building-the-c-sdk).
 
 Install `libghidra[local]` when using the native local backend from Python.
 `LocalClient` auto-detects ELF, PE, Mach-O, and raw data inputs and passes the
@@ -319,7 +342,9 @@ target_link_libraries(app PRIVATE libghidra::client)
 ```
 
 An install exports `libghidra::client` and `libghidra::local`, plus the generated
-`libghidra/*.h` protobuf headers used by the current public C++ API.
+`libghidra/*.h` protobuf headers used by the current public C++ API. Installed
+consumers must make a compatible Protobuf package exporting
+`protobuf::libprotobuf` discoverable to CMake.
 
 Dependencies (auto-fetched via FetchContent): protobuf v29.3, cpp-httplib v0.16.3.
 
@@ -330,11 +355,11 @@ The local backend embeds Ghidra's Sleigh decompiler engine directly -- no Java, 
 ```cpp
 #include "libghidra/ghidra.hpp"
 
-ghidra::LocalOptions opts;
+ghidra::LocalClientOptions opts;
 opts.pool_size = 4;  // parallel decompilation (default: 1)
 auto client = ghidra::local(opts);
 
-ghidra::OpenRequest req;
+ghidra::OpenProgramRequest req;
 req.program_path = "/path/to/binary.exe";
 req.language_id = "x86:LE:64:default";  // optional; Python LocalClient can auto-detect
 client->OpenProgram(req);
@@ -344,14 +369,14 @@ if (decomp.ok())
     printf("%s\n", decomp.value->decompilation->pseudocode.c_str());
 ```
 
-See [`cpp/examples/`](cpp/examples/) for complete examples covering HTTP, headless, and local backends (memory, disassembly, comments, data items, symbols, types, structs, enums, signatures, CFG, session management, parallel headless analysis, and a complete headless cookbook).
+See [`cpp/examples/`](cpp/examples/) for complete examples covering HTTP, headless, and local backends (memory, disassembly, comments, data items, symbols, types, structs, enums, signatures, CFG, session management, project-file import/switching, multi-program string counting, parallel headless analysis, and a complete headless cookbook).
 
 For the full method-by-method reference, see the [C++ LocalClient API Reference](cpp/README.md).
 
 ## Architecture
 
 ```
-IClient (composite interface, 88 domain methods)
+IClient (composite interface, 90 domain methods)
   |-- HttpClient   --> POST /rpc (protobuf) --> libghidra host (Java, live Ghidra)
   |-- LocalClient  --> standalone C++ decompiler engine (offline, no Java)
 ```
@@ -421,8 +446,18 @@ libghidra/
 
 ## Proto Contracts
 
-Typed RPCs across 9 domain service areas, defined in [`proto/libghidra/`](proto/libghidra/). The current contracts define 88 domain RPCs plus one transport RPC. Transport is binary protobuf over `POST /rpc` (not gRPC). See [proto/README.md](proto/README.md).
+Typed RPCs across 9 domain service areas, defined in [`proto/libghidra/`](proto/libghidra/). The current contracts define 90 domain RPCs plus one transport RPC. Transport is binary protobuf over `POST /rpc` (not gRPC). See [proto/README.md](proto/README.md).
 
-## License
+## License and Terms of Use
 
-This project is licensed under the [Mozilla Public License 2.0](LICENSE).
+In short: you may read, build, evaluate, benchmark, package, and use unmodified libghidra, including commercially, if you preserve notices and follow the license terms. You may fork or patch it to prepare bug fixes, optimizations, features, tests, or documentation improvements for contribution back within the license's contribution-purpose rules.
+
+You may not maintain a divergent private fork, port, rebrand, clone, API-compatible replacement, competing implementation, or use libghidra as AI input to recreate or improve a derivative implementation without prior written permission from Elias Bachaalany. Independent implementations that are not copied from, materially derived from, or substantially informed by libghidra in the license's defined sense are not prohibited.
+
+Permission requests: open a GitHub issue at [0xeb/libghidra/issues](https://github.com/0xeb/libghidra/issues).
+
+If libghidra materially informs a distributed project, preserve the human origin: credit libghidra and Elias Bachaalany visibly in your README/docs and in About/credits UI when applicable. The license includes an examples/FAQ section for common allowed and permission-required uses. Third-party dependencies (protobuf/gRPC, the upstream Ghidra engine, and their transitive dependencies) remain under their own licenses.
+
+See the full [Human-Origin Source License v1.0](LICENSE).
+
+Releases up to v0.0.3 remain under the MPL-2.0 they shipped with.

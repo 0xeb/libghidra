@@ -74,4 +74,43 @@ public interface OpenProgramResponseOrBuilder extends
    */
   com.google.protobuf.ByteString
       getSha256Bytes();
+
+  /**
+   * <pre>
+   * Executable container format as reported by the loader (e.g.
+   * "Portable Executable (PE)"); empty when the loader reports none.
+   * </pre>
+   *
+   * <code>string executable_format = 8;</code>
+   * @return The executableFormat.
+   */
+  java.lang.String getExecutableFormat();
+  /**
+   * <pre>
+   * Executable container format as reported by the loader (e.g.
+   * "Portable Executable (PE)"); empty when the loader reports none.
+   * </pre>
+   *
+   * <code>string executable_format = 8;</code>
+   * @return The bytes for executableFormat.
+   */
+  com.google.protobuf.ByteString
+      getExecutableFormatBytes();
+
+  /**
+   * <pre>
+   * Program entry point address; only meaningful when has_entry_point is true
+   * (0 is a valid address, so presence needs its own flag).
+   * </pre>
+   *
+   * <code>uint64 entry_point = 9;</code>
+   * @return The entryPoint.
+   */
+  long getEntryPoint();
+
+  /**
+   * <code>bool has_entry_point = 10;</code>
+   * @return The hasEntryPoint.
+   */
+  boolean getHasEntryPoint();
 }

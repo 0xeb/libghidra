@@ -1,3 +1,9 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
 package libghidra.host.contract;
 
 import java.util.List;
@@ -77,5 +83,43 @@ public final class DecompilerContract {
 	}
 
 	public record ListDecompilationsResponse(List<DecompileRecord> decompilations) {
+	}
+
+	// P-code — two maturity rungs: HIGH (refined SSA via HighFunction.getPcodeOps())
+	// and RAW (per-instruction, non-SSA, via Instruction.getPcode()).
+	public enum PcodeMaturity { HIGH, RAW }
+
+	public record VarnodeRecord(
+		String space,
+		long offset,
+		int size,
+		String kind) {
+	}
+
+	public record PcodeOpRecord(
+		long seq,
+		String op,
+		long address,
+		boolean hasAddress,
+		boolean hasOutput,
+		VarnodeRecord output,
+		List<VarnodeRecord> inputs) {
+	}
+
+	public record PcodeRecord(
+		long functionEntryAddress,
+		List<PcodeOpRecord> ops,
+		boolean completed,
+		String errorMessage,
+		PcodeMaturity maturity) {
+	}
+
+	public record GetPcodeRequest(
+		long address,
+		int timeoutMs,
+		PcodeMaturity maturity) {
+	}
+
+	public record GetPcodeResponse(PcodeRecord pcode) {
 	}
 }
