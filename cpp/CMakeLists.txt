@@ -150,8 +150,18 @@ endif()
 # Forward exit: once the bundled protobuf is bumped to a release carrying
 # abseil >= 20250127 (which emits one -Xarch_x86_64 per HW-AES flag, so arm64
 # is never tagged with x86 SIMD), this APPLE block can be deleted.
+# NOTE: abseil's absl_cc_library() creates targets as `absl_${NAME}` and only
+# adds `absl::${NAME}` as an ALIAS -- and ALIAS targets cannot be mutated by
+# set_property(). So the REAL target names carry the `absl_` prefix, and an
+# earlier version of this block listed the bare names only: every `if(TARGET)`
+# below was false, the strip silently never ran, and macOS arm64 CI failed with
+# `unsupported option '-msse4.1'` while building
+# absl_random_internal_randen_hwaes_impl. The unprefixed spellings are kept so
+# an upstream naming change cannot silently re-break this.
 if(APPLE)
     foreach(_libghidra_absl_target
+        absl_random_internal_randen_hwaes
+        absl_random_internal_randen_hwaes_impl
         random_internal_randen_hwaes
         random_internal_randen_hwaes_impl
     )
