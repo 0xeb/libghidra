@@ -108,6 +108,7 @@ from .models import (
     CreateMemoryBlockResponse,
     RemoveMemoryBlockResponse,
     MoveMemoryBlockResponse,
+    SetMemoryBlockAttributesResponse,
     SetTypeMemberCommentResponse,
     SetTypeEnumMemberCommentResponse,
     ListPostDominatorsResponse,
@@ -642,6 +643,44 @@ class GhidraClient:
         )
         return MoveMemoryBlockResponse(
             moved=resp.moved,
+            block=_to_memory_block(resp.block) if resp.HasField("block") else None,
+        )
+
+    def set_memory_block_attributes(
+        self,
+        address: int,
+        *,
+        name: str | None = None,
+        is_read: bool | None = None,
+        is_write: bool | None = None,
+        is_execute: bool | None = None,
+        end_address: int | None = None,
+    ) -> SetMemoryBlockAttributesResponse:
+        """Change an existing block's name, permissions, and/or extent.
+
+        Every attribute is optional and None means "leave alone" -- the proto fields carry
+        explicit presence, so renaming a block does not also reset its permissions.
+        ``end_address`` is INCLUSIVE (Ghidra convention); growing appends and joins,
+        shrinking splits and drops the tail, discarding the bytes past the new end.
+        """
+        req = memory_pb2.SetMemoryBlockAttributesRequest(address=address)
+        if name is not None:
+            req.name = name
+        if is_read is not None:
+            req.is_read = is_read
+        if is_write is not None:
+            req.is_write = is_write
+        if is_execute is not None:
+            req.is_execute = is_execute
+        if end_address is not None:
+            req.end_address = end_address
+        resp = self._call_rpc(
+            "libghidra.MemoryService/SetMemoryBlockAttributes",
+            req,
+            memory_pb2.SetMemoryBlockAttributesResponse,
+        )
+        return SetMemoryBlockAttributesResponse(
+            updated=resp.updated,
             block=_to_memory_block(resp.block) if resp.HasField("block") else None,
         )
 

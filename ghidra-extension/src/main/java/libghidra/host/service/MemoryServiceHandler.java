@@ -80,4 +80,15 @@ public final class MemoryServiceHandler {
 		}
 		return runtime.moveMemoryBlock(request);
 	}
+
+	public MemoryContract.SetMemoryBlockAttributesResponse setMemoryBlockAttributes(
+			MemoryContract.SetMemoryBlockAttributesRequest request) {
+		if (request == null) {
+			// All-null = "change nothing", which the runtime reports against address 0
+			// as not_found rather than silently succeeding.
+			request = new MemoryContract.SetMemoryBlockAttributesRequest(0L, null, null, null,
+				null, null);
+		}
+		return runtime.setMemoryBlockAttributes(request);
+	}
 }

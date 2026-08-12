@@ -105,6 +105,16 @@ public final class MemoryProto {
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_MoveMemoryBlockResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_SetMemoryBlockAttributesRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_SetMemoryBlockAttributesRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_SetMemoryBlockAttributesResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_SetMemoryBlockAttributesResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -146,24 +156,35 @@ public final class MemoryProto {
       "oryBlockRequest\022\017\n\007address\030\002 \001(\004\022\031\n\021new_" +
       "start_address\030\003 \001(\004\"U\n\027MoveMemoryBlockRe" +
       "sponse\022\r\n\005moved\030\001 \001(\010\022+\n\005block\030\002 \001(\0132\034.l" +
-      "ibghidra.MemoryBlockRecord2\363\004\n\rMemorySer" +
-      "vice\022F\n\tReadBytes\022\033.libghidra.ReadBytesR" +
-      "equest\032\034.libghidra.ReadBytesResponse\022I\n\n" +
-      "WriteBytes\022\034.libghidra.WriteBytesRequest" +
-      "\032\035.libghidra.WriteBytesResponse\022X\n\017Patch" +
-      "BytesBatch\022!.libghidra.PatchBytesBatchRe" +
-      "quest\032\".libghidra.PatchBytesBatchRespons" +
-      "e\022[\n\020ListMemoryBlocks\022\".libghidra.ListMe" +
-      "moryBlocksRequest\032#.libghidra.ListMemory" +
-      "BlocksResponse\022^\n\021CreateMemoryBlock\022#.li" +
-      "bghidra.CreateMemoryBlockRequest\032$.libgh" +
-      "idra.CreateMemoryBlockResponse\022^\n\021Remove" +
-      "MemoryBlock\022#.libghidra.RemoveMemoryBloc" +
-      "kRequest\032$.libghidra.RemoveMemoryBlockRe" +
-      "sponse\022X\n\017MoveMemoryBlock\022!.libghidra.Mo" +
-      "veMemoryBlockRequest\032\".libghidra.MoveMem" +
-      "oryBlockResponseB\032\n\tlibghidraB\013MemoryPro" +
-      "toP\001b\006proto3"
+      "ibghidra.MemoryBlockRecord\"\346\001\n\037SetMemory" +
+      "BlockAttributesRequest\022\017\n\007address\030\002 \001(\004\022" +
+      "\021\n\004name\030\003 \001(\tH\000\210\001\001\022\024\n\007is_read\030\004 \001(\010H\001\210\001\001" +
+      "\022\025\n\010is_write\030\005 \001(\010H\002\210\001\001\022\027\n\nis_execute\030\006 " +
+      "\001(\010H\003\210\001\001\022\030\n\013end_address\030\007 \001(\004H\004\210\001\001B\007\n\005_n" +
+      "ameB\n\n\010_is_readB\013\n\t_is_writeB\r\n\013_is_exec" +
+      "uteB\016\n\014_end_address\"`\n SetMemoryBlockAtt" +
+      "ributesResponse\022\017\n\007updated\030\001 \001(\010\022+\n\005bloc" +
+      "k\030\002 \001(\0132\034.libghidra.MemoryBlockRecord2\350\005" +
+      "\n\rMemoryService\022F\n\tReadBytes\022\033.libghidra" +
+      ".ReadBytesRequest\032\034.libghidra.ReadBytesR" +
+      "esponse\022I\n\nWriteBytes\022\034.libghidra.WriteB" +
+      "ytesRequest\032\035.libghidra.WriteBytesRespon" +
+      "se\022X\n\017PatchBytesBatch\022!.libghidra.PatchB" +
+      "ytesBatchRequest\032\".libghidra.PatchBytesB" +
+      "atchResponse\022[\n\020ListMemoryBlocks\022\".libgh" +
+      "idra.ListMemoryBlocksRequest\032#.libghidra" +
+      ".ListMemoryBlocksResponse\022^\n\021CreateMemor" +
+      "yBlock\022#.libghidra.CreateMemoryBlockRequ" +
+      "est\032$.libghidra.CreateMemoryBlockRespons" +
+      "e\022^\n\021RemoveMemoryBlock\022#.libghidra.Remov" +
+      "eMemoryBlockRequest\032$.libghidra.RemoveMe" +
+      "moryBlockResponse\022X\n\017MoveMemoryBlock\022!.l" +
+      "ibghidra.MoveMemoryBlockRequest\032\".libghi" +
+      "dra.MoveMemoryBlockResponse\022s\n\030SetMemory" +
+      "BlockAttributes\022*.libghidra.SetMemoryBlo" +
+      "ckAttributesRequest\032+.libghidra.SetMemor" +
+      "yBlockAttributesResponseB\032\n\tlibghidraB\013M" +
+      "emoryProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -266,6 +287,18 @@ public final class MemoryProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_MoveMemoryBlockResponse_descriptor,
         new java.lang.String[] { "Moved", "Block", });
+    internal_static_libghidra_SetMemoryBlockAttributesRequest_descriptor =
+      getDescriptor().getMessageTypes().get(16);
+    internal_static_libghidra_SetMemoryBlockAttributesRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_SetMemoryBlockAttributesRequest_descriptor,
+        new java.lang.String[] { "Address", "Name", "IsRead", "IsWrite", "IsExecute", "EndAddress", });
+    internal_static_libghidra_SetMemoryBlockAttributesResponse_descriptor =
+      getDescriptor().getMessageTypes().get(17);
+    internal_static_libghidra_SetMemoryBlockAttributesResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_SetMemoryBlockAttributesResponse_descriptor,
+        new java.lang.String[] { "Updated", "Block", });
     descriptor.resolveAllFeaturesImmutable();
     libghidra.CommonProto.getDescriptor();
   }

@@ -112,6 +112,36 @@ message MoveMemoryBlockResponse {
   MemoryBlockRecord block = 2;
 }
 
+// Mutate an EXISTING block's attributes. CreateMemoryBlock already carries name and
+// permissions, but only at creation time; there was no way to change them afterwards,
+// which is why ghidrasql's segments.name/perm/end_addr stayed read-only while idasql
+// and bnsql had them writable.
+//
+// Every mutable field uses explicit presence: an absent field is left alone, so a
+// caller can flip one permission bit without having to restate the others (and without
+// this RPC needing to read-modify-write on the client side).
+//
+// Field 1 reserved for future common request context.
+message SetMemoryBlockAttributesRequest {
+  uint64 address = 2;               // any address within the target block
+  optional string name = 3;         // rename the block
+  optional bool is_read = 4;
+  optional bool is_write = 5;
+  optional bool is_execute = 6;
+  // Resize. INCLUSIVE, matching MemoryBlockRecord.end_address and the rest of this
+  // service (ghidrasql converts to its exclusive model at the boundary). Growing
+  // appends a block of the same initialized-ness and permissions, then joins;
+  // shrinking splits at the new end and removes the tail, which DISCARDS the bytes
+  // beyond it. Must stay within the same address space and not collide with a
+  // neighbouring block.
+  optional uint64 end_address = 7;
+}
+
+message SetMemoryBlockAttributesResponse {
+  bool updated = 1;
+  MemoryBlockRecord block = 2;
+}
+
 service MemoryService {
   rpc ReadBytes(ReadBytesRequest) returns (ReadBytesResponse);
   rpc WriteBytes(WriteBytesRequest) returns (WriteBytesResponse);
@@ -120,4 +150,5 @@ service MemoryService {
   rpc CreateMemoryBlock(CreateMemoryBlockRequest) returns (CreateMemoryBlockResponse);
   rpc RemoveMemoryBlock(RemoveMemoryBlockRequest) returns (RemoveMemoryBlockResponse);
   rpc MoveMemoryBlock(MoveMemoryBlockRequest) returns (MoveMemoryBlockResponse);
+  rpc SetMemoryBlockAttributes(SetMemoryBlockAttributesRequest) returns (SetMemoryBlockAttributesResponse);
 }

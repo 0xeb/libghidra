@@ -282,6 +282,12 @@ class MoveMemoryBlockResponse:
 
 
 @dataclass
+class SetMemoryBlockAttributesResponse:
+    updated: bool = False
+    block: MemoryBlockRecord | None = None
+
+
+@dataclass
 class FunctionRecord:
     entry_address: int = 0
     name: str = ""

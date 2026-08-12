@@ -283,6 +283,27 @@ pub struct MoveMemoryBlockResponse {
     pub block: Option<MemoryBlockRecord>,
 }
 
+/// Attributes to change on an existing memory block.
+///
+/// Every field is optional and `None` means "leave alone", so a caller can flip a single
+/// permission without restating (and clearing) the others. `end_address` is INCLUSIVE,
+/// matching [`MemoryBlockRecord`].
+#[derive(Debug, Clone, Default)]
+pub struct SetMemoryBlockAttributesSpec {
+    pub address: u64,
+    pub name: Option<String>,
+    pub is_read: Option<bool>,
+    pub is_write: Option<bool>,
+    pub is_execute: Option<bool>,
+    pub end_address: Option<u64>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SetMemoryBlockAttributesResponse {
+    pub updated: bool,
+    pub block: Option<MemoryBlockRecord>,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct FunctionRecord {
     pub entry_address: u64,

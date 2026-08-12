@@ -296,6 +296,124 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 	}
 
 	@Override
+	public MemoryContract.SetMemoryBlockAttributesResponse setMemoryBlockAttributes(
+			MemoryContract.SetMemoryBlockAttributesRequest request) {
+		try (LockScope ignored = writeLock()) {
+			Program program = currentProgram();
+			if (program == null || request == null) {
+				return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
+					"not_loaded", "no current program");
+			}
+			int tx = program.startTransaction("libghidra set memory block attributes");
+			boolean commit = false;
+			try {
+				Memory memory = program.getMemory();
+				MemoryBlock block = memory.getBlock(toAddress(program, request.address()));
+				if (block == null) {
+					return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
+						"not_found",
+						"no memory block at 0x" + Long.toHexString(request.address()));
+				}
+				// Permissions and name are direct setters. Null means "leave alone".
+				if (request.isRead() != null) {
+					block.setRead(request.isRead());
+				}
+				if (request.isWrite() != null) {
+					block.setWrite(request.isWrite());
+				}
+				if (request.isExecute() != null) {
+					block.setExecute(request.isExecute());
+				}
+				if (request.name() != null) {
+					block.setName(request.name());
+				}
+				if (request.endAddress() != null) {
+					String err = resizeBlock(memory, block, request.endAddress());
+					if (err != null) {
+						return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
+							"resize_error", err);
+					}
+					// split/join replace the handle; re-fetch from the (unchanged) start.
+					block = memory.getBlock(toAddress(program, block.getStart().getOffset()));
+					if (block == null) {
+						return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
+							"resize_error", "block vanished after resize");
+					}
+				}
+				commit = true;
+				return new MemoryContract.SetMemoryBlockAttributesResponse(true,
+					toRecord(block), "", "");
+			}
+			catch (Exception e) {
+				Msg.error(this, "setMemoryBlockAttributes failed: " + e.getMessage(), e);
+				return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
+					"set_attributes_error", String.valueOf(e.getMessage()));
+			}
+			finally {
+				program.endTransaction(tx, commit);
+			}
+		}
+	}
+
+	/**
+	 * Resize {@code block} so its INCLUSIVE end becomes {@code newEndInclusive}.
+	 *
+	 * Ghidra has no "set end" — a block's extent is changed by splitting or joining, so
+	 * this expresses shrink as split-then-remove-tail and grow as create-adjacent-then-join.
+	 * The appended block must match the original's initialized-ness or {@code join} refuses
+	 * it, and it inherits the original's permissions so a grow cannot silently widen access.
+	 *
+	 * @return null on success, or a human-readable reason it was rejected.
+	 */
+	private String resizeBlock(Memory memory, MemoryBlock block, long newEndInclusive)
+			throws Exception {
+		Address start = block.getStart();
+		long startOffset = start.getOffset();
+		long currentEndInclusive = block.getEnd().getOffset();
+		if (newEndInclusive == currentEndInclusive) {
+			return null;
+		}
+		if (Long.compareUnsigned(newEndInclusive, startOffset) < 0) {
+			return "end_address 0x" + Long.toHexString(newEndInclusive)
+				+ " is below the block start 0x" + Long.toHexString(startOffset);
+		}
+		if (Long.compareUnsigned(newEndInclusive, currentEndInclusive) < 0) {
+			// Shrink: split just past the new end, then drop the tail.
+			Address splitAt = start.getNewAddress(newEndInclusive + 1);
+			memory.split(block, splitAt);
+			MemoryBlock tail = memory.getBlock(splitAt);
+			if (tail == null) {
+				return "tail block missing after split at 0x"
+					+ Long.toHexString(newEndInclusive + 1);
+			}
+			memory.removeBlock(tail, TaskMonitor.DUMMY);
+			return null;
+		}
+		// Grow: append a same-shaped block covering (currentEnd, newEnd] and join it on.
+		Address appendStart = start.getNewAddress(currentEndInclusive + 1);
+		if (memory.getBlock(appendStart) != null) {
+			return "cannot grow past 0x" + Long.toHexString(currentEndInclusive)
+				+ ": address 0x" + Long.toHexString(currentEndInclusive + 1)
+				+ " already belongs to another block";
+		}
+		long added = newEndInclusive - currentEndInclusive;
+		MemoryBlock appended;
+		if (block.isInitialized()) {
+			appended = memory.createInitializedBlock(block.getName() + "_grow", appendStart,
+				added, (byte) 0, TaskMonitor.DUMMY, false);
+		}
+		else {
+			appended = memory.createUninitializedBlock(block.getName() + "_grow", appendStart,
+				added, false);
+		}
+		appended.setRead(block.isRead());
+		appended.setWrite(block.isWrite());
+		appended.setExecute(block.isExecute());
+		memory.join(block, appended);
+		return null;
+	}
+
+	@Override
 	public MemoryContract.MoveMemoryBlockResponse moveMemoryBlock(
 			MemoryContract.MoveMemoryBlockRequest request) {
 		try (LockScope ignored = writeLock()) {

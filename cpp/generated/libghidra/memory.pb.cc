@@ -79,6 +79,38 @@ struct WriteBytesRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 WriteBytesRequestDefaultTypeInternal _WriteBytesRequest_default_instance_;
 
+inline constexpr SetMemoryBlockAttributesRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        address_{::uint64_t{0u}},
+        end_address_{::uint64_t{0u}},
+        is_read_{false},
+        is_write_{false},
+        is_execute_{false} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR SetMemoryBlockAttributesRequest::SetMemoryBlockAttributesRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct SetMemoryBlockAttributesRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR SetMemoryBlockAttributesRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~SetMemoryBlockAttributesRequestDefaultTypeInternal() {}
+  union {
+    SetMemoryBlockAttributesRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SetMemoryBlockAttributesRequestDefaultTypeInternal _SetMemoryBlockAttributesRequest_default_instance_;
+
 inline constexpr RemoveMemoryBlockResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : removed_{false},
@@ -336,6 +368,32 @@ struct BytePatchDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 BytePatchDefaultTypeInternal _BytePatch_default_instance_;
+
+inline constexpr SetMemoryBlockAttributesResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        block_{nullptr},
+        updated_{false} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR SetMemoryBlockAttributesResponse::SetMemoryBlockAttributesResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct SetMemoryBlockAttributesResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR SetMemoryBlockAttributesResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~SetMemoryBlockAttributesResponseDefaultTypeInternal() {}
+  union {
+    SetMemoryBlockAttributesResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SetMemoryBlockAttributesResponseDefaultTypeInternal _SetMemoryBlockAttributesResponse_default_instance_;
 
 inline constexpr PatchBytesBatchRequest::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -644,6 +702,38 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::libghidra::MoveMemoryBlockResponse, _impl_.block_),
         ~0u,
         0,
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesRequest, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesRequest, _impl_.address_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesRequest, _impl_.name_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesRequest, _impl_.is_read_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesRequest, _impl_.is_write_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesRequest, _impl_.is_execute_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesRequest, _impl_.end_address_),
+        ~0u,
+        0,
+        2,
+        3,
+        4,
+        1,
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesResponse, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesResponse, _impl_.updated_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetMemoryBlockAttributesResponse, _impl_.block_),
+        ~0u,
+        0,
 };
 
 static const ::_pbi::MigrationSchema
@@ -664,6 +754,8 @@ static const ::_pbi::MigrationSchema
         {142, -1, -1, sizeof(::libghidra::RemoveMemoryBlockResponse)},
         {151, -1, -1, sizeof(::libghidra::MoveMemoryBlockRequest)},
         {161, 171, -1, sizeof(::libghidra::MoveMemoryBlockResponse)},
+        {173, 187, -1, sizeof(::libghidra::SetMemoryBlockAttributesRequest)},
+        {193, 203, -1, sizeof(::libghidra::SetMemoryBlockAttributesResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_ReadBytesRequest_default_instance_._instance,
@@ -682,6 +774,8 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_RemoveMemoryBlockResponse_default_instance_._instance,
     &::libghidra::_MoveMemoryBlockRequest_default_instance_._instance,
     &::libghidra::_MoveMemoryBlockResponse_default_instance_._instance,
+    &::libghidra::_SetMemoryBlockAttributesRequest_default_instance_._instance,
+    &::libghidra::_SetMemoryBlockAttributesResponse_default_instance_._instance,
 };
 const char descriptor_table_protodef_libghidra_2fmemory_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
@@ -717,24 +811,35 @@ const char descriptor_table_protodef_libghidra_2fmemory_2eproto[] ABSL_ATTRIBUTE
     "oryBlockRequest\022\017\n\007address\030\002 \001(\004\022\031\n\021new_"
     "start_address\030\003 \001(\004\"U\n\027MoveMemoryBlockRe"
     "sponse\022\r\n\005moved\030\001 \001(\010\022+\n\005block\030\002 \001(\0132\034.l"
-    "ibghidra.MemoryBlockRecord2\363\004\n\rMemorySer"
-    "vice\022F\n\tReadBytes\022\033.libghidra.ReadBytesR"
-    "equest\032\034.libghidra.ReadBytesResponse\022I\n\n"
-    "WriteBytes\022\034.libghidra.WriteBytesRequest"
-    "\032\035.libghidra.WriteBytesResponse\022X\n\017Patch"
-    "BytesBatch\022!.libghidra.PatchBytesBatchRe"
-    "quest\032\".libghidra.PatchBytesBatchRespons"
-    "e\022[\n\020ListMemoryBlocks\022\".libghidra.ListMe"
-    "moryBlocksRequest\032#.libghidra.ListMemory"
-    "BlocksResponse\022^\n\021CreateMemoryBlock\022#.li"
-    "bghidra.CreateMemoryBlockRequest\032$.libgh"
-    "idra.CreateMemoryBlockResponse\022^\n\021Remove"
-    "MemoryBlock\022#.libghidra.RemoveMemoryBloc"
-    "kRequest\032$.libghidra.RemoveMemoryBlockRe"
-    "sponse\022X\n\017MoveMemoryBlock\022!.libghidra.Mo"
-    "veMemoryBlockRequest\032\".libghidra.MoveMem"
-    "oryBlockResponseB\032\n\tlibghidraB\013MemoryPro"
-    "toP\001b\006proto3"
+    "ibghidra.MemoryBlockRecord\"\346\001\n\037SetMemory"
+    "BlockAttributesRequest\022\017\n\007address\030\002 \001(\004\022"
+    "\021\n\004name\030\003 \001(\tH\000\210\001\001\022\024\n\007is_read\030\004 \001(\010H\001\210\001\001"
+    "\022\025\n\010is_write\030\005 \001(\010H\002\210\001\001\022\027\n\nis_execute\030\006 "
+    "\001(\010H\003\210\001\001\022\030\n\013end_address\030\007 \001(\004H\004\210\001\001B\007\n\005_n"
+    "ameB\n\n\010_is_readB\013\n\t_is_writeB\r\n\013_is_exec"
+    "uteB\016\n\014_end_address\"`\n SetMemoryBlockAtt"
+    "ributesResponse\022\017\n\007updated\030\001 \001(\010\022+\n\005bloc"
+    "k\030\002 \001(\0132\034.libghidra.MemoryBlockRecord2\350\005"
+    "\n\rMemoryService\022F\n\tReadBytes\022\033.libghidra"
+    ".ReadBytesRequest\032\034.libghidra.ReadBytesR"
+    "esponse\022I\n\nWriteBytes\022\034.libghidra.WriteB"
+    "ytesRequest\032\035.libghidra.WriteBytesRespon"
+    "se\022X\n\017PatchBytesBatch\022!.libghidra.PatchB"
+    "ytesBatchRequest\032\".libghidra.PatchBytesB"
+    "atchResponse\022[\n\020ListMemoryBlocks\022\".libgh"
+    "idra.ListMemoryBlocksRequest\032#.libghidra"
+    ".ListMemoryBlocksResponse\022^\n\021CreateMemor"
+    "yBlock\022#.libghidra.CreateMemoryBlockRequ"
+    "est\032$.libghidra.CreateMemoryBlockRespons"
+    "e\022^\n\021RemoveMemoryBlock\022#.libghidra.Remov"
+    "eMemoryBlockRequest\032$.libghidra.RemoveMe"
+    "moryBlockResponse\022X\n\017MoveMemoryBlock\022!.l"
+    "ibghidra.MoveMemoryBlockRequest\032\".libghi"
+    "dra.MoveMemoryBlockResponse\022s\n\030SetMemory"
+    "BlockAttributes\022*.libghidra.SetMemoryBlo"
+    "ckAttributesRequest\032+.libghidra.SetMemor"
+    "yBlockAttributesResponseB\032\n\tlibghidraB\013M"
+    "emoryProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2fmemory_2eproto_deps[1] =
     {
@@ -744,13 +849,13 @@ static ::absl::once_flag descriptor_table_libghidra_2fmemory_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fmemory_2eproto = {
     false,
     false,
-    1972,
+    2420,
     descriptor_table_protodef_libghidra_2fmemory_2eproto,
     "libghidra/memory.proto",
     &descriptor_table_libghidra_2fmemory_2eproto_once,
     descriptor_table_libghidra_2fmemory_2eproto_deps,
     1,
-    16,
+    18,
     schemas,
     file_default_instances,
     TableStruct_libghidra_2fmemory_2eproto::offsets,
@@ -5012,6 +5117,672 @@ void MoveMemoryBlockResponse::InternalSwap(MoveMemoryBlockResponse* PROTOBUF_RES
 }
 
 ::google::protobuf::Metadata MoveMemoryBlockResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class SetMemoryBlockAttributesRequest::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<SetMemoryBlockAttributesRequest>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_._has_bits_);
+};
+
+SetMemoryBlockAttributesRequest::SetMemoryBlockAttributesRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.SetMemoryBlockAttributesRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE SetMemoryBlockAttributesRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::SetMemoryBlockAttributesRequest& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        name_(arena, from.name_) {}
+
+SetMemoryBlockAttributesRequest::SetMemoryBlockAttributesRequest(
+    ::google::protobuf::Arena* arena,
+    const SetMemoryBlockAttributesRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SetMemoryBlockAttributesRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, address_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, address_),
+           offsetof(Impl_, is_execute_) -
+               offsetof(Impl_, address_) +
+               sizeof(Impl_::is_execute_));
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.SetMemoryBlockAttributesRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE SetMemoryBlockAttributesRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        name_(arena) {}
+
+inline void SetMemoryBlockAttributesRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, address_),
+           0,
+           offsetof(Impl_, is_execute_) -
+               offsetof(Impl_, address_) +
+               sizeof(Impl_::is_execute_));
+}
+SetMemoryBlockAttributesRequest::~SetMemoryBlockAttributesRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.SetMemoryBlockAttributesRequest)
+  SharedDtor(*this);
+}
+inline void SetMemoryBlockAttributesRequest::SharedDtor(MessageLite& self) {
+  SetMemoryBlockAttributesRequest& this_ = static_cast<SetMemoryBlockAttributesRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.name_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* SetMemoryBlockAttributesRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) SetMemoryBlockAttributesRequest(arena);
+}
+constexpr auto SetMemoryBlockAttributesRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(SetMemoryBlockAttributesRequest),
+                                            alignof(SetMemoryBlockAttributesRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull SetMemoryBlockAttributesRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_SetMemoryBlockAttributesRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &SetMemoryBlockAttributesRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<SetMemoryBlockAttributesRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &SetMemoryBlockAttributesRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<SetMemoryBlockAttributesRequest>(), &SetMemoryBlockAttributesRequest::ByteSizeLong,
+            &SetMemoryBlockAttributesRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_._cached_size_),
+        false,
+    },
+    &SetMemoryBlockAttributesRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fmemory_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* SetMemoryBlockAttributesRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 6, 0, 54, 2> SetMemoryBlockAttributesRequest::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_._has_bits_),
+    0, // no _extensions_
+    7, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967169,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    6,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::SetMemoryBlockAttributesRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    // uint64 address = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(SetMemoryBlockAttributesRequest, _impl_.address_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.address_)}},
+    // optional string name = 3;
+    {::_pbi::TcParser::FastUS1,
+     {26, 0, 0, PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.name_)}},
+    // optional bool is_read = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SetMemoryBlockAttributesRequest, _impl_.is_read_), 2>(),
+     {32, 2, 0, PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.is_read_)}},
+    // optional bool is_write = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SetMemoryBlockAttributesRequest, _impl_.is_write_), 3>(),
+     {40, 3, 0, PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.is_write_)}},
+    // optional bool is_execute = 6;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SetMemoryBlockAttributesRequest, _impl_.is_execute_), 4>(),
+     {48, 4, 0, PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.is_execute_)}},
+    // optional uint64 end_address = 7;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(SetMemoryBlockAttributesRequest, _impl_.end_address_), 1>(),
+     {56, 1, 0, PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.end_address_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint64 address = 2;
+    {PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.address_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // optional string name = 3;
+    {PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.name_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // optional bool is_read = 4;
+    {PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.is_read_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool is_write = 5;
+    {PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.is_write_), _Internal::kHasBitsOffset + 3, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool is_execute = 6;
+    {PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.is_execute_), _Internal::kHasBitsOffset + 4, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional uint64 end_address = 7;
+    {PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.end_address_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt64)},
+  }},
+  // no aux_entries
+  {{
+    "\51\0\4\0\0\0\0\0"
+    "libghidra.SetMemoryBlockAttributesRequest"
+    "name"
+  }},
+};
+
+PROTOBUF_NOINLINE void SetMemoryBlockAttributesRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.SetMemoryBlockAttributesRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    _impl_.name_.ClearNonDefaultToEmpty();
+  }
+  _impl_.address_ = ::uint64_t{0u};
+  if (cached_has_bits & 0x0000001eu) {
+    ::memset(&_impl_.end_address_, 0, static_cast<::size_t>(
+        reinterpret_cast<char*>(&_impl_.is_execute_) -
+        reinterpret_cast<char*>(&_impl_.end_address_)) + sizeof(_impl_.is_execute_));
+  }
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* SetMemoryBlockAttributesRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const SetMemoryBlockAttributesRequest& this_ = static_cast<const SetMemoryBlockAttributesRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* SetMemoryBlockAttributesRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const SetMemoryBlockAttributesRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.SetMemoryBlockAttributesRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint64 address = 2;
+          if (this_._internal_address() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                2, this_._internal_address(), target);
+          }
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // optional string name = 3;
+          if (cached_has_bits & 0x00000001u) {
+            const std::string& _s = this_._internal_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.SetMemoryBlockAttributesRequest.name");
+            target = stream->WriteStringMaybeAliased(3, _s, target);
+          }
+
+          // optional bool is_read = 4;
+          if (cached_has_bits & 0x00000004u) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                4, this_._internal_is_read(), target);
+          }
+
+          // optional bool is_write = 5;
+          if (cached_has_bits & 0x00000008u) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                5, this_._internal_is_write(), target);
+          }
+
+          // optional bool is_execute = 6;
+          if (cached_has_bits & 0x00000010u) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                6, this_._internal_is_execute(), target);
+          }
+
+          // optional uint64 end_address = 7;
+          if (cached_has_bits & 0x00000002u) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                7, this_._internal_end_address(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.SetMemoryBlockAttributesRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t SetMemoryBlockAttributesRequest::ByteSizeLong(const MessageLite& base) {
+          const SetMemoryBlockAttributesRequest& this_ = static_cast<const SetMemoryBlockAttributesRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t SetMemoryBlockAttributesRequest::ByteSizeLong() const {
+          const SetMemoryBlockAttributesRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.SetMemoryBlockAttributesRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // optional string name = 3;
+            cached_has_bits = this_._impl_._has_bits_[0];
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_name());
+            }
+          }
+           {
+            // uint64 address = 2;
+            if (this_._internal_address() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_address());
+            }
+          }
+          if (cached_has_bits & 0x0000001eu) {
+            // optional uint64 end_address = 7;
+            if (cached_has_bits & 0x00000002u) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_end_address());
+            }
+            // optional bool is_read = 4;
+            if (cached_has_bits & 0x00000004u) {
+              total_size += 2;
+            }
+            // optional bool is_write = 5;
+            if (cached_has_bits & 0x00000008u) {
+              total_size += 2;
+            }
+            // optional bool is_execute = 6;
+            if (cached_has_bits & 0x00000010u) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void SetMemoryBlockAttributesRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<SetMemoryBlockAttributesRequest*>(&to_msg);
+  auto& from = static_cast<const SetMemoryBlockAttributesRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.SetMemoryBlockAttributesRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    _this->_internal_set_name(from._internal_name());
+  }
+  if (from._internal_address() != 0) {
+    _this->_impl_.address_ = from._impl_.address_;
+  }
+  if (cached_has_bits & 0x0000001eu) {
+    if (cached_has_bits & 0x00000002u) {
+      _this->_impl_.end_address_ = from._impl_.end_address_;
+    }
+    if (cached_has_bits & 0x00000004u) {
+      _this->_impl_.is_read_ = from._impl_.is_read_;
+    }
+    if (cached_has_bits & 0x00000008u) {
+      _this->_impl_.is_write_ = from._impl_.is_write_;
+    }
+    if (cached_has_bits & 0x00000010u) {
+      _this->_impl_.is_execute_ = from._impl_.is_execute_;
+    }
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void SetMemoryBlockAttributesRequest::CopyFrom(const SetMemoryBlockAttributesRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.SetMemoryBlockAttributesRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void SetMemoryBlockAttributesRequest::InternalSwap(SetMemoryBlockAttributesRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.is_execute_)
+      + sizeof(SetMemoryBlockAttributesRequest::_impl_.is_execute_)
+      - PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesRequest, _impl_.address_)>(
+          reinterpret_cast<char*>(&_impl_.address_),
+          reinterpret_cast<char*>(&other->_impl_.address_));
+}
+
+::google::protobuf::Metadata SetMemoryBlockAttributesRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class SetMemoryBlockAttributesResponse::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<SetMemoryBlockAttributesResponse>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesResponse, _impl_._has_bits_);
+};
+
+SetMemoryBlockAttributesResponse::SetMemoryBlockAttributesResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.SetMemoryBlockAttributesResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE SetMemoryBlockAttributesResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::SetMemoryBlockAttributesResponse& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0} {}
+
+SetMemoryBlockAttributesResponse::SetMemoryBlockAttributesResponse(
+    ::google::protobuf::Arena* arena,
+    const SetMemoryBlockAttributesResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SetMemoryBlockAttributesResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.block_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::MemoryBlockRecord>(
+                              arena, *from._impl_.block_)
+                        : nullptr;
+  _impl_.updated_ = from._impl_.updated_;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.SetMemoryBlockAttributesResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE SetMemoryBlockAttributesResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void SetMemoryBlockAttributesResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, block_),
+           0,
+           offsetof(Impl_, updated_) -
+               offsetof(Impl_, block_) +
+               sizeof(Impl_::updated_));
+}
+SetMemoryBlockAttributesResponse::~SetMemoryBlockAttributesResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.SetMemoryBlockAttributesResponse)
+  SharedDtor(*this);
+}
+inline void SetMemoryBlockAttributesResponse::SharedDtor(MessageLite& self) {
+  SetMemoryBlockAttributesResponse& this_ = static_cast<SetMemoryBlockAttributesResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  delete this_._impl_.block_;
+  this_._impl_.~Impl_();
+}
+
+inline void* SetMemoryBlockAttributesResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) SetMemoryBlockAttributesResponse(arena);
+}
+constexpr auto SetMemoryBlockAttributesResponse::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(SetMemoryBlockAttributesResponse),
+                                            alignof(SetMemoryBlockAttributesResponse));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull SetMemoryBlockAttributesResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_SetMemoryBlockAttributesResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &SetMemoryBlockAttributesResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<SetMemoryBlockAttributesResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &SetMemoryBlockAttributesResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<SetMemoryBlockAttributesResponse>(), &SetMemoryBlockAttributesResponse::ByteSizeLong,
+            &SetMemoryBlockAttributesResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesResponse, _impl_._cached_size_),
+        false,
+    },
+    &SetMemoryBlockAttributesResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fmemory_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* SetMemoryBlockAttributesResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 1, 0, 2> SetMemoryBlockAttributesResponse::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesResponse, _impl_._has_bits_),
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::SetMemoryBlockAttributesResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // .libghidra.MemoryBlockRecord block = 2;
+    {::_pbi::TcParser::FastMtS1,
+     {18, 0, 0, PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesResponse, _impl_.block_)}},
+    // bool updated = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SetMemoryBlockAttributesResponse, _impl_.updated_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesResponse, _impl_.updated_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // bool updated = 1;
+    {PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesResponse, _impl_.updated_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // .libghidra.MemoryBlockRecord block = 2;
+    {PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesResponse, _impl_.block_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::MemoryBlockRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void SetMemoryBlockAttributesResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.SetMemoryBlockAttributesResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(_impl_.block_ != nullptr);
+    _impl_.block_->Clear();
+  }
+  _impl_.updated_ = false;
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* SetMemoryBlockAttributesResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const SetMemoryBlockAttributesResponse& this_ = static_cast<const SetMemoryBlockAttributesResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* SetMemoryBlockAttributesResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const SetMemoryBlockAttributesResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.SetMemoryBlockAttributesResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // bool updated = 1;
+          if (this_._internal_updated() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                1, this_._internal_updated(), target);
+          }
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // .libghidra.MemoryBlockRecord block = 2;
+          if (cached_has_bits & 0x00000001u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                2, *this_._impl_.block_, this_._impl_.block_->GetCachedSize(), target,
+                stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.SetMemoryBlockAttributesResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t SetMemoryBlockAttributesResponse::ByteSizeLong(const MessageLite& base) {
+          const SetMemoryBlockAttributesResponse& this_ = static_cast<const SetMemoryBlockAttributesResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t SetMemoryBlockAttributesResponse::ByteSizeLong() const {
+          const SetMemoryBlockAttributesResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.SetMemoryBlockAttributesResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // .libghidra.MemoryBlockRecord block = 2;
+            cached_has_bits = this_._impl_._has_bits_[0];
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.block_);
+            }
+          }
+           {
+            // bool updated = 1;
+            if (this_._internal_updated() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void SetMemoryBlockAttributesResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<SetMemoryBlockAttributesResponse*>(&to_msg);
+  auto& from = static_cast<const SetMemoryBlockAttributesResponse&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.SetMemoryBlockAttributesResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(from._impl_.block_ != nullptr);
+    if (_this->_impl_.block_ == nullptr) {
+      _this->_impl_.block_ =
+          ::google::protobuf::Message::CopyConstruct<::libghidra::MemoryBlockRecord>(arena, *from._impl_.block_);
+    } else {
+      _this->_impl_.block_->MergeFrom(*from._impl_.block_);
+    }
+  }
+  if (from._internal_updated() != 0) {
+    _this->_impl_.updated_ = from._impl_.updated_;
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void SetMemoryBlockAttributesResponse::CopyFrom(const SetMemoryBlockAttributesResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.SetMemoryBlockAttributesResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void SetMemoryBlockAttributesResponse::InternalSwap(SetMemoryBlockAttributesResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesResponse, _impl_.updated_)
+      + sizeof(SetMemoryBlockAttributesResponse::_impl_.updated_)
+      - PROTOBUF_FIELD_OFFSET(SetMemoryBlockAttributesResponse, _impl_.block_)>(
+          reinterpret_cast<char*>(&_impl_.block_),
+          reinterpret_cast<char*>(&other->_impl_.block_));
+}
+
+::google::protobuf::Metadata SetMemoryBlockAttributesResponse::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // @@protoc_insertion_point(namespace_scope)

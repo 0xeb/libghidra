@@ -144,6 +144,11 @@ class IClient : public IHealthClient,
     return StatusOr<MoveMemoryBlockResponse>::FromError(
         "NOT_SUPPORTED", "not implemented by this backend");
   }
+  StatusOr<SetMemoryBlockAttributesResponse> SetMemoryBlockAttributes(
+      const SetMemoryBlockAttributesSpec&) override {
+    return StatusOr<SetMemoryBlockAttributesResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
 
   // -- IFunctionsClient defaults ---------------------------------------------
 

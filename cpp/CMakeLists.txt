@@ -91,7 +91,18 @@ set(protobuf_INSTALL OFF CACHE BOOL "" FORCE)
 set(ABSL_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
 set(utf8_range_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
 set(ABSL_PROPAGATE_CXX_STD ON CACHE BOOL "" FORCE)
+# The C++ stubs under cpp/generated/ are CHECKED IN, so an ordinary build has no reason
+# to compile protoc/libprotoc — that is pure cost on every clean build and every CI run.
+# Turn it on only to regenerate after editing a .proto (or use proto/tools/regen.py,
+# which drives an external protoc and also covers Java/Python/Rust).
+option(LIBGHIDRA_REGENERATE_PROTO
+    "Build protoc and regenerate the checked-in C++ protobuf stubs" OFF)
+# NOTE the two switches are NOT interchangeable. protobuf_BUILD_PROTOBUF_BINARIES gates
+# the whole library set — turning it off takes protobuf::libprotobuf with it and the
+# build fails with "missing protobuf target". protobuf_BUILD_PROTOC_BINARIES is the one
+# that gates libprotoc + the protoc executable alone, which is exactly what we skip.
 set(protobuf_BUILD_PROTOBUF_BINARIES ON CACHE BOOL "" FORCE)
+set(protobuf_BUILD_PROTOC_BINARIES ${LIBGHIDRA_REGENERATE_PROTO} CACHE BOOL "" FORCE)
 set(protobuf_BUILD_LIBUPB OFF CACHE BOOL "" FORCE)
 set(protobuf_DISABLE_RTTI OFF CACHE BOOL "" FORCE)
 # libghidra does not use protobuf's gzip stream wrappers. Keep the bundled
@@ -179,7 +190,7 @@ endif()
 # Auto-regenerate C++ protobuf stubs when .proto files change
 # ============================================================================
 
-if(TARGET protoc)
+if(LIBGHIDRA_REGENERATE_PROTO AND TARGET protoc)
     set(LIBGHIDRA_PROTO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../proto/libghidra")
     set(LIBGHIDRA_PROTO_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/../proto")
     set(LIBGHIDRA_GEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/generated/libghidra")

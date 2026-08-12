@@ -27,6 +27,57 @@ env:
   GHIDRA_RELEASE_URL: "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.0.4_build/ghidra_12.0.4_PUBLIC_20260303.zip"
 
 jobs:
+  # The generated protobuf stubs are checked in, and ordinary builds no longer compile
+  # protoc (LIBGHIDRA_REGENERATE_PROTO defaults OFF), so nothing in a normal build would
+  # notice a .proto edited without regenerating. check_proto_freshness.py verifies the
+  # stubs EXIST and carry the pinned gencode version — it does not regenerate, so stale
+  # stubs pass it. This job is the missing half: regenerate, and fail on any diff.
+  proto-freshness:
+    name: Generated stubs are up to date
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install pinned protoc
+        run: |
+          set -euo pipefail
+          # Must match the gencode version the committed stubs declare; a different
+          # protoc silently rewrites every file and turns this job into noise.
+          version="29.3"
+          curl -L --retry 5 --fail -o /tmp/protoc.zip \
+            "https://github.com/protocolbuffers/protobuf/releases/download/v${version}/protoc-${version}-linux-x86_64.zip"
+          unzip -q /tmp/protoc.zip -d /tmp/protoc
+          echo "/tmp/protoc/bin" >> "$GITHUB_PATH"
+          curl -L --retry 5 --fail -o /tmp/protobuf-src.tar.gz \
+            "https://github.com/protocolbuffers/protobuf/releases/download/v${version}/protobuf-${version}.tar.gz"
+          mkdir -p /tmp/protobuf-src && tar -xzf /tmp/protobuf-src.tar.gz -C /tmp/protobuf-src --strip-components=1
+
+      - name: Regenerate all stubs
+        run: |
+          python proto/tools/regen.py \
+            --protoc /tmp/protoc/bin/protoc \
+            --wkt-include /tmp/protobuf-src/src \
+            --languages cpp java python rust
+
+      - name: Fail if the committed stubs are stale
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet; then
+            echo "::error::Generated protobuf stubs are stale. Run proto/tools/regen.py and commit the result."
+            git --no-pager diff --stat
+            exit 1
+          fi
+          echo "generated stubs match the .proto sources"
+
   build-sdk:
     name: Build SDK (${{ matrix.name }})
     runs-on: ${{ matrix.os }}

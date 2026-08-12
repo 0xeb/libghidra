@@ -470,6 +470,38 @@ class AsyncGhidraClient:
             block=_to_memory_block(resp.block) if resp.HasField("block") else None,
         )
 
+    async def set_memory_block_attributes(
+        self,
+        address: int,
+        *,
+        name: str | None = None,
+        is_read: bool | None = None,
+        is_write: bool | None = None,
+        is_execute: bool | None = None,
+        end_address: int | None = None,
+    ) -> SetMemoryBlockAttributesResponse:
+        """Async mirror of GhidraClient.set_memory_block_attributes (None = leave alone)."""
+        req = memory_pb2.SetMemoryBlockAttributesRequest(address=address)
+        if name is not None:
+            req.name = name
+        if is_read is not None:
+            req.is_read = is_read
+        if is_write is not None:
+            req.is_write = is_write
+        if is_execute is not None:
+            req.is_execute = is_execute
+        if end_address is not None:
+            req.end_address = end_address
+        resp = await self._call_rpc(
+            "libghidra.MemoryService/SetMemoryBlockAttributes",
+            req,
+            memory_pb2.SetMemoryBlockAttributesResponse,
+        )
+        return SetMemoryBlockAttributesResponse(
+            updated=resp.updated,
+            block=_to_memory_block(resp.block) if resp.HasField("block") else None,
+        )
+
     # =========================================================================
     # Functions
     # =========================================================================

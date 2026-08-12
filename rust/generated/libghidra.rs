@@ -1288,6 +1288,46 @@ pub struct MoveMemoryBlockResponse {
     #[prost(message, optional, tag = "2")]
     pub block: ::core::option::Option<MemoryBlockRecord>,
 }
+/// Mutate an EXISTING block's attributes. CreateMemoryBlock already carries name and
+/// permissions, but only at creation time; there was no way to change them afterwards,
+/// which is why ghidrasql's segments.name/perm/end_addr stayed read-only while idasql
+/// and bnsql had them writable.
+///
+/// Every mutable field uses explicit presence: an absent field is left alone, so a
+/// caller can flip one permission bit without having to restate the others (and without
+/// this RPC needing to read-modify-write on the client side).
+///
+/// Field 1 reserved for future common request context.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SetMemoryBlockAttributesRequest {
+    /// any address within the target block
+    #[prost(uint64, tag = "2")]
+    pub address: u64,
+    /// rename the block
+    #[prost(string, optional, tag = "3")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(bool, optional, tag = "4")]
+    pub is_read: ::core::option::Option<bool>,
+    #[prost(bool, optional, tag = "5")]
+    pub is_write: ::core::option::Option<bool>,
+    #[prost(bool, optional, tag = "6")]
+    pub is_execute: ::core::option::Option<bool>,
+    /// Resize. INCLUSIVE, matching MemoryBlockRecord.end_address and the rest of this
+    /// service (ghidrasql converts to its exclusive model at the boundary). Growing
+    /// appends a block of the same initialized-ness and permissions, then joins;
+    /// shrinking splits at the new end and removes the tail, which DISCARDS the bytes
+    /// beyond it. Must stay within the same address space and not collide with a
+    /// neighbouring block.
+    #[prost(uint64, optional, tag = "7")]
+    pub end_address: ::core::option::Option<u64>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SetMemoryBlockAttributesResponse {
+    #[prost(bool, tag = "1")]
+    pub updated: bool,
+    #[prost(message, optional, tag = "2")]
+    pub block: ::core::option::Option<MemoryBlockRecord>,
+}
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RpcRequest {
     #[prost(string, tag = "1")]

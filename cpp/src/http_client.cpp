@@ -487,6 +487,112 @@ std::string map_http_status(int status) {
   }
 }
 
+// --- transport diagnostics ---------------------------------------------------
+//
+// httplib collapses every connect/read/write failure into one Error enum, and we
+// used to report only that: "HTTP request failed for /rpc (2)". Connection
+// refused, timed out and reset are three different faults needing three
+// different fixes, and that message cannot tell them apart. Diagnosing an
+// intermittent /rpc failure without the OS error burned several wrong
+// hypotheses, so capture it -- for us and for anyone reading a user's log.
+
+int last_socket_error() {
+#ifdef _WIN32
+  return ::WSAGetLastError();
+#else
+  return errno;
+#endif
+}
+
+// Symbolic name for the codes that actually distinguish the failure modes.
+// Shipping the bare number is useless in a bug report.
+std::string socket_error_name(int err) {
+#ifdef _WIN32
+  switch (err) {
+    case 10013: return "WSAEACCES";
+    case 10024: return "WSAEMFILE";
+    case 10035: return "WSAEWOULDBLOCK";
+    case 10048: return "WSAEADDRINUSE";
+    case 10049: return "WSAEADDRNOTAVAIL";
+    case 10051: return "WSAENETUNREACH";
+    case 10053: return "WSAECONNABORTED";
+    case 10054: return "WSAECONNRESET";
+    case 10055: return "WSAENOBUFS";      // ephemeral port / buffer exhaustion
+    case 10060: return "WSAETIMEDOUT";    // accept starvation, e.g. a JVM stall
+    case 10061: return "WSAECONNREFUSED"; // nothing listening / backlog full
+    case 10065: return "WSAEHOSTUNREACH";
+    default:    return "";
+  }
+#else
+  return err ? std::string(std::strerror(err)) : std::string();
+#endif
+}
+
+// Re-probe the endpoint with a raw connect().
+//
+// errno/WSAGetLastError can be clobbered between httplib's failed connect and
+// our reading it, so on a Connection error we ask the OS directly, once. This
+// answers the only question that matters at that moment: is anything actually
+// listening? Non-blocking with a short cap so a filtered/black-holed endpoint
+// cannot stall the error path for the OS connect timeout.
+//
+// Returns the OS error, 0 if the probe connected, or -1 if not probed.
+int probe_connect_error(const std::string& host, int port) {
+  in_addr parsed{};
+  if (::inet_pton(AF_INET, host.c_str(), &parsed) != 1) {
+    return -1;  // non-numeric host; resolving here would add its own failures
+  }
+  // Deliberately BLOCKING. A non-blocking connect + select was tried first and
+  // proved unreliable here -- it reported a fabricated timeout for a port that
+  // refuses instantly, which is worse than no probe at all because it would
+  // point the investigation at accept starvation instead of "nothing is
+  // listening". A refused endpoint returns immediately; the bounded risk is a
+  // filtered endpoint stalling for the OS connect timeout, and this only ever
+  // runs on a path that has already failed.
+#ifdef _WIN32
+  SOCKET sock = ::socket(AF_INET, SOCK_STREAM, 0);
+  if (sock == INVALID_SOCKET) return last_socket_error();
+#else
+  int sock = ::socket(AF_INET, SOCK_STREAM, 0);
+  if (sock < 0) return last_socket_error();
+#endif
+
+  sockaddr_in addr{};
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(static_cast<uint16_t>(port));
+  addr.sin_addr = parsed;
+
+  int result = 0;
+  if (::connect(sock, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) != 0) {
+    result = last_socket_error();
+  }
+#ifdef _WIN32
+  ::closesocket(sock);
+#else
+  ::close(sock);
+#endif
+  return result;
+}
+
+// "(httplib=Connection os_error=10061 WSAECONNREFUSED probe=10061 WSAECONNREFUSED)"
+std::string transport_detail(httplib::Error err, int os_error, int probe) {
+  std::string out = "httplib=" + httplib::to_string(err);
+  if (os_error != 0) {
+    out += " os_error=" + std::to_string(os_error);
+    const std::string name = socket_error_name(os_error);
+    if (!name.empty()) out += " " + name;
+  }
+  if (probe >= 0) {
+    out += " probe=" + (probe == 0 ? std::string("connected")
+                                   : std::to_string(probe));
+    if (probe != 0) {
+      const std::string name = socket_error_name(probe);
+      if (!name.empty()) out += " " + name;
+    }
+  }
+  return out;
+}
+
 std::string map_transport_error(httplib::Error err) {
   switch (err) {
     case httplib::Error::Connection:
@@ -507,7 +613,15 @@ bool is_retryable(const std::string& code) {
          code == "internal_error" ||
          code == "bad_gateway" ||
          code == "service_unavailable" ||
-         code == "gateway_timeout";
+         code == "gateway_timeout" ||
+         // Host-side back-pressure: LibGhidraHost fast-rejects with this RPC
+         // error code once its in-flight semaphore is full. Newer hosts answer
+         // 503 (-> service_unavailable, already above), but a host older than
+         // that returns HTTP 200 carrying "server_busy" -- so without this a
+         // merely busy host became an instant hard failure on a message that
+         // literally says "retry later". CLI and host ship as a version-locked
+         // pair but users do mix them, so both spellings must be retryable.
+         code == "server_busy";
 }
 
 // Read-vs-write retry asymmetry.
@@ -579,6 +693,21 @@ class HttpClient::Impl {
     auto [csec, cusec] = to_sec_usec(options_.connect_timeout);
     auto [rsec, rusec] = to_sec_usec(options_.read_timeout);
     auto [wsec, wusec] = to_sec_usec(options_.write_timeout);
+    // cpp-httplib's CLIENT default is keep_alive_ = false, so without this it
+    // sends "Connection: close" and opens a BRAND NEW TCP connection for every
+    // RPC. Measured: 12 sequential calls -> 12 distinct source ports.
+    //
+    // Over a long live-tier run that churn burns through the ephemeral range and
+    // leaves a TIME_WAIT entry per call (450 observed mid-run against 0 at rest),
+    // until a source-port/destination tuple collides -- which Windows reports as
+    // WSAEADDRINUSE (10048) on connect. That was the intermittent
+    // `connection_failed`, and it explains why it never reproduced in a short run
+    // and never appeared on Linux, which recycles TIME_WAIT far more aggressively.
+    //
+    // A regression test's control case also asserts that a server closing each
+    // connection stays survivable -- reuse must not be bought at the cost of
+    // resilience.
+    client_->set_keep_alive(true);
     client_->set_connection_timeout(csec, cusec);
     client_->set_read_timeout(rsec, rusec);
     client_->set_write_timeout(wsec, wusec);
@@ -609,9 +738,29 @@ class HttpClient::Impl {
             : options_.max_retries;
     const int max_attempts = effective_retries + 1;
     StatusOr<std::string> raw;
+    libghidra::RpcResponse rpc_response;
+    bool parsed = false;
     for (int attempt = 0; attempt < max_attempts; ++attempt) {
       raw = request_bytes("POST", "/rpc", encoded, "application/x-protobuf");
-      if (raw.ok() || !is_retryable(raw.status.code) || attempt + 1 >= max_attempts) {
+
+      bool retry = false;
+      parsed = false;
+      if (!raw.ok()) {
+        // Transport failure, or a non-2xx status (503 -> service_unavailable).
+        retry = is_retryable(raw.status.code);
+      } else {
+        // A 2xx can STILL carry an RPC-level error in the body: hosts older than
+        // the 503 change signalled back-pressure as HTTP 200 + "server_busy".
+        // The transport succeeded, so testing only raw.status.code here would
+        // break out before is_retryable() is ever consulted -- making every
+        // RPC-level code unretryable by construction. Parse once and reuse below.
+        rpc_response.Clear();
+        parsed = rpc_response.ParseFromString(raw.value.value());
+        retry = parsed && !rpc_response.success() &&
+                is_retryable(rpc_response.error_code());
+      }
+
+      if (!retry || attempt + 1 >= max_attempts) {
         break;
       }
       std::this_thread::sleep_for(compute_backoff(
@@ -621,8 +770,7 @@ class HttpClient::Impl {
       return StatusOr<TResponse>::FromError(raw.status.code, raw.status.message);
     }
 
-    libghidra::RpcResponse rpc_response;
-    if (!rpc_response.ParseFromString(raw.value.value())) {
+    if (!parsed) {
       return StatusOr<TResponse>::FromError("parse_error", "failed to parse RpcResponse");
     }
     if (!rpc_response.success()) {
@@ -663,11 +811,18 @@ class HttpClient::Impl {
       result = client_->Post(path.c_str(), headers, body, content_type.c_str());
     }
     if (!result) {
+      // Grab the OS error FIRST -- almost anything else we call can clobber it.
+      const int os_error = last_socket_error();
+      // Only re-probe when httplib says the CONNECT failed; for read/write
+      // errors the endpoint was reachable and a probe would prove nothing.
+      const int probe = (result.error() == httplib::Error::Connection)
+                            ? probe_connect_error(host_, port_)
+                            : -1;
       const auto err_code = map_transport_error(result.error());
       return StatusOr<std::string>::FromError(
           err_code,
           "HTTP request failed for " + path + " (" +
-              std::to_string(static_cast<int>(result.error())) + ")");
+              transport_detail(result.error(), os_error, probe) + ")");
     }
     const auto& response = *result;
     if (response.status < 200 || response.status >= 300) {
@@ -1183,6 +1338,42 @@ StatusOr<MoveMemoryBlockResponse> HttpClient::MoveMemoryBlock(
     copy_block_record(rpc.value->block(), out.block);
   }
   return StatusOr<MoveMemoryBlockResponse>::FromValue(std::move(out));
+}
+
+StatusOr<SetMemoryBlockAttributesResponse> HttpClient::SetMemoryBlockAttributes(
+    const SetMemoryBlockAttributesSpec& spec) {
+  libghidra::SetMemoryBlockAttributesRequest rpc_request;
+  rpc_request.set_address(spec.address);
+  // Only set what the caller asked for: the proto fields carry explicit presence, and
+  // setting one unconditionally would clobber that attribute on the host.
+  if (spec.name.has_value()) {
+    rpc_request.set_name(*spec.name);
+  }
+  if (spec.is_read.has_value()) {
+    rpc_request.set_is_read(*spec.is_read);
+  }
+  if (spec.is_write.has_value()) {
+    rpc_request.set_is_write(*spec.is_write);
+  }
+  if (spec.is_execute.has_value()) {
+    rpc_request.set_is_execute(*spec.is_execute);
+  }
+  if (spec.end_address.has_value()) {
+    rpc_request.set_end_address(*spec.end_address);
+  }
+  auto rpc = impl_->call_rpc<libghidra::SetMemoryBlockAttributesRequest,
+                             libghidra::SetMemoryBlockAttributesResponse>(
+      "libghidra.MemoryService/SetMemoryBlockAttributes", rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<SetMemoryBlockAttributesResponse>::FromError(rpc.status.code,
+                                                                 rpc.status.message);
+  }
+  SetMemoryBlockAttributesResponse out;
+  out.updated = rpc.value->updated();
+  if (rpc.value->has_block()) {
+    copy_block_record(rpc.value->block(), out.block);
+  }
+  return StatusOr<SetMemoryBlockAttributesResponse>::FromValue(std::move(out));
 }
 
 StatusOr<GetFunctionResponse> HttpClient::GetFunction(std::uint64_t address) {

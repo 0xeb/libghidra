@@ -26,6 +26,9 @@ public interface MemoryOperations {
 	MemoryContract.RemoveMemoryBlockResponse removeMemoryBlock(
 		MemoryContract.RemoveMemoryBlockRequest request);
 
+	MemoryContract.SetMemoryBlockAttributesResponse setMemoryBlockAttributes(
+		MemoryContract.SetMemoryBlockAttributesRequest request);
+
 	MemoryContract.MoveMemoryBlockResponse moveMemoryBlock(
 		MemoryContract.MoveMemoryBlockRequest request);
 }

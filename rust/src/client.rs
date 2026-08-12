@@ -505,6 +505,33 @@ impl GhidraClient {
         })
     }
 
+    /// Change an existing block's name, permissions, and/or extent.
+    ///
+    /// Fields left `None` in `spec` are not sent, so the host leaves them untouched --
+    /// renaming a block will not also reset its permissions.
+    pub fn set_memory_block_attributes(
+        &self,
+        spec: &SetMemoryBlockAttributesSpec,
+    ) -> Result<SetMemoryBlockAttributesResponse> {
+        let req = pb::SetMemoryBlockAttributesRequest {
+            address: spec.address,
+            name: spec.name.clone(),
+            is_read: spec.is_read,
+            is_write: spec.is_write,
+            is_execute: spec.is_execute,
+            end_address: spec.end_address,
+        };
+        let resp: pb::SetMemoryBlockAttributesResponse = self.call_rpc(
+            "libghidra.MemoryService/SetMemoryBlockAttributes",
+            &req,
+            "libghidra.SetMemoryBlockAttributesRequest",
+        )?;
+        Ok(SetMemoryBlockAttributesResponse {
+            updated: resp.updated,
+            block: resp.block.map(Into::into),
+        })
+    }
+
     // -- Functions -------------------------------------------------------------
 
     pub fn get_function(&self, address: u64) -> Result<GetFunctionResponse> {

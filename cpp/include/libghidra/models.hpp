@@ -192,6 +192,23 @@ struct MoveMemoryBlockResponse {
   MemoryBlockRecord block;
 };
 
+// Attributes to change on an existing block. Every field is optional and an unset one
+// is left untouched, so callers can flip a single permission without restating (and
+// accidentally clearing) the rest. `end_address` is INCLUSIVE, like MemoryBlockRecord.
+struct SetMemoryBlockAttributesSpec {
+  std::uint64_t address = 0;  // any address within the target block
+  std::optional<std::string> name;
+  std::optional<bool> is_read;
+  std::optional<bool> is_write;
+  std::optional<bool> is_execute;
+  std::optional<std::uint64_t> end_address;
+};
+
+struct SetMemoryBlockAttributesResponse {
+  bool updated = false;
+  MemoryBlockRecord block;
+};
+
 struct FunctionRecord {
   std::uint64_t entry_address = 0;
   std::string name;

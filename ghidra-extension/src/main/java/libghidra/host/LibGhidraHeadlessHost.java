@@ -391,6 +391,12 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			}
 
 			@Override
+			public libghidra.host.contract.MemoryContract.SetMemoryBlockAttributesResponse setMemoryBlockAttributes(
+					libghidra.host.contract.MemoryContract.SetMemoryBlockAttributesRequest request) {
+				return memoryHandler.setMemoryBlockAttributes(request);
+			}
+
+			@Override
 			public FunctionsContract.GetFunctionResponse getFunction(
 					FunctionsContract.GetFunctionRequest request) {
 				return functionsHandler.getFunction(request);

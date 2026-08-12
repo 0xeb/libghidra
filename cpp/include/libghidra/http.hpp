@@ -70,6 +70,8 @@ class HttpClient final : public IClient {
   StatusOr<RemoveMemoryBlockResponse> RemoveMemoryBlock(std::uint64_t address) override;
   StatusOr<MoveMemoryBlockResponse> MoveMemoryBlock(std::uint64_t address,
                                                     std::uint64_t new_start_address) override;
+  StatusOr<SetMemoryBlockAttributesResponse> SetMemoryBlockAttributes(
+      const SetMemoryBlockAttributesSpec& spec) override;
 
   StatusOr<GetFunctionResponse> GetFunction(std::uint64_t address) override;
   StatusOr<ListFunctionsResponse> ListFunctions(std::uint64_t range_start,

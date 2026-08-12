@@ -46,6 +46,8 @@ class IMemoryClient {
   virtual StatusOr<RemoveMemoryBlockResponse> RemoveMemoryBlock(std::uint64_t address) = 0;
   virtual StatusOr<MoveMemoryBlockResponse> MoveMemoryBlock(std::uint64_t address,
                                                             std::uint64_t new_start_address) = 0;
+  virtual StatusOr<SetMemoryBlockAttributesResponse> SetMemoryBlockAttributes(
+      const SetMemoryBlockAttributesSpec& spec) = 0;
 };
 
 }  // namespace libghidra::client

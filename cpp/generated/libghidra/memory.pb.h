@@ -95,6 +95,12 @@ extern RemoveMemoryBlockRequestDefaultTypeInternal _RemoveMemoryBlockRequest_def
 class RemoveMemoryBlockResponse;
 struct RemoveMemoryBlockResponseDefaultTypeInternal;
 extern RemoveMemoryBlockResponseDefaultTypeInternal _RemoveMemoryBlockResponse_default_instance_;
+class SetMemoryBlockAttributesRequest;
+struct SetMemoryBlockAttributesRequestDefaultTypeInternal;
+extern SetMemoryBlockAttributesRequestDefaultTypeInternal _SetMemoryBlockAttributesRequest_default_instance_;
+class SetMemoryBlockAttributesResponse;
+struct SetMemoryBlockAttributesResponseDefaultTypeInternal;
+extern SetMemoryBlockAttributesResponseDefaultTypeInternal _SetMemoryBlockAttributesResponse_default_instance_;
 class WriteBytesRequest;
 struct WriteBytesRequestDefaultTypeInternal;
 extern WriteBytesRequestDefaultTypeInternal _WriteBytesRequest_default_instance_;
@@ -505,6 +511,268 @@ class WriteBytesRequest final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr data_;
     ::uint64_t address_;
     ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fmemory_2eproto;
+};
+// -------------------------------------------------------------------
+
+class SetMemoryBlockAttributesRequest final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.SetMemoryBlockAttributesRequest) */ {
+ public:
+  inline SetMemoryBlockAttributesRequest() : SetMemoryBlockAttributesRequest(nullptr) {}
+  ~SetMemoryBlockAttributesRequest() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(SetMemoryBlockAttributesRequest* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(SetMemoryBlockAttributesRequest));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR SetMemoryBlockAttributesRequest(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline SetMemoryBlockAttributesRequest(const SetMemoryBlockAttributesRequest& from) : SetMemoryBlockAttributesRequest(nullptr, from) {}
+  inline SetMemoryBlockAttributesRequest(SetMemoryBlockAttributesRequest&& from) noexcept
+      : SetMemoryBlockAttributesRequest(nullptr, std::move(from)) {}
+  inline SetMemoryBlockAttributesRequest& operator=(const SetMemoryBlockAttributesRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline SetMemoryBlockAttributesRequest& operator=(SetMemoryBlockAttributesRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const SetMemoryBlockAttributesRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const SetMemoryBlockAttributesRequest* internal_default_instance() {
+    return reinterpret_cast<const SetMemoryBlockAttributesRequest*>(
+        &_SetMemoryBlockAttributesRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 16;
+  friend void swap(SetMemoryBlockAttributesRequest& a, SetMemoryBlockAttributesRequest& b) { a.Swap(&b); }
+  inline void Swap(SetMemoryBlockAttributesRequest* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(SetMemoryBlockAttributesRequest* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  SetMemoryBlockAttributesRequest* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<SetMemoryBlockAttributesRequest>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const SetMemoryBlockAttributesRequest& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const SetMemoryBlockAttributesRequest& from) { SetMemoryBlockAttributesRequest::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(SetMemoryBlockAttributesRequest* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.SetMemoryBlockAttributesRequest"; }
+
+ protected:
+  explicit SetMemoryBlockAttributesRequest(::google::protobuf::Arena* arena);
+  SetMemoryBlockAttributesRequest(::google::protobuf::Arena* arena, const SetMemoryBlockAttributesRequest& from);
+  SetMemoryBlockAttributesRequest(::google::protobuf::Arena* arena, SetMemoryBlockAttributesRequest&& from) noexcept
+      : SetMemoryBlockAttributesRequest(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kNameFieldNumber = 3,
+    kAddressFieldNumber = 2,
+    kEndAddressFieldNumber = 7,
+    kIsReadFieldNumber = 4,
+    kIsWriteFieldNumber = 5,
+    kIsExecuteFieldNumber = 6,
+  };
+  // optional string name = 3;
+  bool has_name() const;
+  void clear_name() ;
+  const std::string& name() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_name(Arg_&& arg, Args_... args);
+  std::string* mutable_name();
+  PROTOBUF_NODISCARD std::string* release_name();
+  void set_allocated_name(std::string* value);
+
+  private:
+  const std::string& _internal_name() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_name(
+      const std::string& value);
+  std::string* _internal_mutable_name();
+
+  public:
+  // uint64 address = 2;
+  void clear_address() ;
+  ::uint64_t address() const;
+  void set_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_address() const;
+  void _internal_set_address(::uint64_t value);
+
+  public:
+  // optional uint64 end_address = 7;
+  bool has_end_address() const;
+  void clear_end_address() ;
+  ::uint64_t end_address() const;
+  void set_end_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_end_address() const;
+  void _internal_set_end_address(::uint64_t value);
+
+  public:
+  // optional bool is_read = 4;
+  bool has_is_read() const;
+  void clear_is_read() ;
+  bool is_read() const;
+  void set_is_read(bool value);
+
+  private:
+  bool _internal_is_read() const;
+  void _internal_set_is_read(bool value);
+
+  public:
+  // optional bool is_write = 5;
+  bool has_is_write() const;
+  void clear_is_write() ;
+  bool is_write() const;
+  void set_is_write(bool value);
+
+  private:
+  bool _internal_is_write() const;
+  void _internal_set_is_write(bool value);
+
+  public:
+  // optional bool is_execute = 6;
+  bool has_is_execute() const;
+  void clear_is_execute() ;
+  bool is_execute() const;
+  void set_is_execute(bool value);
+
+  private:
+  bool _internal_is_execute() const;
+  void _internal_set_is_execute(bool value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.SetMemoryBlockAttributesRequest)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      3, 6, 0,
+      54, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const SetMemoryBlockAttributesRequest& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::google::protobuf::internal::ArenaStringPtr name_;
+    ::uint64_t address_;
+    ::uint64_t end_address_;
+    bool is_read_;
+    bool is_write_;
+    bool is_execute_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -2503,6 +2771,214 @@ class BytePatch final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr data_;
     ::uint64_t address_;
     ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2fmemory_2eproto;
+};
+// -------------------------------------------------------------------
+
+class SetMemoryBlockAttributesResponse final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.SetMemoryBlockAttributesResponse) */ {
+ public:
+  inline SetMemoryBlockAttributesResponse() : SetMemoryBlockAttributesResponse(nullptr) {}
+  ~SetMemoryBlockAttributesResponse() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(SetMemoryBlockAttributesResponse* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(SetMemoryBlockAttributesResponse));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR SetMemoryBlockAttributesResponse(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline SetMemoryBlockAttributesResponse(const SetMemoryBlockAttributesResponse& from) : SetMemoryBlockAttributesResponse(nullptr, from) {}
+  inline SetMemoryBlockAttributesResponse(SetMemoryBlockAttributesResponse&& from) noexcept
+      : SetMemoryBlockAttributesResponse(nullptr, std::move(from)) {}
+  inline SetMemoryBlockAttributesResponse& operator=(const SetMemoryBlockAttributesResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline SetMemoryBlockAttributesResponse& operator=(SetMemoryBlockAttributesResponse&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const SetMemoryBlockAttributesResponse& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const SetMemoryBlockAttributesResponse* internal_default_instance() {
+    return reinterpret_cast<const SetMemoryBlockAttributesResponse*>(
+        &_SetMemoryBlockAttributesResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 17;
+  friend void swap(SetMemoryBlockAttributesResponse& a, SetMemoryBlockAttributesResponse& b) { a.Swap(&b); }
+  inline void Swap(SetMemoryBlockAttributesResponse* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(SetMemoryBlockAttributesResponse* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  SetMemoryBlockAttributesResponse* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<SetMemoryBlockAttributesResponse>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const SetMemoryBlockAttributesResponse& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const SetMemoryBlockAttributesResponse& from) { SetMemoryBlockAttributesResponse::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(SetMemoryBlockAttributesResponse* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.SetMemoryBlockAttributesResponse"; }
+
+ protected:
+  explicit SetMemoryBlockAttributesResponse(::google::protobuf::Arena* arena);
+  SetMemoryBlockAttributesResponse(::google::protobuf::Arena* arena, const SetMemoryBlockAttributesResponse& from);
+  SetMemoryBlockAttributesResponse(::google::protobuf::Arena* arena, SetMemoryBlockAttributesResponse&& from) noexcept
+      : SetMemoryBlockAttributesResponse(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kBlockFieldNumber = 2,
+    kUpdatedFieldNumber = 1,
+  };
+  // .libghidra.MemoryBlockRecord block = 2;
+  bool has_block() const;
+  void clear_block() ;
+  const ::libghidra::MemoryBlockRecord& block() const;
+  PROTOBUF_NODISCARD ::libghidra::MemoryBlockRecord* release_block();
+  ::libghidra::MemoryBlockRecord* mutable_block();
+  void set_allocated_block(::libghidra::MemoryBlockRecord* value);
+  void unsafe_arena_set_allocated_block(::libghidra::MemoryBlockRecord* value);
+  ::libghidra::MemoryBlockRecord* unsafe_arena_release_block();
+
+  private:
+  const ::libghidra::MemoryBlockRecord& _internal_block() const;
+  ::libghidra::MemoryBlockRecord* _internal_mutable_block();
+
+  public:
+  // bool updated = 1;
+  void clear_updated() ;
+  bool updated() const;
+  void set_updated(bool value);
+
+  private:
+  bool _internal_updated() const;
+  void _internal_set_updated(bool value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.SetMemoryBlockAttributesResponse)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      1, 2, 1,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const SetMemoryBlockAttributesResponse& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::libghidra::MemoryBlockRecord* block_;
+    bool updated_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -4922,6 +5398,335 @@ inline void MoveMemoryBlockResponse::set_allocated_block(::libghidra::MemoryBloc
 
   _impl_.block_ = reinterpret_cast<::libghidra::MemoryBlockRecord*>(value);
   // @@protoc_insertion_point(field_set_allocated:libghidra.MoveMemoryBlockResponse.block)
+}
+
+// -------------------------------------------------------------------
+
+// SetMemoryBlockAttributesRequest
+
+// uint64 address = 2;
+inline void SetMemoryBlockAttributesRequest::clear_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.address_ = ::uint64_t{0u};
+}
+inline ::uint64_t SetMemoryBlockAttributesRequest::address() const {
+  // @@protoc_insertion_point(field_get:libghidra.SetMemoryBlockAttributesRequest.address)
+  return _internal_address();
+}
+inline void SetMemoryBlockAttributesRequest::set_address(::uint64_t value) {
+  _internal_set_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.SetMemoryBlockAttributesRequest.address)
+}
+inline ::uint64_t SetMemoryBlockAttributesRequest::_internal_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.address_;
+}
+inline void SetMemoryBlockAttributesRequest::_internal_set_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.address_ = value;
+}
+
+// optional string name = 3;
+inline bool SetMemoryBlockAttributesRequest::has_name() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline void SetMemoryBlockAttributesRequest::clear_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.name_.ClearToEmpty();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+inline const std::string& SetMemoryBlockAttributesRequest::name() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.SetMemoryBlockAttributesRequest.name)
+  return _internal_name();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void SetMemoryBlockAttributesRequest::set_name(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_._has_bits_[0] |= 0x00000001u;
+  _impl_.name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.SetMemoryBlockAttributesRequest.name)
+}
+inline std::string* SetMemoryBlockAttributesRequest::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_name();
+  // @@protoc_insertion_point(field_mutable:libghidra.SetMemoryBlockAttributesRequest.name)
+  return _s;
+}
+inline const std::string& SetMemoryBlockAttributesRequest::_internal_name() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.name_.Get();
+}
+inline void SetMemoryBlockAttributesRequest::_internal_set_name(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_._has_bits_[0] |= 0x00000001u;
+  _impl_.name_.Set(value, GetArena());
+}
+inline std::string* SetMemoryBlockAttributesRequest::_internal_mutable_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_._has_bits_[0] |= 0x00000001u;
+  return _impl_.name_.Mutable( GetArena());
+}
+inline std::string* SetMemoryBlockAttributesRequest::release_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.SetMemoryBlockAttributesRequest.name)
+  if ((_impl_._has_bits_[0] & 0x00000001u) == 0) {
+    return nullptr;
+  }
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  auto* released = _impl_.name_.Release();
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
+    _impl_.name_.Set("", GetArena());
+  }
+  return released;
+}
+inline void SetMemoryBlockAttributesRequest::set_allocated_name(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  _impl_.name_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.name_.IsDefault()) {
+    _impl_.name_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.SetMemoryBlockAttributesRequest.name)
+}
+
+// optional bool is_read = 4;
+inline bool SetMemoryBlockAttributesRequest::has_is_read() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline void SetMemoryBlockAttributesRequest::clear_is_read() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.is_read_ = false;
+  _impl_._has_bits_[0] &= ~0x00000004u;
+}
+inline bool SetMemoryBlockAttributesRequest::is_read() const {
+  // @@protoc_insertion_point(field_get:libghidra.SetMemoryBlockAttributesRequest.is_read)
+  return _internal_is_read();
+}
+inline void SetMemoryBlockAttributesRequest::set_is_read(bool value) {
+  _internal_set_is_read(value);
+  _impl_._has_bits_[0] |= 0x00000004u;
+  // @@protoc_insertion_point(field_set:libghidra.SetMemoryBlockAttributesRequest.is_read)
+}
+inline bool SetMemoryBlockAttributesRequest::_internal_is_read() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.is_read_;
+}
+inline void SetMemoryBlockAttributesRequest::_internal_set_is_read(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.is_read_ = value;
+}
+
+// optional bool is_write = 5;
+inline bool SetMemoryBlockAttributesRequest::has_is_write() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline void SetMemoryBlockAttributesRequest::clear_is_write() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.is_write_ = false;
+  _impl_._has_bits_[0] &= ~0x00000008u;
+}
+inline bool SetMemoryBlockAttributesRequest::is_write() const {
+  // @@protoc_insertion_point(field_get:libghidra.SetMemoryBlockAttributesRequest.is_write)
+  return _internal_is_write();
+}
+inline void SetMemoryBlockAttributesRequest::set_is_write(bool value) {
+  _internal_set_is_write(value);
+  _impl_._has_bits_[0] |= 0x00000008u;
+  // @@protoc_insertion_point(field_set:libghidra.SetMemoryBlockAttributesRequest.is_write)
+}
+inline bool SetMemoryBlockAttributesRequest::_internal_is_write() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.is_write_;
+}
+inline void SetMemoryBlockAttributesRequest::_internal_set_is_write(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.is_write_ = value;
+}
+
+// optional bool is_execute = 6;
+inline bool SetMemoryBlockAttributesRequest::has_is_execute() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline void SetMemoryBlockAttributesRequest::clear_is_execute() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.is_execute_ = false;
+  _impl_._has_bits_[0] &= ~0x00000010u;
+}
+inline bool SetMemoryBlockAttributesRequest::is_execute() const {
+  // @@protoc_insertion_point(field_get:libghidra.SetMemoryBlockAttributesRequest.is_execute)
+  return _internal_is_execute();
+}
+inline void SetMemoryBlockAttributesRequest::set_is_execute(bool value) {
+  _internal_set_is_execute(value);
+  _impl_._has_bits_[0] |= 0x00000010u;
+  // @@protoc_insertion_point(field_set:libghidra.SetMemoryBlockAttributesRequest.is_execute)
+}
+inline bool SetMemoryBlockAttributesRequest::_internal_is_execute() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.is_execute_;
+}
+inline void SetMemoryBlockAttributesRequest::_internal_set_is_execute(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.is_execute_ = value;
+}
+
+// optional uint64 end_address = 7;
+inline bool SetMemoryBlockAttributesRequest::has_end_address() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline void SetMemoryBlockAttributesRequest::clear_end_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.end_address_ = ::uint64_t{0u};
+  _impl_._has_bits_[0] &= ~0x00000002u;
+}
+inline ::uint64_t SetMemoryBlockAttributesRequest::end_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.SetMemoryBlockAttributesRequest.end_address)
+  return _internal_end_address();
+}
+inline void SetMemoryBlockAttributesRequest::set_end_address(::uint64_t value) {
+  _internal_set_end_address(value);
+  _impl_._has_bits_[0] |= 0x00000002u;
+  // @@protoc_insertion_point(field_set:libghidra.SetMemoryBlockAttributesRequest.end_address)
+}
+inline ::uint64_t SetMemoryBlockAttributesRequest::_internal_end_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.end_address_;
+}
+inline void SetMemoryBlockAttributesRequest::_internal_set_end_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.end_address_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// SetMemoryBlockAttributesResponse
+
+// bool updated = 1;
+inline void SetMemoryBlockAttributesResponse::clear_updated() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.updated_ = false;
+}
+inline bool SetMemoryBlockAttributesResponse::updated() const {
+  // @@protoc_insertion_point(field_get:libghidra.SetMemoryBlockAttributesResponse.updated)
+  return _internal_updated();
+}
+inline void SetMemoryBlockAttributesResponse::set_updated(bool value) {
+  _internal_set_updated(value);
+  // @@protoc_insertion_point(field_set:libghidra.SetMemoryBlockAttributesResponse.updated)
+}
+inline bool SetMemoryBlockAttributesResponse::_internal_updated() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.updated_;
+}
+inline void SetMemoryBlockAttributesResponse::_internal_set_updated(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.updated_ = value;
+}
+
+// .libghidra.MemoryBlockRecord block = 2;
+inline bool SetMemoryBlockAttributesResponse::has_block() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.block_ != nullptr);
+  return value;
+}
+inline void SetMemoryBlockAttributesResponse::clear_block() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.block_ != nullptr) _impl_.block_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+inline const ::libghidra::MemoryBlockRecord& SetMemoryBlockAttributesResponse::_internal_block() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  const ::libghidra::MemoryBlockRecord* p = _impl_.block_;
+  return p != nullptr ? *p : reinterpret_cast<const ::libghidra::MemoryBlockRecord&>(::libghidra::_MemoryBlockRecord_default_instance_);
+}
+inline const ::libghidra::MemoryBlockRecord& SetMemoryBlockAttributesResponse::block() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.SetMemoryBlockAttributesResponse.block)
+  return _internal_block();
+}
+inline void SetMemoryBlockAttributesResponse::unsafe_arena_set_allocated_block(::libghidra::MemoryBlockRecord* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.block_);
+  }
+  _impl_.block_ = reinterpret_cast<::libghidra::MemoryBlockRecord*>(value);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:libghidra.SetMemoryBlockAttributesResponse.block)
+}
+inline ::libghidra::MemoryBlockRecord* SetMemoryBlockAttributesResponse::release_block() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::MemoryBlockRecord* released = _impl_.block_;
+  _impl_.block_ = nullptr;
+  if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
+    auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
+    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    if (GetArena() == nullptr) {
+      delete old;
+    }
+  } else {
+    if (GetArena() != nullptr) {
+      released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    }
+  }
+  return released;
+}
+inline ::libghidra::MemoryBlockRecord* SetMemoryBlockAttributesResponse::unsafe_arena_release_block() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.SetMemoryBlockAttributesResponse.block)
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::MemoryBlockRecord* temp = _impl_.block_;
+  _impl_.block_ = nullptr;
+  return temp;
+}
+inline ::libghidra::MemoryBlockRecord* SetMemoryBlockAttributesResponse::_internal_mutable_block() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.block_ == nullptr) {
+    auto* p = ::google::protobuf::Message::DefaultConstruct<::libghidra::MemoryBlockRecord>(GetArena());
+    _impl_.block_ = reinterpret_cast<::libghidra::MemoryBlockRecord*>(p);
+  }
+  return _impl_.block_;
+}
+inline ::libghidra::MemoryBlockRecord* SetMemoryBlockAttributesResponse::mutable_block() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  _impl_._has_bits_[0] |= 0x00000001u;
+  ::libghidra::MemoryBlockRecord* _msg = _internal_mutable_block();
+  // @@protoc_insertion_point(field_mutable:libghidra.SetMemoryBlockAttributesResponse.block)
+  return _msg;
+}
+inline void SetMemoryBlockAttributesResponse::set_allocated_block(::libghidra::MemoryBlockRecord* value) {
+  ::google::protobuf::Arena* message_arena = GetArena();
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (message_arena == nullptr) {
+    delete (_impl_.block_);
+  }
+
+  if (value != nullptr) {
+    ::google::protobuf::Arena* submessage_arena = (value)->GetArena();
+    if (message_arena != submessage_arena) {
+      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
+    }
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+
+  _impl_.block_ = reinterpret_cast<::libghidra::MemoryBlockRecord*>(value);
+  // @@protoc_insertion_point(field_set_allocated:libghidra.SetMemoryBlockAttributesResponse.block)
 }
 
 #ifdef __GNUC__

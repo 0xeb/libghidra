@@ -89,6 +89,8 @@ public final class RpcDispatcher {
 					return memoryRemoveMemoryBlock(request);
 				case "libghidra.MemoryService/MoveMemoryBlock":
 					return memoryMoveMemoryBlock(request);
+				case "libghidra.MemoryService/SetMemoryBlockAttributes":
+					return memorySetMemoryBlockAttributes(request);
 				case "libghidra.FunctionsService/GetFunction":
 					return functionsGetFunction(request);
 				case "libghidra.FunctionsService/ListFunctions":
@@ -769,6 +771,41 @@ public final class RpcDispatcher {
 		libghidra.MoveMemoryBlockResponse.Builder out =
 			libghidra.MoveMemoryBlockResponse.newBuilder()
 				.setMoved(response != null && response.moved());
+		if (response != null && response.block() != null) {
+			out.setBlock(toMemoryBlockRecordProto(response.block()));
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private libghidra.RpcResponse memorySetMemoryBlockAttributes(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.SetMemoryBlockAttributesRequest protoRequest = unpackPayload(request,
+			libghidra.SetMemoryBlockAttributesRequest.class,
+			libghidra.SetMemoryBlockAttributesRequest.getDefaultInstance());
+		// Every mutable field has explicit presence: hasX() false -> null -> leave alone.
+		// Reading them unconditionally would turn "rename this block" into "rename it and
+		// also clear read/write/execute", which is exactly the clobber the presence
+		// semantics exist to prevent.
+		MemoryContract.SetMemoryBlockAttributesResponse response =
+			callbacks.setMemoryBlockAttributes(
+				new MemoryContract.SetMemoryBlockAttributesRequest(
+					protoRequest.getAddress(),
+					protoRequest.hasName() ? protoRequest.getName() : null,
+					protoRequest.hasIsRead() ? protoRequest.getIsRead() : null,
+					protoRequest.hasIsWrite() ? protoRequest.getIsWrite() : null,
+					protoRequest.hasIsExecute() ? protoRequest.getIsExecute() : null,
+					protoRequest.hasEndAddress() ? protoRequest.getEndAddress() : null));
+		if (response != null && !response.updated() && response.errorMessage() != null &&
+			!response.errorMessage().isBlank()) {
+			return error(
+				response.errorCode() != null && !response.errorCode().isBlank()
+					? response.errorCode()
+					: "set_memory_block_attributes_failed",
+				response.errorMessage());
+		}
+		libghidra.SetMemoryBlockAttributesResponse.Builder out =
+			libghidra.SetMemoryBlockAttributesResponse.newBuilder()
+				.setUpdated(response != null && response.updated());
 		if (response != null && response.block() != null) {
 			out.setBlock(toMemoryBlockRecordProto(response.block()));
 		}

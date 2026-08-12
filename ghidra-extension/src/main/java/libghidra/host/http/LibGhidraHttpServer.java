@@ -72,6 +72,8 @@ public final class LibGhidraHttpServer {
 			MemoryContract.RemoveMemoryBlockRequest request);
 		MemoryContract.MoveMemoryBlockResponse moveMemoryBlock(
 			MemoryContract.MoveMemoryBlockRequest request);
+		MemoryContract.SetMemoryBlockAttributesResponse setMemoryBlockAttributes(
+			MemoryContract.SetMemoryBlockAttributesRequest request);
 		FunctionsContract.GetFunctionResponse getFunction(
 			FunctionsContract.GetFunctionRequest request);
 		FunctionsContract.ListFunctionsResponse listFunctions(
@@ -378,7 +380,13 @@ public final class LibGhidraHttpServer {
 			return;
 		}
 		if (!rpcSlots.tryAcquire()) {
-			respondRpcError(exchange, 200, "server_busy", "server is busy; retry later");
+			// 503, not 200: this is back-pressure, and the message tells the caller
+			// to retry -- but an HTTP 200 forces every client to discover that from
+			// the RPC error code alone. 503 maps to the standard retryable
+			// service_unavailable, so a client retries without needing to know
+			// anything libghidra-specific. The "server_busy" code stays in the body
+			// for clients that inspect it.
+			respondRpcError(exchange, 503, "server_busy", "server is busy; retry later");
 			return;
 		}
 		try {

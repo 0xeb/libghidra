@@ -105,4 +105,25 @@ public final class MemoryContract {
 		String errorCode,
 		String errorMessage) {
 	}
+
+	/**
+	 * Mutate an existing block's attributes. Every mutable field is nullable: null means
+	 * "leave alone", so a caller can flip one permission without restating the others.
+	 * {@code endAddress} is INCLUSIVE, matching {@link MemoryBlockRecord}.
+	 */
+	public record SetMemoryBlockAttributesRequest(
+		long address,
+		String name,
+		Boolean isRead,
+		Boolean isWrite,
+		Boolean isExecute,
+		Long endAddress) {
+	}
+
+	public record SetMemoryBlockAttributesResponse(
+		boolean updated,
+		MemoryBlockRecord block,
+		String errorCode,
+		String errorMessage) {
+	}
 }
