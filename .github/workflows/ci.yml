@@ -74,6 +74,16 @@ jobs:
           if ! git diff --quiet; then
             echo "::error::Generated protobuf stubs are stale. Run proto/tools/regen.py and commit the result."
             git --no-pager diff --stat
+            # A --stat-only failure is undiagnosable when the box that generated
+            # the stubs cannot reproduce it: same toolchain, same protoc, same
+            # inputs, different bytes. Print enough of the real patch, plus the
+            # exact versions in play, to tell a formatting difference from a
+            # content one without another round trip through CI.
+            echo "--- versions ---"
+            rustc --version; cargo --version; protoc --version
+            (rustfmt --version || echo "rustfmt: not installed") 2>&1
+            echo "--- patch (first 200 lines) ---"
+            git --no-pager diff --unified=1 | head -200
             exit 1
           fi
           echo "generated stubs match the .proto sources"
