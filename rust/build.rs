@@ -59,7 +59,14 @@ fn build_proto() {
     println!("cargo:rerun-if-changed={}", proto_dir.display());
     println!("cargo:rerun-if-changed={}", fallback.display());
 
-    let protos: Vec<PathBuf> = std::fs::read_dir(&proto_dir)
+    // read_dir yields entries in unspecified filesystem order, and prost-build
+    // emits messages in the order the files are handed to it -- so an unsorted
+    // list makes generated/libghidra.rs layout depend on the filesystem. NTFS
+    // happens to return names alphabetically, ext4 returns them in hash order
+    // and reorders between checkouts, which made the committed stubs reproduce
+    // locally but never on CI. Sort so the output is byte-identical everywhere.
+    // proto/tools/regen.py already sorts for the other three languages.
+    let mut protos: Vec<PathBuf> = std::fs::read_dir(&proto_dir)
         .ok()
         .into_iter()
         .flatten()
@@ -67,6 +74,7 @@ fn build_proto() {
         .map(|e| e.path())
         .filter(|p| p.extension().is_some_and(|ext| ext == "proto"))
         .collect();
+    protos.sort();
 
     if protos.is_empty() {
         copy_fallback(&fallback, &out_dir);
