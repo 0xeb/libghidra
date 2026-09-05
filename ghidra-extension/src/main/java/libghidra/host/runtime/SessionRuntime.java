@@ -809,9 +809,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		if (currentProgram() == null) {
 			return true;
 		}
-		SessionContract.ShutdownPolicy resolved = policy != null
-				? policy
-				: SessionContract.ShutdownPolicy.UNSPECIFIED;
+		SessionContract.ShutdownPolicy resolved = resolveShutdownPolicy(policy);
 		switch (resolved) {
 			case SAVE:
 				return saveProgramLocked(true);
@@ -822,6 +820,17 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			default:
 				return true;
 		}
+	}
+
+	/**
+	 * Normalize a missing wire policy without selecting an application policy.
+	 */
+	static SessionContract.ShutdownPolicy resolveShutdownPolicy(
+			SessionContract.ShutdownPolicy policy) {
+		if (policy == null) {
+			return SessionContract.ShutdownPolicy.UNSPECIFIED;
+		}
+		return policy;
 	}
 
 	private boolean saveProgramLocked(boolean allowDeferredHeadless) {

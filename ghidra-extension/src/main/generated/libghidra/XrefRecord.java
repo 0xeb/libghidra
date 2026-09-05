@@ -29,6 +29,8 @@ private static final long serialVersionUID = 0L;
   private XrefRecord() {
     refType_ = "";
     source_ = "";
+    fromFunctionName_ = "";
+    toFunctionName_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -210,6 +212,111 @@ private static final long serialVersionUID = 0L;
     return isFlow_;
   }
 
+  public static final int FROM_FUNCTION_ADDRESS_FIELD_NUMBER = 11;
+  private long fromFunctionAddress_ = 0L;
+  /**
+   * <pre>
+   * Populated for exact-from-function reads. These fields let clients enrich
+   * a bounded call graph without issuing one function lookup per reference.
+   * </pre>
+   *
+   * <code>uint64 from_function_address = 11;</code>
+   * @return The fromFunctionAddress.
+   */
+  @java.lang.Override
+  public long getFromFunctionAddress() {
+    return fromFunctionAddress_;
+  }
+
+  public static final int FROM_FUNCTION_NAME_FIELD_NUMBER = 12;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object fromFunctionName_ = "";
+  /**
+   * <code>string from_function_name = 12;</code>
+   * @return The fromFunctionName.
+   */
+  @java.lang.Override
+  public java.lang.String getFromFunctionName() {
+    java.lang.Object ref = fromFunctionName_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      fromFunctionName_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string from_function_name = 12;</code>
+   * @return The bytes for fromFunctionName.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getFromFunctionNameBytes() {
+    java.lang.Object ref = fromFunctionName_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      fromFunctionName_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int TO_FUNCTION_ADDRESS_FIELD_NUMBER = 13;
+  private long toFunctionAddress_ = 0L;
+  /**
+   * <code>uint64 to_function_address = 13;</code>
+   * @return The toFunctionAddress.
+   */
+  @java.lang.Override
+  public long getToFunctionAddress() {
+    return toFunctionAddress_;
+  }
+
+  public static final int TO_FUNCTION_NAME_FIELD_NUMBER = 14;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object toFunctionName_ = "";
+  /**
+   * <code>string to_function_name = 14;</code>
+   * @return The toFunctionName.
+   */
+  @java.lang.Override
+  public java.lang.String getToFunctionName() {
+    java.lang.Object ref = toFunctionName_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      toFunctionName_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string to_function_name = 14;</code>
+   * @return The bytes for toFunctionName.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getToFunctionNameBytes() {
+    java.lang.Object ref = toFunctionName_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      toFunctionName_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -253,6 +360,18 @@ private static final long serialVersionUID = 0L;
     }
     if (isFlow_ != false) {
       output.writeBool(10, isFlow_);
+    }
+    if (fromFunctionAddress_ != 0L) {
+      output.writeUInt64(11, fromFunctionAddress_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(fromFunctionName_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 12, fromFunctionName_);
+    }
+    if (toFunctionAddress_ != 0L) {
+      output.writeUInt64(13, toFunctionAddress_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(toFunctionName_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 14, toFunctionName_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -301,6 +420,20 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(10, isFlow_);
     }
+    if (fromFunctionAddress_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(11, fromFunctionAddress_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(fromFunctionName_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(12, fromFunctionName_);
+    }
+    if (toFunctionAddress_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(13, toFunctionAddress_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(toFunctionName_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(14, toFunctionName_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -336,6 +469,14 @@ private static final long serialVersionUID = 0L;
         != other.getIsMemory()) return false;
     if (getIsFlow()
         != other.getIsFlow()) return false;
+    if (getFromFunctionAddress()
+        != other.getFromFunctionAddress()) return false;
+    if (!getFromFunctionName()
+        .equals(other.getFromFunctionName())) return false;
+    if (getToFunctionAddress()
+        != other.getToFunctionAddress()) return false;
+    if (!getToFunctionName()
+        .equals(other.getToFunctionName())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -374,6 +515,16 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + IS_FLOW_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getIsFlow());
+    hash = (37 * hash) + FROM_FUNCTION_ADDRESS_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getFromFunctionAddress());
+    hash = (37 * hash) + FROM_FUNCTION_NAME_FIELD_NUMBER;
+    hash = (53 * hash) + getFromFunctionName().hashCode();
+    hash = (37 * hash) + TO_FUNCTION_ADDRESS_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getToFunctionAddress());
+    hash = (37 * hash) + TO_FUNCTION_NAME_FIELD_NUMBER;
+    hash = (53 * hash) + getToFunctionName().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -515,6 +666,10 @@ private static final long serialVersionUID = 0L;
       isExternal_ = false;
       isMemory_ = false;
       isFlow_ = false;
+      fromFunctionAddress_ = 0L;
+      fromFunctionName_ = "";
+      toFunctionAddress_ = 0L;
+      toFunctionName_ = "";
       return this;
     }
 
@@ -578,6 +733,18 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000200) != 0)) {
         result.isFlow_ = isFlow_;
       }
+      if (((from_bitField0_ & 0x00000400) != 0)) {
+        result.fromFunctionAddress_ = fromFunctionAddress_;
+      }
+      if (((from_bitField0_ & 0x00000800) != 0)) {
+        result.fromFunctionName_ = fromFunctionName_;
+      }
+      if (((from_bitField0_ & 0x00001000) != 0)) {
+        result.toFunctionAddress_ = toFunctionAddress_;
+      }
+      if (((from_bitField0_ & 0x00002000) != 0)) {
+        result.toFunctionName_ = toFunctionName_;
+      }
     }
 
     @java.lang.Override
@@ -625,6 +792,22 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getIsFlow() != false) {
         setIsFlow(other.getIsFlow());
+      }
+      if (other.getFromFunctionAddress() != 0L) {
+        setFromFunctionAddress(other.getFromFunctionAddress());
+      }
+      if (!other.getFromFunctionName().isEmpty()) {
+        fromFunctionName_ = other.fromFunctionName_;
+        bitField0_ |= 0x00000800;
+        onChanged();
+      }
+      if (other.getToFunctionAddress() != 0L) {
+        setToFunctionAddress(other.getToFunctionAddress());
+      }
+      if (!other.getToFunctionName().isEmpty()) {
+        toFunctionName_ = other.toFunctionName_;
+        bitField0_ |= 0x00002000;
+        onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -702,6 +885,26 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000200;
               break;
             } // case 80
+            case 88: {
+              fromFunctionAddress_ = input.readUInt64();
+              bitField0_ |= 0x00000400;
+              break;
+            } // case 88
+            case 98: {
+              fromFunctionName_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000800;
+              break;
+            } // case 98
+            case 104: {
+              toFunctionAddress_ = input.readUInt64();
+              bitField0_ |= 0x00001000;
+              break;
+            } // case 104
+            case 114: {
+              toFunctionName_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00002000;
+              break;
+            } // case 114
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1115,6 +1318,229 @@ private static final long serialVersionUID = 0L;
     public Builder clearIsFlow() {
       bitField0_ = (bitField0_ & ~0x00000200);
       isFlow_ = false;
+      onChanged();
+      return this;
+    }
+
+    private long fromFunctionAddress_ ;
+    /**
+     * <pre>
+     * Populated for exact-from-function reads. These fields let clients enrich
+     * a bounded call graph without issuing one function lookup per reference.
+     * </pre>
+     *
+     * <code>uint64 from_function_address = 11;</code>
+     * @return The fromFunctionAddress.
+     */
+    @java.lang.Override
+    public long getFromFunctionAddress() {
+      return fromFunctionAddress_;
+    }
+    /**
+     * <pre>
+     * Populated for exact-from-function reads. These fields let clients enrich
+     * a bounded call graph without issuing one function lookup per reference.
+     * </pre>
+     *
+     * <code>uint64 from_function_address = 11;</code>
+     * @param value The fromFunctionAddress to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFromFunctionAddress(long value) {
+
+      fromFunctionAddress_ = value;
+      bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Populated for exact-from-function reads. These fields let clients enrich
+     * a bounded call graph without issuing one function lookup per reference.
+     * </pre>
+     *
+     * <code>uint64 from_function_address = 11;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFromFunctionAddress() {
+      bitField0_ = (bitField0_ & ~0x00000400);
+      fromFunctionAddress_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object fromFunctionName_ = "";
+    /**
+     * <code>string from_function_name = 12;</code>
+     * @return The fromFunctionName.
+     */
+    public java.lang.String getFromFunctionName() {
+      java.lang.Object ref = fromFunctionName_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        fromFunctionName_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string from_function_name = 12;</code>
+     * @return The bytes for fromFunctionName.
+     */
+    public com.google.protobuf.ByteString
+        getFromFunctionNameBytes() {
+      java.lang.Object ref = fromFunctionName_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        fromFunctionName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string from_function_name = 12;</code>
+     * @param value The fromFunctionName to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFromFunctionName(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      fromFunctionName_ = value;
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string from_function_name = 12;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFromFunctionName() {
+      fromFunctionName_ = getDefaultInstance().getFromFunctionName();
+      bitField0_ = (bitField0_ & ~0x00000800);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string from_function_name = 12;</code>
+     * @param value The bytes for fromFunctionName to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFromFunctionNameBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      fromFunctionName_ = value;
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+
+    private long toFunctionAddress_ ;
+    /**
+     * <code>uint64 to_function_address = 13;</code>
+     * @return The toFunctionAddress.
+     */
+    @java.lang.Override
+    public long getToFunctionAddress() {
+      return toFunctionAddress_;
+    }
+    /**
+     * <code>uint64 to_function_address = 13;</code>
+     * @param value The toFunctionAddress to set.
+     * @return This builder for chaining.
+     */
+    public Builder setToFunctionAddress(long value) {
+
+      toFunctionAddress_ = value;
+      bitField0_ |= 0x00001000;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>uint64 to_function_address = 13;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearToFunctionAddress() {
+      bitField0_ = (bitField0_ & ~0x00001000);
+      toFunctionAddress_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object toFunctionName_ = "";
+    /**
+     * <code>string to_function_name = 14;</code>
+     * @return The toFunctionName.
+     */
+    public java.lang.String getToFunctionName() {
+      java.lang.Object ref = toFunctionName_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        toFunctionName_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string to_function_name = 14;</code>
+     * @return The bytes for toFunctionName.
+     */
+    public com.google.protobuf.ByteString
+        getToFunctionNameBytes() {
+      java.lang.Object ref = toFunctionName_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        toFunctionName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string to_function_name = 14;</code>
+     * @param value The toFunctionName to set.
+     * @return This builder for chaining.
+     */
+    public Builder setToFunctionName(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      toFunctionName_ = value;
+      bitField0_ |= 0x00002000;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string to_function_name = 14;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearToFunctionName() {
+      toFunctionName_ = getDefaultInstance().getToFunctionName();
+      bitField0_ = (bitField0_ & ~0x00002000);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string to_function_name = 14;</code>
+     * @param value The bytes for toFunctionName to set.
+     * @return This builder for chaining.
+     */
+    public Builder setToFunctionNameBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      toFunctionName_ = value;
+      bitField0_ |= 0x00002000;
       onChanged();
       return this;
     }

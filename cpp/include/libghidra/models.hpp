@@ -418,6 +418,10 @@ struct XrefRecord {
   bool is_external = false;
   bool is_memory = false;
   bool is_flow = false;
+  std::uint64_t from_function_address = 0;
+  std::string from_function_name;
+  std::uint64_t to_function_address = 0;
+  std::string to_function_name;
 };
 
 struct ListXrefsResponse {

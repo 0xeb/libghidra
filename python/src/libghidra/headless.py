@@ -6,6 +6,7 @@
 """Launch headless Ghidra and return a connected GhidraClient."""
 
 from collections import deque
+import os
 import shutil
 import socket
 import subprocess
@@ -142,7 +143,12 @@ class HeadlessClient:
 
 
 def _find_launcher(ghidra_dir: Path) -> Path:
-    for name in ("support/analyzeHeadless.bat", "support/analyzeHeadless"):
+    names = (
+        ("support/analyzeHeadless.bat", "support/analyzeHeadless")
+        if os.name == "nt"
+        else ("support/analyzeHeadless", "support/analyzeHeadless.bat")
+    )
+    for name in names:
         p = ghidra_dir / name
         if p.exists():
             return p

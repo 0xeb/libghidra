@@ -18,6 +18,12 @@ namespace libghidra::client {
 struct HttpClientOptions {
   std::string base_url = "http://127.0.0.1:18080";
   std::string auth_token;
+  // Optional identity sent as X-LibGhidra-Client. When set, Cancel() aborts
+  // only THIS client's in-flight RPCs; several clients can share one host
+  // (ghidrasql alongside a parallel test tier), and MAX_IN_FLIGHT_RPC is
+  // greater than one, so an unidentified cancel aborts everyone's work.
+  // Empty preserves the original cancel-everything behaviour.
+  std::string client_id;
   std::chrono::milliseconds connect_timeout{3000};
   std::chrono::milliseconds read_timeout{120000};
   std::chrono::milliseconds write_timeout{15000};
@@ -40,6 +46,10 @@ class HttpClient final : public IClient {
 
   StatusOr<HealthStatus> GetStatus() override;
   StatusOr<std::vector<Capability>> GetCapabilities() override;
+
+  /// Send an out-of-band cooperative cancellation request using a dedicated
+  /// HTTP connection, so it remains callable while the primary RPC is blocked.
+  Status Cancel() const;
 
   StatusOr<OpenProjectResponse> OpenProject(const OpenProjectRequest& request) override;
   StatusOr<CloseProjectResponse> CloseProject(ShutdownPolicy policy) override;
@@ -78,6 +88,10 @@ class HttpClient final : public IClient {
                                                 std::uint64_t range_end,
                                                 int limit,
                                                 int offset) override;
+  StatusOr<ListFunctionsResponse> ListLeafFunctions(std::uint64_t range_start,
+                                                    std::uint64_t range_end,
+                                                    int limit,
+                                                    int offset) override;
   StatusOr<RenameFunctionResponse> RenameFunction(std::uint64_t address,
                                                   const std::string& new_name) override;
   StatusOr<ListBasicBlocksResponse> ListBasicBlocks(std::uint64_t range_start,
@@ -131,6 +145,17 @@ class HttpClient final : public IClient {
                                         std::uint64_t range_end,
                                         int limit,
                                         int offset) override;
+  StatusOr<ListXrefsResponse> ListXrefsTo(std::uint64_t to_address,
+                                          int limit,
+                                          int offset) override;
+  StatusOr<ListXrefsResponse> ListXrefsFromFunction(
+      std::uint64_t function_address,
+      int limit,
+      int offset) override;
+  StatusOr<ListXrefsResponse> ListXrefsToFunction(
+      std::uint64_t function_address,
+      int limit,
+      int offset) override;
   StatusOr<GetTypeResponse> GetType(const std::string& path) override;
   StatusOr<ListTypesResponse> ListTypes(const std::string& query,
                                         int limit,

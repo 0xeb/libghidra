@@ -161,6 +161,11 @@ class IClient : public IHealthClient,
     return StatusOr<ListFunctionsResponse>::FromError(
         "NOT_SUPPORTED", "not implemented by this backend");
   }
+  StatusOr<ListFunctionsResponse> ListLeafFunctions(std::uint64_t, std::uint64_t, int,
+                                                    int) override {
+    return StatusOr<ListFunctionsResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
   StatusOr<RenameFunctionResponse> RenameFunction(std::uint64_t,
                                                   const std::string&) override {
     return StatusOr<RenameFunctionResponse>::FromError(

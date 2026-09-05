@@ -169,7 +169,7 @@ int main(int argc, char* argv[]) {
     auto save = h->SaveProgram();
     printf("  saved=%s\n", save.ok() ? "true" : "false");
 
-    int code = h.close();
+    int code = h.close(true);
     printf("  Ghidra exited with code %d\n", code);
 
   } catch (const std::exception& e) {

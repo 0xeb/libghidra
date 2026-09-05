@@ -166,9 +166,10 @@ client.open_program(OpenProgramRequest {
 # Ok::<(), libghidra::Error>(())
 ```
 
-Call `close(true)` or shut down with `ShutdownPolicy::Save` to persist the
-project. Later Rust, Python, C++, GUI, or ghidrasql sessions can reopen the same
-project and select saved programs by domain path. See
+Generic headless options default to no save/discard action. Call `close(true)`
+or shut down with `ShutdownPolicy::Save` to persist the project explicitly.
+Later Rust, Python, C++, GUI, or ghidrasql sessions can reopen the same project
+and select saved programs by domain path. See
 [`examples/multi_program_strings.rs`](examples/multi_program_strings.rs) for a
 variadic live example that imports multiple binaries, counts strings, saves, and
 shuts headless down.

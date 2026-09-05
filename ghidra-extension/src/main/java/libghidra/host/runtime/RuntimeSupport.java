@@ -31,6 +31,10 @@ abstract class RuntimeSupport {
 		return state.writeLock();
 	}
 
+	protected final void checkCancelled() {
+		RequestCancellation.throwIfCancelled();
+	}
+
 	protected final Program currentProgram() {
 		return state.getCurrentProgram();
 	}

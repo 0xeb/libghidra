@@ -158,6 +158,20 @@ program path. See `python/examples/multi_program_strings.py`,
 `rust/examples/multi_program_strings.rs` for runnable live examples that import
 multiple binaries, count strings, save, and shut down cleanly.
 
+### Headless process ownership
+
+`HeadlessClient` owns the complete process tree it launches. On Windows the
+tree is assigned to a kill-on-close Job Object. On POSIX systems the launcher
+and JVM share a dedicated process group, and a small lifetime guardian closes
+that group if the C++ owner disappears without running destructors (including
+`SIGKILL`). Generic headless launchers default to the no-action policy; owning
+applications must select their desired policy. Normal `close()` requests the
+caller-selected policy before escalating to a bounded force-kill.
+
+Calling `detach()` is the explicit exception: it disarms ownership and leaves
+the headless host running after the client object or process exits. The caller
+then owns shutdown, project locks, and cleanup of the detached host.
+
 ### 3. Query the API
 
 **Python** (easiest):
@@ -214,8 +228,13 @@ function listing, decompilation, and small offline binary helpers:
 ```bash
 libghidra status --url http://127.0.0.1:18080
 libghidra functions --url http://127.0.0.1:18080 --limit 20
-libghidra decompile --url http://127.0.0.1:18080 0x140001000
+libghidra decompile --url http://127.0.0.1:18080 \
+  --require-exact 0x140001000
 ```
+
+`--require-exact` returns nonzero instead of accepting incomplete or synthetic
+fallback pseudocode. JSON output always includes `completed`, `is_fallback`,
+and a normalized `status`.
 
 **C++:**
 ```cpp
@@ -427,7 +446,8 @@ libghidra/
 - **Enumeration methods are out of scope in local mode.** `IClient` is the shared API across
   two backends. `HttpClient` talks to a running Ghidra instance whose analysis pass populates a
   full function/xref/string database — `list_functions()`, `list_basic_blocks(addr)`,
-  `list_cfg_edges(addr)`, `list_xrefs(start, end)`, and `list_defined_strings()` work as you
+  `list_cfg_edges(addr)`, `list_xrefs(start, end)`, exact xref helpers such as
+  `list_xrefs_to_function(addr)`, and `list_defined_strings()` work as you
   would expect there. `LocalClient` wraps the standalone C++ decompiler engine, which does not
   run an analysis pass; those same enumeration methods always return empty by design. Local
   mode is for **address-driven** queries — `get_decompilation(addr)`,
@@ -447,6 +467,12 @@ libghidra/
 ## Proto Contracts
 
 Typed RPCs across 9 domain service areas, defined in [`proto/libghidra/`](proto/libghidra/). The current contracts define 90 domain RPCs plus one transport RPC. Transport is binary protobuf over `POST /rpc` (not gRPC). See [proto/README.md](proto/README.md).
+
+Exact-from-function xref responses include source and destination function
+identity, so downstream call-graph views can remain bounded without an RPC per
+edge. The live declaration parser also supplies exact signed and unsigned
+8/16/32/64-bit `stdint` typedef identities despite intentionally not running a
+C preprocessor or loading `<stdint.h>`.
 
 ## License and Terms of Use
 

@@ -24,6 +24,11 @@ Prerequisites:
 
 By default, the host binds to `127.0.0.1:18080`.
 
+The generic headless script defaults to `shutdown=none`, which performs no
+automatic save or discard action. An owning application that wants persistence
+must pass `shutdown=save` explicitly; `SaveProgram` remains available as an
+independent checkpoint at any time.
+
 ## Responsibilities
 
 - Host typed API operations defined in `libghidra/proto`

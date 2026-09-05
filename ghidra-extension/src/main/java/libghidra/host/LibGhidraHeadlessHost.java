@@ -42,6 +42,18 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 		NONE
 	}
 
+	/**
+	 * Parse a shutdown policy string, falling back to SAVE.
+	 *
+	 * The fallback is deliberate and is NOT the same question as the RPC-layer
+	 * default. This runs on the SHUTDOWN path: an unrecognised or absent value
+	 * here means the process is already on its way down, and the two failure
+	 * modes are not symmetric. Falling back to SAVE writes work the caller may
+	 * not have asked to keep; throwing, or defaulting to NONE, DISCARDS work the
+	 * caller may have spent hours producing -- and an uncaught throw during
+	 * shutdown means nothing is saved at all. Preserving data is the recoverable
+	 * error.
+	 */
 	public static ShutdownPolicy parseShutdownPolicy(String raw) {
 		if (raw == null || raw.isBlank()) {
 			return ShutdownPolicy.SAVE;
@@ -406,6 +418,12 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			public FunctionsContract.ListFunctionsResponse listFunctions(
 					FunctionsContract.ListFunctionsRequest request) {
 				return functionsHandler.listFunctions(request);
+			}
+
+			@Override
+			public FunctionsContract.ListFunctionsResponse listLeafFunctions(
+					FunctionsContract.ListFunctionsRequest request) {
+				return functionsHandler.listLeafFunctions(request);
 			}
 
 			@Override

@@ -274,14 +274,16 @@ Or use the bundled CLI:
 ```bash
 libghidra status    --url http://127.0.0.1:18080
 libghidra functions --url http://127.0.0.1:18080 --limit 5
-libghidra decompile --url http://127.0.0.1:18080 0x<entry-of-first-function>
+libghidra decompile --url http://127.0.0.1:18080 \
+  --require-exact 0x<entry-of-first-function>
 ```
 
 **Gate**:
 - `client.get_status().service_name` is non-empty.
 - `client.list_functions()` returns ≥ 1 function for a real binary.
-- `client.get_decompilation(addr).decompilation.pseudocode` is a
-  non-empty string for the first function's entry address.
+- `client.get_decompilation(addr).decompilation` has `completed == true`,
+  `is_fallback == false`, and non-empty `pseudocode` for the first function's
+  entry address.
 
 If `list_functions()` returns zero entries:
 - The post-script may have been launched before analysis completed —

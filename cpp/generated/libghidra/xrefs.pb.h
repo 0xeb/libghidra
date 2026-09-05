@@ -223,6 +223,8 @@ class XrefRecord final : public ::google::protobuf::Message
   enum : int {
     kRefTypeFieldNumber = 4,
     kSourceFieldNumber = 6,
+    kFromFunctionNameFieldNumber = 12,
+    kToFunctionNameFieldNumber = 14,
     kFromAddressFieldNumber = 1,
     kToAddressFieldNumber = 2,
     kSymbolIdFieldNumber = 7,
@@ -231,6 +233,8 @@ class XrefRecord final : public ::google::protobuf::Message
     kIsExternalFieldNumber = 8,
     kIsMemoryFieldNumber = 9,
     kIsFlowFieldNumber = 10,
+    kFromFunctionAddressFieldNumber = 11,
+    kToFunctionAddressFieldNumber = 13,
   };
   // string ref_type = 4;
   void clear_ref_type() ;
@@ -262,6 +266,38 @@ class XrefRecord final : public ::google::protobuf::Message
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_source(
       const std::string& value);
   std::string* _internal_mutable_source();
+
+  public:
+  // string from_function_name = 12;
+  void clear_from_function_name() ;
+  const std::string& from_function_name() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_from_function_name(Arg_&& arg, Args_... args);
+  std::string* mutable_from_function_name();
+  PROTOBUF_NODISCARD std::string* release_from_function_name();
+  void set_allocated_from_function_name(std::string* value);
+
+  private:
+  const std::string& _internal_from_function_name() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_from_function_name(
+      const std::string& value);
+  std::string* _internal_mutable_from_function_name();
+
+  public:
+  // string to_function_name = 14;
+  void clear_to_function_name() ;
+  const std::string& to_function_name() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_to_function_name(Arg_&& arg, Args_... args);
+  std::string* mutable_to_function_name();
+  PROTOBUF_NODISCARD std::string* release_to_function_name();
+  void set_allocated_to_function_name(std::string* value);
+
+  private:
+  const std::string& _internal_to_function_name() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_to_function_name(
+      const std::string& value);
+  std::string* _internal_mutable_to_function_name();
 
   public:
   // uint64 from_address = 1;
@@ -344,13 +380,33 @@ class XrefRecord final : public ::google::protobuf::Message
   void _internal_set_is_flow(bool value);
 
   public:
+  // uint64 from_function_address = 11;
+  void clear_from_function_address() ;
+  ::uint64_t from_function_address() const;
+  void set_from_function_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_from_function_address() const;
+  void _internal_set_from_function_address(::uint64_t value);
+
+  public:
+  // uint64 to_function_address = 13;
+  void clear_to_function_address() ;
+  ::uint64_t to_function_address() const;
+  void set_to_function_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_to_function_address() const;
+  void _internal_set_to_function_address(::uint64_t value);
+
+  public:
   // @@protoc_insertion_point(class_scope:libghidra.XrefRecord)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      4, 10, 0,
-      51, 2>
+      4, 14, 0,
+      85, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -369,6 +425,8 @@ class XrefRecord final : public ::google::protobuf::Message
                           const XrefRecord& from_msg);
     ::google::protobuf::internal::ArenaStringPtr ref_type_;
     ::google::protobuf::internal::ArenaStringPtr source_;
+    ::google::protobuf::internal::ArenaStringPtr from_function_name_;
+    ::google::protobuf::internal::ArenaStringPtr to_function_name_;
     ::uint64_t from_address_;
     ::uint64_t to_address_;
     ::int64_t symbol_id_;
@@ -377,6 +435,8 @@ class XrefRecord final : public ::google::protobuf::Message
     bool is_external_;
     bool is_memory_;
     bool is_flow_;
+    ::uint64_t from_function_address_;
+    ::uint64_t to_function_address_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -730,6 +790,12 @@ class ListXrefsRequest final : public ::google::protobuf::Message
   enum : int {
     kRangeFieldNumber = 2,
     kPageFieldNumber = 3,
+    kToAddressFieldNumber = 5,
+    kFunctionAddressFieldNumber = 7,
+    kToFunctionAddressFieldNumber = 9,
+    kExactToAddressFieldNumber = 4,
+    kExactFromFunctionFieldNumber = 6,
+    kExactToFunctionFieldNumber = 8,
   };
   // .libghidra.AddressRange range = 2;
   bool has_range() const;
@@ -761,12 +827,72 @@ class ListXrefsRequest final : public ::google::protobuf::Message
   ::libghidra::Pagination* _internal_mutable_page();
 
   public:
+  // uint64 to_address = 5;
+  void clear_to_address() ;
+  ::uint64_t to_address() const;
+  void set_to_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_to_address() const;
+  void _internal_set_to_address(::uint64_t value);
+
+  public:
+  // uint64 function_address = 7;
+  void clear_function_address() ;
+  ::uint64_t function_address() const;
+  void set_function_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_function_address() const;
+  void _internal_set_function_address(::uint64_t value);
+
+  public:
+  // uint64 to_function_address = 9;
+  void clear_to_function_address() ;
+  ::uint64_t to_function_address() const;
+  void set_to_function_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_to_function_address() const;
+  void _internal_set_to_function_address(::uint64_t value);
+
+  public:
+  // bool exact_to_address = 4;
+  void clear_exact_to_address() ;
+  bool exact_to_address() const;
+  void set_exact_to_address(bool value);
+
+  private:
+  bool _internal_exact_to_address() const;
+  void _internal_set_exact_to_address(bool value);
+
+  public:
+  // bool exact_from_function = 6;
+  void clear_exact_from_function() ;
+  bool exact_from_function() const;
+  void set_exact_from_function(bool value);
+
+  private:
+  bool _internal_exact_from_function() const;
+  void _internal_set_exact_from_function(bool value);
+
+  public:
+  // bool exact_to_function = 8;
+  void clear_exact_to_function() ;
+  bool exact_to_function() const;
+  void set_exact_to_function(bool value);
+
+  private:
+  bool _internal_exact_to_function() const;
+  void _internal_set_exact_to_function(bool value);
+
+  public:
   // @@protoc_insertion_point(class_scope:libghidra.ListXrefsRequest)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      1, 2, 2,
+      3, 8, 2,
       0, 2>
       _table_;
 
@@ -788,6 +914,12 @@ class ListXrefsRequest final : public ::google::protobuf::Message
     ::google::protobuf::internal::CachedSize _cached_size_;
     ::libghidra::AddressRange* range_;
     ::libghidra::Pagination* page_;
+    ::uint64_t to_address_;
+    ::uint64_t function_address_;
+    ::uint64_t to_function_address_;
+    bool exact_to_address_;
+    bool exact_from_function_;
+    bool exact_to_function_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -1082,6 +1214,146 @@ inline void XrefRecord::_internal_set_is_flow(bool value) {
   _impl_.is_flow_ = value;
 }
 
+// uint64 from_function_address = 11;
+inline void XrefRecord::clear_from_function_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.from_function_address_ = ::uint64_t{0u};
+}
+inline ::uint64_t XrefRecord::from_function_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.XrefRecord.from_function_address)
+  return _internal_from_function_address();
+}
+inline void XrefRecord::set_from_function_address(::uint64_t value) {
+  _internal_set_from_function_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.XrefRecord.from_function_address)
+}
+inline ::uint64_t XrefRecord::_internal_from_function_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.from_function_address_;
+}
+inline void XrefRecord::_internal_set_from_function_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.from_function_address_ = value;
+}
+
+// string from_function_name = 12;
+inline void XrefRecord::clear_from_function_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.from_function_name_.ClearToEmpty();
+}
+inline const std::string& XrefRecord::from_function_name() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.XrefRecord.from_function_name)
+  return _internal_from_function_name();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void XrefRecord::set_from_function_name(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.from_function_name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.XrefRecord.from_function_name)
+}
+inline std::string* XrefRecord::mutable_from_function_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_from_function_name();
+  // @@protoc_insertion_point(field_mutable:libghidra.XrefRecord.from_function_name)
+  return _s;
+}
+inline const std::string& XrefRecord::_internal_from_function_name() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.from_function_name_.Get();
+}
+inline void XrefRecord::_internal_set_from_function_name(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.from_function_name_.Set(value, GetArena());
+}
+inline std::string* XrefRecord::_internal_mutable_from_function_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.from_function_name_.Mutable( GetArena());
+}
+inline std::string* XrefRecord::release_from_function_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.XrefRecord.from_function_name)
+  return _impl_.from_function_name_.Release();
+}
+inline void XrefRecord::set_allocated_from_function_name(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.from_function_name_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.from_function_name_.IsDefault()) {
+    _impl_.from_function_name_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.XrefRecord.from_function_name)
+}
+
+// uint64 to_function_address = 13;
+inline void XrefRecord::clear_to_function_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_function_address_ = ::uint64_t{0u};
+}
+inline ::uint64_t XrefRecord::to_function_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.XrefRecord.to_function_address)
+  return _internal_to_function_address();
+}
+inline void XrefRecord::set_to_function_address(::uint64_t value) {
+  _internal_set_to_function_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.XrefRecord.to_function_address)
+}
+inline ::uint64_t XrefRecord::_internal_to_function_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.to_function_address_;
+}
+inline void XrefRecord::_internal_set_to_function_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_function_address_ = value;
+}
+
+// string to_function_name = 14;
+inline void XrefRecord::clear_to_function_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_function_name_.ClearToEmpty();
+}
+inline const std::string& XrefRecord::to_function_name() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.XrefRecord.to_function_name)
+  return _internal_to_function_name();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void XrefRecord::set_to_function_name(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_function_name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.XrefRecord.to_function_name)
+}
+inline std::string* XrefRecord::mutable_to_function_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_to_function_name();
+  // @@protoc_insertion_point(field_mutable:libghidra.XrefRecord.to_function_name)
+  return _s;
+}
+inline const std::string& XrefRecord::_internal_to_function_name() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.to_function_name_.Get();
+}
+inline void XrefRecord::_internal_set_to_function_name(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_function_name_.Set(value, GetArena());
+}
+inline std::string* XrefRecord::_internal_mutable_to_function_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.to_function_name_.Mutable( GetArena());
+}
+inline std::string* XrefRecord::release_to_function_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.XrefRecord.to_function_name)
+  return _impl_.to_function_name_.Release();
+}
+inline void XrefRecord::set_allocated_to_function_name(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_function_name_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.to_function_name_.IsDefault()) {
+    _impl_.to_function_name_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.XrefRecord.to_function_name)
+}
+
 // -------------------------------------------------------------------
 
 // ListXrefsRequest
@@ -1266,6 +1538,138 @@ inline void ListXrefsRequest::set_allocated_page(::libghidra::Pagination* value)
 
   _impl_.page_ = reinterpret_cast<::libghidra::Pagination*>(value);
   // @@protoc_insertion_point(field_set_allocated:libghidra.ListXrefsRequest.page)
+}
+
+// bool exact_to_address = 4;
+inline void ListXrefsRequest::clear_exact_to_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.exact_to_address_ = false;
+}
+inline bool ListXrefsRequest::exact_to_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.ListXrefsRequest.exact_to_address)
+  return _internal_exact_to_address();
+}
+inline void ListXrefsRequest::set_exact_to_address(bool value) {
+  _internal_set_exact_to_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.ListXrefsRequest.exact_to_address)
+}
+inline bool ListXrefsRequest::_internal_exact_to_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.exact_to_address_;
+}
+inline void ListXrefsRequest::_internal_set_exact_to_address(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.exact_to_address_ = value;
+}
+
+// uint64 to_address = 5;
+inline void ListXrefsRequest::clear_to_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_address_ = ::uint64_t{0u};
+}
+inline ::uint64_t ListXrefsRequest::to_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.ListXrefsRequest.to_address)
+  return _internal_to_address();
+}
+inline void ListXrefsRequest::set_to_address(::uint64_t value) {
+  _internal_set_to_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.ListXrefsRequest.to_address)
+}
+inline ::uint64_t ListXrefsRequest::_internal_to_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.to_address_;
+}
+inline void ListXrefsRequest::_internal_set_to_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_address_ = value;
+}
+
+// bool exact_from_function = 6;
+inline void ListXrefsRequest::clear_exact_from_function() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.exact_from_function_ = false;
+}
+inline bool ListXrefsRequest::exact_from_function() const {
+  // @@protoc_insertion_point(field_get:libghidra.ListXrefsRequest.exact_from_function)
+  return _internal_exact_from_function();
+}
+inline void ListXrefsRequest::set_exact_from_function(bool value) {
+  _internal_set_exact_from_function(value);
+  // @@protoc_insertion_point(field_set:libghidra.ListXrefsRequest.exact_from_function)
+}
+inline bool ListXrefsRequest::_internal_exact_from_function() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.exact_from_function_;
+}
+inline void ListXrefsRequest::_internal_set_exact_from_function(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.exact_from_function_ = value;
+}
+
+// uint64 function_address = 7;
+inline void ListXrefsRequest::clear_function_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.function_address_ = ::uint64_t{0u};
+}
+inline ::uint64_t ListXrefsRequest::function_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.ListXrefsRequest.function_address)
+  return _internal_function_address();
+}
+inline void ListXrefsRequest::set_function_address(::uint64_t value) {
+  _internal_set_function_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.ListXrefsRequest.function_address)
+}
+inline ::uint64_t ListXrefsRequest::_internal_function_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.function_address_;
+}
+inline void ListXrefsRequest::_internal_set_function_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.function_address_ = value;
+}
+
+// bool exact_to_function = 8;
+inline void ListXrefsRequest::clear_exact_to_function() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.exact_to_function_ = false;
+}
+inline bool ListXrefsRequest::exact_to_function() const {
+  // @@protoc_insertion_point(field_get:libghidra.ListXrefsRequest.exact_to_function)
+  return _internal_exact_to_function();
+}
+inline void ListXrefsRequest::set_exact_to_function(bool value) {
+  _internal_set_exact_to_function(value);
+  // @@protoc_insertion_point(field_set:libghidra.ListXrefsRequest.exact_to_function)
+}
+inline bool ListXrefsRequest::_internal_exact_to_function() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.exact_to_function_;
+}
+inline void ListXrefsRequest::_internal_set_exact_to_function(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.exact_to_function_ = value;
+}
+
+// uint64 to_function_address = 9;
+inline void ListXrefsRequest::clear_to_function_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_function_address_ = ::uint64_t{0u};
+}
+inline ::uint64_t ListXrefsRequest::to_function_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.ListXrefsRequest.to_function_address)
+  return _internal_to_function_address();
+}
+inline void ListXrefsRequest::set_to_function_address(::uint64_t value) {
+  _internal_set_to_function_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.ListXrefsRequest.to_function_address)
+}
+inline ::uint64_t ListXrefsRequest::_internal_to_function_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.to_function_address_;
+}
+inline void ListXrefsRequest::_internal_set_to_function_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_function_address_ = value;
 }
 
 // -------------------------------------------------------------------

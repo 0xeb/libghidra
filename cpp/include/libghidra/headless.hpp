@@ -24,6 +24,7 @@ struct HeadlessProjectOptions {
   std::string bind = "127.0.0.1";  // Bind address for the headless server
   std::string project_dir;     // Empty = temp dir (auto-cleaned)
   std::string project_name = "HeadlessProject";
+  // Generic launcher default; owning applications select persistence.
   std::string shutdown = "save";   // "save"|"discard"|"none"
   std::string auth_token;          // Bearer auth token
   int max_runtime_seconds = 0;     // 0 = no limit (forwarded as max_runtime_ms)
@@ -81,14 +82,22 @@ class HeadlessClient {
   /// The Shutdown RPC and the output-pipe drain are issued in detached
   /// worker threads so a wedged Java host can't block close() indefinitely.
   /// If the child process has not exited within `timeout`, it is
-  /// force-killed via TerminateProcess / SIGTERM. A force-kill is reported
-  /// as exit code -2 (distinguishable from a clean -1 timeout).
+  /// force-killed via a Windows Job Object or POSIX process-group SIGKILL. A
+  /// force-kill is reported as exit code -2 (distinguishable from a clean -1
+  /// timeout).
   ///
   /// Default timeout is 60 seconds, which is long enough for a healthy
   /// save+exit on a normal program. Pass a smaller value for tests or a
   /// larger value when expecting very long save flushes.
-  int close(bool save = true,
+  int close(ShutdownPolicy policy,
             std::chrono::milliseconds timeout = std::chrono::seconds(60));
+
+  /// Compatibility shorthand for an explicit save or discard choice.
+  int close(bool save,
+            std::chrono::milliseconds timeout = std::chrono::seconds(60)) {
+    return close(save ? ShutdownPolicy::kSave : ShutdownPolicy::kDiscard,
+                 timeout);
+  }
 
  private:
   friend HeadlessClient LaunchHeadlessProject(HeadlessProjectOptions);

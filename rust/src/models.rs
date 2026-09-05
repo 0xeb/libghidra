@@ -15,6 +15,16 @@ pub enum ShutdownPolicy {
     None,
 }
 
+#[cfg(test)]
+mod shutdown_policy_tests {
+    use super::ShutdownPolicy;
+
+    #[test]
+    fn default_is_unspecified() {
+        assert_eq!(ShutdownPolicy::default(), ShutdownPolicy::Unspecified);
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum CommentKind {
     #[default]
@@ -409,6 +419,10 @@ pub struct XrefRecord {
     pub is_external: bool,
     pub is_memory: bool,
     pub is_flow: bool,
+    pub from_function_address: u64,
+    pub from_function_name: String,
+    pub to_function_address: u64,
+    pub to_function_name: String,
 }
 
 #[derive(Debug, Clone, Default)]

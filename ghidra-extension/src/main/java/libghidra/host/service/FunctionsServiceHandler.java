@@ -38,6 +38,18 @@ public final class FunctionsServiceHandler {
 		return runtime.listFunctions(request);
 	}
 
+	public FunctionsContract.ListFunctionsResponse listLeafFunctions(
+			FunctionsContract.ListFunctionsRequest request) {
+		if (request == null) {
+			request = new FunctionsContract.ListFunctionsRequest(
+				0L,
+				0L,
+				0,
+				0);
+		}
+		return runtime.listLeafFunctions(request);
+	}
+
 	public FunctionsContract.RenameFunctionResponse renameFunction(
 			FunctionsContract.RenameFunctionRequest request) {
 		if (request == null) {

@@ -80,4 +80,45 @@ public interface XrefRecordOrBuilder extends
    * @return The isFlow.
    */
   boolean getIsFlow();
+
+  /**
+   * <pre>
+   * Populated for exact-from-function reads. These fields let clients enrich
+   * a bounded call graph without issuing one function lookup per reference.
+   * </pre>
+   *
+   * <code>uint64 from_function_address = 11;</code>
+   * @return The fromFunctionAddress.
+   */
+  long getFromFunctionAddress();
+
+  /**
+   * <code>string from_function_name = 12;</code>
+   * @return The fromFunctionName.
+   */
+  java.lang.String getFromFunctionName();
+  /**
+   * <code>string from_function_name = 12;</code>
+   * @return The bytes for fromFunctionName.
+   */
+  com.google.protobuf.ByteString
+      getFromFunctionNameBytes();
+
+  /**
+   * <code>uint64 to_function_address = 13;</code>
+   * @return The toFunctionAddress.
+   */
+  long getToFunctionAddress();
+
+  /**
+   * <code>string to_function_name = 14;</code>
+   * @return The toFunctionName.
+   */
+  java.lang.String getToFunctionName();
+  /**
+   * <code>string to_function_name = 14;</code>
+   * @return The bytes for toFunctionName.
+   */
+  com.google.protobuf.ByteString
+      getToFunctionNameBytes();
 }

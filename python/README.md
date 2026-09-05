@@ -74,6 +74,7 @@ with ghidra.launch_headless_project(ghidra.HeadlessProjectOptions(
     ghidra_dir="C:/ghidra_dist/ghidra_12.1_DEV",
     project_dir="C:/work/projects",
     project_name="firmware",
+    shutdown="save",
 )) as host:
     loader = host.import_program(ghidra.ImportProgramRequest(
         source_path="C:/samples/loader.elf",
@@ -103,11 +104,12 @@ with ghidra.launch_headless_project(ghidra.HeadlessProjectOptions(
     ))
 ```
 
-Use absolute Ghidra domain paths (`/folder/name`) for project programs. Closing
-the host with save enabled persists the project; a later Python, C++, Rust, GUI,
-or ghidrasql session can reopen the project and select saved programs by domain
-path. See [`examples/project_files.py`](examples/project_files.py) for a compact
-listing/switching example and
+Use absolute Ghidra domain paths (`/folder/name`) for project programs. Generic
+headless options default to no save/discard action, so select `shutdown="save"`
+when context-manager exit should persist pending work. A later Python, C++,
+Rust, GUI, or ghidrasql session can reopen the project and select saved programs
+by domain path. See [`examples/project_files.py`](examples/project_files.py)
+for a compact listing/switching example and
 [`examples/multi_program_strings.py`](examples/multi_program_strings.py) for a
 variadic live example that imports multiple binaries, counts strings, saves, and
 shuts headless down.
@@ -137,8 +139,14 @@ workflows. Connected commands talk to a running LibGhidraHost:
 ```bash
 libghidra status --url http://127.0.0.1:18080
 libghidra functions --url http://127.0.0.1:18080 --limit 20
-libghidra decompile --url http://127.0.0.1:18080 0x140001000
+libghidra decompile --url http://127.0.0.1:18080 \
+  --require-exact 0x140001000
 ```
+
+`--require-exact` returns nonzero and suppresses text/file export when native
+decompilation is incomplete or returns synthetic fallback pseudocode. Without
+it, the CLI retains compatibility by accepting nonempty non-exact text; JSON
+records still identify `completed`, `is_fallback`, and normalized `status`.
 
 The CLI also includes small offline binary helpers:
 
@@ -205,8 +213,8 @@ For the full method-by-method reference, see the [API Reference](docs/api_refere
 
 ## API Surface
 
-This table describes the synchronous client. The async client mirrors the core
-host operations but does not expose every newer helper method yet.
+This table describes the synchronous client. The async client mirrors these
+core host operations, including the exact xref helpers.
 
 | Area | Methods |
 |------|---------|
@@ -215,7 +223,7 @@ host operations but does not expose every newer helper method yet.
 | Memory | `read_bytes`, `write_bytes`, `patch_bytes_batch`, `list_memory_blocks` |
 | Functions | `get_function`, `list_functions`, `rename_function`, `list_basic_blocks`, `list_cfg_edges`, `list_switch_tables`, `list_dominators`, `list_post_dominators`, `list_loops`, `list_function_tags`, `create_function_tag`, `delete_function_tag`, `list_function_tag_mappings`, `tag_function`, `untag_function` |
 | Symbols | `get_symbol`, `list_symbols`, `rename_symbol`, `delete_symbol` |
-| Xrefs | `list_xrefs` |
+| Xrefs | `list_xrefs`, `list_xrefs_to`, `list_xrefs_from_function`, `list_xrefs_to_function` |
 | Types | `get_type`, `list_types`, `list_type_aliases`, `list_type_unions`, `list_type_enums`, `list_type_enum_members`, `list_type_members`, `get_function_signature`, `list_function_signatures`, `set_function_signature`, `rename_function_parameter`, `set_function_parameter_type`, `rename_function_local`, `set_function_local_type`, `apply_data_type`, `create_type`, `delete_type`, `rename_type`, `create_type_alias`, `delete_type_alias`, `set_type_alias_target`, `create_type_enum`, `delete_type_enum`, `add_type_enum_member`, `delete_type_enum_member`, `rename_type_enum_member`, `set_type_enum_member_value`, `add_type_member`, `delete_type_member`, `rename_type_member`, `set_type_member_type`, `parse_declarations` |
 | Decompiler | `get_decompilation`, `list_decompilations` |
 | Listing | `get_instruction`, `list_instructions`, `get_comments`, `set_comment`, `delete_comment`, `rename_data_item`, `delete_data_item`, `list_data_items`, `list_bookmarks`, `add_bookmark`, `delete_bookmark`, `list_breakpoints`, `add_breakpoint`, `set_breakpoint_enabled`, `set_breakpoint_kind`, `set_breakpoint_size`, `set_breakpoint_condition`, `set_breakpoint_group`, `delete_breakpoint`, `list_defined_strings` |

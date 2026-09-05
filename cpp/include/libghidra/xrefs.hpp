@@ -21,6 +21,29 @@ class IXrefsClient {
                                                 std::uint64_t range_end,
                                                 int limit,
                                                 int offset) = 0;
+
+  virtual StatusOr<ListXrefsResponse> ListXrefsTo(std::uint64_t to_address,
+                                                  int limit,
+                                                  int offset) {
+    return StatusOr<ListXrefsResponse>::FromError(
+        "NOT_SUPPORTED", "exact destination xrefs are not implemented by this backend");
+  }
+
+  virtual StatusOr<ListXrefsResponse> ListXrefsFromFunction(
+      std::uint64_t function_address,
+      int limit,
+      int offset) {
+    return StatusOr<ListXrefsResponse>::FromError(
+        "NOT_SUPPORTED", "exact function xrefs are not implemented by this backend");
+  }
+
+  virtual StatusOr<ListXrefsResponse> ListXrefsToFunction(
+      std::uint64_t function_address,
+      int limit,
+      int offset) {
+    return StatusOr<ListXrefsResponse>::FromError(
+        "NOT_SUPPORTED", "exact destination-function xrefs are not implemented by this backend");
+  }
 };
 
 }  // namespace libghidra::client

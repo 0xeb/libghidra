@@ -24,7 +24,13 @@ public final class XrefsServiceHandler {
 				0L,
 				0L,
 				0,
-				0);
+				0,
+				false,
+				0L,
+				false,
+				0L,
+				false,
+				0L);
 		}
 		return runtime.listXrefs(request);
 	}

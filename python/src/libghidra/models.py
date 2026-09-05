@@ -19,6 +19,8 @@ from enum import IntEnum
 
 
 class ShutdownPolicy(IntEnum):
+    """Explicit close policy; owning applications choose their default."""
+
     UNSPECIFIED = 0
     SAVE = 1
     DISCARD = 2
@@ -392,6 +394,10 @@ class XrefRecord:
     is_external: bool = False
     is_memory: bool = False
     is_flow: bool = False
+    from_function_address: int = 0
+    from_function_name: str = ""
+    to_function_address: int = 0
+    to_function_name: str = ""
 
 
 @dataclass

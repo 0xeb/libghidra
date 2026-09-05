@@ -200,7 +200,11 @@ class LocalClient final : public IClient {
       // Call the non-locking helper, NOT the public CloseProgram(): we already
       // hold req_mu_ and it is a non-recursive std::mutex, so re-entering it
       // here would self-deadlock.
-      closeProgramLocked(policy);
+      auto closed = closeProgramLocked(policy);
+      if (!closed.ok()) {
+        return StatusOr<ShutdownResponse>::FromError(
+            closed.status.code, closed.status.message);
+      }
     }
     ShutdownResponse resp;
     resp.accepted = true;
@@ -1638,8 +1642,11 @@ class LocalClient final : public IClient {
                                                        "no program loaded");
     }
 
-    if (policy == ShutdownPolicy::kSave && !opts_.state_path.empty()) {
-      pool_->saveState(opts_.state_path);
+    const bool should_save = policy == ShutdownPolicy::kSave;
+    if (should_save && !opts_.state_path.empty() &&
+        !pool_->saveState(opts_.state_path)) {
+      return StatusOr<CloseProgramResponse>::FromError(
+          "SAVE_FAILED", pool_->getError());
     }
 
     pool_->resetAdapters();

@@ -11,11 +11,13 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.sun.net.httpserver.Headers;
@@ -32,12 +34,16 @@ import libghidra.host.contract.DecompilerContract;
 import libghidra.host.contract.TypesContract;
 import libghidra.host.contract.XrefsContract;
 import libghidra.host.rpc.RpcDispatcher;
+import libghidra.host.runtime.RequestCancellation;
 
 public final class LibGhidraHttpServer {
 	private static final int MAX_WORKERS =
 		Math.max(2, Math.min(8, Runtime.getRuntime().availableProcessors()));
 	private static final int MAX_QUEUE_DEPTH = MAX_WORKERS * 4;
 	private static final int MAX_IN_FLIGHT_RPC = MAX_WORKERS * 2;
+
+	/** Optional header identifying the calling client, for scoped /cancel. */
+	private static final String CLIENT_ID_HEADER = "X-LibGhidra-Client";
 
 	public interface Callbacks {
 		HealthContract.HealthStatusResponse healthStatus(HealthContract.HealthStatusRequest request);
@@ -77,6 +83,8 @@ public final class LibGhidraHttpServer {
 		FunctionsContract.GetFunctionResponse getFunction(
 			FunctionsContract.GetFunctionRequest request);
 		FunctionsContract.ListFunctionsResponse listFunctions(
+			FunctionsContract.ListFunctionsRequest request);
+		FunctionsContract.ListFunctionsResponse listLeafFunctions(
 			FunctionsContract.ListFunctionsRequest request);
 		FunctionsContract.RenameFunctionResponse renameFunction(
 			FunctionsContract.RenameFunctionRequest request);
@@ -243,6 +251,13 @@ public final class LibGhidraHttpServer {
 	private String authToken;
 	private Callbacks callbacks;
 	private final Semaphore rpcSlots = new Semaphore(MAX_IN_FLIGHT_RPC, true);
+	// Bumped by an unscoped /cancel and by stop(); aborts every in-flight RPC.
+	private final AtomicLong cancelEpoch = new AtomicLong();
+	// Per-client epochs, so an identified client cancels only its own requests.
+	// Keyed by the X-LibGhidra-Client header; unbounded in principle, but keys
+	// come from a small fixed set of cooperating clients, not from user input.
+	private final ConcurrentHashMap<String, AtomicLong> clientCancelEpochs =
+		new ConcurrentHashMap<>();
 
 	public int start(String bind, int port, String token, Callbacks cb) throws IOException {
 		synchronized (stateLock) {
@@ -269,6 +284,7 @@ public final class LibGhidraHttpServer {
 			nextServer.createContext("/", this::handleRoot);
 			nextServer.createContext("/help", this::handleHelp);
 			nextServer.createContext("/rpc", this::handleRpc);
+			nextServer.createContext("/cancel", this::handleCancel);
 
 			authToken = token != null ? token.trim() : "";
 			callbacks = cb;
@@ -297,6 +313,7 @@ public final class LibGhidraHttpServer {
 
 	public void stop() {
 		synchronized (stateLock) {
+			cancelEpoch.incrementAndGet();
 			if (server != null) {
 				server.stop(0);
 				server = null;
@@ -327,6 +344,7 @@ public final class LibGhidraHttpServer {
 		String text =
 			"libghidra host\n" +
 			"POST /rpc (application/x-protobuf; body=libghidra.RpcRequest)\n" +
+			"POST /cancel (cancel RPCs already executing)\n" +
 			"GET  /help\n";
 		respond(exchange, 200, "text/plain", text);
 	}
@@ -342,6 +360,7 @@ public final class LibGhidraHttpServer {
 		String text =
 			"libghidra transport\n" +
 			"POST /rpc (application/x-protobuf; body=libghidra.RpcRequest)\n" +
+			"POST /cancel (cancel RPCs already executing)\n" +
 			"\n" +
 			"Method names currently implemented over /rpc:\n" +
 			"- libghidra.HealthService/GetStatus\n" +
@@ -400,7 +419,20 @@ public final class LibGhidraHttpServer {
 				e.getMessage() != null ? e.getMessage() : "failed to parse RpcRequest");
 			return;
 		}
-		libghidra.RpcResponse response = new RpcDispatcher(cb).dispatch(request);
+		// Observe both the global epoch (unscoped cancel / stop) and this
+		// client's own epoch, so a scoped cancel from another client cannot
+		// abort this request.
+		long requestCancelEpoch = cancelEpoch.get();
+		String requestClientId = clientIdOf(exchange);
+		AtomicLong clientEpoch =
+			requestClientId.isEmpty() ? null : clientCancelEpoch(requestClientId);
+		long requestClientEpoch = clientEpoch != null ? clientEpoch.get() : 0L;
+		libghidra.RpcResponse response;
+		try (RequestCancellation.Scope ignored = RequestCancellation.begin(
+				() -> cancelEpoch.get() != requestCancelEpoch ||
+					(clientEpoch != null && clientEpoch.get() != requestClientEpoch))) {
+			response = new RpcDispatcher(cb).dispatch(request);
+		}
 		respondBytes(exchange, 200, "application/x-protobuf", response.toByteArray());
 		try {
 			cb.afterRpcResponse(request.getMethod());
@@ -413,6 +445,52 @@ public final class LibGhidraHttpServer {
 		finally {
 			rpcSlots.release();
 		}
+	}
+
+	/**
+	 * Cancel in-flight RPCs.
+	 *
+	 * Scoped by the optional X-LibGhidra-Client header. MAX_IN_FLIGHT_RPC is
+	 * greater than one and several clients can share a host (ghidrasql plus a
+	 * parallel test tier, say), so an unscoped cancel is cross-talk: one client's
+	 * Ctrl-C would abort every other client's work with no way to tell why. A
+	 * client that identifies itself cancels only its own requests.
+	 *
+	 * Omitting the header keeps the original cancel-everything behaviour, so an
+	 * older client is unaffected.
+	 */
+	private void handleCancel(HttpExchange exchange) throws IOException {
+		if (!checkAuth(exchange)) {
+			return;
+		}
+		if (!"POST".equals(exchange.getRequestMethod())) {
+			respond(exchange, 405, "text/plain", "method not allowed");
+			return;
+		}
+		String clientId = clientIdOf(exchange);
+		if (clientId.isEmpty()) {
+			cancelEpoch.incrementAndGet();
+			respond(exchange, 200, "application/json",
+				"{\"success\":true,\"message\":\"cancel requested (all clients)\"}");
+			return;
+		}
+		clientCancelEpoch(clientId).incrementAndGet();
+		respond(exchange, 200, "application/json",
+			"{\"success\":true,\"message\":\"cancel requested\",\"client\":\"" +
+				jsonEscape(clientId) + "\"}");
+	}
+
+	private String clientIdOf(HttpExchange exchange) {
+		String value = exchange.getRequestHeaders().getFirst(CLIENT_ID_HEADER);
+		return value == null ? "" : value.trim();
+	}
+
+	private AtomicLong clientCancelEpoch(String clientId) {
+		return clientCancelEpochs.computeIfAbsent(clientId, unused -> new AtomicLong());
+	}
+
+	private static String jsonEscape(String value) {
+		return value.replace("\\", "\\\\").replace("\"", "\\\"");
 	}
 
 	private boolean checkAuth(HttpExchange exchange) throws IOException {

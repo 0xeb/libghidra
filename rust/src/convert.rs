@@ -109,6 +109,10 @@ impl From<pb::XrefRecord> for models::XrefRecord {
             is_external: r.is_external,
             is_memory: r.is_memory,
             is_flow: r.is_flow,
+            from_function_address: r.from_function_address,
+            from_function_name: r.from_function_name,
+            to_function_address: r.to_function_address,
+            to_function_name: r.to_function_name,
         }
     }
 }

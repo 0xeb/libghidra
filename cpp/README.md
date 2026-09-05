@@ -20,6 +20,23 @@ with **explicit addresses** (`GetDecompilation(addr)`, `ListInstructions(start, 
 `ReadBytes(addr, n)`, `RenameFunction(addr, name)`); if you need program-wide enumeration,
 route the call through `HttpClient` against a Ghidra host.
 
+### Out-of-band cancellation (HTTP)
+
+`HttpClient::Cancel()` uses a short-lived control connection rather than the
+client's primary RPC connection. It is therefore safe to call from another
+thread while the primary client is blocked in a long listing RPC:
+
+```cpp
+libghidra::client::HttpClient client(options);
+// Worker thread: client.ListInstructions(...)
+auto cancelled = client.Cancel();
+```
+
+The paired Java extension marks RPCs that were already executing as cancelled.
+Long listing loops poll that state and return the RPC error code `cancelled`.
+Cancellation is cooperative: operations that do not poll cannot be forcibly
+terminated, and a client/extension version mismatch returns an HTTP error.
+
 ## Quick Start
 
 ```cpp
@@ -131,7 +148,9 @@ auto r = client->OpenProgram(req);
 StatusOr<CloseProgramResponse> CloseProgram(ShutdownPolicy policy)
 ```
 
-Closes the current program. Pass `ShutdownPolicy::kSave` to save state first, `kDiscard` to abandon changes.
+Closes the current program. Pass `ShutdownPolicy::kSave` to save state first,
+`ShutdownPolicy::kDiscard` to abandon changes, or `ShutdownPolicy::kNone` to
+perform no save/discard action.
 
 ### SaveProgram
 
@@ -213,6 +232,13 @@ StatusOr<GetDecompilationResponse> GetDecompilation(uint64_t address, int timeou
 
 Decompiles the function at `address`. This is a prerequisite for signature, xref, and basic block data.
 
+For the live Ghidra host, `DecompilationRecord::pseudocode` is the unchanged
+`DecompiledFunction.getC()` string. Tokens and locals are returned in separate
+record fields; they are never injected into the pseudocode text. Treat a result
+as an exact successful decompilation only when `completed` is true and
+`is_fallback` is false. On failure, `pseudocode` may contain a synthetic
+diagnostic comment, with the reason in `error_message`.
+
 ```cpp
 auto d = client->GetDecompilation(0x140001000, 30000);
 if (d.ok() && d.value->decompilation) {
@@ -222,6 +248,7 @@ if (d.ok() && d.value->decompilation) {
     // dec.prototype             -- function prototype
     // dec.function_entry_address
     // dec.completed             -- true if decompilation succeeded
+    // dec.is_fallback           -- true if pseudocode is diagnostic fallback text
     // dec.error_message         -- non-empty on failure
 }
 ```
@@ -266,7 +293,9 @@ because the offline bridge does not yet expose this contract.
 StatusOr<GetFunctionResponse> GetFunction(uint64_t address)
 ```
 
-Gets a single function by entry address.
+Gets the function at an entry address or containing an interior address. The
+returned record always carries the canonical entry address; callers requiring
+exact-entry semantics must compare it with the requested address.
 
 ```cpp
 auto f = client->GetFunction(0x140001000);
@@ -890,6 +919,13 @@ for (auto& x : xrefs.value->xrefs) {
     // x.is_flow, x.is_memory, x.is_external
 }
 ```
+
+The live HTTP client also exposes `ListXrefsFromFunction(function_address,
+limit, offset)`. That bounded operation returns `from_function_address` /
+`from_function_name` and `to_function_address` / `to_function_name` on each
+record, allowing call-graph clients to enrich one function without issuing a
+function lookup for every reference. The four fields remain empty on backends
+or query modes that do not provide function context.
 
 Uses the decompiler pool for parallel extraction when `pool_size > 1`.
 

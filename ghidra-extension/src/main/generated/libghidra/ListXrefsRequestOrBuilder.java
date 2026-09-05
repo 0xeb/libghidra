@@ -38,4 +38,40 @@ public interface ListXrefsRequestOrBuilder extends
    * <code>.libghidra.Pagination page = 3;</code>
    */
   libghidra.PaginationOrBuilder getPageOrBuilder();
+
+  /**
+   * <code>bool exact_to_address = 4;</code>
+   * @return The exactToAddress.
+   */
+  boolean getExactToAddress();
+
+  /**
+   * <code>uint64 to_address = 5;</code>
+   * @return The toAddress.
+   */
+  long getToAddress();
+
+  /**
+   * <code>bool exact_from_function = 6;</code>
+   * @return The exactFromFunction.
+   */
+  boolean getExactFromFunction();
+
+  /**
+   * <code>uint64 function_address = 7;</code>
+   * @return The functionAddress.
+   */
+  long getFunctionAddress();
+
+  /**
+   * <code>bool exact_to_function = 8;</code>
+   * @return The exactToFunction.
+   */
+  boolean getExactToFunction();
+
+  /**
+   * <code>uint64 to_function_address = 9;</code>
+   * @return The toFunctionAddress.
+   */
+  long getToFunctionAddress();
 }

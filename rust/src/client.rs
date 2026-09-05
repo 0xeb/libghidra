@@ -788,6 +788,73 @@ impl GhidraClient {
         let req = pb::ListXrefsRequest {
             range: Self::address_range(range_start, range_end),
             page: Self::pagination(limit, offset),
+            ..Default::default()
+        };
+        let resp: pb::ListXrefsResponse = self.call_rpc(
+            "libghidra.XrefsService/ListXrefs",
+            &req,
+            "libghidra.ListXrefsRequest",
+        )?;
+        Ok(ListXrefsResponse {
+            xrefs: resp.xrefs.into_iter().map(Into::into).collect(),
+        })
+    }
+
+    pub fn list_xrefs_to(
+        &self,
+        to_address: u64,
+        limit: i32,
+        offset: i32,
+    ) -> Result<ListXrefsResponse> {
+        let req = pb::ListXrefsRequest {
+            page: Self::pagination(limit, offset),
+            exact_to_address: true,
+            to_address,
+            ..Default::default()
+        };
+        let resp: pb::ListXrefsResponse = self.call_rpc(
+            "libghidra.XrefsService/ListXrefs",
+            &req,
+            "libghidra.ListXrefsRequest",
+        )?;
+        Ok(ListXrefsResponse {
+            xrefs: resp.xrefs.into_iter().map(Into::into).collect(),
+        })
+    }
+
+    pub fn list_xrefs_from_function(
+        &self,
+        function_address: u64,
+        limit: i32,
+        offset: i32,
+    ) -> Result<ListXrefsResponse> {
+        let req = pb::ListXrefsRequest {
+            page: Self::pagination(limit, offset),
+            exact_from_function: true,
+            function_address,
+            ..Default::default()
+        };
+        let resp: pb::ListXrefsResponse = self.call_rpc(
+            "libghidra.XrefsService/ListXrefs",
+            &req,
+            "libghidra.ListXrefsRequest",
+        )?;
+        Ok(ListXrefsResponse {
+            xrefs: resp.xrefs.into_iter().map(Into::into).collect(),
+        })
+    }
+
+    pub fn list_xrefs_to_function(
+        &self,
+        function_address: u64,
+        limit: i32,
+        offset: i32,
+    ) -> Result<ListXrefsResponse> {
+        let req = pb::ListXrefsRequest {
+            page: Self::pagination(limit, offset),
+            exact_to_function: true,
+            to_function_address: function_address,
+            ..Default::default()
         };
         let resp: pb::ListXrefsResponse = self.call_rpc(
             "libghidra.XrefsService/ListXrefs",

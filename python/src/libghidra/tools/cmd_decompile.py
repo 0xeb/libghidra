@@ -27,6 +27,11 @@ def register(subparsers: argparse._SubParsersAction) -> None:
     p.add_argument("--output-dir", "-o", default=None, help="Write .c files to this directory (with --all)")
     p.add_argument("--timeout", type=int, default=30000, help="Decompile timeout in ms (default: 30000)")
     p.add_argument("--limit", type=int, default=0, help="Max functions to decompile with --all (0=all)")
+    p.add_argument(
+        "--require-exact",
+        action="store_true",
+        help="Fail instead of accepting incomplete or synthetic fallback pseudocode",
+    )
     p.set_defaults(func=run)
 
 
@@ -63,7 +68,17 @@ def _resolve_function(client, name: str) -> int | None:
     return None
 
 
-def _decompile_single(client, target: str, timeout_ms: int, fmt: str) -> int:
+def _decompilation_status(dec) -> str:
+    if dec.completed and not dec.is_fallback:
+        return "ok"
+    if dec.is_fallback:
+        return "fallback"
+    return "incomplete"
+
+
+def _decompile_single(
+    client, target: str, timeout_ms: int, fmt: str, require_exact: bool = False
+) -> int:
     from libghidra import GhidraError
 
     addr = _parse_address(target)
@@ -80,6 +95,8 @@ def _decompile_single(client, target: str, timeout_ms: int, fmt: str) -> int:
         return 1
 
     dec = resp.decompilation
+    status = _decompilation_status(dec)
+    exact = status == "ok"
 
     if fmt == "json":
         import json
@@ -89,12 +106,14 @@ def _decompile_single(client, target: str, timeout_ms: int, fmt: str) -> int:
             "prototype": dec.prototype,
             "pseudocode": dec.pseudocode,
             "completed": dec.completed,
+            "is_fallback": dec.is_fallback,
+            "status": status,
         }
         if dec.error_message:
             obj["error"] = dec.error_message
         json.dump(obj, sys.stdout, indent=2)
         print()
-    else:
+    elif exact or not require_exact:
         if dec.prototype:
             print(f"// {dec.function_name} @ 0x{dec.function_entry_address:x}")
             print(f"// {dec.prototype}")
@@ -103,11 +122,21 @@ def _decompile_single(client, target: str, timeout_ms: int, fmt: str) -> int:
             print(dec.pseudocode)
         elif dec.error_message:
             print(f"// Decompilation error: {dec.error_message}", file=sys.stderr)
+    else:
+        reason = dec.error_message or "native decompilation did not complete exactly"
+        print(f"Error: decompilation at 0x{addr:x} is {status}: {reason}", file=sys.stderr)
 
-    return 0
+    return 0 if exact or not require_exact else 1
 
 
-def _decompile_all(client, timeout_ms: int, output_dir: str | None, fmt: str, limit: int) -> int:
+def _decompile_all(
+    client,
+    timeout_ms: int,
+    output_dir: str | None,
+    fmt: str,
+    limit: int,
+    require_exact: bool = False,
+) -> int:
     from libghidra import GhidraError
 
     try:
@@ -125,6 +154,7 @@ def _decompile_all(client, timeout_ms: int, output_dir: str | None, fmt: str, li
         os.makedirs(output_dir, exist_ok=True)
 
     succeeded = 0
+    non_exact = 0
     failed = 0
     results = []
 
@@ -133,8 +163,14 @@ def _decompile_all(client, timeout_ms: int, output_dir: str | None, fmt: str, li
         try:
             dec_resp = client.get_decompilation(f.entry_address, timeout_ms=timeout_ms)
             dec = dec_resp.decompilation
-            if dec.pseudocode:
-                succeeded += 1
+            status = _decompilation_status(dec)
+            exact = status == "ok"
+            accepted = exact or (not require_exact and bool(dec.pseudocode))
+            if accepted:
+                if exact:
+                    succeeded += 1
+                else:
+                    non_exact += 1
                 if output_dir:
                     safe_name = f.name.replace("/", "_").replace("\\", "_").replace(":", "_")
                     filepath = os.path.join(output_dir, f"{safe_name}_0x{f.entry_address:x}.c")
@@ -148,7 +184,9 @@ def _decompile_all(client, timeout_ms: int, output_dir: str | None, fmt: str, li
                         "address": f"0x{f.entry_address:x}",
                         "name": f.name,
                         "lines": dec.pseudocode.count("\n") + 1,
-                        "status": "ok",
+                        "status": status,
+                        "completed": dec.completed,
+                        "is_fallback": dec.is_fallback,
                     })
             else:
                 failed += 1
@@ -156,7 +194,9 @@ def _decompile_all(client, timeout_ms: int, output_dir: str | None, fmt: str, li
                     results.append({
                         "address": f"0x{f.entry_address:x}",
                         "name": f.name,
-                        "status": "empty",
+                        "status": status if dec.pseudocode else "empty",
+                        "completed": dec.completed,
+                        "is_fallback": dec.is_fallback,
                         "error": dec.error_message or "",
                     })
         except GhidraError as e:
@@ -176,11 +216,15 @@ def _decompile_all(client, timeout_ms: int, output_dir: str | None, fmt: str, li
         json.dump(results, sys.stdout, indent=2)
         print()
     else:
-        print(f"\nDecompiled {succeeded}/{len(funcs)} functions ({failed} failed)", file=sys.stderr)
+        print(
+            f"\nExact {succeeded}/{len(funcs)} functions "
+            f"({non_exact} non-exact accepted, {failed} failed)",
+            file=sys.stderr,
+        )
         if output_dir:
             print(f"Output written to: {output_dir}", file=sys.stderr)
 
-    return 0
+    return 1 if require_exact and failed else 0
 
 
 def run(args: argparse.Namespace) -> int:
@@ -201,6 +245,15 @@ def run(args: argparse.Namespace) -> int:
         return 1
 
     if args.decompile_all:
-        return _decompile_all(client, args.timeout, args.output_dir, args.format, args.limit)
+        return _decompile_all(
+            client,
+            args.timeout,
+            args.output_dir,
+            args.format,
+            args.limit,
+            args.require_exact,
+        )
     else:
-        return _decompile_single(client, args.target, args.timeout, args.format)
+        return _decompile_single(
+            client, args.target, args.timeout, args.format, args.require_exact
+        )

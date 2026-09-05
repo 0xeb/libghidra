@@ -220,10 +220,16 @@ client.shutdown(ghidra::ShutdownPolicy::Save)?;
 
 ### `fn get_decompilation(&self, address: u64, timeout_ms: u32) -> Result<GetDecompilationResponse>`
 
+Against the live Ghidra host, `pseudocode` is the unchanged
+`DecompiledFunction.getC()` string. Tokens and locals are separate fields and
+are not inserted into it. Require `completed && !is_fallback` for an exact
+successful result. A fallback may contain a synthetic diagnostic comment, with
+the native reason in `error_message`.
+
 ```rust
 let resp = client.get_decompilation(0x140001000, 30000)?;
 if let Some(d) = &resp.decompilation {
-    if d.completed {
+    if d.completed && !d.is_fallback {
         println!("{}", d.pseudocode);
     }
 }

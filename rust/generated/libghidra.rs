@@ -2322,6 +2322,16 @@ pub struct XrefRecord {
     pub is_memory: bool,
     #[prost(bool, tag = "10")]
     pub is_flow: bool,
+    /// Populated for exact-from-function reads. These fields let clients enrich
+    /// a bounded call graph without issuing one function lookup per reference.
+    #[prost(uint64, tag = "11")]
+    pub from_function_address: u64,
+    #[prost(string, tag = "12")]
+    pub from_function_name: ::prost::alloc::string::String,
+    #[prost(uint64, tag = "13")]
+    pub to_function_address: u64,
+    #[prost(string, tag = "14")]
+    pub to_function_name: ::prost::alloc::string::String,
 }
 /// Field 1 reserved for future common request context.
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
@@ -2330,6 +2340,18 @@ pub struct ListXrefsRequest {
     pub range: ::core::option::Option<AddressRange>,
     #[prost(message, optional, tag = "3")]
     pub page: ::core::option::Option<Pagination>,
+    #[prost(bool, tag = "4")]
+    pub exact_to_address: bool,
+    #[prost(uint64, tag = "5")]
+    pub to_address: u64,
+    #[prost(bool, tag = "6")]
+    pub exact_from_function: bool,
+    #[prost(uint64, tag = "7")]
+    pub function_address: u64,
+    #[prost(bool, tag = "8")]
+    pub exact_to_function: bool,
+    #[prost(uint64, tag = "9")]
+    pub to_function_address: u64,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListXrefsResponse {

@@ -23,14 +23,24 @@ public final class XrefsContract {
 		long symbolId,
 		boolean isExternal,
 		boolean isMemory,
-		boolean isFlow) {
+		boolean isFlow,
+		long fromFunctionAddress,
+		String fromFunctionName,
+		long toFunctionAddress,
+		String toFunctionName) {
 	}
 
 	public record ListXrefsRequest(
 		long rangeStart,
 		long rangeEnd,
 		int limit,
-		int offset) {
+		int offset,
+		boolean exactToAddress,
+		long toAddress,
+		boolean exactFromFunction,
+		long functionAddress,
+		boolean exactToFunction,
+		long toFunctionAddress) {
 	}
 
 	public record ListXrefsResponse(List<XrefRecord> xrefs) {

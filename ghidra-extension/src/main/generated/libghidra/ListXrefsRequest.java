@@ -99,6 +99,72 @@ private static final long serialVersionUID = 0L;
     return page_ == null ? libghidra.Pagination.getDefaultInstance() : page_;
   }
 
+  public static final int EXACT_TO_ADDRESS_FIELD_NUMBER = 4;
+  private boolean exactToAddress_ = false;
+  /**
+   * <code>bool exact_to_address = 4;</code>
+   * @return The exactToAddress.
+   */
+  @java.lang.Override
+  public boolean getExactToAddress() {
+    return exactToAddress_;
+  }
+
+  public static final int TO_ADDRESS_FIELD_NUMBER = 5;
+  private long toAddress_ = 0L;
+  /**
+   * <code>uint64 to_address = 5;</code>
+   * @return The toAddress.
+   */
+  @java.lang.Override
+  public long getToAddress() {
+    return toAddress_;
+  }
+
+  public static final int EXACT_FROM_FUNCTION_FIELD_NUMBER = 6;
+  private boolean exactFromFunction_ = false;
+  /**
+   * <code>bool exact_from_function = 6;</code>
+   * @return The exactFromFunction.
+   */
+  @java.lang.Override
+  public boolean getExactFromFunction() {
+    return exactFromFunction_;
+  }
+
+  public static final int FUNCTION_ADDRESS_FIELD_NUMBER = 7;
+  private long functionAddress_ = 0L;
+  /**
+   * <code>uint64 function_address = 7;</code>
+   * @return The functionAddress.
+   */
+  @java.lang.Override
+  public long getFunctionAddress() {
+    return functionAddress_;
+  }
+
+  public static final int EXACT_TO_FUNCTION_FIELD_NUMBER = 8;
+  private boolean exactToFunction_ = false;
+  /**
+   * <code>bool exact_to_function = 8;</code>
+   * @return The exactToFunction.
+   */
+  @java.lang.Override
+  public boolean getExactToFunction() {
+    return exactToFunction_;
+  }
+
+  public static final int TO_FUNCTION_ADDRESS_FIELD_NUMBER = 9;
+  private long toFunctionAddress_ = 0L;
+  /**
+   * <code>uint64 to_function_address = 9;</code>
+   * @return The toFunctionAddress.
+   */
+  @java.lang.Override
+  public long getToFunctionAddress() {
+    return toFunctionAddress_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -119,6 +185,24 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000002) != 0)) {
       output.writeMessage(3, getPage());
     }
+    if (exactToAddress_ != false) {
+      output.writeBool(4, exactToAddress_);
+    }
+    if (toAddress_ != 0L) {
+      output.writeUInt64(5, toAddress_);
+    }
+    if (exactFromFunction_ != false) {
+      output.writeBool(6, exactFromFunction_);
+    }
+    if (functionAddress_ != 0L) {
+      output.writeUInt64(7, functionAddress_);
+    }
+    if (exactToFunction_ != false) {
+      output.writeBool(8, exactToFunction_);
+    }
+    if (toFunctionAddress_ != 0L) {
+      output.writeUInt64(9, toFunctionAddress_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -135,6 +219,30 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000002) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(3, getPage());
+    }
+    if (exactToAddress_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(4, exactToAddress_);
+    }
+    if (toAddress_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(5, toAddress_);
+    }
+    if (exactFromFunction_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(6, exactFromFunction_);
+    }
+    if (functionAddress_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(7, functionAddress_);
+    }
+    if (exactToFunction_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(8, exactToFunction_);
+    }
+    if (toFunctionAddress_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(9, toFunctionAddress_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -161,6 +269,18 @@ private static final long serialVersionUID = 0L;
       if (!getPage()
           .equals(other.getPage())) return false;
     }
+    if (getExactToAddress()
+        != other.getExactToAddress()) return false;
+    if (getToAddress()
+        != other.getToAddress()) return false;
+    if (getExactFromFunction()
+        != other.getExactFromFunction()) return false;
+    if (getFunctionAddress()
+        != other.getFunctionAddress()) return false;
+    if (getExactToFunction()
+        != other.getExactToFunction()) return false;
+    if (getToFunctionAddress()
+        != other.getToFunctionAddress()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -180,6 +300,24 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + PAGE_FIELD_NUMBER;
       hash = (53 * hash) + getPage().hashCode();
     }
+    hash = (37 * hash) + EXACT_TO_ADDRESS_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getExactToAddress());
+    hash = (37 * hash) + TO_ADDRESS_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getToAddress());
+    hash = (37 * hash) + EXACT_FROM_FUNCTION_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getExactFromFunction());
+    hash = (37 * hash) + FUNCTION_ADDRESS_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getFunctionAddress());
+    hash = (37 * hash) + EXACT_TO_FUNCTION_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getExactToFunction());
+    hash = (37 * hash) + TO_FUNCTION_ADDRESS_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getToFunctionAddress());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -332,6 +470,12 @@ private static final long serialVersionUID = 0L;
         pageBuilder_.dispose();
         pageBuilder_ = null;
       }
+      exactToAddress_ = false;
+      toAddress_ = 0L;
+      exactFromFunction_ = false;
+      functionAddress_ = 0L;
+      exactToFunction_ = false;
+      toFunctionAddress_ = 0L;
       return this;
     }
 
@@ -378,6 +522,24 @@ private static final long serialVersionUID = 0L;
             : pageBuilder_.build();
         to_bitField0_ |= 0x00000002;
       }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.exactToAddress_ = exactToAddress_;
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.toAddress_ = toAddress_;
+      }
+      if (((from_bitField0_ & 0x00000010) != 0)) {
+        result.exactFromFunction_ = exactFromFunction_;
+      }
+      if (((from_bitField0_ & 0x00000020) != 0)) {
+        result.functionAddress_ = functionAddress_;
+      }
+      if (((from_bitField0_ & 0x00000040) != 0)) {
+        result.exactToFunction_ = exactToFunction_;
+      }
+      if (((from_bitField0_ & 0x00000080) != 0)) {
+        result.toFunctionAddress_ = toFunctionAddress_;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -398,6 +560,24 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasPage()) {
         mergePage(other.getPage());
+      }
+      if (other.getExactToAddress() != false) {
+        setExactToAddress(other.getExactToAddress());
+      }
+      if (other.getToAddress() != 0L) {
+        setToAddress(other.getToAddress());
+      }
+      if (other.getExactFromFunction() != false) {
+        setExactFromFunction(other.getExactFromFunction());
+      }
+      if (other.getFunctionAddress() != 0L) {
+        setFunctionAddress(other.getFunctionAddress());
+      }
+      if (other.getExactToFunction() != false) {
+        setExactToFunction(other.getExactToFunction());
+      }
+      if (other.getToFunctionAddress() != 0L) {
+        setToFunctionAddress(other.getToFunctionAddress());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -439,6 +619,36 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000002;
               break;
             } // case 26
+            case 32: {
+              exactToAddress_ = input.readBool();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 32
+            case 40: {
+              toAddress_ = input.readUInt64();
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 40
+            case 48: {
+              exactFromFunction_ = input.readBool();
+              bitField0_ |= 0x00000010;
+              break;
+            } // case 48
+            case 56: {
+              functionAddress_ = input.readUInt64();
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 56
+            case 64: {
+              exactToFunction_ = input.readBool();
+              bitField0_ |= 0x00000040;
+              break;
+            } // case 64
+            case 72: {
+              toFunctionAddress_ = input.readUInt64();
+              bitField0_ |= 0x00000080;
+              break;
+            } // case 72
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -696,6 +906,198 @@ private static final long serialVersionUID = 0L;
         page_ = null;
       }
       return pageBuilder_;
+    }
+
+    private boolean exactToAddress_ ;
+    /**
+     * <code>bool exact_to_address = 4;</code>
+     * @return The exactToAddress.
+     */
+    @java.lang.Override
+    public boolean getExactToAddress() {
+      return exactToAddress_;
+    }
+    /**
+     * <code>bool exact_to_address = 4;</code>
+     * @param value The exactToAddress to set.
+     * @return This builder for chaining.
+     */
+    public Builder setExactToAddress(boolean value) {
+
+      exactToAddress_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool exact_to_address = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearExactToAddress() {
+      bitField0_ = (bitField0_ & ~0x00000004);
+      exactToAddress_ = false;
+      onChanged();
+      return this;
+    }
+
+    private long toAddress_ ;
+    /**
+     * <code>uint64 to_address = 5;</code>
+     * @return The toAddress.
+     */
+    @java.lang.Override
+    public long getToAddress() {
+      return toAddress_;
+    }
+    /**
+     * <code>uint64 to_address = 5;</code>
+     * @param value The toAddress to set.
+     * @return This builder for chaining.
+     */
+    public Builder setToAddress(long value) {
+
+      toAddress_ = value;
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>uint64 to_address = 5;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearToAddress() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      toAddress_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private boolean exactFromFunction_ ;
+    /**
+     * <code>bool exact_from_function = 6;</code>
+     * @return The exactFromFunction.
+     */
+    @java.lang.Override
+    public boolean getExactFromFunction() {
+      return exactFromFunction_;
+    }
+    /**
+     * <code>bool exact_from_function = 6;</code>
+     * @param value The exactFromFunction to set.
+     * @return This builder for chaining.
+     */
+    public Builder setExactFromFunction(boolean value) {
+
+      exactFromFunction_ = value;
+      bitField0_ |= 0x00000010;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool exact_from_function = 6;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearExactFromFunction() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      exactFromFunction_ = false;
+      onChanged();
+      return this;
+    }
+
+    private long functionAddress_ ;
+    /**
+     * <code>uint64 function_address = 7;</code>
+     * @return The functionAddress.
+     */
+    @java.lang.Override
+    public long getFunctionAddress() {
+      return functionAddress_;
+    }
+    /**
+     * <code>uint64 function_address = 7;</code>
+     * @param value The functionAddress to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFunctionAddress(long value) {
+
+      functionAddress_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>uint64 function_address = 7;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFunctionAddress() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      functionAddress_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private boolean exactToFunction_ ;
+    /**
+     * <code>bool exact_to_function = 8;</code>
+     * @return The exactToFunction.
+     */
+    @java.lang.Override
+    public boolean getExactToFunction() {
+      return exactToFunction_;
+    }
+    /**
+     * <code>bool exact_to_function = 8;</code>
+     * @param value The exactToFunction to set.
+     * @return This builder for chaining.
+     */
+    public Builder setExactToFunction(boolean value) {
+
+      exactToFunction_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool exact_to_function = 8;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearExactToFunction() {
+      bitField0_ = (bitField0_ & ~0x00000040);
+      exactToFunction_ = false;
+      onChanged();
+      return this;
+    }
+
+    private long toFunctionAddress_ ;
+    /**
+     * <code>uint64 to_function_address = 9;</code>
+     * @return The toFunctionAddress.
+     */
+    @java.lang.Override
+    public long getToFunctionAddress() {
+      return toFunctionAddress_;
+    }
+    /**
+     * <code>uint64 to_function_address = 9;</code>
+     * @param value The toFunctionAddress to set.
+     * @return This builder for chaining.
+     */
+    public Builder setToFunctionAddress(long value) {
+
+      toFunctionAddress_ = value;
+      bitField0_ |= 0x00000080;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>uint64 to_function_address = 9;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearToFunctionAddress() {
+      bitField0_ = (bitField0_ & ~0x00000080);
+      toFunctionAddress_ = 0L;
+      onChanged();
+      return this;
     }
 
     // @@protoc_insertion_point(builder_scope:libghidra.ListXrefsRequest)

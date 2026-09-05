@@ -229,11 +229,26 @@ resp = client.shutdown(ghidra.ShutdownPolicy.SAVE)
 
 ### `get_decompilation(address, timeout_ms=0) -> GetDecompilationResponse`
 
-Decompile the function at `address`.
+Decompile the function at `address`. Against the live Ghidra host,
+`decompilation.pseudocode` is the unchanged `DecompiledFunction.getC()` string;
+tokens and locals are separate fields and are not inserted into it. Require
+`completed and not is_fallback` for an exact successful result. A fallback may
+place a synthetic diagnostic comment in `pseudocode`, with the native reason in
+`error_message`.
+
+The bundled CLI exposes this contract with `--require-exact`. Without that
+flag, it retains compatibility by allowing nonempty fallback/partial text while
+still labeling JSON records as `fallback` or `incomplete`:
+
+```bash
+libghidra decompile --url http://127.0.0.1:18080 \
+  --require-exact 0x140001000
+```
 
 ```python
 resp = client.get_decompilation(0x140001000, timeout_ms=30000)
-if resp.decompilation and resp.decompilation.completed:
+if (resp.decompilation and resp.decompilation.completed
+        and not resp.decompilation.is_fallback):
     print(resp.decompilation.pseudocode)
 ```
 
@@ -854,7 +869,7 @@ for s in strings.strings:
 
 ---
 
-## Cross-References (1 method)
+## Cross-References (4 methods)
 
 ### `list_xrefs(range_start=0, range_end=0, limit=0, offset=0) -> ListXrefsResponse`
 
@@ -866,7 +881,25 @@ for x in xrefs.xrefs:
     print(f"0x{x.from_address:x} -> 0x{x.to_address:x}  {x.ref_type}")
 ```
 
-**Returns:** list of `XrefRecord` with fields `from_address: int`, `to_address: int`, `operand_index: int`, `ref_type: str`, `is_primary: bool`, `source: str`, `symbol_id: int`, `is_external: bool`, `is_memory: bool`, `is_flow: bool`.
+**Returns:** list of `XrefRecord` with the raw edge fields plus
+`from_function_address`, `from_function_name`, `to_function_address`, and
+`to_function_name` when the host can attribute the endpoints.
+
+### `list_xrefs_to(to_address, limit=0, offset=0) -> ListXrefsResponse`
+
+List references to one exact destination address without scanning the full xref
+surface.
+
+### `list_xrefs_from_function(function_address, limit=0, offset=0) -> ListXrefsResponse`
+
+List references whose source lies in one exact function body. Each result
+carries source and destination function context.
+
+### `list_xrefs_to_function(function_address, limit=0, offset=0) -> ListXrefsResponse`
+
+List references whose destination lies anywhere in one exact function body.
+This is the bounded incoming-call/cross-reference primitive; pagination applies
+to references, not destination addresses.
 
 ---
 

@@ -236,7 +236,11 @@ final class RuntimeMappers {
 			reference.getSymbolID(),
 			reference.isExternalReference(),
 			reference.isMemoryReference(),
-			isFlow);
+			isFlow,
+			0L,
+			"",
+			0L,
+			"");
 	}
 
 	static TypesContract.TypeRecord toTypeRecord(DataTypeManager manager, DataType dataType) {

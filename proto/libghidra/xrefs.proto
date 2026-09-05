@@ -25,12 +25,24 @@ message XrefRecord {
   bool is_external = 8;
   bool is_memory = 9;
   bool is_flow = 10;
+  // Populated for exact-from-function reads. These fields let clients enrich
+  // a bounded call graph without issuing one function lookup per reference.
+  uint64 from_function_address = 11;
+  string from_function_name = 12;
+  uint64 to_function_address = 13;
+  string to_function_name = 14;
 }
 
 // Field 1 reserved for future common request context.
 message ListXrefsRequest {
   AddressRange range = 2;
   Pagination page = 3;
+  bool exact_to_address = 4;
+  uint64 to_address = 5;
+  bool exact_from_function = 6;
+  uint64 function_address = 7;
+  bool exact_to_function = 8;
+  uint64 to_function_address = 9;
 }
 
 message ListXrefsResponse {

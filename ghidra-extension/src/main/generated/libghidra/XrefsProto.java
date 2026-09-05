@@ -50,19 +50,26 @@ public final class XrefsProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\025libghidra/xrefs.proto\022\tlibghidra\032\026libg" +
-      "hidra/common.proto\"\317\001\n\nXrefRecord\022\024\n\014fro" +
+      "hidra/common.proto\"\301\002\n\nXrefRecord\022\024\n\014fro" +
       "m_address\030\001 \001(\004\022\022\n\nto_address\030\002 \001(\004\022\025\n\ro" +
       "perand_index\030\003 \001(\005\022\020\n\010ref_type\030\004 \001(\t\022\022\n\n" +
       "is_primary\030\005 \001(\010\022\016\n\006source\030\006 \001(\t\022\021\n\tsymb" +
       "ol_id\030\007 \001(\003\022\023\n\013is_external\030\010 \001(\010\022\021\n\tis_m" +
-      "emory\030\t \001(\010\022\017\n\007is_flow\030\n \001(\010\"_\n\020ListXref" +
-      "sRequest\022&\n\005range\030\002 \001(\0132\027.libghidra.Addr" +
-      "essRange\022#\n\004page\030\003 \001(\0132\025.libghidra.Pagin" +
-      "ation\"9\n\021ListXrefsResponse\022$\n\005xrefs\030\001 \003(" +
-      "\0132\025.libghidra.XrefRecord2V\n\014XrefsService" +
-      "\022F\n\tListXrefs\022\033.libghidra.ListXrefsReque" +
-      "st\032\034.libghidra.ListXrefsResponseB\031\n\tlibg" +
-      "hidraB\nXrefsProtoP\001b\006proto3"
+      "emory\030\t \001(\010\022\017\n\007is_flow\030\n \001(\010\022\035\n\025from_fun" +
+      "ction_address\030\013 \001(\004\022\032\n\022from_function_nam" +
+      "e\030\014 \001(\t\022\033\n\023to_function_address\030\r \001(\004\022\030\n\020" +
+      "to_function_name\030\016 \001(\t\"\374\001\n\020ListXrefsRequ" +
+      "est\022&\n\005range\030\002 \001(\0132\027.libghidra.AddressRa" +
+      "nge\022#\n\004page\030\003 \001(\0132\025.libghidra.Pagination" +
+      "\022\030\n\020exact_to_address\030\004 \001(\010\022\022\n\nto_address" +
+      "\030\005 \001(\004\022\033\n\023exact_from_function\030\006 \001(\010\022\030\n\020f" +
+      "unction_address\030\007 \001(\004\022\031\n\021exact_to_functi" +
+      "on\030\010 \001(\010\022\033\n\023to_function_address\030\t \001(\004\"9\n" +
+      "\021ListXrefsResponse\022$\n\005xrefs\030\001 \003(\0132\025.libg" +
+      "hidra.XrefRecord2V\n\014XrefsService\022F\n\tList" +
+      "Xrefs\022\033.libghidra.ListXrefsRequest\032\034.lib" +
+      "ghidra.ListXrefsResponseB\031\n\tlibghidraB\nX" +
+      "refsProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -74,13 +81,13 @@ public final class XrefsProto {
     internal_static_libghidra_XrefRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_XrefRecord_descriptor,
-        new java.lang.String[] { "FromAddress", "ToAddress", "OperandIndex", "RefType", "IsPrimary", "Source", "SymbolId", "IsExternal", "IsMemory", "IsFlow", });
+        new java.lang.String[] { "FromAddress", "ToAddress", "OperandIndex", "RefType", "IsPrimary", "Source", "SymbolId", "IsExternal", "IsMemory", "IsFlow", "FromFunctionAddress", "FromFunctionName", "ToFunctionAddress", "ToFunctionName", });
     internal_static_libghidra_ListXrefsRequest_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_libghidra_ListXrefsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListXrefsRequest_descriptor,
-        new java.lang.String[] { "Range", "Page", });
+        new java.lang.String[] { "Range", "Page", "ExactToAddress", "ToAddress", "ExactFromFunction", "FunctionAddress", "ExactToFunction", "ToFunctionAddress", });
     internal_static_libghidra_ListXrefsResponse_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_libghidra_ListXrefsResponse_fieldAccessorTable = new

@@ -22,6 +22,8 @@ import ghidra.graph.GEdge;
 import ghidra.graph.GraphAlgorithms;
 import ghidra.graph.jung.JungDirectedGraph;
 import ghidra.program.model.address.Address;
+import ghidra.program.model.address.AddressIterator;
+import ghidra.program.model.address.AddressRange;
 import ghidra.program.model.address.AddressSetView;
 import ghidra.program.model.block.CodeBlock;
 import ghidra.program.model.block.CodeBlockIterator;
@@ -43,6 +45,8 @@ import ghidra.program.model.pcode.HighFunction;
 import ghidra.program.model.pcode.JumpTable;
 import ghidra.program.model.pcode.PcodeBlock;
 import ghidra.program.model.symbol.SourceType;
+import ghidra.program.model.symbol.Reference;
+import ghidra.program.model.symbol.ReferenceManager;
 import ghidra.util.Msg;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.exception.DuplicateNameException;
@@ -124,6 +128,101 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 				return new FunctionsContract.ListFunctionsResponse(List.of());
 			}
 		}
+	}
+
+	@Override
+	public FunctionsContract.ListFunctionsResponse listLeafFunctions(
+			FunctionsContract.ListFunctionsRequest request) {
+		try (LockScope ignored = readLock()) {
+			Program program = requireProgram();
+			try {
+				long defaultStart = programMinOffset(program);
+				long startOffset = request != null ? request.rangeStart() : defaultStart;
+				long endOffset = request != null ? request.rangeEnd() : -1L;
+				if (startOffset == 0) {
+					startOffset = defaultStart;
+				}
+				if (Long.compareUnsigned(endOffset, startOffset) < 0) {
+					return new FunctionsContract.ListFunctionsResponse(List.of());
+				}
+
+				int offset = request != null ? Math.max(0, request.offset()) : 0;
+				int limit = request != null && request.limit() > 0 ? request.limit() : 512;
+
+				FunctionManager functionManager = program.getFunctionManager();
+				ReferenceManager referenceManager = program.getReferenceManager();
+				Address start = toAddress(program, startOffset);
+				FunctionIterator it = functionManager.getFunctions(start, true);
+				List<FunctionsContract.FunctionRecord> rows = new ArrayList<>();
+				int seen = 0;
+				while (it.hasNext()) {
+					Function function = it.next();
+					if (function == null) {
+						continue;
+					}
+					long address = function.getEntryPoint().getOffset();
+					if (Long.compareUnsigned(address, startOffset) < 0) {
+						continue;
+					}
+					if (Long.compareUnsigned(address, endOffset) > 0) {
+						break;
+					}
+					if (hasOutgoingCall(function, referenceManager)) {
+						continue;
+					}
+					if (seen++ < offset) {
+						continue;
+					}
+					rows.add(RuntimeMappers.toFunctionRecord(function));
+					if (rows.size() >= limit) {
+						break;
+					}
+				}
+				return new FunctionsContract.ListFunctionsResponse(rows);
+			}
+			catch (IllegalArgumentException e) {
+				return new FunctionsContract.ListFunctionsResponse(List.of());
+			}
+		}
+	}
+
+	/**
+	 * True when {@code function} makes at least one call.
+	 *
+	 * Replaces a precomputed whole-program set. That set walked every reference
+	 * source in the program and ignored rangeStart/rangeEnd entirely, and it was
+	 * rebuilt on EVERY page -- so a paginated leaf scan cost
+	 * O(pages * total_references). Bounding that scan to the requested range
+	 * would have been wrong rather than merely slow: a function whose entry sits
+	 * inside the range but whose body extends past rangeEnd would have had its
+	 * calls missed and been reported as a leaf.
+	 *
+	 * Testing each candidate individually is bounded by the page size instead of
+	 * the program, and walking getBody()'s ranges keeps discontiguous bodies and
+	 * body holes correct (the same shape ListXrefsFromFunction uses).
+	 */
+	private boolean hasOutgoingCall(Function function, ReferenceManager referenceManager) {
+		if (function == null) {
+			return false;
+		}
+		for (AddressRange bodyRange : function.getBody().getAddressRanges(true)) {
+			AddressIterator sources =
+				referenceManager.getReferenceSourceIterator(bodyRange.getMinAddress(), true);
+			while (sources.hasNext()) {
+				Address source = sources.next();
+				if (source.compareTo(bodyRange.getMaxAddress()) > 0) {
+					break;
+				}
+				for (Reference reference : referenceManager.getReferencesFrom(source)) {
+					Address destination = reference != null ? reference.getToAddress() : null;
+					if (reference != null && reference.getReferenceType().isCall() &&
+						destination != null && destination.getOffset() != 0) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -630,6 +729,7 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 		try (LockScope ignored = readLock()) {
 			Program program = requireProgram();
 			try {
+				TaskMonitor monitor = RequestCancellation.taskMonitor();
 				long defaultStart = programMinOffset(program);
 				long startOff = request != null ? request.rangeStart() : defaultStart;
 				long endOff = request != null ? request.rangeEnd() : -1L;
@@ -648,6 +748,7 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 					List<FunctionsContract.LoopRecord> rows = new ArrayList<>();
 					int seen = 0;
 					while (funcIter.hasNext() && rows.size() < limit) {
+						checkCancelled();
 						Function func = funcIter.next();
 						long funcEntry = func.getEntryPoint().getOffset();
 						if (Long.compareUnsigned(funcEntry, startOff) < 0) { continue; }
@@ -655,7 +756,7 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 						if (func.isExternal()) { continue; }
 
 						List<FunctionsContract.LoopRecord> funcLoops =
-							extractLoops(func, funcEntry, blockModel, decompiler);
+							extractLoops(func, funcEntry, blockModel, decompiler, monitor);
 						for (FunctionsContract.LoopRecord loop : funcLoops) {
 							if (seen++ < pOffset) { continue; }
 							rows.add(loop);
@@ -665,7 +766,11 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 					return new FunctionsContract.ListLoopsResponse(rows);
 				}
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
+				RequestCancellation.throwIfCancelled();
 				return new FunctionsContract.ListLoopsResponse(List.of());
 			}
 		}
@@ -903,16 +1008,18 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 	// BlockGraph built from the function's CFG (BlockCopy vertices + internal edges).
 	// This mirrors Ghidra's own DecompilerNestedLayout.
 	private List<FunctionsContract.LoopRecord> extractLoops(
-			Function func, long funcEntry, SimpleBlockModel blockModel, DecompInterface decompiler) {
+			Function func, long funcEntry, SimpleBlockModel blockModel,
+			DecompInterface decompiler, TaskMonitor monitor) {
 		List<FunctionsContract.LoopRecord> loops = new ArrayList<>();
 		try {
 			AddressSetView body = func.getBody();
-			CodeBlockIterator blockIter = blockModel.getCodeBlocksContaining(body, TaskMonitor.DUMMY);
+			CodeBlockIterator blockIter = blockModel.getCodeBlocksContaining(body, monitor);
 
 			BlockGraph ingraph = new BlockGraph();
 			Map<Address, PcodeBlock> blockByStart = new HashMap<>();
 			List<CodeBlock> codeBlocks = new ArrayList<>();
 			while (blockIter.hasNext()) {
+				checkCancelled();
 				CodeBlock codeBlock = blockIter.next();
 				Address startAddr = codeBlock.getMinAddress();
 				if (blockByStart.containsKey(startAddr)) {
@@ -928,12 +1035,14 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			}
 
 			for (CodeBlock codeBlock : codeBlocks) {
+				checkCancelled();
 				PcodeBlock srcPcode = blockByStart.get(codeBlock.getMinAddress());
 				if (srcPcode == null) {
 					continue;
 				}
-				CodeBlockReferenceIterator destIter = codeBlock.getDestinations(TaskMonitor.DUMMY);
+				CodeBlockReferenceIterator destIter = codeBlock.getDestinations(monitor);
 				while (destIter.hasNext()) {
+					checkCancelled();
 					CodeBlockReference ref = destIter.next();
 					// Only keep control flow internal to the function; drop call edges.
 					if (ref.getFlowType() != null && ref.getFlowType().isCall()) {
@@ -952,7 +1061,8 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			}
 			ingraph.setIndices();
 
-			BlockGraph outgraph = decompiler.structureGraph(ingraph, 0, TaskMonitor.DUMMY);
+			BlockGraph outgraph = decompiler.structureGraph(ingraph, 0, monitor);
+			checkCancelled();
 			if (outgraph == null) {
 				return loops;
 			}
@@ -962,7 +1072,11 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 			}
 			collectLoopBlocks(funcEntry, topBlocks, loops, 0);
 		}
+		catch (SessionRpcException e) {
+			throw e;
+		}
 		catch (Exception e) {
+			RequestCancellation.throwIfCancelled();
 			// Structuring can fail for pathological CFGs; treat as no loops.
 			return loops;
 		}
@@ -972,6 +1086,7 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 	private void collectLoopBlocks(long funcEntry, List<PcodeBlock> blocks,
 			List<FunctionsContract.LoopRecord> loops, int nestingDepth) {
 		for (PcodeBlock block : blocks) {
+			checkCancelled();
 			int blockType = block.getType();
 			String loopKind = null;
 			switch (blockType) {

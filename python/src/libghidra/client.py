@@ -183,6 +183,25 @@ from .models import (
     StackVariableRecord,
 )
 
+
+def _to_xref(record: Message) -> XrefRecord:
+    return XrefRecord(
+        from_address=record.from_address,
+        to_address=record.to_address,
+        operand_index=record.operand_index,
+        ref_type=record.ref_type,
+        is_primary=record.is_primary,
+        source=record.source,
+        symbol_id=record.symbol_id,
+        is_external=record.is_external,
+        is_memory=record.is_memory,
+        is_flow=record.is_flow,
+        from_function_address=record.from_function_address,
+        from_function_name=record.from_function_name,
+        to_function_address=record.to_function_address,
+        to_function_name=record.to_function_name,
+    )
+
 T = TypeVar("T", bound=Message)
 
 
@@ -948,21 +967,46 @@ class GhidraClient:
             req,
             xrefs_pb2.ListXrefsResponse,
         )
-        return ListXrefsResponse(xrefs=[
-            XrefRecord(
-                from_address=x.from_address,
-                to_address=x.to_address,
-                operand_index=x.operand_index,
-                ref_type=x.ref_type,
-                is_primary=x.is_primary,
-                source=x.source,
-                symbol_id=x.symbol_id,
-                is_external=x.is_external,
-                is_memory=x.is_memory,
-                is_flow=x.is_flow,
-            )
-            for x in resp.xrefs
-        ])
+        return ListXrefsResponse(xrefs=[_to_xref(x) for x in resp.xrefs])
+
+    def list_xrefs_to(
+        self, to_address: int, limit: int = 0, offset: int = 0,
+    ) -> ListXrefsResponse:
+        req = xrefs_pb2.ListXrefsRequest(
+            exact_to_address=True,
+            to_address=to_address,
+            page=self._pagination(limit, offset),
+        )
+        resp = self._call_rpc(
+            "libghidra.XrefsService/ListXrefs", req, xrefs_pb2.ListXrefsResponse,
+        )
+        return ListXrefsResponse(xrefs=[_to_xref(x) for x in resp.xrefs])
+
+    def list_xrefs_from_function(
+        self, function_address: int, limit: int = 0, offset: int = 0,
+    ) -> ListXrefsResponse:
+        req = xrefs_pb2.ListXrefsRequest(
+            exact_from_function=True,
+            function_address=function_address,
+            page=self._pagination(limit, offset),
+        )
+        resp = self._call_rpc(
+            "libghidra.XrefsService/ListXrefs", req, xrefs_pb2.ListXrefsResponse,
+        )
+        return ListXrefsResponse(xrefs=[_to_xref(x) for x in resp.xrefs])
+
+    def list_xrefs_to_function(
+        self, function_address: int, limit: int = 0, offset: int = 0,
+    ) -> ListXrefsResponse:
+        req = xrefs_pb2.ListXrefsRequest(
+            exact_to_function=True,
+            to_function_address=function_address,
+            page=self._pagination(limit, offset),
+        )
+        resp = self._call_rpc(
+            "libghidra.XrefsService/ListXrefs", req, xrefs_pb2.ListXrefsResponse,
+        )
+        return ListXrefsResponse(xrefs=[_to_xref(x) for x in resp.xrefs])
 
     # =========================================================================
     # Types

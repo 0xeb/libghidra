@@ -595,6 +595,10 @@ fn decode_xref(v: &Value) -> XrefRecord {
         is_external: v["is_external"].as_bool().unwrap_or(false),
         is_memory: v["is_memory"].as_bool().unwrap_or(false),
         is_flow: v["is_flow"].as_bool().unwrap_or(false),
+        from_function_address: v["from_function_address"].as_u64().unwrap_or(0),
+        from_function_name: take_str(v, "from_function_name"),
+        to_function_address: v["to_function_address"].as_u64().unwrap_or(0),
+        to_function_name: take_str(v, "to_function_name"),
     }
 }
 

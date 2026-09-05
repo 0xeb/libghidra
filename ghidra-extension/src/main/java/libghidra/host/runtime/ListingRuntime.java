@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Locale;
 
 import ghidra.program.model.address.Address;
+import ghidra.program.model.address.AddressIterator;
 import ghidra.program.model.address.AddressSet;
 import ghidra.program.model.listing.Bookmark;
 import ghidra.program.model.listing.BookmarkManager;
 import ghidra.program.model.listing.CodeUnit;
-import ghidra.program.model.listing.CodeUnitIterator;
 import ghidra.program.model.listing.CommentType;
 import ghidra.program.model.listing.Data;
 import ghidra.program.model.listing.DataIterator;
@@ -89,6 +89,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				List<ListingContract.InstructionRecord> rows = new ArrayList<>();
 				int seen = 0;
 				while (it.hasNext()) {
+					checkCancelled();
 					Instruction instruction = it.next();
 					long address = instruction.getAddress().getOffset();
 					if (Long.compareUnsigned(address, startOffset) < 0) {
@@ -140,6 +141,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				int seen = 0;
 				outer:
 				while (it.hasNext()) {
+					checkCancelled();
 					Instruction instruction = it.next();
 					long address = instruction.getAddress().getOffset();
 					if (Long.compareUnsigned(address, startOffset) < 0) {
@@ -167,6 +169,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 			}
 		}
 	}
+
 
 	@Override
 	public ListingContract.GetCommentsResponse getComments(ListingContract.GetCommentsRequest request) {
@@ -215,52 +218,56 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					return new ListingContract.GetCommentsResponse(result);
 				}
 
-				// Range path: iterate code units with early termination.
+				// Range path: iterate only addresses that actually carry comments.
 				// Clamp the end to the start space's max (an unbounded request carries
-				// endOffset = -1/INT64_MAX) and intersect with loaded memory, so we never
-				// walk undefined code units across the empty gap up to the top of the
-				// address space — that turns a "list all comments" query into a hang.
+				// endOffset = -1/INT64_MAX) and intersect with loaded memory. Walking every
+				// code unit is still prohibitively expensive on large programs even after
+				// that intersection; Listing's comment iterator uses its comment index.
 				Address start = toAddress(program, startOffset);
 				long spaceMax = start.getAddressSpace().getMaxAddress().getOffset();
 				long clampedEnd = Long.compareUnsigned(endOffset, spaceMax) > 0 ? spaceMax : endOffset;
 				Address end = toAddress(program, clampedEnd);
 				AddressSet set = new AddressSet(start, end).intersect(program.getMemory());
-				CodeUnitIterator it = listing.getCodeUnits(set, true);
+				AddressIterator it = listing.getCommentAddressIterator(set, true);
 				int pageOffset = request != null ? Math.max(0, request.offset()) : 0;
 				int limit = request != null && request.limit() > 0 ? request.limit() : 512;
 				int seen = 0;
 				List<ListingContract.CommentRecord> rows = new ArrayList<>();
 				while (it.hasNext()) {
-					CodeUnit codeUnit = it.next();
+					checkCancelled();
+					Address commentAddress = it.next();
+					CodeUnit codeUnit = listing.getCodeUnitAt(commentAddress);
+					if (codeUnit == null) {
+						continue;
+					}
 					long address = codeUnit.getAddress().getOffset();
-					int before = rows.size();
+					List<ListingContract.CommentRecord> atAddress = new ArrayList<>(5);
 					RuntimeMappers.appendCommentIfPresent(
-						rows, address, ListingContract.CommentKind.EOL,
+						atAddress, address, ListingContract.CommentKind.EOL,
 						codeUnit.getComment(CommentType.EOL));
 					RuntimeMappers.appendCommentIfPresent(
-						rows, address, ListingContract.CommentKind.PRE,
+						atAddress, address, ListingContract.CommentKind.PRE,
 						codeUnit.getComment(CommentType.PRE));
 					RuntimeMappers.appendCommentIfPresent(
-						rows, address, ListingContract.CommentKind.POST,
+						atAddress, address, ListingContract.CommentKind.POST,
 						codeUnit.getComment(CommentType.POST));
 					RuntimeMappers.appendCommentIfPresent(
-						rows, address, ListingContract.CommentKind.PLATE,
+						atAddress, address, ListingContract.CommentKind.PLATE,
 						codeUnit.getComment(CommentType.PLATE));
 					RuntimeMappers.appendCommentIfPresent(
-						rows, address, ListingContract.CommentKind.REPEATABLE,
+						atAddress, address, ListingContract.CommentKind.REPEATABLE,
 						codeUnit.getComment(CommentType.REPEATABLE));
-					// Early termination: stop once we have enough results past the offset.
-					if (rows.size() >= pageOffset + limit) {
-						break;
+					for (ListingContract.CommentRecord comment : atAddress) {
+						if (seen++ < pageOffset) {
+							continue;
+						}
+						rows.add(comment);
+						if (rows.size() >= limit) {
+							return new ListingContract.GetCommentsResponse(rows);
+						}
 					}
 				}
-
-				if (pageOffset >= rows.size()) {
-					return new ListingContract.GetCommentsResponse(List.of());
-				}
-				int endIndex = Math.min(rows.size(), pageOffset + limit);
-				return new ListingContract.GetCommentsResponse(
-					new ArrayList<>(rows.subList(pageOffset, endIndex)));
+				return new ListingContract.GetCommentsResponse(rows);
 			}
 			catch (IllegalArgumentException e) {
 				return new ListingContract.GetCommentsResponse(List.of());
@@ -444,9 +451,12 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 
 				Listing listing = program.getListing();
 				SymbolTable symbolTable = program.getSymbolTable();
-				DataIterator it = listing.getDefinedData(true);
-				List<ListingContract.DataItemRecord> all = new ArrayList<>();
+				Address start = toAddress(program, startOffset);
+				DataIterator it = listing.getDefinedData(start, true);
+				List<ListingContract.DataItemRecord> rows = new ArrayList<>();
+				int seen = 0;
 				while (it.hasNext()) {
+					checkCancelled();
 					Data data = it.next();
 					if (data == null) {
 						continue;
@@ -456,7 +466,13 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 					// Inclusive [start, end] to match the C++ client's point-query
 					// convention [addr, addr] (read_data_items_at) — an exclusive end
 					// dropped the exact address.
-					if (Long.compareUnsigned(addressOffset, startOffset) < 0 || Long.compareUnsigned(addressOffset, endOffset) > 0) {
+					if (Long.compareUnsigned(addressOffset, startOffset) < 0) {
+						continue;
+					}
+					if (Long.compareUnsigned(addressOffset, endOffset) > 0) {
+						break;
+					}
+					if (seen++ < offset) {
 						continue;
 					}
 					long endAddress = data.getMaxAddress() != null
@@ -469,21 +485,18 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 							: "";
 					String valueRepr = nullableString(data.getDefaultValueRepresentation());
 					long size = Math.max(0, data.getLength());
-					all.add(new ListingContract.DataItemRecord(
+					rows.add(new ListingContract.DataItemRecord(
 						addressOffset,
 						endAddress,
 						name,
 						dataType,
 						size,
 						valueRepr));
+					if (rows.size() >= limit) {
+						break;
+					}
 				}
-
-				if (offset >= all.size()) {
-					return new ListingContract.ListDataItemsResponse(List.of());
-				}
-				int endIndex = Math.min(all.size(), offset + limit);
-				return new ListingContract.ListDataItemsResponse(
-					new ArrayList<>(all.subList(offset, endIndex)));
+				return new ListingContract.ListDataItemsResponse(rows);
 			}
 			catch (IllegalArgumentException e) {
 				return new ListingContract.ListDataItemsResponse(List.of());
@@ -520,6 +533,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				List<ListingContract.BookmarkRecord> rows = new ArrayList<>();
 				int seen = 0;
 				for (var it = manager.getBookmarksIterator(); it.hasNext();) {
+					checkCancelled();
 					Bookmark bookmark = it.next();
 					if (bookmark == null) {
 						continue;
@@ -670,6 +684,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				List<ListingContract.BreakpointRecord> rows = new ArrayList<>();
 				int seen = 0;
 				for (Bookmark bookmark : BreakpointBookmarkStore.all(manager)) {
+					checkCancelled();
 					BreakpointBookmarkStore.BreakpointRecord row =
 						BreakpointBookmarkStore.fromBookmark(bookmark);
 					// Inclusive [start, end] to match the C++ client's point-query
@@ -909,6 +924,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				for (Data data : DefinedDataIterator.byDataType(
 					program,
 					dt -> dt instanceof ghidra.program.model.data.AbstractStringDataType)) {
+					checkCancelled();
 					long addr = data.getAddress().getOffset();
 					if (Long.compareUnsigned(addr, startOff) < 0) {
 						continue;

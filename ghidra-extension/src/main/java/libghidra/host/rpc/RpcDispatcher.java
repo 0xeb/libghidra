@@ -95,6 +95,8 @@ public final class RpcDispatcher {
 					return functionsGetFunction(request);
 				case "libghidra.FunctionsService/ListFunctions":
 					return functionsListFunctions(request);
+				case "libghidra.FunctionsService/ListLeafFunctions":
+					return functionsListLeafFunctions(request);
 				case "libghidra.FunctionsService/RenameFunction":
 					return functionsRenameFunction(request);
 				case "libghidra.FunctionsService/ListBasicBlocks":
@@ -853,6 +855,32 @@ public final class RpcDispatcher {
 		return ok(out.build(), 0L);
 	}
 
+	private libghidra.RpcResponse functionsListLeafFunctions(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.ListFunctionsRequest protoRequest = unpackPayload(request,
+			libghidra.ListFunctionsRequest.class,
+			libghidra.ListFunctionsRequest.getDefaultInstance());
+		long start = protoRequest.hasRange() ? protoRequest.getRange().getStart() : 0L;
+		long end = (protoRequest.hasRange() && protoRequest.getRange().getEnd() != 0L)
+			? protoRequest.getRange().getEnd() : -1L;
+		int limit = protoRequest.hasPage() ? (int) protoRequest.getPage().getLimit() : 0;
+		int offset = protoRequest.hasPage() ? (int) protoRequest.getPage().getOffset() : 0;
+		FunctionsContract.ListFunctionsResponse response = callbacks.listLeafFunctions(
+			new FunctionsContract.ListFunctionsRequest(
+				start,
+				end,
+				limit,
+				offset));
+		libghidra.ListFunctionsResponse.Builder out =
+			libghidra.ListFunctionsResponse.newBuilder();
+		if (response != null && response.functions() != null) {
+			for (FunctionsContract.FunctionRecord row : response.functions()) {
+				out.addFunctions(toFunctionRecord(row));
+			}
+		}
+		return ok(out.build(), 0L);
+	}
+
 	private libghidra.RpcResponse functionsRenameFunction(libghidra.RpcRequest request)
 			throws InvalidProtocolBufferException {
 		libghidra.RenameFunctionRequest protoRequest = unpackPayload(request,
@@ -1291,7 +1319,13 @@ public final class RpcDispatcher {
 				start,
 				end,
 				limit,
-				offset));
+				offset,
+				protoRequest.getExactToAddress(),
+				protoRequest.getToAddress(),
+				protoRequest.getExactFromFunction(),
+				protoRequest.getFunctionAddress(),
+				protoRequest.getExactToFunction(),
+				protoRequest.getToFunctionAddress()));
 		libghidra.ListXrefsResponse.Builder out = libghidra.ListXrefsResponse.newBuilder();
 		if (response != null && response.xrefs() != null) {
 			for (XrefsContract.XrefRecord row : response.xrefs()) {
@@ -2797,6 +2831,10 @@ public final class RpcDispatcher {
 			.setIsExternal(row.isExternal())
 			.setIsMemory(row.isMemory())
 			.setIsFlow(row.isFlow())
+			.setFromFunctionAddress(row.fromFunctionAddress())
+			.setFromFunctionName(nullable(row.fromFunctionName()))
+			.setToFunctionAddress(row.toFunctionAddress())
+			.setToFunctionName(nullable(row.toFunctionName()))
 			.build();
 	}
 

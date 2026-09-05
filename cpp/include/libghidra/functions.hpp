@@ -23,6 +23,10 @@ class IFunctionsClient {
                                                         std::uint64_t range_end,
                                                         int limit,
                                                         int offset) = 0;
+  virtual StatusOr<ListFunctionsResponse> ListLeafFunctions(std::uint64_t range_start,
+                                                            std::uint64_t range_end,
+                                                            int limit,
+                                                            int offset) = 0;
   virtual StatusOr<RenameFunctionResponse> RenameFunction(std::uint64_t address,
                                                           const std::string& new_name) = 0;
   virtual StatusOr<ListBasicBlocksResponse> ListBasicBlocks(std::uint64_t range_start,

@@ -307,6 +307,10 @@ XrefRecord from_proto_xref_record(const libghidra::XrefRecord& row) {
   out.is_external = row.is_external();
   out.is_memory = row.is_memory();
   out.is_flow = row.is_flow();
+  out.from_function_address = row.from_function_address();
+  out.from_function_name = row.from_function_name();
+  out.to_function_address = row.to_function_address();
+  out.to_function_name = row.to_function_name();
   return out;
 }
 
@@ -790,6 +794,43 @@ class HttpClient::Impl {
     return StatusOr<TResponse>::FromValue(std::move(response));
   }
 
+  Status cancel() const {
+    // The primary client may currently be blocked in /rpc and cpp-httplib's
+    // Client is not safe for concurrent requests. Use a short-lived, dedicated
+    // connection so cancellation is genuinely out-of-band.
+    httplib::Client control(host_, port_);
+    auto [csec, cusec] = to_sec_usec(options_.connect_timeout);
+    auto [wsec, wusec] = to_sec_usec(options_.write_timeout);
+    control.set_connection_timeout(csec, cusec);
+    control.set_read_timeout(5, 0);
+    control.set_write_timeout(wsec, wusec);
+
+    httplib::Headers headers;
+    if (!options_.auth_token.empty()) {
+      headers.emplace("Authorization", "Bearer " + options_.auth_token);
+    }
+    if (!options_.client_id.empty()) {
+      headers.emplace("X-LibGhidra-Client", options_.client_id);
+    }
+    auto result = control.Post("/cancel", headers, "", "text/plain");
+    if (!result) {
+      const int os_error = last_socket_error();
+      const int probe = (result.error() == httplib::Error::Connection)
+                            ? probe_connect_error(host_, port_)
+                            : -1;
+      return Status::Error(
+          map_transport_error(result.error()),
+          "HTTP request failed for /cancel (" +
+              transport_detail(result.error(), os_error, probe) + ")");
+    }
+    if (result->status < 200 || result->status >= 300) {
+      return Status::Error(
+          map_http_status(result->status),
+          "HTTP status " + std::to_string(result->status) + " for /cancel");
+    }
+    return Status::Ok();
+  }
+
  private:
   StatusOr<std::string> request_bytes(const std::string& method,
                                       const std::string& path,
@@ -802,6 +843,11 @@ class HttpClient::Impl {
     httplib::Headers headers;
     if (!options_.auth_token.empty()) {
       headers.emplace("Authorization", "Bearer " + options_.auth_token);
+    }
+    // Must accompany the REQUEST too, not just /cancel: the host records which
+    // client each in-flight RPC belongs to so a scoped cancel can match it.
+    if (!options_.client_id.empty()) {
+      headers.emplace("X-LibGhidra-Client", options_.client_id);
     }
 
     httplib::Result result;
@@ -850,6 +896,8 @@ HttpClient::HttpClient(HttpClientOptions options)
 HttpClient::~HttpClient() = default;
 HttpClient::HttpClient(HttpClient&&) noexcept = default;
 HttpClient& HttpClient::operator=(HttpClient&&) noexcept = default;
+
+Status HttpClient::Cancel() const { return impl_->cancel(); }
 
 StatusOr<HealthStatus> HttpClient::GetStatus() {
   auto rpc = impl_->call_rpc<libghidra::HealthStatusRequest, libghidra::HealthStatusResponse>(
@@ -1428,6 +1476,29 @@ StatusOr<ListFunctionsResponse> HttpClient::ListFunctions(std::uint64_t range_st
   return StatusOr<ListFunctionsResponse>::FromValue(std::move(out));
 }
 
+StatusOr<ListFunctionsResponse> HttpClient::ListLeafFunctions(std::uint64_t range_start,
+                                                              std::uint64_t range_end,
+                                                              int limit,
+                                                              int offset) {
+  libghidra::ListFunctionsRequest rpc_request;
+  rpc_request.mutable_range()->set_start(range_start);
+  rpc_request.mutable_range()->set_end(range_end);
+  rpc_request.mutable_page()->set_limit(limit > 0 ? static_cast<std::uint32_t>(limit) : 0);
+  rpc_request.mutable_page()->set_offset(offset > 0 ? static_cast<std::uint32_t>(offset) : 0);
+  auto rpc = impl_->call_rpc<libghidra::ListFunctionsRequest, libghidra::ListFunctionsResponse>(
+      "libghidra.FunctionsService/ListLeafFunctions",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListFunctionsResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListFunctionsResponse out;
+  out.functions.reserve(static_cast<std::size_t>(rpc.value->functions_size()));
+  for (const auto& row : rpc.value->functions()) {
+    out.functions.push_back(from_proto_function_record(row));
+  }
+  return StatusOr<ListFunctionsResponse>::FromValue(std::move(out));
+}
+
 StatusOr<RenameFunctionResponse> HttpClient::RenameFunction(std::uint64_t address,
                                                             const std::string& new_name) {
   libghidra::RenameFunctionRequest rpc_request;
@@ -1865,6 +1936,80 @@ StatusOr<ListXrefsResponse> HttpClient::ListXrefs(std::uint64_t range_start,
   rpc_request.mutable_range()->set_end(range_end);
   rpc_request.mutable_page()->set_limit(limit > 0 ? static_cast<std::uint32_t>(limit) : 0);
   rpc_request.mutable_page()->set_offset(offset > 0 ? static_cast<std::uint32_t>(offset) : 0);
+  auto rpc = impl_->call_rpc<libghidra::ListXrefsRequest, libghidra::ListXrefsResponse>(
+      "libghidra.XrefsService/ListXrefs",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListXrefsResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListXrefsResponse out;
+  out.xrefs.reserve(static_cast<std::size_t>(rpc.value->xrefs_size()));
+  for (const auto& row : rpc.value->xrefs()) {
+    out.xrefs.push_back(from_proto_xref_record(row));
+  }
+  return StatusOr<ListXrefsResponse>::FromValue(std::move(out));
+}
+
+StatusOr<ListXrefsResponse> HttpClient::ListXrefsTo(std::uint64_t to_address,
+                                                    int limit,
+                                                    int offset) {
+  libghidra::ListXrefsRequest rpc_request;
+  rpc_request.set_exact_to_address(true);
+  rpc_request.set_to_address(to_address);
+  rpc_request.mutable_page()->set_limit(
+      limit > 0 ? static_cast<std::uint32_t>(limit) : 0);
+  rpc_request.mutable_page()->set_offset(
+      offset > 0 ? static_cast<std::uint32_t>(offset) : 0);
+  auto rpc = impl_->call_rpc<libghidra::ListXrefsRequest, libghidra::ListXrefsResponse>(
+      "libghidra.XrefsService/ListXrefs",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListXrefsResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListXrefsResponse out;
+  out.xrefs.reserve(static_cast<std::size_t>(rpc.value->xrefs_size()));
+  for (const auto& row : rpc.value->xrefs()) {
+    out.xrefs.push_back(from_proto_xref_record(row));
+  }
+  return StatusOr<ListXrefsResponse>::FromValue(std::move(out));
+}
+
+StatusOr<ListXrefsResponse> HttpClient::ListXrefsFromFunction(
+    std::uint64_t function_address,
+    int limit,
+    int offset) {
+  libghidra::ListXrefsRequest rpc_request;
+  rpc_request.set_exact_from_function(true);
+  rpc_request.set_function_address(function_address);
+  rpc_request.mutable_page()->set_limit(
+      limit > 0 ? static_cast<std::uint32_t>(limit) : 0);
+  rpc_request.mutable_page()->set_offset(
+      offset > 0 ? static_cast<std::uint32_t>(offset) : 0);
+  auto rpc = impl_->call_rpc<libghidra::ListXrefsRequest, libghidra::ListXrefsResponse>(
+      "libghidra.XrefsService/ListXrefs",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListXrefsResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListXrefsResponse out;
+  out.xrefs.reserve(static_cast<std::size_t>(rpc.value->xrefs_size()));
+  for (const auto& row : rpc.value->xrefs()) {
+    out.xrefs.push_back(from_proto_xref_record(row));
+  }
+  return StatusOr<ListXrefsResponse>::FromValue(std::move(out));
+}
+
+StatusOr<ListXrefsResponse> HttpClient::ListXrefsToFunction(
+    std::uint64_t function_address,
+    int limit,
+    int offset) {
+  libghidra::ListXrefsRequest rpc_request;
+  rpc_request.set_exact_to_function(true);
+  rpc_request.set_to_function_address(function_address);
+  rpc_request.mutable_page()->set_limit(
+      limit > 0 ? static_cast<std::uint32_t>(limit) : 0);
+  rpc_request.mutable_page()->set_offset(
+      offset > 0 ? static_cast<std::uint32_t>(offset) : 0);
   auto rpc = impl_->call_rpc<libghidra::ListXrefsRequest, libghidra::ListXrefsResponse>(
       "libghidra.XrefsService/ListXrefs",
       rpc_request);

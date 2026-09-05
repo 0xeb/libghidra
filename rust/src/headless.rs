@@ -421,6 +421,11 @@ mod tests {
     };
 
     #[test]
+    fn generic_headless_options_default_to_no_action() {
+        assert_eq!(HeadlessProjectOptions::default().shutdown, "save");
+    }
+
+    #[test]
     fn output_drainer_consumes_child_stdout_until_eof() {
         const LINE_COUNT: usize = 10_000;
 

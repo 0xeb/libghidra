@@ -163,6 +163,19 @@ class ProcessHandle {
 
   bool alive() const { return alive_; }
 
+  // Counterpart to the POSIX detach(). HeadlessClient::detach() calls this from
+  // common, un-ifdef'd code, so the member must exist on both platforms.
+  //
+  // Nothing to do here. The POSIX side needs an explicit guardian process
+  // because it has no way to be told "kill this process tree when its owner
+  // dies" -- it forks a watcher that blocks on a pipe and reaps on EOF. Windows
+  // gets that from the kernel: the child is in a Job Object created with
+  // JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE (see launch()), so the OS terminates the
+  // whole tree when the last job handle closes, including on an abnormal exit
+  // where no destructor runs. Detaching therefore means only "stop managing
+  // it", which the caller's own bookkeeping already records.
+  void detach() {}
+
   int wait(DWORD timeout_ms = INFINITE) {
     if (!alive_) return exit_code_;
     DWORD result = WaitForSingleObject(pi_.hProcess, timeout_ms);
@@ -207,15 +220,27 @@ class ProcessHandle {
 class ProcessHandle {
  public:
   ProcessHandle() = default;
-  ~ProcessHandle() = default;
+  ~ProcessHandle() { finish_guardian(/*detach=*/false); }
 
   ProcessHandle(const ProcessHandle&) = delete;
   ProcessHandle& operator=(const ProcessHandle&) = delete;
 
   bool launch(const std::vector<std::string>& args, int write_fd) {
+    int lifetime_pipe[2];
+    if (pipe(lifetime_pipe) < 0) return false;
+
     pid_ = fork();
-    if (pid_ < 0) return false;
+    if (pid_ < 0) {
+      close(lifetime_pipe[0]);
+      close(lifetime_pipe[1]);
+      return false;
+    }
     if (pid_ == 0) {
+      // Only the C++ parent may retain the write end. A separate guardian
+      // below blocks on the read end and treats EOF as proof that the parent
+      // disappeared, including SIGKILL where no destructor can run.
+      close(lifetime_pipe[0]);
+      close(lifetime_pipe[1]);
       // Child. Lead a new process group so the whole tree
       // (analyzeHeadless -> launch.sh -> java) can be force-killed together
       // via kill(-pid_) in terminate() -- the POSIX analog of the Windows
@@ -239,6 +264,39 @@ class ProcessHandle {
     // yet (ESRCH) and miss the tree. EACCES here just means the child already
     // execvp'd and set the group first, which is fine.
     setpgid(pid_, pid_);
+
+    // A process group makes explicit terminate() reliable, but it cannot act
+    // when this parent is itself killed. Keep a tiny async-signal-safe
+    // guardian outside the host's process group. It owns only the lifetime
+    // pipe's read end; EOF means every copy of the parent's write end closed,
+    // so it kills the entire analyzeHeadless -> launch.sh -> java group.
+    guardian_pid_ = fork();
+    if (guardian_pid_ < 0) {
+      close(lifetime_pipe[0]);
+      close(lifetime_pipe[1]);
+      kill(-pid_, SIGKILL);
+      int status = 0;
+      while (waitpid(pid_, &status, 0) < 0 && errno == EINTR) {
+      }
+      pid_ = -1;
+      return false;
+    }
+    if (guardian_pid_ == 0) {
+      close(lifetime_pipe[1]);
+      char ignored = 0;
+      ssize_t n;
+      do {
+        n = read(lifetime_pipe[0], &ignored, 1);
+      } while (n < 0 && errno == EINTR);
+      close(lifetime_pipe[0]);
+      if (n == 0) {
+        kill(-pid_, SIGKILL);
+      }
+      _exit(0);
+    }
+
+    close(lifetime_pipe[0]);
+    lifetime_write_fd_ = lifetime_pipe[1];
     alive_ = true;
     return true;
   }
@@ -260,6 +318,7 @@ class ProcessHandle {
         // return so a later terminate() does not kill(-pid_) and then poll
         // WNOHANG for the full timeout against a process that no longer exists.
         alive_ = false;
+        finish_guardian(/*detach=*/false);
         return exit_code_;
       }
       reaped = (r > 0);
@@ -283,6 +342,7 @@ class ProcessHandle {
     }
     exit_code_ = WIFEXITED(status) ? WEXITSTATUS(status) : -1;
     alive_ = false;
+    finish_guardian(/*detach=*/false);
     return exit_code_;
   }
 
@@ -299,8 +359,33 @@ class ProcessHandle {
     }
   }
 
+  void detach() { finish_guardian(/*detach=*/true); }
+
  private:
+  void finish_guardian(bool detach) {
+    if (guardian_pid_ <= 0 && lifetime_write_fd_ < 0) return;
+
+    if (detach && guardian_pid_ > 0) {
+      // detach() deliberately transfers lifecycle ownership to the caller's
+      // environment. Stop the guardian before closing the pipe so EOF cannot
+      // be mistaken for an abnormal parent exit.
+      kill(guardian_pid_, SIGTERM);
+    }
+    if (lifetime_write_fd_ >= 0) {
+      close(lifetime_write_fd_);
+      lifetime_write_fd_ = -1;
+    }
+    if (guardian_pid_ > 0) {
+      int status = 0;
+      while (waitpid(guardian_pid_, &status, 0) < 0 && errno == EINTR) {
+      }
+      guardian_pid_ = -1;
+    }
+  }
+
   pid_t pid_ = -1;
+  pid_t guardian_pid_ = -1;
+  int lifetime_write_fd_ = -1;
   int exit_code_ = 0;
   bool alive_ = false;
 };
@@ -401,6 +486,7 @@ const IClient& HeadlessClient::client() const { return *impl_->client; }
 const std::string& HeadlessClient::base_url() const { return impl_->base_url; }
 
 void HeadlessClient::detach() {
+  impl_->proc->detach();
   impl_->detached = true;
   impl_->owns_project = false;
 }
@@ -413,7 +499,8 @@ int HeadlessClient::wait() {
   return code;
 }
 
-int HeadlessClient::close(bool save, std::chrono::milliseconds timeout) {
+int HeadlessClient::close(ShutdownPolicy policy,
+                          std::chrono::milliseconds timeout) {
   if (impl_->detached) return 0;
 
   // The previous implementation blocked here on two unbounded waits:
@@ -435,10 +522,9 @@ int HeadlessClient::close(bool save, std::chrono::milliseconds timeout) {
   // Worker: send the Shutdown RPC. May block on a wedged host; force-kill
   // below will close the socket and unblock it.
   std::thread shutdown_thread(
-      [client = impl_->client.get(), save] {
+      [client = impl_->client.get(), policy] {
         try {
-          client->Shutdown(save ? ShutdownPolicy::kSave
-                                : ShutdownPolicy::kDiscard);
+          client->Shutdown(policy);
         } catch (...) {
           // RPC may legitimately fail (timeout, connection reset on
           // force-kill); not our concern here.

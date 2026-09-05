@@ -73,14 +73,14 @@ def find_protoc(args_protoc: str | None) -> Path:
     if args_protoc:
         p = Path(args_protoc)
         if p.is_file():
-            return p
+            return p.resolve()
         raise FileNotFoundError(f"protoc not found at: {args_protoc}")
 
     env_protoc = os.environ.get("PROTOC")
     if env_protoc:
         p = Path(env_protoc)
         if p.is_file():
-            return p
+            return p.resolve()
         raise FileNotFoundError(f"PROTOC env points to missing file: {env_protoc}")
 
     which = shutil.which("protoc")
@@ -134,7 +134,7 @@ def find_wkt_include(args_wkt: str | None) -> Path | None:
     if args_wkt:
         p = Path(args_wkt)
         if (p / "google" / "protobuf" / "any.proto").is_file():
-            return p
+            return p.resolve()
         raise FileNotFoundError(
             f"WKT include path invalid (no google/protobuf/any.proto): {args_wkt}"
         )
@@ -143,7 +143,7 @@ def find_wkt_include(args_wkt: str | None) -> Path | None:
     if env_include:
         p = Path(env_include)
         if (p / "google" / "protobuf" / "any.proto").is_file():
-            return p
+            return p.resolve()
         raise FileNotFoundError(
             f"PROTOC_INCLUDE env path invalid (no google/protobuf/any.proto): {env_include}"
         )

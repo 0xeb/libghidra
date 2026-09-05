@@ -379,6 +379,12 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						}
 
 						@Override
+						public FunctionsContract.ListFunctionsResponse listLeafFunctions(
+								FunctionsContract.ListFunctionsRequest request) {
+							return functionsHandler.listLeafFunctions(request);
+						}
+
+						@Override
 						public FunctionsContract.RenameFunctionResponse renameFunction(
 								FunctionsContract.RenameFunctionRequest request) {
 							return functionsHandler.renameFunction(request);
