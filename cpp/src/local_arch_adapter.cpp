@@ -17,6 +17,7 @@
 
 #include "libdecomp.hh"
 #include "print_stream_guard.hpp"
+#include "symbol_entry.hpp"
 
 #ifdef LIBGHIDRA_LOCAL_TEST_HOOKS
 #include "local_test_hooks.hpp"
@@ -212,8 +213,13 @@ std::vector<FunctionRecord> ArchAdapter::listFunctions(std::uint64_t range_start
       const FunctionSymbol* fsym =
           dynamic_cast<const FunctionSymbol*>(entry->getSymbol());
       if (fsym == nullptr) continue;
+      // Dynamic (hash-identified) storage has no address to list under; the
+      // pre-split base class would have yielded an invalid Address here and
+      // this loop would have recorded its offset as a real one.
+      const auto* mapped = libghidra::detail::as_map_entry(entry);
+      if (mapped == nullptr) continue;
       int4 sz = fsym->getBytesConsumed();
-      fns.push_back({entry->getAddr().getOffset(), fsym->getName(),
+      fns.push_back({mapped->getAddr().getOffset(), fsym->getName(),
                      sz > 0 ? static_cast<std::uint64_t>(sz) : 0});
     }
 
@@ -302,7 +308,12 @@ std::vector<SymbolRecord> ArchAdapter::listSymbols(std::uint64_t range_start,
     while (it != end) {
       const SymbolEntry* entry = *it;
       const Symbol* sym = entry->getSymbol();
-      std::uint64_t addr = entry->getAddr().getOffset();
+      const auto* mapped = libghidra::detail::as_map_entry(entry);
+      if (mapped == nullptr) {  // dynamic storage: no address to range-filter on
+        ++it;
+        continue;
+      }
+      std::uint64_t addr = mapped->getAddr().getOffset();
 
       if (addr < range_start || addr >= range_end) {
         ++it;
@@ -1009,8 +1020,8 @@ std::string canonical_local_id(Architecture* arch, Funcdata* fd, const Symbol* s
       first_use = static_cast<int>(static_cast<intb>(fu.getOffset()) -
                                    static_cast<intb>(fd->getAddress().getOffset()));
   }
-  if (entry != nullptr && !entry->getAddr().isInvalid()) {
-    const Address& a = entry->getAddr();
+  if (const auto* mapped = libghidra::detail::as_map_entry(entry)) {
+    const Address& a = mapped->getAddr();
     AddrSpace* space = a.getSpace();
     if (space == arch->getStackSpace()) {
       // Stack-first, offset-only: durable across rename AND retype (retype changes
@@ -1023,8 +1034,8 @@ std::string canonical_local_id(Architecture* arch, Funcdata* fd, const Symbol* s
     return "local:" + space->getName() + ":0x" + to_hex(a.getOffset()) + ":" +
            std::to_string(first_use);
   }
-  if (entry != nullptr && entry->getHash() != 0)
-    return "local:hash:0x" + to_hex(entry->getHash()) + ":" + std::to_string(first_use);
+  if (const auto* dynamic = libghidra::detail::as_dynamic_entry(entry))
+    return "local:hash:0x" + to_hex(dynamic->getHash()) + ":" + std::to_string(first_use);
   return "local:anon:" + std::to_string(first_use);
 }
 
@@ -1032,7 +1043,7 @@ DecompileLocalKind classify_local_kind(const Symbol* sym) {
   if (sym->getCategory() == Symbol::function_parameter)
     return DecompileLocalKind::kParam;
   const SymbolEntry* e = sym->getFirstWholeMap();
-  if (e != nullptr && e->getAddr().isInvalid())
+  if (e != nullptr && !libghidra::detail::as_map_entry(e))
     return DecompileLocalKind::kTemp;  // dynamic/hash storage
   return DecompileLocalKind::kLocal;
 }
@@ -1040,8 +1051,9 @@ DecompileLocalKind classify_local_kind(const Symbol* sym) {
 std::string local_storage_string(Architecture* arch, const Symbol* sym) {
   const SymbolEntry* e = sym->getFirstWholeMap();
   if (e == nullptr) return "";
-  const Address& a = e->getAddr();
-  if (a.isInvalid()) return "hash";
+  const auto* mapped = libghidra::detail::as_map_entry(e);
+  if (!mapped) return "hash";
+  const Address& a = mapped->getAddr();
   AddrSpace* space = a.getSpace();
   if (space == arch->getStackSpace()) {
     intb off = sign_extend(static_cast<intb>(a.getOffset()),
@@ -1085,8 +1097,9 @@ void collect_function_locals(
 
   for (MapIterator it = local->begin(); it != local->end(); ++it)
     handle((*it)->getSymbol());
+  // beginDynamic() iterates list<DynamicEntry *>, so *dit is a pointer.
   for (auto dit = local->beginDynamic(); dit != local->endDynamic(); ++dit)
-    handle((*dit).getSymbol());
+    handle((*dit)->getSymbol());
 }
 
 struct AnalysisCleanup {
@@ -1340,7 +1353,12 @@ std::vector<ArchAdapter::DataItemEntry> ArchAdapter::listDataItems(
         continue;
       }
 
-      std::uint64_t addr = entry->getAddr().getOffset();
+      const auto* mapped = libghidra::detail::as_map_entry(entry);
+      if (mapped == nullptr) {  // dynamic storage: no address to range-filter on
+        ++it;
+        continue;
+      }
+      std::uint64_t addr = mapped->getAddr().getOffset();
 
       if (addr < range_start || addr >= range_end) {
         ++it;

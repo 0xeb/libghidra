@@ -1,0 +1,25 @@
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc	2026-09-06 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc	2026-09-06 00:00:00.000000000 -0700
+@@ -72,6 +72,10 @@ void BfdArchitecture::buildLoader(DocumentStorage &store)
+   collectSpecFiles(*errorstream);
+   if (getTarget().find("binary")==0)
+     ldr.reset(new LoadImageBfd(getFilename(),"binary"));
++  else if (getTarget().find(':')!=string::npos)
++    // The target is already a Sleigh language id. Let BFD auto-detect the
++    // object format from the file header.
++    ldr.reset(new LoadImageBfd(getFilename(),""));
+   else if (getTarget().find("default")==0)
+     ldr.reset(new LoadImageBfd(getFilename(),"default"));
+   else
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage_bfd.cc	2026-09-06 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage_bfd.cc	2026-09-06 00:00:00.000000000 -0700
+@@ -75,7 +75,8 @@ void LoadImageBfd::open(void)
+ 
+ {
+   if (thebfd != (bfd *)0) throw LowlevelError("BFD library did not initialize");
+-  thebfd = bfd_openr(filename.c_str(),target.c_str());
++  const char *bfdtarget = target.empty() ? NULL : target.c_str();
++  thebfd = bfd_openr(filename.c_str(),bfdtarget);
+   if (thebfd == (bfd *)0) {
+     string errmsg="Unable to open image file: ";
+     errmsg += filename;

@@ -1,0 +1,20 @@
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/userop.cc	2026-09-06 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/userop.cc	2026-09-06 00:00:00.000000000 -0700
+@@ -585,7 +585,16 @@ void UserOpManage::decodeCallOtherFixup(Decoder &decoder,Architecture *glb)
+ 
+ {
+   unique_ptr<UserPcodeOp> op(new InjectedUserOp("",glb,0,0));
+-  op->decode(decoder);
++  try {
++    op->decode(decoder);
++  } catch(LowlevelError &err) {
++    // Ignore call-other fixups that reference a userop the loaded language
++    // does not define; the unique_ptr frees op on return.
++    const string unknownUseropPrefix = "Unknown userop name in <callotherfixup>: ";
++    if (err.explain.rfind(unknownUseropPrefix, 0) == 0)
++      return;
++    throw err;
++  }
+   registerOp(op.release());
+ }
+ 

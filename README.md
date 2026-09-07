@@ -2,7 +2,17 @@
 
 Typed API for Ghidra program databases. Query functions, types, memory, decompiler output, and more from C++, Python, or Rust -- without touching Java.
 
-Current release: `0.0.3` alpha. The API is usable, but still evolving.
+Current release: `0.0.7` alpha. The API is usable, but still evolving.
+
+Two backends behind one interface:
+
+| | **Remote** (`HttpClient`) | **Local** (`LocalClient`) |
+|---|---|---|
+| Runtime | Ghidra JVM + host extension | none -- Sleigh engine is compiled in |
+| Capabilities | full live host API (read + write) | offline subset: decompiler, functions, symbols, types, memory, listing, xrefs |
+| Use case | GUI automation, live analysis, writes | offline batch decompilation, CI, tooling |
+
+Every call returns `StatusOr<T>` -- check `.ok()`, then use `.value`.
 
 ## Install with an AI agent (recommended)
 
@@ -13,84 +23,65 @@ installer prompt:
 > [`install-prompt.md`](install-prompt.md)
 
 It is a self-contained runbook with explicit verification gates at
-every step — preflight checks, Ghidra install, host extension install,
+every step -- preflight checks, Ghidra install, host extension install,
 Python wheel install, and a first live decompilation. Hand it to your
 agent and let it drive the install; intervene only if a gate reports a
 failure.
 
-If you would rather drive the install yourself, see **Get Running**
-below.
+If you would rather drive the install yourself, see **Get Running** below.
 
 ## Get Running
 
-### Quickstart
-
-If you are evaluating this release, the shortest successful path is:
-
-1. Install the `LibGhidraHost` extension into a Ghidra 12.0.4+ distribution.
-2. Start Ghidra, open a program, and start `Tools > libghidra Host > Start Server...`.
-3. Verify connectivity with the Python client first.
-4. Then layer the C++/Rust SDKs or your own tooling on top of the same host URL.
-
-This path exercises the current release focus: live typed access, decompiler-backed reads,
-and structured annotation writes.
+Shortest successful path: install the extension, start the server, verify with
+Python, then layer the C++/Rust SDKs on the same host URL.
 
 ### Prerequisites
 
 - [Ghidra](https://ghidra-sre.org/) distribution (12.0.4+)
-- JDK 21 (e.g. [Eclipse Adoptium](https://adoptium.net/)) for building the Java extension
-- [Gradle](https://gradle.org/) for building the Java extension
-  - no standalone Gradle wrapper is checked into `libghidra/ghidra-extension`
-  - if you have the local Ghidra source tree, you can also drive the extension build with `ghidra/gradlew.bat`
-- `protoc` is optional for normal extension builds; pre-generated Java protobuf stubs are included in-tree
-- C++20 compiler (Visual Studio 2022, GCC 12+, or Clang 15+) -- only if using the C++ SDK
-- CMake 3.26+ -- only if using the C++ SDK
+- JDK 21 (e.g. [Eclipse Adoptium](https://adoptium.net/)) and [Gradle](https://gradle.org/), for building the Java extension
+  - no Gradle wrapper is checked into `ghidra-extension`; with a local Ghidra source tree you can use `ghidra/gradlew.bat` instead
+  - `protoc` is optional -- pre-generated Java protobuf stubs ship in-tree
+- C++20 compiler (Visual Studio 2022, GCC 12+, Clang 15+) and CMake 3.26+ -- only for the C++ SDK
 
-### 1. Install the libghidra host extension
+### 1. Install the host extension
 
-This installs the Ghidra plugin that serves the typed libghidra RPC API over HTTP:
-
-`GHIDRA_INSTALL_DIR` must point at the Ghidra distribution root, the directory that contains `support/buildExtension.gradle`.
-For example, if you unpack Ghidra under `C:\ghidra_dist\ghidra_12.1_DEV`, use that full inner path as the install dir.
-
-Normal extension builds do not require `protoc`; if it is missing, the build uses the shipped generated stubs.
+`GHIDRA_INSTALL_DIR` must be the Ghidra distribution **root** -- the directory
+containing `support/buildExtension.gradle`. If you unpacked Ghidra under
+`C:\ghidra_dist\ghidra_12.1_DEV`, that full inner path is the install dir.
 
 ```bash
 cd ghidra-extension
 gradle installExtension -PGHIDRA_INSTALL_DIR=/path/to/ghidra_dist
 ```
 
-If you already have the local Ghidra source tree checked out, this wrapper-based variant works too:
+With a local Ghidra source tree, the wrapper variant works too:
 
 ```bat
 C:\path\to\ghidra\gradlew.bat -p libghidra\ghidra-extension installExtension -PGHIDRA_INSTALL_DIR=C:\ghidra_dist\ghidra_12.1_DEV
 ```
 
-After install, the extension is unpacked under:
-
-```text
-/path/to/ghidra_dist/Ghidra/Extensions/LibGhidraHost
-```
+The extension unpacks to `/path/to/ghidra_dist/Ghidra/Extensions/LibGhidraHost`.
 
 ### 2. Start the API server
 
-**Option A -- From the Ghidra GUI:**
-Start Ghidra from the same distribution you installed into and open a program. Then:
+**Option A -- Ghidra GUI.** Start Ghidra from the distribution you installed
+into and open a program, then:
 
-1. Go to `File > Configure` and enable `LibGhidraHost` if it is not already enabled.
-2. Use `Tools > libghidra Host > Start Server...`, then accept the default URL or enter a full `http://host:port` URL or plain `host:port`.
-3. Optionally check `Tools > libghidra Host > Status` to confirm the bound URL and active program.
+1. `File > Configure` -- enable `LibGhidraHost` if it is not already.
+2. `Tools > libghidra Host > Start Server...` -- accept the default URL, or enter `http://host:port` or plain `host:port`.
+3. `Tools > libghidra Host > Status` confirms the bound URL and active program.
 
-By default, the start dialog is prefilled with `http://127.0.0.1:18080`.
-
-To override the GUI bind/port, launch Ghidra with JVM properties via Ghidra's launcher environment variables:
+The dialog is prefilled with `http://127.0.0.1:18080`. To override the bind/port
+at launch:
 
 ```bat
 set GHIDRA_GUI_JAVA_OPTIONS=-Dlibghidra.host.bind=127.0.0.1 -Dlibghidra.host.port=19090
 C:\ghidra_dist\ghidra_12.1_DEV\ghidraRun.bat
 ```
 
-**Option B -- Headless project session (no GUI):**
+**Option B -- Headless, no GUI.** Use the same distribution root (the one
+containing `support/analyzeHeadless`):
+
 ```bash
 /path/to/ghidra_dist/support/analyzeHeadless \
   ./myproject MyProject \
@@ -98,145 +89,22 @@ C:\ghidra_dist\ghidra_12.1_DEV\ghidraRun.bat
   -postScript LibGhidraHeadlessServer.java port=18080 shutdown=save
 ```
 
-The headless command must also use the Ghidra distribution root that contains
-`support/analyzeHeadless`. In this mode the host starts without importing a
-binary; clients drive project operations explicitly with `import_program`,
-`open_program`, queries, `close_program`, and final shutdown.
+The host starts without importing a binary; clients drive project operations
+explicitly (`import_program`, `open_program`, queries, `close_program`,
+shutdown). See [Working with projects](#working-with-projects).
 
-### Project files and active-program switching
-
-A Ghidra project may contain many domain files and many programs, but a
-libghidra host intentionally has one active `Program` at a time. Use the
-live/headless project RPCs to list or import project contents, then switch the
-active program with an explicit close/open sequence:
-
-```python
-import libghidra as ghidra
-
-with ghidra.launch_headless_project(ghidra.HeadlessProjectOptions(
-    ghidra_dir="C:/ghidra_dist/ghidra_12.1_DEV",
-    project_dir="C:/work/projects",
-    project_name="firmware",
-    shutdown="save",
-)) as host:
-    loader = host.import_program(ghidra.ImportProgramRequest(
-        source_path="C:/samples/loader.elf",
-        overwrite=True,
-        analyze=True,
-    ))
-    host.import_program(ghidra.ImportProgramRequest(
-        source_path="C:/samples/payload.elf",
-        overwrite=True,
-        analyze=True,
-    ))
-    host.open_program(ghidra.OpenProgramRequest(
-        project_path="C:/work/projects",
-        project_name="firmware",
-        program_path=loader.primary_program_path,
-    ))
-
-    files = host.list_project_files(ghidra.ListProjectFilesRequest(programs_only=True))
-    for item in files.files:
-        print(item.path)
-
-    host.close_program(ghidra.ShutdownPolicy.SAVE)
-    host.open_program(ghidra.OpenProgramRequest(
-        project_path="C:/work/projects",
-        project_name="firmware",
-        program_path="/payload.elf",
-    ))
-```
-
-`OpenProgramRequest.program_path` is a Ghidra domain path such as
-`/payload.elf` or `/firmware/payload.elf` when `project_path` and
-`project_name` are set. Existing program-scoped APIs such as functions, memory,
-types, decompiler, and comments always read or mutate the active program only.
-Close the host with save enabled to persist the project; a later GUI, Python,
-C++, Rust, or ghidrasql session can reopen the same project and select any saved
-program path. See `python/examples/multi_program_strings.py`,
-`cpp/examples/multi_program_strings.cpp`, and
-`rust/examples/multi_program_strings.rs` for runnable live examples that import
-multiple binaries, count strings, save, and shut down cleanly.
-
-### Headless process ownership
-
-`HeadlessClient` owns the complete process tree it launches. On Windows the
-tree is assigned to a kill-on-close Job Object. On POSIX systems the launcher
-and JVM share a dedicated process group, and a small lifetime guardian closes
-that group if the C++ owner disappears without running destructors (including
-`SIGKILL`). Generic headless launchers default to the no-action policy; owning
-applications must select their desired policy. Normal `close()` requests the
-caller-selected policy before escalating to a bounded force-kill.
-
-Calling `detach()` is the explicit exception: it disarms ownership and leaves
-the headless host running after the client object or process exits. The caller
-then owns shutdown, project locks, and cleanup of the detached host.
-
-### 3. Query the API
-
-**Python** (easiest):
-
-Pre-built wheels (Python 3.12+) are attached to every [release](https://github.com/0xeb/libghidra/releases). Each native wheel bundles both the HTTP/RPC client and the offline local backend — Ghidra's Sleigh decompiler engine is compiled in and Sleigh processor specs are embedded, so no Ghidra install or Java is needed at runtime.
-
-```bash
-# Linux x86_64 (RHEL 8+, Ubuntu 20.04+, Debian 11+, Fedora 29+)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.3/libghidra-0.0.3-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-
-# Linux aarch64 (Raspberry Pi 4/5 on 64-bit OS, Ubuntu aarch64, Debian arm64)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.3/libghidra-0.0.3-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
-
-# macOS Apple Silicon (M1/M2/M3/M4)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.3/libghidra-0.0.3-cp312-abi3-macosx_15_0_arm64.whl
-
-# Windows x64
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.3/libghidra-0.0.3-cp312-abi3-win_amd64.whl
-```
-
-No wheel for your platform (Intel Mac, Windows on Arm, etc.)? Use the pure-Python fallback `libghidra-0.0.3-py3-none-any.whl` inside `libghidra-python-v0.0.3.zip` on the release page — it gives you the HTTP/RPC client only; the local offline backend is unavailable.
-
-For contributor / editable installs from a clone:
-
-```bash
-pip install -e python                       # HTTP/RPC client only
-pip install -e "python[async]"              # adds aiohttp for AsyncGhidraClient
-pip install -e "python[cli]"                # adds pefile/capstone for CLI offline helpers
-pip install -e "python[local]"              # adds local ELF/PE/Mach-O detection helpers
-```
-
-Building the offline local backend from source additionally needs CMake 3.26+, a C++20 compiler, and a local Ghidra source tree — see [Building the C++ SDK](#building-the-c-sdk).
-
-Install `libghidra[local]` when using the native local backend from Python.
-`LocalClient` auto-detects ELF, PE, Mach-O, and raw data inputs and passes the
-matching Ghidra `language_id` to the backend. Advanced users can still pass an
-explicit `language_id` on `OpenProgramRequest`.
+### 3. First query
 
 ```python
 import libghidra as ghidra
 
 client = ghidra.connect("http://127.0.0.1:18080")
-status = client.get_status()
-print(f"Connected: {status.service_name}")
+print(f"Connected: {client.get_status().service_name}")
 
-funcs = client.list_functions()
-for f in funcs.functions[:10]:
+for f in client.list_functions().functions[:10]:
     print(f"  0x{f.entry_address:x}  {f.name}")
 ```
 
-The Python package also installs a `libghidra` command for quick status checks,
-function listing, decompilation, and small offline binary helpers:
-
-```bash
-libghidra status --url http://127.0.0.1:18080
-libghidra functions --url http://127.0.0.1:18080 --limit 20
-libghidra decompile --url http://127.0.0.1:18080 \
-  --require-exact 0x140001000
-```
-
-`--require-exact` returns nonzero instead of accepting incomplete or synthetic
-fallback pseudocode. JSON output always includes `completed`, `is_fallback`,
-and a normalized `status`.
-
-**C++:**
 ```cpp
 #include "libghidra/ghidra.hpp"
 
@@ -248,39 +116,98 @@ if (funcs.ok())
         printf("0x%llx  %s\n", f.entry_address, f.name.c_str());
 ```
 
-**Rust:**
+```rust
+use libghidra as ghidra;
 
-Just like the Python wheel, the Rust crate ships both backends in one
-package — and just like the Python wheel, it's **distributed from the
-GitHub Releases page, not crates.io**:
+let client = ghidra::connect("http://127.0.0.1:18080");
+for f in &client.list_functions(0, u64::MAX, 10, 0)?.functions {
+    println!("0x{:x}  {}", f.entry_address, f.name);
+}
+# Ok::<(), libghidra::Error>(())
+```
+
+## Installing the SDKs
+
+### Python
+
+Pre-built wheels (Python 3.12+) are attached to every
+[release](https://github.com/0xeb/libghidra/releases). Each native wheel bundles
+**both** backends: the HTTP/RPC client and the offline local backend, with
+Ghidra's Sleigh engine compiled in and processor specs embedded -- no Ghidra
+install and no Java at runtime.
+
+```bash
+# Linux x86_64 (RHEL 8+, Ubuntu 20.04+, Debian 11+, Fedora 29+)
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.7/libghidra-0.0.7-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+
+# Linux aarch64 (Raspberry Pi 4/5 on 64-bit OS, Ubuntu/Debian arm64)
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.7/libghidra-0.0.7-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
+
+# macOS Apple Silicon (M1/M2/M3/M4)
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.7/libghidra-0.0.7-cp312-abi3-macosx_26_0_arm64.whl
+
+# Windows x64
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.7/libghidra-0.0.7-cp312-abi3-win_amd64.whl
+```
+
+Inspecting an executable **file** offline (rather than a live program) also
+needs the format-detection dependencies, packaged as the `local` extra.
+`LocalClient` then auto-detects ELF, PE, Mach-O and raw inputs and picks the
+matching Ghidra `language_id`; you can still pass one explicitly on
+`OpenProgramRequest`.
+
+```bash
+pip install "libghidra[local] @ https://github.com/0xeb/libghidra/releases/download/v0.0.7/libghidra-0.0.7-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+```
+
+No wheel for your platform (Intel Mac, Windows on Arm)? The pure-Python
+fallback `libghidra-0.0.7-py3-none-any.whl` inside `libghidra-python-v0.0.7.zip`
+on the release page gives you the HTTP/RPC client only -- no local backend.
+
+From a clone, for contributors:
+
+```bash
+pip install -e python                       # HTTP/RPC client only
+pip install -e "python[async]"              # + aiohttp for AsyncGhidraClient
+pip install -e "python[cli]"                # + pefile/capstone for CLI offline helpers
+pip install -e "python[local]"              # + local ELF/PE/Mach-O detection
+```
+
+The package also installs a `libghidra` command:
+
+```bash
+libghidra status    --url http://127.0.0.1:18080
+libghidra functions --url http://127.0.0.1:18080 --limit 20
+libghidra decompile --url http://127.0.0.1:18080 --require-exact 0x140001000
+```
+
+`--require-exact` exits nonzero rather than accepting incomplete or synthetic
+fallback pseudocode. JSON output always carries `completed`, `is_fallback`, and
+a normalized `status`.
+
+### Rust
+
+Like the Python wheel, the crate ships both backends -- and is **distributed
+from GitHub Releases, not crates.io**:
 
 ```toml
 [dependencies]
-# Live (HTTP) only — pure Rust, no system deps
+# Live (HTTP) only -- pure Rust, no system deps
 libghidra = { git = "https://github.com/0xeb/libghidra" }
 
-# Live + offline (cxx → C++ engine, prebuilt archive needed)
+# Live + offline (cxx -> C++ engine, prebuilt archive needed)
 libghidra = { git = "https://github.com/0xeb/libghidra", features = ["local"] }
 ```
 
 ```bash
-# Or grab a prebuilt local archive from the Releases page:
-cargo binstall libghidra
+cargo binstall libghidra   # or grab a prebuilt local archive from Releases
 ```
 
-See [`rust/README.md`](rust/README.md) for the full story.
+Offline use needs no Ghidra install at runtime:
 
 ```rust
 use libghidra as ghidra;
 
-// Live (HTTP) — needs a Ghidra Desktop with the LibGhidraHost extension
-let client = ghidra::connect("http://127.0.0.1:18080");
-let funcs = client.list_functions(0, u64::MAX, 10, 0)?;
-for f in &funcs.functions {
-    println!("0x{:x}  {}", f.entry_address, f.name);
-}
-
-// Offline — no Ghidra install required at runtime (feature = "local")
 # #[cfg(feature = "local")] {
 let local = ghidra::local()?;
 let _ = libghidra::format_detect::detect_and_open(&local, "/usr/bin/ls", None)?;
@@ -290,6 +217,67 @@ println!("{}", dec.decompilation.unwrap().pseudocode);
 # Ok::<(), libghidra::Error>(())
 ```
 
+See [`rust/README.md`](rust/README.md) for the full story.
+
+### C++
+
+See [Building the C++ SDK](#building-the-c-sdk).
+
+## Working with projects
+
+A Ghidra project may hold many programs, but a libghidra host intentionally has
+**one active `Program`** at a time. List or import project contents, then switch
+with an explicit close/open:
+
+```python
+import libghidra as ghidra
+
+with ghidra.launch_headless_project(ghidra.HeadlessProjectOptions(
+    ghidra_dir="C:/ghidra_dist/ghidra_12.1_DEV",
+    project_dir="C:/work/projects",
+    project_name="firmware",
+    shutdown="save",
+)) as host:
+    loader = host.import_program(ghidra.ImportProgramRequest(
+        source_path="C:/samples/loader.elf", overwrite=True, analyze=True))
+    host.import_program(ghidra.ImportProgramRequest(
+        source_path="C:/samples/payload.elf", overwrite=True, analyze=True))
+    host.open_program(ghidra.OpenProgramRequest(
+        project_path="C:/work/projects", project_name="firmware",
+        program_path=loader.primary_program_path))
+
+    for item in host.list_project_files(
+            ghidra.ListProjectFilesRequest(programs_only=True)).files:
+        print(item.path)
+
+    host.close_program(ghidra.ShutdownPolicy.SAVE)
+    host.open_program(ghidra.OpenProgramRequest(
+        project_path="C:/work/projects", project_name="firmware",
+        program_path="/payload.elf"))
+```
+
+`program_path` is a Ghidra domain path (`/payload.elf`,
+`/firmware/payload.elf`) when `project_path` and `project_name` are set.
+Program-scoped APIs -- functions, memory, types, decompiler, comments -- always
+act on the active program only. Close with save to persist; a later GUI, Python,
+C++, Rust, or ghidrasql session can reopen any saved program.
+
+Runnable multi-program examples: `python/examples/multi_program_strings.py`,
+`cpp/examples/multi_program_strings.cpp`, `rust/examples/multi_program_strings.rs`.
+
+### Headless process ownership
+
+`HeadlessClient` owns the entire process tree it launches. On Windows that tree
+is assigned to a kill-on-close Job Object; on POSIX the launcher and JVM share a
+dedicated process group, and a lifetime guardian closes that group if the C++
+owner disappears without running destructors (including `SIGKILL`).
+
+Generic headless launchers default to the no-action policy -- owning
+applications select their own. `close()` requests the caller's policy before
+escalating to a bounded force-kill. `detach()` is the explicit exception: it
+disarms ownership and leaves the host running after the client exits, and the
+caller then owns shutdown, project locks, and cleanup.
+
 ## Building the C++ SDK
 
 ```bash
@@ -297,32 +285,38 @@ cmake -B build -G "Visual Studio 17 2022"
 cmake --build build --config Release
 ```
 
-On Windows, prefer the Visual Studio generator. MinGW may work for the HTTP
-client, but the local/offline backend is validated with MSVC.
+On Windows prefer the Visual Studio generator; MinGW may work for the HTTP
+client, but the local backend is validated with MSVC. This builds
+`libghidra_client` (HTTP only) -- the offline backend is opt-in because it also
+needs a Ghidra **source** checkout.
 
-This builds `libghidra_client` (HTTP client). The offline local backend is
-opt-in because it also needs a local Ghidra source checkout.
+> **Which Ghidra source.** The local backend tracks Ghidra `master`, not a
+> release branch. It requires source at or after **GP-7063** ("New detection of
+> symbol conflicts"), which split `SymbolEntry` into `MapEntry` and
+> `DynamicEntry`. That landed *after* the 12.1.3 release, so the 12.1.3 source
+> tree (and anything older) fails to compile the local backend with errors about
+> `MapEntry`. CI pins the exact commit it builds against; see
+> `.github/workflows/ci.yml`. The HTTP client has no such requirement.
 
-To also build the offline local backend:
+To also build the offline backend:
 
 ```bash
-# 1) Apply libghidra's patches to Ghidra's C++ decompiler source. CI does
-#    this automatically before every release build; if you skip it, some
-#    local/offline loads will fail or mis-detect architecture metadata.
+# 1) Apply libghidra's patches to Ghidra's C++ decompiler source. CI does this
+#    before every release build. Skipping it leaves some local loads failing or
+#    mis-detecting architecture metadata -- and one patch (rawloadimage) is what
+#    stops a single short read from silently turning every later image read
+#    into zeros.
 cd /path/to/ghidra-source
 for p in /path/to/libghidra/cpp/patches/*.patch; do patch -p1 < "$p"; done
 cd -
 
-# 2) Overlay compiled Sleigh `.sla` grammars from the Ghidra release ZIP.
-#    The git source tree only ships `.slaspec` (grammar source) — without
-#    the compiled `.sla` files, the embedded-spec generator finds the
-#    architecture metadata but the decompiler has no grammar to use, so
-#    every disassembly returns `halt_baddata()`. Download the matching
-#    Ghidra release ZIP, extract, and copy:
-#       cp -R ghidra_*_PUBLIC/Ghidra/Processors/*/data/languages/*.sla \
-#             /path/to/ghidra-source/Ghidra/Processors/<proc>/data/languages/
-#    (one .sla per processor; the ci.yml `Overlay compiled Sleigh .sla`
-#    step has the exact rsync invocation.)
+# 2) Overlay compiled Sleigh .sla grammars from the matching Ghidra release ZIP.
+#    The git tree ships only .slaspec (grammar source); without the compiled
+#    .sla files the embedded-spec generator finds architecture metadata but the
+#    decompiler has no grammar, so every disassembly returns halt_baddata().
+#      cp -R ghidra_*_PUBLIC/Ghidra/Processors/*/data/languages/*.sla \
+#            /path/to/ghidra-source/Ghidra/Processors/<proc>/data/languages/
+#    (ci.yml's "Overlay compiled Sleigh .sla" step has the exact invocation.)
 
 # 3) Configure + build.
 cmake -B build -G "Visual Studio 17 2022" \
@@ -331,45 +325,41 @@ cmake -B build -G "Visual Studio 17 2022" \
 cmake --build build --config Release
 ```
 
-**Source-build only — `cargo binstall` / `pip install` users skip all
-this.** The published wheels and Rust prebuilt archives are produced by
-CI with both the patch step and the `.sla` overlay already applied.
+**Source builds only** -- `pip install` and `cargo binstall` users skip all of
+this; published wheels and Rust archives are produced by CI with both steps
+already applied.
 
 If you re-source the same Ghidra tree after a `.sla` update, delete
-`build/cpp/embedded_specs.{cpp,h}` first — `embed_specs.py`'s mtime
-staleness check trusts source mtimes, and rsync/cp preserve original
-timestamps from the release ZIP, so a re-overlay can look "older" than
-the cached output.
+`build/cpp/embedded_specs.{cpp,h}` first: `embed_specs.py`'s staleness check
+trusts source mtimes, and cp/rsync preserve the release ZIP's timestamps, so a
+re-overlay can look *older* than the cached output.
 
 ### CMake targets
 
 | Target | Alias | What |
 |--------|-------|------|
 | `libghidra_client` | `libghidra::client` | IClient + HTTP backend + protobuf stubs |
-| `libghidra_local` | `libghidra::local` | Adds offline decompiler backend (no Java needed at runtime) |
+| `libghidra_local` | `libghidra::local` | Adds the offline decompiler backend |
 
 ```cmake
 target_link_libraries(app PRIVATE libghidra::client)  # HTTP only
 target_link_libraries(app PRIVATE libghidra::local)   # HTTP + offline
-```
 
-Installed-package consumption is supported too:
-
-```cmake
+# Installed-package consumption
 find_package(libghidra CONFIG REQUIRED)
-target_link_libraries(app PRIVATE libghidra::client)
 ```
 
-An install exports `libghidra::client` and `libghidra::local`, plus the generated
-`libghidra/*.h` protobuf headers used by the current public C++ API. Installed
-consumers must make a compatible Protobuf package exporting
-`protobuf::libprotobuf` discoverable to CMake.
+An install exports both targets plus the generated `libghidra/*.h` protobuf
+headers used by the public C++ API; installed consumers must make a compatible
+Protobuf package exporting `protobuf::libprotobuf` discoverable to CMake.
 
 Dependencies (auto-fetched via FetchContent): protobuf v29.3, cpp-httplib v0.16.3.
 
 ## Offline / Local Backend
 
-The local backend embeds Ghidra's Sleigh decompiler engine directly -- no Java, no network, no running Ghidra instance. Processor specs are embedded at build time; at runtime it's fully self-contained.
+The local backend embeds Ghidra's Sleigh decompiler engine directly -- no Java,
+no network, no running Ghidra. Processor specs are embedded at build time, so at
+runtime it is fully self-contained.
 
 ```cpp
 #include "libghidra/ghidra.hpp"
@@ -380,7 +370,7 @@ auto client = ghidra::local(opts);
 
 ghidra::OpenProgramRequest req;
 req.program_path = "/path/to/binary.exe";
-req.language_id = "x86:LE:64:default";  // optional; Python LocalClient can auto-detect
+req.language_id = "x86:LE:64:default";  // optional; Python auto-detects
 client->OpenProgram(req);
 
 auto decomp = client->GetDecompilation(0x140001000, 30000);
@@ -388,11 +378,15 @@ if (decomp.ok())
     printf("%s\n", decomp.value->decompilation->pseudocode.c_str());
 ```
 
-See [`cpp/examples/`](cpp/examples/) for complete examples covering HTTP, headless, and local backends (memory, disassembly, comments, data items, symbols, types, structs, enums, signatures, CFG, session management, project-file import/switching, multi-program string counting, parallel headless analysis, and a complete headless cookbook).
+[`cpp/examples/`](cpp/examples/) covers HTTP, headless, and local backends
+(memory, disassembly, comments, data items, symbols, types, structs, enums,
+signatures, CFG, session management, project import/switching, multi-program
+string counting, parallel headless analysis, and a headless cookbook). Full
+method-by-method reference: [C++ LocalClient API Reference](cpp/README.md).
 
-For the full method-by-method reference, see the [C++ LocalClient API Reference](cpp/README.md).
+## Reference
 
-## Architecture
+### Architecture
 
 ```
 IClient (composite interface, 90 domain methods)
@@ -400,15 +394,7 @@ IClient (composite interface, 90 domain methods)
   |-- LocalClient  --> standalone C++ decompiler engine (offline, no Java)
 ```
 
-Two backends, one interface. Every call returns `StatusOr<T>` -- check `.ok()`, then use `.value`.
-
-| | **Remote** (HttpClient) | **Local** (LocalClient) |
-|---|---|---|
-| Runtime | Ghidra JVM + extension | None |
-| Capabilities | Live host API (read + write) | Offline subset: decompiler, functions, symbols, types, memory, listing, xrefs |
-| Use case | GUI automation, live analysis, writes | Offline batch decompilation, CI, tooling |
-
-## Directory Structure
+### Directory structure
 
 ```
 libghidra/
@@ -423,56 +409,60 @@ libghidra/
   ghidra-extension/       Java extension project (installed as `LibGhidraHost`)
 ```
 
-## SDK Status
+### SDK status
 
 | SDK | Status | Notes |
 |-----|--------|-------|
 | **C++ (HttpClient)** | Available | Broad live-host API coverage |
 | **C++ (LocalClient)** | Available | Offline subset; see [cpp/](cpp/) for supported and unsupported methods |
-| **Python** | Available | Sync + async HTTP, typed models, and CLI tooling. See [python/](python/) and [API Reference](python/docs/api_reference.md) |
-| **Rust** | Available | Sync HTTP client, typed models, and pagination helpers. See [rust/](rust/) and [API Reference](rust/docs/api_reference.md) |
+| **Python** | Available | Sync + async HTTP, typed models, CLI. See [python/](python/) and [API Reference](python/docs/api_reference.md) |
+| **Rust** | Available | Sync HTTP, typed models, pagination helpers. See [rust/](rust/) and [API Reference](rust/docs/api_reference.md) |
+
+### Proto contracts
+
+Typed RPCs across 9 domain service areas, defined in
+[`proto/libghidra/`](proto/libghidra/): 90 domain RPCs plus one transport RPC.
+Transport is binary protobuf over `POST /rpc` (not gRPC). See
+[proto/README.md](proto/README.md).
+
+Exact-from-function xref responses carry source and destination function
+identity, so call-graph views stay bounded without an RPC per edge. The live
+declaration parser also supplies exact signed/unsigned 8/16/32/64-bit `stdint`
+typedef identities, despite intentionally not running a C preprocessor or
+loading `<stdint.h>`.
 
 ## Known Limitations
 
 - Method names and data models may still change before a compatibility promise.
-- The current public C++ API still exposes generated protobuf headers under `libghidra/*`.
-- Structured local-variable mutation is supported, but callers should use the canonical `local_id`
-  returned by the API instead of guessing display-style names.
-- The primary validation path is the live host plus headless integration coverage; more expansive
-  clean-room packaging and installer coverage is still release hardening work.
+- The public C++ API still exposes generated protobuf headers under `libghidra/*`.
+- Structured local-variable mutation is supported, but use the canonical
+  `local_id` returned by the API rather than guessing display-style names.
+- Primary validation is the live host plus headless integration coverage;
+  broader clean-room packaging and installer coverage is still hardening work.
 
-### Local backend (`LocalClient`) caveats
+**`LocalClient` caveats:**
 
-- **Enumeration methods are out of scope in local mode.** `IClient` is the shared API across
-  two backends. `HttpClient` talks to a running Ghidra instance whose analysis pass populates a
-  full function/xref/string database — `list_functions()`, `list_basic_blocks(addr)`,
-  `list_cfg_edges(addr)`, `list_xrefs(start, end)`, exact xref helpers such as
-  `list_xrefs_to_function(addr)`, and `list_defined_strings()` work as you
-  would expect there. `LocalClient` wraps the standalone C++ decompiler engine, which does not
-  run an analysis pass; those same enumeration methods always return empty by design. Local
-  mode is for **address-driven** queries — `get_decompilation(addr)`,
-  `list_instructions(start, end)`, `read_bytes(addr, n)`, `rename_function(addr, name)`, and
-  the rest of the per-address API work as documented. If you need enumeration of everything in
-  the analyzed program, route through `HttpClient` against a Ghidra host.
-- **No macOS x86_64 / Windows arm64 wheel** in the matrix — both fell out due to GitHub Actions
-  runner availability (macos-13 saturation) and `actions/setup-python` not yet shipping arm64
-  Python for `windows-11-arm`. Both gaps will be revisited; in the meantime users on those
-  platforms can `pip install` the pure-Python wheel from the release ZIP for the HTTP client.
-- **After upgrading the wheel, clear the spec cache once.** The native module decompresses
-  Ghidra's Sleigh data into `~/.ghidracpp/cache/sleigh/<key>/` on first use; the key is now a
-  content hash of the embedded specs (rc8+), so an upgrade picks up new data automatically.
-  Older rc wheels (rc1–rc7) hashed the host process binary's mtime instead and could leave a
-  stale cache. If you upgraded from one of those, run `rm -rf ~/.ghidracpp` once.
-
-## Proto Contracts
-
-Typed RPCs across 9 domain service areas, defined in [`proto/libghidra/`](proto/libghidra/). The current contracts define 90 domain RPCs plus one transport RPC. Transport is binary protobuf over `POST /rpc` (not gRPC). See [proto/README.md](proto/README.md).
-
-Exact-from-function xref responses include source and destination function
-identity, so downstream call-graph views can remain bounded without an RPC per
-edge. The live declaration parser also supplies exact signed and unsigned
-8/16/32/64-bit `stdint` typedef identities despite intentionally not running a
-C preprocessor or loading `<stdint.h>`.
+- **Enumeration is out of scope in local mode.** `HttpClient` talks to a running
+  Ghidra whose analysis pass populates a full function/xref/string database, so
+  `list_functions()`, `list_basic_blocks(addr)`, `list_cfg_edges(addr)`,
+  `list_xrefs(start, end)`, `list_xrefs_to_function(addr)` and
+  `list_defined_strings()` behave as expected. `LocalClient` wraps the
+  standalone decompiler engine, which runs no analysis pass -- those same
+  methods always return empty **by design**. Local mode is **address-driven**:
+  `get_decompilation(addr)`, `list_instructions(start, end)`,
+  `read_bytes(addr, n)`, `rename_function(addr, name)` and the rest of the
+  per-address API work as documented. For whole-program enumeration, route
+  through `HttpClient`.
+- **No macOS x86_64 / Windows arm64 wheel.** Both fell out of the matrix due to
+  GitHub Actions runner availability (macos-13 saturation) and
+  `actions/setup-python` not shipping arm64 Python for `windows-11-arm`. Both
+  will be revisited; meanwhile use the pure-Python wheel for the HTTP client.
+- **After upgrading the wheel, clear the spec cache once.** The native module
+  decompresses Sleigh data into `~/.ghidracpp/cache/sleigh/<key>/` on first use.
+  The key is a content hash of the embedded specs (rc8+), so upgrades pick up
+  new data automatically; older rc wheels (rc1-rc7) hashed the host binary's
+  mtime and could leave a stale cache. If you upgraded from one of those, run
+  `rm -rf ~/.ghidracpp` once.
 
 ## License and Terms of Use
 

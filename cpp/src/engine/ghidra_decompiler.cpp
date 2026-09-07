@@ -10,6 +10,7 @@
 #include "ghidra_cpp_init.h"
 #include "libdecomp.hh"
 #include "../print_stream_guard.hpp"
+#include "../symbol_entry.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -299,7 +300,7 @@ bool Decompiler::loadBinary(const std::string& filepath, const std::string& arch
 
         // Read loader symbols if the format supports them (e.g. XML images)
         if (capa->getName() == "xml")
-            impl_->arch->readLoaderSymbols("::");
+            impl_->arch->readLoaderSymbols();
 
     } catch (DecoderError &err) {
         impl_->lastError = err.explain;
@@ -1158,10 +1159,12 @@ std::vector<FunctionInfo> Decompiler::listFunctions()
             const SymbolEntry *entry = *it;
             const Symbol *sym = entry->getSymbol();
             const FunctionSymbol *fsym = dynamic_cast<const FunctionSymbol *>(sym);
-            if (fsym != nullptr) {
+            // Dynamic (hash-identified) storage has no address to report.
+            const auto *mapped = libghidra::detail::as_map_entry(entry);
+            if (fsym != nullptr && mapped != nullptr) {
                 FunctionInfo fi;
                 fi.name = fsym->getName();
-                fi.address = entry->getAddr().getOffset();
+                fi.address = mapped->getAddr().getOffset();
                 fi.size = fsym->getBytesConsumed();
                 result.push_back(std::move(fi));
             }

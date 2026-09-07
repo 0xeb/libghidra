@@ -12,6 +12,7 @@ from __future__ import annotations
 LANGUAGE_COMPILERS: dict[str, tuple[str, ...]] = {
     '6502:LE:16:default': ('default',),
     '65C02:LE:16:default': ('default',),
+    '68000:BE:32:CPU32': ('default',),
     '68000:BE:32:Coldfire': ('default', 'register',),
     '68000:BE:32:MC68020': ('default',),
     '68000:BE:32:MC68030': ('default',),
@@ -171,6 +172,7 @@ LANGUAGE_COMPILERS: dict[str, tuple[str, ...]] = {
     'Toy:LE:32:wordSize2': ('default',),
     'Toy:LE:64:default': ('default',),
     'V850:LE:32:default': ('default',),
+    'V850:LE:32:v850e3v5': ('default',),
     'Xtensa:BE:32:default': ('default',),
     'Xtensa:LE:32:default': ('default',),
     'avr32:BE:32:default': ('default',),

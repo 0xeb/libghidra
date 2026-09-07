@@ -24,7 +24,12 @@ concurrency:
 env:
   PYTHON_VERSION: "3.12"
   JAVA_VERSION: "21"
-  GHIDRA_RELEASE_URL: "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.0.4_build/ghidra_12.0.4_PUBLIC_20260303.zip"
+  # Must stay in step with the Ghidra source `ref` pinned in the local-backend
+  # job below: this ZIP supplies the compiled .sla grammars overlaid onto that
+  # source tree. The .sla binary FORMAT_VERSION is 4 in both, so the overlay
+  # loads; only grammar content for architectures changed after the release is
+  # slightly behind the pinned source.
+  GHIDRA_RELEASE_URL: "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.1.3_build/ghidra_12.1.3_PUBLIC_20260817.zip"
 
 jobs:
   # The generated protobuf stubs are checked in, and ordinary builds no longer compile
@@ -307,8 +312,14 @@ jobs:
           repository: NationalSecurityAgency/ghidra
           # Pinned to a master commit that contains all decompiler sources referenced
           # by cpp/cmake/GhidraSources.cmake (notably bitfield.cc, which is on master
-          # but not on the Ghidra_12.0.4_build release branch).
-          ref: b211a07b51e5098648d8f571130cf93448470d6a
+          # but not on the release branches).
+          #
+          # Must be at or after GP-7063 ("New detection of symbol conflicts"), which
+          # split SymbolEntry into MapEntry (getAddr) and DynamicEntry (getHash).
+          # cpp/src/symbol_entry_compat.hpp targets that shape; older Ghidra source,
+          # including the 12.1.3 release itself, will not compile the local backend.
+          # Keep GHIDRA_RELEASE_URL above on the matching release when moving this.
+          ref: 2035b8153afaf7ce2edde24a2c80b62bbcf5127f
           path: _ghidra-src
 
       - name: Use manylinux Python 3.12 and install libbfd
