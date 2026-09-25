@@ -24,8 +24,9 @@ pub struct AnalysisJobRecord {
 /// analysis_running (poll ListAnalysisJobs, or CancelAnalysis). One job at a time.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct StartAnalysisRequest {
-    /// "changed" (default when empty): analyze what is new or changed, or everything if the
-    /// program was never analyzed. "all": re-run every enabled analyzer over the program.
+    /// "changed" (default when empty): run the analysis the host has queued for edits made
+    /// since the program was opened -- normally nothing on a freshly opened program.
+    /// "all": re-run every enabled analyzer over the whole program.
     #[prost(string, tag = "1")]
     pub mode: ::prost::alloc::string::String,
 }
@@ -1409,10 +1410,6 @@ pub struct OpenProgramRequest {
     pub project_name: ::prost::alloc::string::String,
     #[prost(string, tag = "3")]
     pub program_path: ::prost::alloc::string::String,
-    /// Run auto-analysis after opening: a full pass when the program has never been
-    /// analyzed, otherwise only what is new or changed (normally instant).
-    #[prost(bool, tag = "4")]
-    pub analyze: bool,
     #[prost(bool, tag = "5")]
     pub read_only: bool,
     #[prost(string, tag = "6")]

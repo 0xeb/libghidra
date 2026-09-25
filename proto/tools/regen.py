@@ -36,6 +36,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 # Resolve libghidra root (two levels up from this script)
@@ -212,28 +213,26 @@ def regen_rust(protoc: Path, wkt: Path | None) -> None:
     if wkt:
         env["PROTOC_INCLUDE"] = str(wkt)
 
-    cmd = [cargo, "build"]
-    print(f"[rust] PROTOC={protoc} cargo build (in {RUST_CRATE_DIR})")
-    subprocess.run(cmd, cwd=str(RUST_CRATE_DIR), env=env, check=True)
+    # Build in a throwaway target dir. In a reused one, cargo may skip build.rs and
+    # several out/ dirs (one per feature set) compete, so "the newest libghidra.rs"
+    # can be a stale stub. A fresh dir always runs build.rs and holds exactly one.
+    with tempfile.TemporaryDirectory(prefix="libghidra-regen-") as target_root:
+        env["CARGO_TARGET_DIR"] = target_root
+        cmd = [cargo, "build"]
+        print(f"[rust] PROTOC={protoc} cargo build (in {RUST_CRATE_DIR}, target {target_root})")
+        subprocess.run(cmd, cwd=str(RUST_CRATE_DIR), env=env, check=True)
 
-    # Honour CARGO_TARGET_DIR: cargo writes the build there instead of <crate>/target
-    # when it is set, and looking only under the crate would miss the fresh output.
-    target_root = Path(env["CARGO_TARGET_DIR"]) if env.get("CARGO_TARGET_DIR") else RUST_CRATE_DIR / "target"
-    target_build_dir = target_root / "debug" / "build"
-    candidates = sorted(
-        target_build_dir.glob("*/out/libghidra.rs"),
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
-    if not candidates:
-        raise FileNotFoundError(
-            f"Rust build completed but no generated libghidra.rs found under "
-            f"{target_build_dir}"
-        )
+        target_build_dir = Path(target_root) / "debug" / "build"
+        candidates = list(target_build_dir.glob("*/out/libghidra.rs"))
+        if len(candidates) != 1:
+            raise FileNotFoundError(
+                f"expected exactly one generated libghidra.rs under {target_build_dir}, "
+                f"found {len(candidates)}"
+            )
 
-    RUST_GENERATED.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(candidates[0], RUST_GENERATED)
-    print(f"[rust] copied {candidates[0]} -> {RUST_GENERATED}")
+        RUST_GENERATED.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(candidates[0], RUST_GENERATED)
+        print(f"[rust] copied {candidates[0]} -> {RUST_GENERATED}")
     print("[rust] done")
 
 
