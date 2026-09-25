@@ -29,6 +29,7 @@
 
 #include <httplib.h>
 
+#include "libghidra/analysis.pb.h"
 #include "libghidra/common.pb.h"
 #include "libghidra/decompiler.pb.h"
 #include "libghidra/functions.pb.h"
@@ -1016,6 +1017,12 @@ StatusOr<ImportProgramResponse> HttpClient::ImportProgram(
     proto_arg->set_name(arg.name);
     proto_arg->set_value(arg.value);
   }
+  for (const auto& pattern : request.analyzers_off) {
+    rpc_request.add_analyzers_off(pattern);
+  }
+  for (const auto& pattern : request.analyzers_on) {
+    rpc_request.add_analyzers_on(pattern);
+  }
   auto rpc = impl_->call_rpc<libghidra::ImportProgramRequest, libghidra::ImportProgramResponse>(
       "libghidra.SessionService/ImportProgram",
       rpc_request);
@@ -1028,6 +1035,13 @@ StatusOr<ImportProgramResponse> HttpClient::ImportProgram(
   for (const auto& path : rpc.value->program_paths()) {
     out.program_paths.push_back(path);
   }
+  for (const auto& match : rpc.value->analyzer_matches()) {
+    AnalyzerPatternMatch row;
+    row.pattern = match.pattern();
+    row.enabled = match.enabled();
+    row.options.assign(match.options().begin(), match.options().end());
+    out.analyzer_matches.push_back(std::move(row));
+  }
   return StatusOr<ImportProgramResponse>::FromValue(std::move(out));
 }
 
@@ -1036,7 +1050,6 @@ StatusOr<OpenProgramResponse> HttpClient::OpenProgram(const OpenProgramRequest& 
   rpc_request.set_project_path(request.project_path);
   rpc_request.set_project_name(request.project_name);
   rpc_request.set_program_path(request.program_path);
-  rpc_request.set_analyze(request.analyze);
   rpc_request.set_read_only(request.read_only);
   rpc_request.set_language_id(request.language_id);
   rpc_request.set_compiler_spec_id(request.compiler_spec_id);
@@ -1209,6 +1222,147 @@ StatusOr<DeletePerfBenchmarkResponse> HttpClient::DeletePerfBenchmark(
   DeletePerfBenchmarkResponse out;
   out.deleted = rpc.value->deleted();
   return StatusOr<DeletePerfBenchmarkResponse>::FromValue(out);
+}
+
+// ---- program options, transaction history, analysis jobs --------------------
+// Retry classification comes from is_idempotent_method(): List* are retryable
+// reads; SetProgramOption / StartAnalysis / CancelAnalysis are single-attempt
+// writes. "analysis_running" is deliberately not retryable: a job can own the
+// program for minutes, so callers poll ListAnalysisJobs instead.
+
+StatusOr<ListProgramOptionsResponse> HttpClient::ListProgramOptions(
+    const std::string& category, const std::string& name_filter) {
+  libghidra::ListProgramOptionsRequest rpc_request;
+  rpc_request.set_category(category);
+  rpc_request.set_name_filter(name_filter);
+  auto rpc = impl_->call_rpc<libghidra::ListProgramOptionsRequest,
+                             libghidra::ListProgramOptionsResponse>(
+      "libghidra.SessionService/ListProgramOptions",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListProgramOptionsResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListProgramOptionsResponse out;
+  out.options.reserve(static_cast<std::size_t>(rpc.value->options_size()));
+  for (const auto& proto : rpc.value->options()) {
+    ProgramOptionRecord record;
+    record.category = proto.category();
+    record.name = proto.name();
+    record.value = proto.value();
+    record.type = proto.type();
+    record.description = proto.description();
+    record.default_value = proto.default_value();
+    record.settable = proto.settable();
+    record.allowed_values.assign(proto.allowed_values().begin(), proto.allowed_values().end());
+    out.options.push_back(std::move(record));
+  }
+  return StatusOr<ListProgramOptionsResponse>::FromValue(std::move(out));
+}
+
+StatusOr<SetProgramOptionResponse> HttpClient::SetProgramOption(const std::string& category,
+                                                                const std::string& name,
+                                                                const std::string& value) {
+  libghidra::SetProgramOptionRequest rpc_request;
+  rpc_request.set_category(category);
+  rpc_request.set_name(name);
+  rpc_request.set_value(value);
+  auto rpc = impl_->call_rpc<libghidra::SetProgramOptionRequest,
+                             libghidra::SetProgramOptionResponse>(
+      "libghidra.SessionService/SetProgramOption",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<SetProgramOptionResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  SetProgramOptionResponse out;
+  out.applied = rpc.value->applied();
+  out.previous_value = rpc.value->previous_value();
+  return StatusOr<SetProgramOptionResponse>::FromValue(std::move(out));
+}
+
+StatusOr<ListTransactionsResponse> HttpClient::ListTransactions() {
+  libghidra::ListTransactionsRequest rpc_request;
+  auto rpc = impl_->call_rpc<libghidra::ListTransactionsRequest,
+                             libghidra::ListTransactionsResponse>(
+      "libghidra.SessionService/ListTransactions",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListTransactionsResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListTransactionsResponse out;
+  out.transactions.reserve(static_cast<std::size_t>(rpc.value->transactions_size()));
+  for (const auto& proto : rpc.value->transactions()) {
+    TransactionRecord record;
+    record.position = proto.position();
+    record.name = proto.name();
+    record.kind = proto.kind();
+    record.open_subtransactions.assign(proto.open_subtransactions().begin(),
+                                       proto.open_subtransactions().end());
+    out.transactions.push_back(std::move(record));
+  }
+  return StatusOr<ListTransactionsResponse>::FromValue(std::move(out));
+}
+
+namespace {
+
+AnalysisJobRecord analysis_job_from_proto(const libghidra::AnalysisJobRecord& proto) {
+  AnalysisJobRecord job;
+  job.job_id = proto.job_id();
+  job.mode = proto.mode();
+  job.state = proto.state();
+  job.started_unix_ms = proto.started_unix_ms();
+  job.ended_unix_ms = proto.ended_unix_ms();
+  job.elapsed_ms = proto.elapsed_ms();
+  job.message = proto.message();
+  return job;
+}
+
+}  // namespace
+
+StatusOr<StartAnalysisResponse> HttpClient::StartAnalysis(const std::string& mode) {
+  libghidra::StartAnalysisRequest rpc_request;
+  rpc_request.set_mode(mode);
+  auto rpc = impl_->call_rpc<libghidra::StartAnalysisRequest,
+                             libghidra::StartAnalysisResponse>(
+      "libghidra.AnalysisService/StartAnalysis",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<StartAnalysisResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  StartAnalysisResponse out;
+  out.job = analysis_job_from_proto(rpc.value->job());
+  return StatusOr<StartAnalysisResponse>::FromValue(std::move(out));
+}
+
+StatusOr<ListAnalysisJobsResponse> HttpClient::ListAnalysisJobs() {
+  libghidra::ListAnalysisJobsRequest rpc_request;
+  auto rpc = impl_->call_rpc<libghidra::ListAnalysisJobsRequest,
+                             libghidra::ListAnalysisJobsResponse>(
+      "libghidra.AnalysisService/ListAnalysisJobs",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListAnalysisJobsResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListAnalysisJobsResponse out;
+  out.jobs.reserve(static_cast<std::size_t>(rpc.value->jobs_size()));
+  for (const auto& proto : rpc.value->jobs()) {
+    out.jobs.push_back(analysis_job_from_proto(proto));
+  }
+  return StatusOr<ListAnalysisJobsResponse>::FromValue(std::move(out));
+}
+
+StatusOr<CancelAnalysisResponse> HttpClient::CancelAnalysis(std::uint64_t job_id) {
+  libghidra::CancelAnalysisRequest rpc_request;
+  rpc_request.set_job_id(job_id);
+  auto rpc = impl_->call_rpc<libghidra::CancelAnalysisRequest,
+                             libghidra::CancelAnalysisResponse>(
+      "libghidra.AnalysisService/CancelAnalysis",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<CancelAnalysisResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  CancelAnalysisResponse out;
+  out.cancelled = rpc.value->cancelled();
+  return StatusOr<CancelAnalysisResponse>::FromValue(out);
 }
 
 StatusOr<ClearPerfBenchmarksResponse> HttpClient::ClearPerfBenchmarks() {

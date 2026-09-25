@@ -285,6 +285,8 @@ impl GhidraClient {
                     value: arg.value.clone(),
                 })
                 .collect(),
+            analyzers_off: request.analyzers_off.clone(),
+            analyzers_on: request.analyzers_on.clone(),
         };
         let resp: pb::ImportProgramResponse = self.call_rpc(
             "libghidra.SessionService/ImportProgram",
@@ -294,6 +296,7 @@ impl GhidraClient {
         Ok(ImportProgramResponse {
             program_paths: resp.program_paths,
             primary_program_path: resp.primary_program_path,
+            analyzer_matches: resp.analyzer_matches.into_iter().map(Into::into).collect(),
         })
     }
 
@@ -302,7 +305,6 @@ impl GhidraClient {
             project_path: request.project_path.clone(),
             project_name: request.project_name.clone(),
             program_path: request.program_path.clone(),
-            analyze: request.analyze,
             read_only: request.read_only,
             language_id: request.language_id.clone(),
             compiler_spec_id: request.compiler_spec_id.clone(),
@@ -934,6 +936,97 @@ impl GhidraClient {
             "libghidra.DeletePerfBenchmarkRequest",
         )?;
         Ok(resp.deleted)
+    }
+
+    // -- Program options, transaction history, analysis jobs ---------------------
+
+    /// List program options. `category` is an exact category ("Analyzers", ...) or
+    /// empty for all; `name_filter` is a case-insensitive substring or empty.
+    pub fn list_program_options(
+        &self,
+        category: &str,
+        name_filter: &str,
+    ) -> Result<Vec<ProgramOptionRecord>> {
+        let req = pb::ListProgramOptionsRequest {
+            category: category.to_string(),
+            name_filter: name_filter.to_string(),
+        };
+        let resp: pb::ListProgramOptionsResponse = self.call_rpc(
+            "libghidra.SessionService/ListProgramOptions",
+            &req,
+            "libghidra.ListProgramOptionsRequest",
+        )?;
+        Ok(resp.options.into_iter().map(Into::into).collect())
+    }
+
+    /// Set one option, coerced to its declared type; a rejected value is an
+    /// `invalid_argument` error rather than a silent no-op.
+    pub fn set_program_option(
+        &self,
+        category: &str,
+        name: &str,
+        value: &str,
+    ) -> Result<SetProgramOptionResponse> {
+        let req = pb::SetProgramOptionRequest {
+            category: category.to_string(),
+            name: name.to_string(),
+            value: value.to_string(),
+        };
+        let resp: pb::SetProgramOptionResponse = self.call_rpc(
+            "libghidra.SessionService/SetProgramOption",
+            &req,
+            "libghidra.SetProgramOptionRequest",
+        )?;
+        Ok(SetProgramOptionResponse {
+            applied: resp.applied,
+            previous_value: resp.previous_value,
+        })
+    }
+
+    pub fn list_transactions(&self) -> Result<Vec<TransactionRecord>> {
+        let req = pb::ListTransactionsRequest {};
+        let resp: pb::ListTransactionsResponse = self.call_rpc(
+            "libghidra.SessionService/ListTransactions",
+            &req,
+            "libghidra.ListTransactionsRequest",
+        )?;
+        Ok(resp.transactions.into_iter().map(Into::into).collect())
+    }
+
+    /// Start a background analysis job ("changed" or "all") and return at once.
+    /// While it runs the job owns the program: other program calls fail with
+    /// `analysis_running`. Follow it with [`list_analysis_jobs`](Self::list_analysis_jobs).
+    pub fn start_analysis(&self, mode: &str) -> Result<AnalysisJobRecord> {
+        let req = pb::StartAnalysisRequest {
+            mode: mode.to_string(),
+        };
+        let resp: pb::StartAnalysisResponse = self.call_rpc(
+            "libghidra.AnalysisService/StartAnalysis",
+            &req,
+            "libghidra.StartAnalysisRequest",
+        )?;
+        Ok(resp.job.map(Into::into).unwrap_or_default())
+    }
+
+    pub fn list_analysis_jobs(&self) -> Result<Vec<AnalysisJobRecord>> {
+        let req = pb::ListAnalysisJobsRequest {};
+        let resp: pb::ListAnalysisJobsResponse = self.call_rpc(
+            "libghidra.AnalysisService/ListAnalysisJobs",
+            &req,
+            "libghidra.ListAnalysisJobsRequest",
+        )?;
+        Ok(resp.jobs.into_iter().map(Into::into).collect())
+    }
+
+    /// Cancel a job (0 = whichever is running); `true` if one was signalled.
+    pub fn cancel_analysis(&self, job_id: u64) -> Result<bool> {
+        let req = pb::CancelAnalysisRequest { job_id };
+        let resp: pb::CancelAnalysisResponse = self.call_rpc(
+            "libghidra.AnalysisService/CancelAnalysis",
+            &req,
+            "libghidra.CancelAnalysisRequest",
+        )?;
+        Ok(resp.cancelled)
     }
 
     // -- Types ----------------------------------------------------------------

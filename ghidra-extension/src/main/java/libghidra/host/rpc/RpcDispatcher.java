@@ -14,6 +14,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 
+import libghidra.host.contract.AnalysisContract;
 import libghidra.host.contract.DecompilerContract;
 import libghidra.host.contract.FunctionsContract;
 import libghidra.host.contract.HealthContract;
@@ -75,6 +76,18 @@ public final class RpcDispatcher {
 					return sessionClearPerfBenchmarks(request);
 				case "libghidra.SessionService/DeletePerfBenchmark":
 					return sessionDeletePerfBenchmark(request);
+				case "libghidra.SessionService/ListProgramOptions":
+					return sessionListProgramOptions(request);
+				case "libghidra.SessionService/SetProgramOption":
+					return sessionSetProgramOption(request);
+				case "libghidra.SessionService/ListTransactions":
+					return sessionListTransactions(request);
+				case "libghidra.AnalysisService/StartAnalysis":
+					return analysisStartAnalysis(request);
+				case "libghidra.AnalysisService/ListAnalysisJobs":
+					return analysisListAnalysisJobs(request);
+				case "libghidra.AnalysisService/CancelAnalysis":
+					return analysisCancelAnalysis(request);
 				case "libghidra.MemoryService/ReadBytes":
 					return memoryReadBytes(request);
 				case "libghidra.MemoryService/WriteBytes":
@@ -391,11 +404,25 @@ public final class RpcDispatcher {
 				protoRequest.getLanguageId(),
 				protoRequest.getCompilerSpecId(),
 				protoRequest.getLoaderClass(),
-				loaderArgs));
+				loaderArgs,
+				List.copyOf(protoRequest.getAnalyzersOffList()),
+				List.copyOf(protoRequest.getAnalyzersOnList())));
 		libghidra.ImportProgramResponse.Builder out = libghidra.ImportProgramResponse.newBuilder()
 			.setPrimaryProgramPath(nullable(response != null ? response.primaryProgramPath() : null));
 		if (response != null && response.programPaths() != null) {
 			out.addAllProgramPaths(copyStrings(response.programPaths()));
+		}
+		if (response != null && response.analyzerMatches() != null) {
+			for (SessionContract.AnalyzerPatternMatch match : response.analyzerMatches()) {
+				if (match == null) {
+					continue;
+				}
+				out.addAnalyzerMatches(libghidra.AnalyzerPatternMatch.newBuilder()
+					.setPattern(nullable(match.pattern()))
+					.setEnabled(match.enabled())
+					.addAllOptions(copyStrings(match.options()))
+					.build());
+			}
 		}
 		return ok(out.build(), 0L);
 	}
@@ -410,7 +437,6 @@ public final class RpcDispatcher {
 				protoRequest.getProjectPath(),
 				protoRequest.getProjectName(),
 				protoRequest.getProgramPath(),
-				protoRequest.getAnalyze(),
 				protoRequest.getReadOnly(),
 				protoRequest.getLanguageId(),
 				protoRequest.getCompilerSpecId(),
@@ -563,6 +589,132 @@ public final class RpcDispatcher {
 			.setDeleted(response != null && response.deleted())
 			.build();
 		return ok(proto, 0L);
+	}
+
+	private libghidra.RpcResponse sessionListProgramOptions(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.ListProgramOptionsRequest protoRequest = unpackPayload(request,
+			libghidra.ListProgramOptionsRequest.class,
+			libghidra.ListProgramOptionsRequest.getDefaultInstance());
+		SessionContract.ListProgramOptionsResponse response = callbacks.listProgramOptions(
+			new SessionContract.ListProgramOptionsRequest(
+				protoRequest.getCategory(), protoRequest.getNameFilter()));
+		libghidra.ListProgramOptionsResponse.Builder out =
+			libghidra.ListProgramOptionsResponse.newBuilder();
+		if (response != null && response.options() != null) {
+			for (SessionContract.ProgramOptionRecord row : response.options()) {
+				if (row == null) {
+					continue;
+				}
+				out.addOptions(libghidra.ProgramOptionRecord.newBuilder()
+					.setCategory(nullable(row.category()))
+					.setName(nullable(row.name()))
+					.setValue(nullable(row.value()))
+					.setType(nullable(row.type()))
+					.setDescription(nullable(row.description()))
+					.setDefaultValue(nullable(row.defaultValue()))
+					.setSettable(row.settable())
+					.addAllAllowedValues(copyStrings(row.allowedValues()))
+					.build());
+			}
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private libghidra.RpcResponse sessionSetProgramOption(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.SetProgramOptionRequest protoRequest = unpackPayload(request,
+			libghidra.SetProgramOptionRequest.class,
+			libghidra.SetProgramOptionRequest.getDefaultInstance());
+		SessionContract.SetProgramOptionResponse response = callbacks.setProgramOption(
+			new SessionContract.SetProgramOptionRequest(
+				protoRequest.getCategory(), protoRequest.getName(), protoRequest.getValue()));
+		libghidra.SetProgramOptionResponse proto = libghidra.SetProgramOptionResponse.newBuilder()
+			.setApplied(response != null && response.applied())
+			.setPreviousValue(nullable(response != null ? response.previousValue() : null))
+			.build();
+		return ok(proto, 0L);
+	}
+
+	private libghidra.RpcResponse sessionListTransactions(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		unpackPayload(request,
+			libghidra.ListTransactionsRequest.class,
+			libghidra.ListTransactionsRequest.getDefaultInstance());
+		SessionContract.ListTransactionsResponse response = callbacks.listTransactions(
+			new SessionContract.ListTransactionsRequest());
+		libghidra.ListTransactionsResponse.Builder out = libghidra.ListTransactionsResponse.newBuilder();
+		if (response != null && response.transactions() != null) {
+			for (SessionContract.TransactionRecord row : response.transactions()) {
+				if (row == null) {
+					continue;
+				}
+				out.addTransactions(libghidra.TransactionRecord.newBuilder()
+					.setPosition(row.position())
+					.setName(nullable(row.name()))
+					.setKind(nullable(row.kind()))
+					.addAllOpenSubtransactions(copyStrings(row.openSubtransactions()))
+					.build());
+			}
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private libghidra.RpcResponse analysisStartAnalysis(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.StartAnalysisRequest protoRequest = unpackPayload(request,
+			libghidra.StartAnalysisRequest.class,
+			libghidra.StartAnalysisRequest.getDefaultInstance());
+		AnalysisContract.StartAnalysisResponse response = callbacks.startAnalysis(
+			new AnalysisContract.StartAnalysisRequest(protoRequest.getMode()));
+		libghidra.StartAnalysisResponse.Builder out = libghidra.StartAnalysisResponse.newBuilder();
+		if (response != null && response.job() != null) {
+			out.setJob(toAnalysisJobProto(response.job()));
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private libghidra.RpcResponse analysisListAnalysisJobs(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		unpackPayload(request,
+			libghidra.ListAnalysisJobsRequest.class,
+			libghidra.ListAnalysisJobsRequest.getDefaultInstance());
+		AnalysisContract.ListAnalysisJobsResponse response = callbacks.listAnalysisJobs(
+			new AnalysisContract.ListAnalysisJobsRequest());
+		libghidra.ListAnalysisJobsResponse.Builder out = libghidra.ListAnalysisJobsResponse.newBuilder();
+		if (response != null && response.jobs() != null) {
+			for (AnalysisContract.AnalysisJobRecord job : response.jobs()) {
+				if (job != null) {
+					out.addJobs(toAnalysisJobProto(job));
+				}
+			}
+		}
+		return ok(out.build(), 0L);
+	}
+
+	private libghidra.RpcResponse analysisCancelAnalysis(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.CancelAnalysisRequest protoRequest = unpackPayload(request,
+			libghidra.CancelAnalysisRequest.class,
+			libghidra.CancelAnalysisRequest.getDefaultInstance());
+		AnalysisContract.CancelAnalysisResponse response = callbacks.cancelAnalysis(
+			new AnalysisContract.CancelAnalysisRequest(protoRequest.getJobId()));
+		libghidra.CancelAnalysisResponse proto = libghidra.CancelAnalysisResponse.newBuilder()
+			.setCancelled(response != null && response.cancelled())
+			.build();
+		return ok(proto, 0L);
+	}
+
+	private static libghidra.AnalysisJobRecord toAnalysisJobProto(AnalysisContract.AnalysisJobRecord job) {
+		return libghidra.AnalysisJobRecord.newBuilder()
+			.setJobId(job.jobId())
+			.setMode(job.mode() != null ? job.mode() : "")
+			.setState(job.state() != null ? job.state() : "")
+			.setStartedUnixMs(job.startedUnixMs())
+			.setEndedUnixMs(job.endedUnixMs())
+			.setElapsedMs(Math.max(0L, job.elapsedMs()))
+			.setMessage(job.message() != null ? job.message() : "")
+			.build();
 	}
 
 	private static SessionContract.PerfBenchmarkRecord toPerfBenchmarkRecord(

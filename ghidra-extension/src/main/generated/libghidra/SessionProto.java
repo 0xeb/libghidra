@@ -81,6 +81,11 @@ public final class SessionProto {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_ImportProgramRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_AnalyzerPatternMatch_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_AnalyzerPatternMatch_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_ImportProgramResponse_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -180,6 +185,46 @@ public final class SessionProto {
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_DeletePerfBenchmarkResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ProgramOptionRecord_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ProgramOptionRecord_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListProgramOptionsRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListProgramOptionsRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListProgramOptionsResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListProgramOptionsResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_SetProgramOptionRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_SetProgramOptionRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_SetProgramOptionResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_SetProgramOptionResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_TransactionRecord_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_TransactionRecord_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListTransactionsRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListTransactionsRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_ListTransactionsResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_ListTransactionsResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -190,103 +235,131 @@ public final class SessionProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\027libghidra/session.proto\022\tlibghidra\032\026li" +
-      "bghidra/common.proto\"\317\001\n\022OpenProgramRequ" +
+      "bghidra/common.proto\"\315\001\n\022OpenProgramRequ" +
       "est\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_nam" +
-      "e\030\002 \001(\t\022\024\n\014program_path\030\003 \001(\t\022\017\n\007analyze" +
-      "\030\004 \001(\010\022\021\n\tread_only\030\005 \001(\010\022\023\n\013language_id" +
-      "\030\006 \001(\t\022\030\n\020compiler_spec_id\030\007 \001(\t\022\016\n\006form" +
-      "at\030\010 \001(\t\022\024\n\014base_address\030\t \001(\004\"\321\001\n\023OpenP" +
-      "rogramResponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013" +
-      "language_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t" +
-      "\022\022\n\nimage_base\030\005 \001(\004\022\013\n\003md5\030\006 \001(\t\022\016\n\006sha" +
-      "256\030\007 \001(\t\022\031\n\021executable_format\030\010 \001(\t\022\023\n\013" +
-      "entry_point\030\t \001(\004\022\027\n\017has_entry_point\030\n \001" +
-      "(\010\"c\n\022OpenProjectRequest\022\024\n\014project_path" +
-      "\030\001 \001(\t\022\024\n\014project_name\030\002 \001(\t\022\016\n\006create\030\003" +
-      " \001(\010\022\021\n\tread_only\030\004 \001(\010\"R\n\023OpenProjectRe" +
-      "sponse\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_" +
-      "name\030\002 \001(\t\022\017\n\007created\030\003 \001(\010\"I\n\023CloseProj" +
-      "ectRequest\0222\n\017shutdown_policy\030\001 \001(\0162\031.li" +
-      "bghidra.ShutdownPolicy\"&\n\024CloseProjectRe" +
-      "sponse\022\016\n\006closed\030\001 \001(\010\"\230\001\n\013ProjectFile\022\014" +
-      "\n\004path\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\023\n\013folder_pat" +
-      "h\030\003 \001(\t\022\024\n\014content_type\030\004 \001(\t\022\033\n\023domain_" +
-      "object_class\030\005 \001(\t\022\021\n\tis_folder\030\006 \001(\010\022\022\n" +
-      "\nis_program\030\007 \001(\010\"I\n\027ListProjectFilesReq" +
-      "uest\022\027\n\017include_folders\030\001 \001(\010\022\025\n\rprogram" +
-      "s_only\030\002 \001(\010\"A\n\030ListProjectFilesResponse" +
-      "\022%\n\005files\030\001 \003(\0132\026.libghidra.ProjectFile\"" +
-      "(\n\tLoaderArg\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(" +
-      "\t\"\362\001\n\024ImportProgramRequest\022\023\n\013source_pat" +
-      "h\030\001 \001(\t\022\033\n\023project_folder_path\030\002 \001(\t\022\024\n\014" +
-      "program_name\030\003 \001(\t\022\021\n\toverwrite\030\004 \001(\010\022\017\n" +
-      "\007analyze\030\005 \001(\010\022\023\n\013language_id\030\006 \001(\t\022\030\n\020c" +
-      "ompiler_spec_id\030\007 \001(\t\022\024\n\014loader_class\030\010 " +
-      "\001(\t\022)\n\013loader_args\030\t \003(\0132\024.libghidra.Loa" +
-      "derArg\"L\n\025ImportProgramResponse\022\025\n\rprogr" +
-      "am_paths\030\001 \003(\t\022\034\n\024primary_program_path\030\002" +
-      " \001(\t\"I\n\023CloseProgramRequest\0222\n\017shutdown_" +
-      "policy\030\002 \001(\0162\031.libghidra.ShutdownPolicy\"" +
-      "&\n\024CloseProgramResponse\022\016\n\006closed\030\001 \001(\010\"" +
-      "\024\n\022SaveProgramRequest\"$\n\023SaveProgramResp" +
-      "onse\022\r\n\005saved\030\001 \001(\010\"\027\n\025DiscardProgramReq" +
-      "uest\"+\n\026DiscardProgramResponse\022\021\n\tdiscar" +
-      "ded\030\001 \001(\010\"\024\n\022GetRevisionRequest\"\244\001\n\023GetR" +
-      "evisionResponse\022\022\n\nprogram_id\030\001 \001(\004\022\033\n\023m" +
-      "odification_number\030\002 \001(\004\022\024\n\014program_path" +
-      "\030\003 \001(\t\022\017\n\007file_id\030\004 \001(\t\022\024\n\014file_version\030" +
-      "\005 \001(\005\022\037\n\027file_last_modified_time\030\006 \001(\003\"E" +
-      "\n\017ShutdownRequest\0222\n\017shutdown_policy\030\001 \001" +
-      "(\0162\031.libghidra.ShutdownPolicy\"$\n\020Shutdow" +
-      "nResponse\022\020\n\010accepted\030\001 \001(\010\"\352\001\n\023PerfBenc" +
-      "hmarkRecord\022\020\n\010bench_id\030\001 \001(\t\022\024\n\014query_f" +
-      "amily\030\002 \001(\t\022\027\n\017dataset_profile\030\003 \001(\t\022\023\n\013" +
-      "cold_ms_p50\030\004 \001(\001\022\023\n\013cold_ms_p95\030\005 \001(\001\022\023" +
-      "\n\013warm_ms_p50\030\006 \001(\001\022\023\n\013warm_ms_p95\030\007 \001(\001" +
-      "\022\026\n\016throughput_qps\030\010 \001(\001\022\026\n\016regression_p" +
-      "ct\030\t \001(\001\022\016\n\006status\030\n \001(\t\"I\n\027AddPerfBench" +
-      "markRequest\022.\n\006record\030\001 \001(\0132\036.libghidra." +
-      "PerfBenchmarkRecord\")\n\030AddPerfBenchmarkR" +
-      "esponse\022\r\n\005added\030\001 \001(\010\"\033\n\031ListPerfBenchm" +
-      "arksRequest\"M\n\032ListPerfBenchmarksRespons" +
-      "e\022/\n\007records\030\001 \003(\0132\036.libghidra.PerfBench" +
-      "markRecord\"\034\n\032ClearPerfBenchmarksRequest" +
-      "\"E\n\033ClearPerfBenchmarksResponse\022\017\n\007clear" +
-      "ed\030\001 \001(\010\022\025\n\rremoved_count\030\002 \001(\r\".\n\032Delet" +
-      "ePerfBenchmarkRequest\022\020\n\010bench_id\030\001 \001(\t\"" +
-      ".\n\033DeletePerfBenchmarkResponse\022\017\n\007delete" +
-      "d\030\001 \001(\0102\303\t\n\016SessionService\022L\n\013OpenProjec" +
-      "t\022\035.libghidra.OpenProjectRequest\032\036.libgh" +
-      "idra.OpenProjectResponse\022O\n\014CloseProject" +
-      "\022\036.libghidra.CloseProjectRequest\032\037.libgh" +
-      "idra.CloseProjectResponse\022[\n\020ListProject" +
-      "Files\022\".libghidra.ListProjectFilesReques" +
-      "t\032#.libghidra.ListProjectFilesResponse\022R" +
-      "\n\rImportProgram\022\037.libghidra.ImportProgra" +
-      "mRequest\032 .libghidra.ImportProgramRespon" +
-      "se\022L\n\013OpenProgram\022\035.libghidra.OpenProgra" +
-      "mRequest\032\036.libghidra.OpenProgramResponse" +
-      "\022O\n\014CloseProgram\022\036.libghidra.CloseProgra" +
-      "mRequest\032\037.libghidra.CloseProgramRespons" +
-      "e\022L\n\013SaveProgram\022\035.libghidra.SaveProgram" +
-      "Request\032\036.libghidra.SaveProgramResponse\022" +
-      "U\n\016DiscardProgram\022 .libghidra.DiscardPro" +
-      "gramRequest\032!.libghidra.DiscardProgramRe" +
-      "sponse\022L\n\013GetRevision\022\035.libghidra.GetRev" +
-      "isionRequest\032\036.libghidra.GetRevisionResp" +
-      "onse\022C\n\010Shutdown\022\032.libghidra.ShutdownReq" +
-      "uest\032\033.libghidra.ShutdownResponse\022[\n\020Add" +
-      "PerfBenchmark\022\".libghidra.AddPerfBenchma" +
-      "rkRequest\032#.libghidra.AddPerfBenchmarkRe" +
-      "sponse\022a\n\022ListPerfBenchmarks\022$.libghidra" +
-      ".ListPerfBenchmarksRequest\032%.libghidra.L" +
-      "istPerfBenchmarksResponse\022d\n\023ClearPerfBe" +
-      "nchmarks\022%.libghidra.ClearPerfBenchmarks" +
-      "Request\032&.libghidra.ClearPerfBenchmarksR" +
-      "esponse\022d\n\023DeletePerfBenchmark\022%.libghid" +
-      "ra.DeletePerfBenchmarkRequest\032&.libghidr" +
-      "a.DeletePerfBenchmarkResponseB\033\n\tlibghid" +
-      "raB\014SessionProtoP\001b\006proto3"
+      "e\030\002 \001(\t\022\024\n\014program_path\030\003 \001(\t\022\021\n\tread_on" +
+      "ly\030\005 \001(\010\022\023\n\013language_id\030\006 \001(\t\022\030\n\020compile" +
+      "r_spec_id\030\007 \001(\t\022\016\n\006format\030\010 \001(\t\022\024\n\014base_" +
+      "address\030\t \001(\004J\004\010\004\020\005R\007analyze\"\321\001\n\023OpenPro" +
+      "gramResponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013la" +
+      "nguage_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t\022\022" +
+      "\n\nimage_base\030\005 \001(\004\022\013\n\003md5\030\006 \001(\t\022\016\n\006sha25" +
+      "6\030\007 \001(\t\022\031\n\021executable_format\030\010 \001(\t\022\023\n\013en" +
+      "try_point\030\t \001(\004\022\027\n\017has_entry_point\030\n \001(\010" +
+      "\"c\n\022OpenProjectRequest\022\024\n\014project_path\030\001" +
+      " \001(\t\022\024\n\014project_name\030\002 \001(\t\022\016\n\006create\030\003 \001" +
+      "(\010\022\021\n\tread_only\030\004 \001(\010\"R\n\023OpenProjectResp" +
+      "onse\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_na" +
+      "me\030\002 \001(\t\022\017\n\007created\030\003 \001(\010\"I\n\023CloseProjec" +
+      "tRequest\0222\n\017shutdown_policy\030\001 \001(\0162\031.libg" +
+      "hidra.ShutdownPolicy\"&\n\024CloseProjectResp" +
+      "onse\022\016\n\006closed\030\001 \001(\010\"\230\001\n\013ProjectFile\022\014\n\004" +
+      "path\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\023\n\013folder_path\030" +
+      "\003 \001(\t\022\024\n\014content_type\030\004 \001(\t\022\033\n\023domain_ob" +
+      "ject_class\030\005 \001(\t\022\021\n\tis_folder\030\006 \001(\010\022\022\n\ni" +
+      "s_program\030\007 \001(\010\"I\n\027ListProjectFilesReque" +
+      "st\022\027\n\017include_folders\030\001 \001(\010\022\025\n\rprograms_" +
+      "only\030\002 \001(\010\"A\n\030ListProjectFilesResponse\022%" +
+      "\n\005files\030\001 \003(\0132\026.libghidra.ProjectFile\"(\n" +
+      "\tLoaderArg\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"" +
+      "\237\002\n\024ImportProgramRequest\022\023\n\013source_path\030" +
+      "\001 \001(\t\022\033\n\023project_folder_path\030\002 \001(\t\022\024\n\014pr" +
+      "ogram_name\030\003 \001(\t\022\021\n\toverwrite\030\004 \001(\010\022\017\n\007a" +
+      "nalyze\030\005 \001(\010\022\023\n\013language_id\030\006 \001(\t\022\030\n\020com" +
+      "piler_spec_id\030\007 \001(\t\022\024\n\014loader_class\030\010 \001(" +
+      "\t\022)\n\013loader_args\030\t \003(\0132\024.libghidra.Loade" +
+      "rArg\022\025\n\ranalyzers_off\030\n \003(\t\022\024\n\014analyzers" +
+      "_on\030\013 \003(\t\"I\n\024AnalyzerPatternMatch\022\017\n\007pat" +
+      "tern\030\001 \001(\t\022\017\n\007enabled\030\002 \001(\010\022\017\n\007options\030\003" +
+      " \003(\t\"\207\001\n\025ImportProgramResponse\022\025\n\rprogra" +
+      "m_paths\030\001 \003(\t\022\034\n\024primary_program_path\030\002 " +
+      "\001(\t\0229\n\020analyzer_matches\030\003 \003(\0132\037.libghidr" +
+      "a.AnalyzerPatternMatch\"I\n\023CloseProgramRe" +
+      "quest\0222\n\017shutdown_policy\030\002 \001(\0162\031.libghid" +
+      "ra.ShutdownPolicy\"&\n\024CloseProgramRespons" +
+      "e\022\016\n\006closed\030\001 \001(\010\"\024\n\022SaveProgramRequest\"" +
+      "$\n\023SaveProgramResponse\022\r\n\005saved\030\001 \001(\010\"\027\n" +
+      "\025DiscardProgramRequest\"+\n\026DiscardProgram" +
+      "Response\022\021\n\tdiscarded\030\001 \001(\010\"\024\n\022GetRevisi" +
+      "onRequest\"\244\001\n\023GetRevisionResponse\022\022\n\npro" +
+      "gram_id\030\001 \001(\004\022\033\n\023modification_number\030\002 \001" +
+      "(\004\022\024\n\014program_path\030\003 \001(\t\022\017\n\007file_id\030\004 \001(" +
+      "\t\022\024\n\014file_version\030\005 \001(\005\022\037\n\027file_last_mod" +
+      "ified_time\030\006 \001(\003\"E\n\017ShutdownRequest\0222\n\017s" +
+      "hutdown_policy\030\001 \001(\0162\031.libghidra.Shutdow" +
+      "nPolicy\"$\n\020ShutdownResponse\022\020\n\010accepted\030" +
+      "\001 \001(\010\"\352\001\n\023PerfBenchmarkRecord\022\020\n\010bench_i" +
+      "d\030\001 \001(\t\022\024\n\014query_family\030\002 \001(\t\022\027\n\017dataset" +
+      "_profile\030\003 \001(\t\022\023\n\013cold_ms_p50\030\004 \001(\001\022\023\n\013c" +
+      "old_ms_p95\030\005 \001(\001\022\023\n\013warm_ms_p50\030\006 \001(\001\022\023\n" +
+      "\013warm_ms_p95\030\007 \001(\001\022\026\n\016throughput_qps\030\010 \001" +
+      "(\001\022\026\n\016regression_pct\030\t \001(\001\022\016\n\006status\030\n \001" +
+      "(\t\"I\n\027AddPerfBenchmarkRequest\022.\n\006record\030" +
+      "\001 \001(\0132\036.libghidra.PerfBenchmarkRecord\")\n" +
+      "\030AddPerfBenchmarkResponse\022\r\n\005added\030\001 \001(\010" +
+      "\"\033\n\031ListPerfBenchmarksRequest\"M\n\032ListPer" +
+      "fBenchmarksResponse\022/\n\007records\030\001 \003(\0132\036.l" +
+      "ibghidra.PerfBenchmarkRecord\"\034\n\032ClearPer" +
+      "fBenchmarksRequest\"E\n\033ClearPerfBenchmark" +
+      "sResponse\022\017\n\007cleared\030\001 \001(\010\022\025\n\rremoved_co" +
+      "unt\030\002 \001(\r\".\n\032DeletePerfBenchmarkRequest\022" +
+      "\020\n\010bench_id\030\001 \001(\t\".\n\033DeletePerfBenchmark" +
+      "Response\022\017\n\007deleted\030\001 \001(\010\"\250\001\n\023ProgramOpt" +
+      "ionRecord\022\020\n\010category\030\001 \001(\t\022\014\n\004name\030\002 \001(" +
+      "\t\022\r\n\005value\030\003 \001(\t\022\014\n\004type\030\004 \001(\t\022\023\n\013descri" +
+      "ption\030\005 \001(\t\022\025\n\rdefault_value\030\006 \001(\t\022\020\n\010se" +
+      "ttable\030\007 \001(\010\022\026\n\016allowed_values\030\010 \003(\t\"B\n\031" +
+      "ListProgramOptionsRequest\022\020\n\010category\030\001 " +
+      "\001(\t\022\023\n\013name_filter\030\002 \001(\t\"M\n\032ListProgramO" +
+      "ptionsResponse\022/\n\007options\030\001 \003(\0132\036.libghi" +
+      "dra.ProgramOptionRecord\"H\n\027SetProgramOpt" +
+      "ionRequest\022\020\n\010category\030\001 \001(\t\022\014\n\004name\030\002 \001" +
+      "(\t\022\r\n\005value\030\003 \001(\t\"C\n\030SetProgramOptionRes" +
+      "ponse\022\017\n\007applied\030\001 \001(\010\022\026\n\016previous_value" +
+      "\030\002 \001(\t\"_\n\021TransactionRecord\022\020\n\010position\030" +
+      "\001 \001(\r\022\014\n\004name\030\002 \001(\t\022\014\n\004kind\030\003 \001(\t\022\034\n\024ope" +
+      "n_subtransactions\030\004 \003(\t\"\031\n\027ListTransacti" +
+      "onsRequest\"N\n\030ListTransactionsResponse\0222" +
+      "\n\014transactions\030\001 \003(\0132\034.libghidra.Transac" +
+      "tionRecord2\340\013\n\016SessionService\022L\n\013OpenPro" +
+      "ject\022\035.libghidra.OpenProjectRequest\032\036.li" +
+      "bghidra.OpenProjectResponse\022O\n\014CloseProj" +
+      "ect\022\036.libghidra.CloseProjectRequest\032\037.li" +
+      "bghidra.CloseProjectResponse\022[\n\020ListProj" +
+      "ectFiles\022\".libghidra.ListProjectFilesReq" +
+      "uest\032#.libghidra.ListProjectFilesRespons" +
+      "e\022R\n\rImportProgram\022\037.libghidra.ImportPro" +
+      "gramRequest\032 .libghidra.ImportProgramRes" +
+      "ponse\022L\n\013OpenProgram\022\035.libghidra.OpenPro" +
+      "gramRequest\032\036.libghidra.OpenProgramRespo" +
+      "nse\022O\n\014CloseProgram\022\036.libghidra.ClosePro" +
+      "gramRequest\032\037.libghidra.CloseProgramResp" +
+      "onse\022L\n\013SaveProgram\022\035.libghidra.SaveProg" +
+      "ramRequest\032\036.libghidra.SaveProgramRespon" +
+      "se\022U\n\016DiscardProgram\022 .libghidra.Discard" +
+      "ProgramRequest\032!.libghidra.DiscardProgra" +
+      "mResponse\022L\n\013GetRevision\022\035.libghidra.Get" +
+      "RevisionRequest\032\036.libghidra.GetRevisionR" +
+      "esponse\022C\n\010Shutdown\022\032.libghidra.Shutdown" +
+      "Request\032\033.libghidra.ShutdownResponse\022[\n\020" +
+      "AddPerfBenchmark\022\".libghidra.AddPerfBenc" +
+      "hmarkRequest\032#.libghidra.AddPerfBenchmar" +
+      "kResponse\022a\n\022ListPerfBenchmarks\022$.libghi" +
+      "dra.ListPerfBenchmarksRequest\032%.libghidr" +
+      "a.ListPerfBenchmarksResponse\022d\n\023ClearPer" +
+      "fBenchmarks\022%.libghidra.ClearPerfBenchma" +
+      "rksRequest\032&.libghidra.ClearPerfBenchmar" +
+      "ksResponse\022d\n\023DeletePerfBenchmark\022%.libg" +
+      "hidra.DeletePerfBenchmarkRequest\032&.libgh" +
+      "idra.DeletePerfBenchmarkResponse\022a\n\022List" +
+      "ProgramOptions\022$.libghidra.ListProgramOp" +
+      "tionsRequest\032%.libghidra.ListProgramOpti" +
+      "onsResponse\022[\n\020SetProgramOption\022\".libghi" +
+      "dra.SetProgramOptionRequest\032#.libghidra." +
+      "SetProgramOptionResponse\022[\n\020ListTransact" +
+      "ions\022\".libghidra.ListTransactionsRequest" +
+      "\032#.libghidra.ListTransactionsResponseB\033\n" +
+      "\tlibghidraB\014SessionProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -298,7 +371,7 @@ public final class SessionProto {
     internal_static_libghidra_OpenProgramRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_OpenProgramRequest_descriptor,
-        new java.lang.String[] { "ProjectPath", "ProjectName", "ProgramPath", "Analyze", "ReadOnly", "LanguageId", "CompilerSpecId", "Format", "BaseAddress", });
+        new java.lang.String[] { "ProjectPath", "ProjectName", "ProgramPath", "ReadOnly", "LanguageId", "CompilerSpecId", "Format", "BaseAddress", });
     internal_static_libghidra_OpenProgramResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_libghidra_OpenProgramResponse_fieldAccessorTable = new
@@ -358,127 +431,181 @@ public final class SessionProto {
     internal_static_libghidra_ImportProgramRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ImportProgramRequest_descriptor,
-        new java.lang.String[] { "SourcePath", "ProjectFolderPath", "ProgramName", "Overwrite", "Analyze", "LanguageId", "CompilerSpecId", "LoaderClass", "LoaderArgs", });
-    internal_static_libghidra_ImportProgramResponse_descriptor =
+        new java.lang.String[] { "SourcePath", "ProjectFolderPath", "ProgramName", "Overwrite", "Analyze", "LanguageId", "CompilerSpecId", "LoaderClass", "LoaderArgs", "AnalyzersOff", "AnalyzersOn", });
+    internal_static_libghidra_AnalyzerPatternMatch_descriptor =
       getDescriptor().getMessageTypes().get(11);
+    internal_static_libghidra_AnalyzerPatternMatch_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_AnalyzerPatternMatch_descriptor,
+        new java.lang.String[] { "Pattern", "Enabled", "Options", });
+    internal_static_libghidra_ImportProgramResponse_descriptor =
+      getDescriptor().getMessageTypes().get(12);
     internal_static_libghidra_ImportProgramResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ImportProgramResponse_descriptor,
-        new java.lang.String[] { "ProgramPaths", "PrimaryProgramPath", });
+        new java.lang.String[] { "ProgramPaths", "PrimaryProgramPath", "AnalyzerMatches", });
     internal_static_libghidra_CloseProgramRequest_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_libghidra_CloseProgramRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_CloseProgramRequest_descriptor,
         new java.lang.String[] { "ShutdownPolicy", });
     internal_static_libghidra_CloseProgramResponse_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_libghidra_CloseProgramResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_CloseProgramResponse_descriptor,
         new java.lang.String[] { "Closed", });
     internal_static_libghidra_SaveProgramRequest_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_libghidra_SaveProgramRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SaveProgramRequest_descriptor,
         new java.lang.String[] { });
     internal_static_libghidra_SaveProgramResponse_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_libghidra_SaveProgramResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SaveProgramResponse_descriptor,
         new java.lang.String[] { "Saved", });
     internal_static_libghidra_DiscardProgramRequest_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_libghidra_DiscardProgramRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DiscardProgramRequest_descriptor,
         new java.lang.String[] { });
     internal_static_libghidra_DiscardProgramResponse_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_libghidra_DiscardProgramResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DiscardProgramResponse_descriptor,
         new java.lang.String[] { "Discarded", });
     internal_static_libghidra_GetRevisionRequest_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_libghidra_GetRevisionRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_GetRevisionRequest_descriptor,
         new java.lang.String[] { });
     internal_static_libghidra_GetRevisionResponse_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_libghidra_GetRevisionResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_GetRevisionResponse_descriptor,
         new java.lang.String[] { "ProgramId", "ModificationNumber", "ProgramPath", "FileId", "FileVersion", "FileLastModifiedTime", });
     internal_static_libghidra_ShutdownRequest_descriptor =
-      getDescriptor().getMessageTypes().get(20);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_libghidra_ShutdownRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ShutdownRequest_descriptor,
         new java.lang.String[] { "ShutdownPolicy", });
     internal_static_libghidra_ShutdownResponse_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_libghidra_ShutdownResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ShutdownResponse_descriptor,
         new java.lang.String[] { "Accepted", });
     internal_static_libghidra_PerfBenchmarkRecord_descriptor =
-      getDescriptor().getMessageTypes().get(22);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_libghidra_PerfBenchmarkRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_PerfBenchmarkRecord_descriptor,
         new java.lang.String[] { "BenchId", "QueryFamily", "DatasetProfile", "ColdMsP50", "ColdMsP95", "WarmMsP50", "WarmMsP95", "ThroughputQps", "RegressionPct", "Status", });
     internal_static_libghidra_AddPerfBenchmarkRequest_descriptor =
-      getDescriptor().getMessageTypes().get(23);
+      getDescriptor().getMessageTypes().get(24);
     internal_static_libghidra_AddPerfBenchmarkRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_AddPerfBenchmarkRequest_descriptor,
         new java.lang.String[] { "Record", });
     internal_static_libghidra_AddPerfBenchmarkResponse_descriptor =
-      getDescriptor().getMessageTypes().get(24);
+      getDescriptor().getMessageTypes().get(25);
     internal_static_libghidra_AddPerfBenchmarkResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_AddPerfBenchmarkResponse_descriptor,
         new java.lang.String[] { "Added", });
     internal_static_libghidra_ListPerfBenchmarksRequest_descriptor =
-      getDescriptor().getMessageTypes().get(25);
+      getDescriptor().getMessageTypes().get(26);
     internal_static_libghidra_ListPerfBenchmarksRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListPerfBenchmarksRequest_descriptor,
         new java.lang.String[] { });
     internal_static_libghidra_ListPerfBenchmarksResponse_descriptor =
-      getDescriptor().getMessageTypes().get(26);
+      getDescriptor().getMessageTypes().get(27);
     internal_static_libghidra_ListPerfBenchmarksResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListPerfBenchmarksResponse_descriptor,
         new java.lang.String[] { "Records", });
     internal_static_libghidra_ClearPerfBenchmarksRequest_descriptor =
-      getDescriptor().getMessageTypes().get(27);
+      getDescriptor().getMessageTypes().get(28);
     internal_static_libghidra_ClearPerfBenchmarksRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ClearPerfBenchmarksRequest_descriptor,
         new java.lang.String[] { });
     internal_static_libghidra_ClearPerfBenchmarksResponse_descriptor =
-      getDescriptor().getMessageTypes().get(28);
+      getDescriptor().getMessageTypes().get(29);
     internal_static_libghidra_ClearPerfBenchmarksResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ClearPerfBenchmarksResponse_descriptor,
         new java.lang.String[] { "Cleared", "RemovedCount", });
     internal_static_libghidra_DeletePerfBenchmarkRequest_descriptor =
-      getDescriptor().getMessageTypes().get(29);
+      getDescriptor().getMessageTypes().get(30);
     internal_static_libghidra_DeletePerfBenchmarkRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeletePerfBenchmarkRequest_descriptor,
         new java.lang.String[] { "BenchId", });
     internal_static_libghidra_DeletePerfBenchmarkResponse_descriptor =
-      getDescriptor().getMessageTypes().get(30);
+      getDescriptor().getMessageTypes().get(31);
     internal_static_libghidra_DeletePerfBenchmarkResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeletePerfBenchmarkResponse_descriptor,
         new java.lang.String[] { "Deleted", });
+    internal_static_libghidra_ProgramOptionRecord_descriptor =
+      getDescriptor().getMessageTypes().get(32);
+    internal_static_libghidra_ProgramOptionRecord_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ProgramOptionRecord_descriptor,
+        new java.lang.String[] { "Category", "Name", "Value", "Type", "Description", "DefaultValue", "Settable", "AllowedValues", });
+    internal_static_libghidra_ListProgramOptionsRequest_descriptor =
+      getDescriptor().getMessageTypes().get(33);
+    internal_static_libghidra_ListProgramOptionsRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListProgramOptionsRequest_descriptor,
+        new java.lang.String[] { "Category", "NameFilter", });
+    internal_static_libghidra_ListProgramOptionsResponse_descriptor =
+      getDescriptor().getMessageTypes().get(34);
+    internal_static_libghidra_ListProgramOptionsResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListProgramOptionsResponse_descriptor,
+        new java.lang.String[] { "Options", });
+    internal_static_libghidra_SetProgramOptionRequest_descriptor =
+      getDescriptor().getMessageTypes().get(35);
+    internal_static_libghidra_SetProgramOptionRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_SetProgramOptionRequest_descriptor,
+        new java.lang.String[] { "Category", "Name", "Value", });
+    internal_static_libghidra_SetProgramOptionResponse_descriptor =
+      getDescriptor().getMessageTypes().get(36);
+    internal_static_libghidra_SetProgramOptionResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_SetProgramOptionResponse_descriptor,
+        new java.lang.String[] { "Applied", "PreviousValue", });
+    internal_static_libghidra_TransactionRecord_descriptor =
+      getDescriptor().getMessageTypes().get(37);
+    internal_static_libghidra_TransactionRecord_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_TransactionRecord_descriptor,
+        new java.lang.String[] { "Position", "Name", "Kind", "OpenSubtransactions", });
+    internal_static_libghidra_ListTransactionsRequest_descriptor =
+      getDescriptor().getMessageTypes().get(38);
+    internal_static_libghidra_ListTransactionsRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListTransactionsRequest_descriptor,
+        new java.lang.String[] { });
+    internal_static_libghidra_ListTransactionsResponse_descriptor =
+      getDescriptor().getMessageTypes().get(39);
+    internal_static_libghidra_ListTransactionsResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_ListTransactionsResponse_descriptor,
+        new java.lang.String[] { "Transactions", });
     descriptor.resolveAllFeaturesImmutable();
     libghidra.CommonProto.getDescriptor();
   }

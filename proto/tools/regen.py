@@ -216,7 +216,10 @@ def regen_rust(protoc: Path, wkt: Path | None) -> None:
     print(f"[rust] PROTOC={protoc} cargo build (in {RUST_CRATE_DIR})")
     subprocess.run(cmd, cwd=str(RUST_CRATE_DIR), env=env, check=True)
 
-    target_build_dir = RUST_CRATE_DIR / "target" / "debug" / "build"
+    # Honour CARGO_TARGET_DIR: cargo writes the build there instead of <crate>/target
+    # when it is set, and looking only under the crate would miss the fresh output.
+    target_root = Path(env["CARGO_TARGET_DIR"]) if env.get("CARGO_TARGET_DIR") else RUST_CRATE_DIR / "target"
+    target_build_dir = target_root / "debug" / "build"
     candidates = sorted(
         target_build_dir.glob("*/out/libghidra.rs"),
         key=lambda p: p.stat().st_mtime,

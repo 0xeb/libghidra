@@ -140,12 +140,26 @@ pub struct ImportProgramRequest {
     pub compiler_spec_id: String,
     pub loader_class: String,
     pub loader_args: Vec<LoaderArg>,
+    /// Analyzer on/off patterns applied to every loaded program before analysis: a
+    /// pattern with `*` is a case-insensitive glob over the `Analyzers` toggles,
+    /// anything else a substring. "on" applies after "off".
+    pub analyzers_off: Vec<String>,
+    pub analyzers_on: Vec<String>,
+}
+
+/// Which analyzer toggles one import pattern matched, across every loaded program.
+#[derive(Debug, Clone, Default)]
+pub struct AnalyzerPatternMatch {
+    pub pattern: String,
+    pub enabled: bool,
+    pub options: Vec<String>,
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct ImportProgramResponse {
     pub program_paths: Vec<String>,
     pub primary_program_path: String,
+    pub analyzer_matches: Vec<AnalyzerPatternMatch>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -153,7 +167,6 @@ pub struct OpenProgramRequest {
     pub project_path: String,
     pub project_name: String,
     pub program_path: String,
-    pub analyze: bool,
     pub read_only: bool,
     pub language_id: String,
     pub compiler_spec_id: String,
@@ -473,6 +486,49 @@ pub struct PerfBenchmarkRecord {
 pub struct ClearPerfBenchmarksResponse {
     pub cleared: bool,
     pub removed_count: u32,
+}
+
+/// One entry of the current program's options. `type_name` is the Ghidra
+/// OptionType in lower case without its `_TYPE` suffix (boolean, int, long, double,
+/// float, string, enum, file, ...). ENUM values are constant names, listed in
+/// `allowed_values`. Only scalar and enum options of `Analyzers` are settable.
+#[derive(Debug, Clone, Default)]
+pub struct ProgramOptionRecord {
+    pub category: String,
+    pub name: String,
+    pub value: String,
+    pub type_name: String,
+    pub description: String,
+    pub default_value: String,
+    pub settable: bool,
+    pub allowed_values: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SetProgramOptionResponse {
+    pub applied: bool,
+    pub previous_value: String,
+}
+
+/// `kind` is "undo" (position 1 = most recent), "redo" or "open" (position 0).
+#[derive(Debug, Clone, Default)]
+pub struct TransactionRecord {
+    pub position: u32,
+    pub name: String,
+    pub kind: String,
+    pub open_subtransactions: Vec<String>,
+}
+
+/// A background auto-analysis job; `state` is running | done | error | cancelled.
+#[derive(Debug, Clone, Default)]
+pub struct AnalysisJobRecord {
+    pub job_id: u64,
+    pub mode: String,
+    pub state: String,
+    pub started_unix_ms: i64,
+    pub ended_unix_ms: i64,
+    pub elapsed_ms: u64,
+    pub message: String,
 }
 
 #[derive(Debug, Clone, Default)]

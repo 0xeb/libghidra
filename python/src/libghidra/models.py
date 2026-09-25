@@ -145,12 +145,25 @@ class ImportProgramRequest:
     compiler_spec_id: str = ""
     loader_class: str = ""
     loader_args: list[LoaderArg] = field(default_factory=list)
+    # Analyzer on/off patterns applied to every loaded program before analysis: a
+    # pattern with '*' is a case-insensitive glob over the "Analyzers" toggles,
+    # anything else a substring. "on" applies after "off".
+    analyzers_off: list[str] = field(default_factory=list)
+    analyzers_on: list[str] = field(default_factory=list)
+
+
+@dataclass
+class AnalyzerPatternMatch:
+    pattern: str = ""
+    enabled: bool = False
+    options: list[str] = field(default_factory=list)
 
 
 @dataclass
 class ImportProgramResponse:
     program_paths: list[str] = field(default_factory=list)
     primary_program_path: str = ""
+    analyzer_matches: list[AnalyzerPatternMatch] = field(default_factory=list)
 
 
 @dataclass
@@ -158,7 +171,6 @@ class OpenProgramRequest:
     project_path: str = ""
     project_name: str = ""
     program_path: str = ""
-    analyze: bool = False
     read_only: bool = False
     language_id: str = ""
     compiler_spec_id: str = ""
@@ -1078,3 +1090,52 @@ class PerfBenchmarkRecord:
 class ClearPerfBenchmarksResponse:
     cleared: bool = False
     removed_count: int = 0
+
+
+@dataclass
+class ProgramOptionRecord:
+    """One entry of the current program's options.
+
+    ``type`` is the Ghidra OptionType in lower case without its ``_TYPE`` suffix
+    (boolean, int, long, double, float, string, enum, file, ...). ENUM values are
+    constant names, listed in ``allowed_values``. Only scalar and enum options of the
+    ``Analyzers`` category are settable.
+    """
+
+    category: str = ""
+    name: str = ""
+    value: str = ""
+    type: str = ""
+    description: str = ""
+    default_value: str = ""
+    settable: bool = False
+    allowed_values: list[str] = field(default_factory=list)
+
+
+@dataclass
+class SetProgramOptionResponse:
+    applied: bool = False
+    previous_value: str = ""
+
+
+@dataclass
+class TransactionRecord:
+    """kind is "undo" (position 1 = most recent), "redo" or "open" (position 0)."""
+
+    position: int = 0
+    name: str = ""
+    kind: str = ""
+    open_subtransactions: list[str] = field(default_factory=list)
+
+
+@dataclass
+class AnalysisJobRecord:
+    """A background auto-analysis job; state is running | done | error | cancelled."""
+
+    job_id: int = 0
+    mode: str = ""
+    state: str = ""
+    started_unix_ms: int = 0
+    ended_unix_ms: int = 0
+    elapsed_ms: int = 0
+    message: str = ""

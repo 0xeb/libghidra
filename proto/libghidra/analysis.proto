@@ -1,0 +1,61 @@
+// Copyright (c) 2024-2026 Elias Bachaalany
+// SPDX-License-Identifier: LicenseRef-Human-Origin-Source-1.0
+//
+// This file is licensed under the Human-Origin Source License v1.0.
+// See LICENSE.
+
+syntax = "proto3";
+
+package libghidra;
+
+option java_multiple_files = true;
+option java_package = "libghidra";
+option java_outer_classname = "AnalysisProto";
+
+// One auto-analysis job on the current program. state is running | done | error |
+// cancelled. Times are Unix epoch milliseconds; ended_unix_ms is 0 while running.
+message AnalysisJobRecord {
+  uint64 job_id = 1;
+  string mode = 2;
+  string state = 3;
+  int64 started_unix_ms = 4;
+  int64 ended_unix_ms = 5;
+  uint64 elapsed_ms = 6;
+  string message = 7;
+}
+
+// Analysis of a large program runs for minutes, far longer than an RPC read timeout,
+// so StartAnalysis starts a BACKGROUND job and returns immediately. While the job runs
+// it holds the program exclusively: every other program RPC fails fast with
+// analysis_running (poll ListAnalysisJobs, or CancelAnalysis). One job at a time.
+message StartAnalysisRequest {
+  // "changed" (default when empty): run the analysis the host has queued for edits made
+  // since the program was opened -- normally nothing on a freshly opened program.
+  // "all": re-run every enabled analyzer over the whole program.
+  string mode = 1;
+}
+
+message StartAnalysisResponse {
+  AnalysisJobRecord job = 1;
+}
+
+message ListAnalysisJobsRequest {}
+
+message ListAnalysisJobsResponse {
+  repeated AnalysisJobRecord jobs = 1;
+}
+
+message CancelAnalysisRequest {
+  // 0 cancels the running job, whatever its id.
+  uint64 job_id = 1;
+}
+
+message CancelAnalysisResponse {
+  bool cancelled = 1;
+}
+
+service AnalysisService {
+  rpc StartAnalysis(StartAnalysisRequest) returns (StartAnalysisResponse);
+  rpc ListAnalysisJobs(ListAnalysisJobsRequest) returns (ListAnalysisJobsResponse);
+  rpc CancelAnalysis(CancelAnalysisRequest) returns (CancelAnalysisResponse);
+}

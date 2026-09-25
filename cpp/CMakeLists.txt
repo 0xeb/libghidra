@@ -225,6 +225,7 @@ endif()
 add_library(libghidra_client
     src/http_client.cpp
     src/headless.cpp
+    generated/libghidra/analysis.pb.cc
     generated/libghidra/common.pb.cc
     generated/libghidra/decompiler.pb.cc
     generated/libghidra/functions.pb.cc

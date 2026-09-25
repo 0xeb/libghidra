@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ghidra.framework.model.Project;
 import ghidra.program.model.listing.Program;
 import ghidra.util.task.TaskMonitor;
+import libghidra.host.contract.AnalysisContract;
 import libghidra.host.contract.FunctionsContract;
 import libghidra.host.contract.ListingContract;
 import libghidra.host.contract.SessionContract;
@@ -24,6 +25,7 @@ import libghidra.host.http.LibGhidraHttpServer;
 import libghidra.host.runtime.HostState;
 import libghidra.host.runtime.RuntimeBundle;
 import libghidra.host.runtime.SessionRuntime;
+import libghidra.host.service.AnalysisServiceHandler;
 import libghidra.host.service.FunctionsServiceHandler;
 import libghidra.host.service.HealthServiceHandler;
 import libghidra.host.service.ListingServiceHandler;
@@ -75,6 +77,7 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 	private final RuntimeBundle runtimes;
 	private final HealthServiceHandler healthHandler;
 	private final SessionServiceHandler sessionHandler;
+	private final AnalysisServiceHandler analysisHandler;
 	private final MemoryServiceHandler memoryHandler;
 	private final FunctionsServiceHandler functionsHandler;
 	private final SymbolsServiceHandler symbolsHandler;
@@ -161,6 +164,7 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 		typesHandler = new TypesServiceHandler(runtimes.types());
 		decompilerHandler = new DecompilerServiceHandler(runtimes.decompiler());
 		listingHandler = new ListingServiceHandler(runtimes.listing());
+		analysisHandler = new AnalysisServiceHandler(runtimes.analysis());
 		this.bindAddress = bindAddress != null && !bindAddress.isBlank() ? bindAddress : "127.0.0.1";
 		this.listenPort = Math.max(0, listenPort);
 		this.authToken = authToken != null ? authToken : "";
@@ -234,6 +238,8 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			}
 			server.stop();
 			try {
+				// A running analysis job owns the program; stop it before the policy runs.
+				runtimes.state().cancelAnalysisAndWait();
 				if (!shutdownPolicyApplied.get()) {
 					applyShutdownPolicy();
 				}
@@ -350,6 +356,42 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			public SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
 					SessionContract.DeletePerfBenchmarkRequest request) {
 				return sessionHandler.deletePerfBenchmark(request);
+			}
+
+			@Override
+			public SessionContract.ListProgramOptionsResponse listProgramOptions(
+					SessionContract.ListProgramOptionsRequest request) {
+				return sessionHandler.listProgramOptions(request);
+			}
+
+			@Override
+			public SessionContract.SetProgramOptionResponse setProgramOption(
+					SessionContract.SetProgramOptionRequest request) {
+				return sessionHandler.setProgramOption(request);
+			}
+
+			@Override
+			public SessionContract.ListTransactionsResponse listTransactions(
+					SessionContract.ListTransactionsRequest request) {
+				return sessionHandler.listTransactions(request);
+			}
+
+			@Override
+			public AnalysisContract.StartAnalysisResponse startAnalysis(
+					AnalysisContract.StartAnalysisRequest request) {
+				return analysisHandler.startAnalysis(request);
+			}
+
+			@Override
+			public AnalysisContract.ListAnalysisJobsResponse listAnalysisJobs(
+					AnalysisContract.ListAnalysisJobsRequest request) {
+				return analysisHandler.listAnalysisJobs(request);
+			}
+
+			@Override
+			public AnalysisContract.CancelAnalysisResponse cancelAnalysis(
+					AnalysisContract.CancelAnalysisRequest request) {
+				return analysisHandler.cancelAnalysis(request);
 			}
 
 			@Override

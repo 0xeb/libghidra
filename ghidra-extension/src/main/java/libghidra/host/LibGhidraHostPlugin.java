@@ -34,6 +34,7 @@ import ghidra.framework.plugintool.PluginTool;
 import ghidra.framework.plugintool.util.PluginStatus;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
+import libghidra.host.contract.AnalysisContract;
 import libghidra.host.contract.FunctionsContract;
 import libghidra.host.contract.ListingContract;
 import libghidra.host.contract.SessionContract;
@@ -43,6 +44,7 @@ import libghidra.host.contract.TypesContract;
 import libghidra.host.contract.XrefsContract;
 import libghidra.host.http.LibGhidraHttpServer;
 import libghidra.host.runtime.RuntimeBundle;
+import libghidra.host.service.AnalysisServiceHandler;
 import libghidra.host.service.FunctionsServiceHandler;
 import libghidra.host.service.HealthServiceHandler;
 import libghidra.host.service.ListingServiceHandler;
@@ -80,6 +82,7 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 	private final DecompilerServiceHandler decompilerHandler =
 		new DecompilerServiceHandler(runtimes.decompiler());
 	private final ListingServiceHandler listingHandler = new ListingServiceHandler(runtimes.listing());
+	private final AnalysisServiceHandler analysisHandler = new AnalysisServiceHandler(runtimes.analysis());
 
 	private DockingAction startServerAction;
 	private DockingAction stopServerAction;
@@ -316,6 +319,42 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						public SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
 								SessionContract.DeletePerfBenchmarkRequest request) {
 							return sessionHandler.deletePerfBenchmark(request);
+						}
+
+						@Override
+						public SessionContract.ListProgramOptionsResponse listProgramOptions(
+								SessionContract.ListProgramOptionsRequest request) {
+							return sessionHandler.listProgramOptions(request);
+						}
+
+						@Override
+						public SessionContract.SetProgramOptionResponse setProgramOption(
+								SessionContract.SetProgramOptionRequest request) {
+							return sessionHandler.setProgramOption(request);
+						}
+
+						@Override
+						public SessionContract.ListTransactionsResponse listTransactions(
+								SessionContract.ListTransactionsRequest request) {
+							return sessionHandler.listTransactions(request);
+						}
+
+						@Override
+						public AnalysisContract.StartAnalysisResponse startAnalysis(
+								AnalysisContract.StartAnalysisRequest request) {
+							return analysisHandler.startAnalysis(request);
+						}
+
+						@Override
+						public AnalysisContract.ListAnalysisJobsResponse listAnalysisJobs(
+								AnalysisContract.ListAnalysisJobsRequest request) {
+							return analysisHandler.listAnalysisJobs(request);
+						}
+
+						@Override
+						public AnalysisContract.CancelAnalysisResponse cancelAnalysis(
+								AnalysisContract.CancelAnalysisRequest request) {
+							return analysisHandler.cancelAnalysis(request);
 						}
 
 						@Override

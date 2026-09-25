@@ -9,6 +9,7 @@ package libghidra.host.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
+import libghidra.host.LibGhidraVersion;
 import libghidra.host.contract.HealthContract;
 
 public final class HealthRuntime extends RuntimeSupport implements HealthOperations {
@@ -27,6 +28,9 @@ public final class HealthRuntime extends RuntimeSupport implements HealthOperati
 		if (closing) {
 			warnings.add("host is closing or switching programs");
 		}
+		else if (state.isAnalysisRunning()) {
+			warnings.add("an analysis job owns the program; program RPCs return analysis_running");
+		}
 		else if (!hasProgram) {
 			warnings.add("no active program bound; project/session RPCs remain available");
 		}
@@ -36,7 +40,7 @@ public final class HealthRuntime extends RuntimeSupport implements HealthOperati
 		return new HealthContract.HealthStatusResponse(
 			ok,
 			"libghidra-host",
-			"0.1.0-dev",
+			LibGhidraVersion.VERSION,
 			hostMode(),
 			modificationNumber(),
 			warnings);
@@ -45,7 +49,9 @@ public final class HealthRuntime extends RuntimeSupport implements HealthOperati
 	@Override
 	public HealthContract.CapabilityResponse getCapabilities(
 			HealthContract.CapabilityRequest request) {
-		try (LockScope ignored = readLock()) {
+		// Lock-free (it only reads the volatile program binding) so capability discovery keeps
+		// working while an analysis job owns the program.
+		{
 			List<HealthContract.Capability> capabilities = new ArrayList<>();
 			boolean ready = currentProgram() != null;
 			String programState = ready ? "ready" : "degraded";
@@ -199,6 +205,18 @@ public final class HealthRuntime extends RuntimeSupport implements HealthOperati
 				"listing.breakpoints",
 				programState,
 				"Bookmark-backed live breakpoint CRUD and edit surfaces"));
+			capabilities.add(new HealthContract.Capability(
+				"program.options",
+				programState,
+				"Lists every program option category; Analyzers options are settable"));
+			capabilities.add(new HealthContract.Capability(
+				"program.transactions",
+				programState,
+				"Undo/redo history and the open transaction of the active program"));
+			capabilities.add(new HealthContract.Capability(
+				"analysis.jobs",
+				"gui".equals(hostMode()) ? "unsupported" : programState,
+				"Background auto-analysis jobs: start (changed/all), poll, cancel"));
 			return new HealthContract.CapabilityResponse(capabilities);
 		}
 	}

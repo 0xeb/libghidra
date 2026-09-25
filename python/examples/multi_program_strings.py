@@ -53,7 +53,6 @@ def main() -> int:
 
             opened = host.open_program(ghidra.OpenProgramRequest(
                 program_path=program_path,
-                analyze=False,
                 read_only=False,
             ))
             strings = host.list_defined_strings().strings

@@ -84,9 +84,18 @@ struct ListProjectFilesResponse {
   std::vector<ProjectFile> files;
 };
 
+// Which analyzer toggles one ImportProgramRequest pattern matched, across every
+// loaded program. An empty option list means the pattern matched nothing.
+struct AnalyzerPatternMatch {
+  std::string pattern;
+  bool enabled = false;
+  std::vector<std::string> options;
+};
+
 struct ImportProgramResponse {
   std::vector<std::string> program_paths;
   std::string primary_program_path;
+  std::vector<AnalyzerPatternMatch> analyzer_matches;
 };
 
 struct CloseProgramResponse {
@@ -144,6 +153,67 @@ struct ClearPerfBenchmarksResponse {
 
 struct DeletePerfBenchmarkResponse {
   bool deleted = false;
+};
+
+// One entry of the current program's options. `type` is the Ghidra OptionType in
+// lower case without its _TYPE suffix (boolean, int, long, double, float, string,
+// enum, file, ...). ENUM values are constant names, listed in allowed_values. Only
+// scalar and enum options of the "Analyzers" category are settable.
+struct ProgramOptionRecord {
+  std::string category;
+  std::string name;
+  std::string value;
+  std::string type;
+  std::string description;
+  std::string default_value;
+  bool settable = false;
+  std::vector<std::string> allowed_values;
+};
+
+struct ListProgramOptionsResponse {
+  std::vector<ProgramOptionRecord> options;
+};
+
+struct SetProgramOptionResponse {
+  bool applied = false;
+  std::string previous_value;
+};
+
+// kind is "undo" (position 1 = most recent), "redo" (position 1 = next to redo) or
+// "open" (the transaction in progress, position 0).
+struct TransactionRecord {
+  std::uint32_t position = 0;
+  std::string name;
+  std::string kind;
+  std::vector<std::string> open_subtransactions;
+};
+
+struct ListTransactionsResponse {
+  std::vector<TransactionRecord> transactions;
+};
+
+// One background auto-analysis job. state is running | done | error | cancelled;
+// times are Unix epoch milliseconds (ended_unix_ms is 0 while running).
+struct AnalysisJobRecord {
+  std::uint64_t job_id = 0;
+  std::string mode;
+  std::string state;
+  std::int64_t started_unix_ms = 0;
+  std::int64_t ended_unix_ms = 0;
+  std::uint64_t elapsed_ms = 0;
+  std::string message;
+};
+
+struct StartAnalysisResponse {
+  AnalysisJobRecord job;
+};
+
+struct ListAnalysisJobsResponse {
+  std::vector<AnalysisJobRecord> jobs;
+};
+
+struct CancelAnalysisResponse {
+  bool cancelled = false;
 };
 
 struct ReadBytesResponse {

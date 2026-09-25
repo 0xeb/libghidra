@@ -7,12 +7,15 @@
 package libghidra.host.runtime;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import ghidra.app.decompiler.DecompInterface;
 import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Program;
+import ghidra.util.task.TaskMonitor;
 
 public final class HostState {
 
@@ -32,28 +35,114 @@ public final class HostState {
 	private DecompInterface warmDecompiler;    // guarded by decompilerLock
 	private Program warmDecompilerProgram;     // guarded by decompilerLock
 
+	// An analysis job owns the program exclusively: its worker thread holds the write lock
+	// for the whole run, and every OTHER thread's readLock()/writeLock() fails fast with
+	// analysis_running instead of queueing behind it for minutes. Lock-free RPCs (health,
+	// GetRevision, ListAnalysisJobs, CancelAnalysis) stay available throughout.
+	private static final long LOCK_POLL_MILLIS = 25L;
+	private static final long ANALYSIS_STOP_TIMEOUT_MILLIS = 30_000L;
+	private final AtomicReference<Thread> analysisThread = new AtomicReference<>();
+	private volatile long analysisJobId;
+	private volatile TaskMonitor analysisMonitor;
+
 	public HostState(String initialHostMode) {
 		hostMode = normalizeHostMode(initialHostMode);
 	}
 
 	public LockScope readLock() {
+		return acquireGated(stateLock.readLock());
+	}
+
+	public LockScope writeLock() {
+		return acquireGated(stateLock.writeLock());
+	}
+
+	// Poll rather than block so a caller already waiting when a job claims the program (or
+	// when the host starts closing) is released with a clean error instead of stalling.
+	private LockScope acquireGated(Lock lock) {
 		throwIfClosing();
-		LockScope scope = new LockScope(stateLock.readLock());
+		throwIfAnalysisBlocks();
+		try {
+			while (!lock.tryLock(LOCK_POLL_MILLIS, TimeUnit.MILLISECONDS)) {
+				throwIfClosing();
+				throwIfAnalysisBlocks();
+			}
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new SessionRpcException("cancelled", "interrupted while waiting for the host lock");
+		}
+		LockScope scope = LockScope.adopt(lock);
 		if (closing) {
 			scope.close();
 			throw hostClosingException();
+		}
+		if (analysisBlocksCurrentThread()) {
+			scope.close();
+			throw analysisRunningException();
 		}
 		return scope;
 	}
 
-	public LockScope writeLock() {
-		throwIfClosing();
-		LockScope scope = new LockScope(stateLock.writeLock());
-		if (closing) {
-			scope.close();
-			throw hostClosingException();
+	/**
+	 * Claim the program for an analysis job run by {@code worker}. Returns false when another
+	 * job already owns it. The worker must then take {@link #analysisWriteLock()} and call
+	 * {@link #releaseAnalysis(Thread)} when done.
+	 */
+	boolean claimAnalysis(Thread worker, long jobId, TaskMonitor monitor) {
+		if (!analysisThread.compareAndSet(null, worker)) {
+			return false;
 		}
-		return scope;
+		analysisJobId = jobId;
+		analysisMonitor = monitor;
+		return true;
+	}
+
+	/** The job worker's exclusive lock. Waits for in-flight readers; new callers fail fast. */
+	LockScope analysisWriteLock() {
+		return new LockScope(stateLock.writeLock());
+	}
+
+	void releaseAnalysis(Thread worker) {
+		if (analysisThread.compareAndSet(worker, null)) {
+			analysisMonitor = null;
+			analysisJobId = 0L;
+		}
+	}
+
+	public boolean isAnalysisRunning() {
+		return analysisThread.get() != null;
+	}
+
+	/** Cancel the running job ({@code jobId} 0 matches any); true if one was signalled. */
+	boolean cancelAnalysis(long jobId) {
+		TaskMonitor monitor = analysisMonitor;
+		if (analysisThread.get() == null || monitor == null) {
+			return false;
+		}
+		if (jobId != 0L && jobId != analysisJobId) {
+			return false;
+		}
+		monitor.cancel();
+		return true;
+	}
+
+	/**
+	 * Cancel any running job and wait for its worker to release the program. Called before
+	 * shutdown, close and program switches so they never race (or wait minutes behind) a job.
+	 */
+	public void cancelAnalysisAndWait() {
+		Thread worker = analysisThread.get();
+		if (worker == null || worker == Thread.currentThread()) {
+			return;
+		}
+		cancelAnalysis(0L);
+		try {
+			worker.join(ANALYSIS_STOP_TIMEOUT_MILLIS);
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	public void bindProgram(Program program, String mode) {
@@ -61,6 +150,7 @@ public final class HostState {
 	}
 
 	public void bindProgram(Program program, String mode, String programPath) {
+		cancelAnalysisAndWait();
 		stateLock.writeLock().lock();
 		try {
 			disposeWarmDecompiler();
@@ -75,6 +165,7 @@ public final class HostState {
 	}
 
 	public void unbindProgram(Program program) {
+		cancelAnalysisAndWait();
 		stateLock.writeLock().lock();
 		try {
 			unbindProgramLocked(program);
@@ -87,6 +178,7 @@ public final class HostState {
 
 	public boolean tryBeginUnbindProgram(Program program, long timeoutMillis) throws InterruptedException {
 		closing = true;
+		cancelAnalysisAndWait();
 		boolean acquired = stateLock.writeLock().tryLock(Math.max(0L, timeoutMillis), TimeUnit.MILLISECONDS);
 		if (!acquired) {
 			return false;
@@ -210,6 +302,24 @@ public final class HostState {
 		if (closing) {
 			throw hostClosingException();
 		}
+	}
+
+	private boolean analysisBlocksCurrentThread() {
+		Thread worker = analysisThread.get();
+		return worker != null && worker != Thread.currentThread();
+	}
+
+	private void throwIfAnalysisBlocks() {
+		if (analysisBlocksCurrentThread()) {
+			throw analysisRunningException();
+		}
+	}
+
+	private SessionRpcException analysisRunningException() {
+		return new SessionRpcException(
+			"analysis_running",
+			"analysis job " + analysisJobId +
+				" owns the program; poll ListAnalysisJobs until it finishes, or CancelAnalysis");
 	}
 
 	private static SessionRpcException hostClosingException() {

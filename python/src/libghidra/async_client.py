@@ -36,6 +36,7 @@ from google.protobuf import any_pb2
 from google.protobuf.message import Message
 
 from . import (
+    analysis_pb2,
     common_pb2,
     decompiler_pb2,
     functions_pb2,
@@ -50,9 +51,11 @@ from . import (
 )
 from .client import (
     ClientOptions,
+    _analysis_job_from_pb,
     _frame_from_pb,
     _perf_from_pb,
     _perf_to_pb,
+    _program_option_from_pb,
     _to_decompilation,
     _to_function,
     _to_instruction,
@@ -63,9 +66,14 @@ from .client import (
     _to_symbol,
     _to_type,
     _to_xref,
+    _transaction_from_pb,
 )
 from .errors import ErrorCode, GhidraError
 from .models import (
+    AnalysisJobRecord,
+    ProgramOptionRecord,
+    SetProgramOptionResponse,
+    TransactionRecord,
     AddBookmarkResponse,
     AddBreakpointResponse,
     AddTypeEnumMemberResponse,
@@ -333,7 +341,7 @@ class AsyncGhidraClient:
     async def open_program(self, request: OpenProgramRequest) -> OpenProgramResponse:
         req = session_pb2.OpenProgramRequest(
             project_path=request.project_path, project_name=request.project_name,
-            program_path=request.program_path, analyze=request.analyze, read_only=request.read_only,
+            program_path=request.program_path, read_only=request.read_only,
             language_id=request.language_id, compiler_spec_id=request.compiler_spec_id,
             format=request.format, base_address=request.base_address,
         )
@@ -417,6 +425,52 @@ class AsyncGhidraClient:
             "libghidra.SessionService/DeletePerfBenchmark", req, session_pb2.DeletePerfBenchmarkResponse,
         )
         return resp.deleted
+
+    async def list_program_options(
+        self, category: str = "", name_filter: str = ""
+    ) -> list[ProgramOptionRecord]:
+        req = session_pb2.ListProgramOptionsRequest(category=category, name_filter=name_filter)
+        resp = await self._call_rpc(
+            "libghidra.SessionService/ListProgramOptions", req, session_pb2.ListProgramOptionsResponse,
+        )
+        return [_program_option_from_pb(r) for r in resp.options]
+
+    async def set_program_option(
+        self, category: str, name: str, value: str
+    ) -> SetProgramOptionResponse:
+        req = session_pb2.SetProgramOptionRequest(category=category, name=name, value=value)
+        resp = await self._call_rpc(
+            "libghidra.SessionService/SetProgramOption", req, session_pb2.SetProgramOptionResponse,
+        )
+        return SetProgramOptionResponse(applied=resp.applied, previous_value=resp.previous_value)
+
+    async def list_transactions(self) -> list[TransactionRecord]:
+        req = session_pb2.ListTransactionsRequest()
+        resp = await self._call_rpc(
+            "libghidra.SessionService/ListTransactions", req, session_pb2.ListTransactionsResponse,
+        )
+        return [_transaction_from_pb(r) for r in resp.transactions]
+
+    async def start_analysis(self, mode: str = "changed") -> AnalysisJobRecord:
+        req = analysis_pb2.StartAnalysisRequest(mode=mode)
+        resp = await self._call_rpc(
+            "libghidra.AnalysisService/StartAnalysis", req, analysis_pb2.StartAnalysisResponse,
+        )
+        return _analysis_job_from_pb(resp.job)
+
+    async def list_analysis_jobs(self) -> list[AnalysisJobRecord]:
+        req = analysis_pb2.ListAnalysisJobsRequest()
+        resp = await self._call_rpc(
+            "libghidra.AnalysisService/ListAnalysisJobs", req, analysis_pb2.ListAnalysisJobsResponse,
+        )
+        return [_analysis_job_from_pb(r) for r in resp.jobs]
+
+    async def cancel_analysis(self, job_id: int = 0) -> bool:
+        req = analysis_pb2.CancelAnalysisRequest(job_id=job_id)
+        resp = await self._call_rpc(
+            "libghidra.AnalysisService/CancelAnalysis", req, analysis_pb2.CancelAnalysisResponse,
+        )
+        return resp.cancelled
 
     # =========================================================================
     # Memory

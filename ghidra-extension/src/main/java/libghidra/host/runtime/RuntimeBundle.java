@@ -18,6 +18,7 @@ public final class RuntimeBundle {
 	private final TypesRuntime types;
 	private final DecompilerRuntime decompiler;
 	private final ListingRuntime listing;
+	private final AnalysisRuntime analysis;
 
 	public RuntimeBundle(String initialHostMode) {
 		this(createState(initialHostMode), initialHostMode);
@@ -38,6 +39,10 @@ public final class RuntimeBundle {
 		types = new TypesRuntime(state);
 		decompiler = new DecompilerRuntime(state);
 		listing = new ListingRuntime(state);
+		// With a PluginTool, AutoAnalysisManager runs analysis as a tool background task and
+		// returns at once, so a job's completion would not be observable: GUI hosts do not
+		// start analysis over RPC.
+		analysis = new AnalysisRuntime(state, !"gui".equals(state.getHostMode()));
 	}
 
 	public HostState state() {
@@ -78,6 +83,10 @@ public final class RuntimeBundle {
 
 	public ListingRuntime listing() {
 		return listing;
+	}
+
+	public AnalysisRuntime analysis() {
+		return analysis;
 	}
 
 	private static HostState createState(String initialHostMode) {

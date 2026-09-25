@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include "libghidra/analysis.hpp"
 #include "libghidra/decompiler.hpp"
 #include "libghidra/functions.hpp"
 #include "libghidra/health.hpp"
@@ -33,7 +34,8 @@ class IClient : public IHealthClient,
                 public IXrefsClient,
                 public ITypesClient,
                 public IDecompilerClient,
-                public IListingClient {
+                public IListingClient,
+                public IAnalysisClient {
  public:
   ~IClient() override = default;
 
@@ -107,6 +109,36 @@ class IClient : public IHealthClient,
   StatusOr<DeletePerfBenchmarkResponse> DeletePerfBenchmark(
       const std::string&) override {
     return StatusOr<DeletePerfBenchmarkResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<ListProgramOptionsResponse> ListProgramOptions(const std::string&,
+                                                          const std::string&) override {
+    return StatusOr<ListProgramOptionsResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<SetProgramOptionResponse> SetProgramOption(const std::string&,
+                                                      const std::string&,
+                                                      const std::string&) override {
+    return StatusOr<SetProgramOptionResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<ListTransactionsResponse> ListTransactions() override {
+    return StatusOr<ListTransactionsResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+
+  // -- IAnalysisClient defaults ----------------------------------------------
+
+  StatusOr<StartAnalysisResponse> StartAnalysis(const std::string&) override {
+    return StatusOr<StartAnalysisResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<ListAnalysisJobsResponse> ListAnalysisJobs() override {
+    return StatusOr<ListAnalysisJobsResponse>::FromError(
+        "NOT_SUPPORTED", "not implemented by this backend");
+  }
+  StatusOr<CancelAnalysisResponse> CancelAnalysis(std::uint64_t) override {
+    return StatusOr<CancelAnalysisResponse>::FromError(
         "NOT_SUPPORTED", "not implemented by this backend");
   }
 

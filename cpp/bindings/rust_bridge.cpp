@@ -380,7 +380,6 @@ rust::String LocalClientHandle::get_capabilities_json() const {
 // --- Session ----------------------------------------------------------------
 
 rust::String LocalClientHandle::open_program_json(rust::Str program_path,
-                                                  bool analyze,
                                                   bool read_only,
                                                   rust::Str project_path,
                                                   rust::Str project_name,
@@ -390,7 +389,6 @@ rust::String LocalClientHandle::open_program_json(rust::Str program_path,
                                                   uint64_t base_address) const {
   OpenProgramRequest req;
   req.program_path = str_of(program_path);
-  req.analyze = analyze;
   req.read_only = read_only;
   req.project_path = str_of(project_path);
   req.project_name = str_of(project_name);

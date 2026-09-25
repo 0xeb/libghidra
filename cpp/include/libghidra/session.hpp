@@ -15,7 +15,6 @@ struct OpenProgramRequest {
   std::string project_path;
   std::string project_name;
   std::string program_path;
-  bool analyze = false;
   bool read_only = false;
   std::string language_id;
   std::string compiler_spec_id;
@@ -50,6 +49,11 @@ struct ImportProgramRequest {
   std::string compiler_spec_id;
   std::string loader_class;
   std::vector<LoaderArg> loader_args;
+  // Analyzer on/off patterns applied to every loaded program before analysis: a
+  // pattern with '*' is a case-insensitive glob over the analyzer toggles of the
+  // "Analyzers" category, anything else a substring. "on" applies after "off".
+  std::vector<std::string> analyzers_off;
+  std::vector<std::string> analyzers_on;
 };
 
 class ISessionClient {
@@ -73,6 +77,16 @@ class ISessionClient {
   virtual StatusOr<ClearPerfBenchmarksResponse> ClearPerfBenchmarks() = 0;
   virtual StatusOr<DeletePerfBenchmarkResponse> DeletePerfBenchmark(
       const std::string& bench_id) = 0;
+  // category: exact option category ("Analyzers", ...), empty = all categories.
+  // name_filter: case-insensitive substring on the option name, empty = all.
+  virtual StatusOr<ListProgramOptionsResponse> ListProgramOptions(
+      const std::string& category, const std::string& name_filter) = 0;
+  // The value is coerced to the option's declared type; a rejected value is an
+  // invalid_argument error rather than a silent no-op.
+  virtual StatusOr<SetProgramOptionResponse> SetProgramOption(const std::string& category,
+                                                              const std::string& name,
+                                                              const std::string& value) = 0;
+  virtual StatusOr<ListTransactionsResponse> ListTransactions() = 0;
 };
 
 }  // namespace libghidra::client

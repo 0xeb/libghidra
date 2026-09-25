@@ -18,7 +18,10 @@ message OpenProgramRequest {
   string project_path = 1;
   string project_name = 2;
   string program_path = 3;
-  bool analyze = 4;
+  // Field 4 was `bool analyze`, which the host never honoured: re-analysing an
+  // opened program is AnalysisService/StartAnalysis.
+  reserved 4;
+  reserved "analyze";
   bool read_only = 5;
   string language_id = 6;
   string compiler_spec_id = 7;
@@ -97,11 +100,26 @@ message ImportProgramRequest {
   string compiler_spec_id = 7;
   string loader_class = 8;
   repeated LoaderArg loader_args = 9;
+  // Analyzer on/off patterns applied to every loaded program before analysis runs.
+  // Each pattern matches the analyzer toggles of the "Analyzers" option category
+  // (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+  // '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+  repeated string analyzers_off = 10;
+  repeated string analyzers_on = 11;
+}
+
+// Which analyzer toggles one ImportProgramRequest pattern matched, across every
+// loaded program. An empty option list means the pattern matched nothing.
+message AnalyzerPatternMatch {
+  string pattern = 1;
+  bool enabled = 2;
+  repeated string options = 3;
 }
 
 message ImportProgramResponse {
   repeated string program_paths = 1;
   string primary_program_path = 2;
+  repeated AnalyzerPatternMatch analyzer_matches = 3;
 }
 
 // Field 1 reserved for future common request context.
@@ -188,6 +206,62 @@ message DeletePerfBenchmarkResponse {
   bool deleted = 1;
 }
 
+// One entry of the current program's options (Program.getOptions(category)).
+// `type` is the Ghidra OptionType in lower case without the _TYPE suffix
+// (boolean, int, long, double, float, string, enum, file, ...). ENUM values are the
+// enum constant name; `allowed_values` lists the constants. Only scalar and enum
+// options of the "Analyzers" category are settable.
+message ProgramOptionRecord {
+  string category = 1;
+  string name = 2;
+  string value = 3;
+  string type = 4;
+  string description = 5;
+  string default_value = 6;
+  bool settable = 7;
+  repeated string allowed_values = 8;
+}
+
+message ListProgramOptionsRequest {
+  // Exact category name (e.g. "Analyzers"); empty lists every category.
+  string category = 1;
+  // Case-insensitive substring on the option name; empty matches all.
+  string name_filter = 2;
+}
+
+message ListProgramOptionsResponse {
+  repeated ProgramOptionRecord options = 1;
+}
+
+message SetProgramOptionRequest {
+  string category = 1;
+  string name = 2;
+  // Coerced to the option's declared type; a value the type rejects is an
+  // invalid_argument error rather than a silent no-op.
+  string value = 3;
+}
+
+message SetProgramOptionResponse {
+  bool applied = 1;
+  string previous_value = 2;
+}
+
+// One entry of the current program's transaction history. kind is "undo" (committed,
+// undoable; position 1 is the most recent), "redo" (undone; position 1 is the next to
+// redo) or "open" (the transaction in progress, position 0).
+message TransactionRecord {
+  uint32 position = 1;
+  string name = 2;
+  string kind = 3;
+  repeated string open_subtransactions = 4;
+}
+
+message ListTransactionsRequest {}
+
+message ListTransactionsResponse {
+  repeated TransactionRecord transactions = 1;
+}
+
 service SessionService {
   rpc OpenProject(OpenProjectRequest) returns (OpenProjectResponse);
   rpc CloseProject(CloseProjectRequest) returns (CloseProjectResponse);
@@ -203,4 +277,7 @@ service SessionService {
   rpc ListPerfBenchmarks(ListPerfBenchmarksRequest) returns (ListPerfBenchmarksResponse);
   rpc ClearPerfBenchmarks(ClearPerfBenchmarksRequest) returns (ClearPerfBenchmarksResponse);
   rpc DeletePerfBenchmark(DeletePerfBenchmarkRequest) returns (DeletePerfBenchmarkResponse);
+  rpc ListProgramOptions(ListProgramOptionsRequest) returns (ListProgramOptionsResponse);
+  rpc SetProgramOption(SetProgramOptionRequest) returns (SetProgramOptionResponse);
+  rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse);
 }

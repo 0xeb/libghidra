@@ -116,4 +116,82 @@ public interface ImportProgramRequestOrBuilder extends
    */
   libghidra.LoaderArgOrBuilder getLoaderArgsOrBuilder(
       int index);
+
+  /**
+   * <pre>
+   * Analyzer on/off patterns applied to every loaded program before analysis runs.
+   * Each pattern matches the analyzer toggles of the "Analyzers" option category
+   * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+   * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+   * </pre>
+   *
+   * <code>repeated string analyzers_off = 10;</code>
+   * @return A list containing the analyzersOff.
+   */
+  java.util.List<java.lang.String>
+      getAnalyzersOffList();
+  /**
+   * <pre>
+   * Analyzer on/off patterns applied to every loaded program before analysis runs.
+   * Each pattern matches the analyzer toggles of the "Analyzers" option category
+   * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+   * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+   * </pre>
+   *
+   * <code>repeated string analyzers_off = 10;</code>
+   * @return The count of analyzersOff.
+   */
+  int getAnalyzersOffCount();
+  /**
+   * <pre>
+   * Analyzer on/off patterns applied to every loaded program before analysis runs.
+   * Each pattern matches the analyzer toggles of the "Analyzers" option category
+   * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+   * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+   * </pre>
+   *
+   * <code>repeated string analyzers_off = 10;</code>
+   * @param index The index of the element to return.
+   * @return The analyzersOff at the given index.
+   */
+  java.lang.String getAnalyzersOff(int index);
+  /**
+   * <pre>
+   * Analyzer on/off patterns applied to every loaded program before analysis runs.
+   * Each pattern matches the analyzer toggles of the "Analyzers" option category
+   * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+   * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+   * </pre>
+   *
+   * <code>repeated string analyzers_off = 10;</code>
+   * @param index The index of the value to return.
+   * @return The bytes of the analyzersOff at the given index.
+   */
+  com.google.protobuf.ByteString
+      getAnalyzersOffBytes(int index);
+
+  /**
+   * <code>repeated string analyzers_on = 11;</code>
+   * @return A list containing the analyzersOn.
+   */
+  java.util.List<java.lang.String>
+      getAnalyzersOnList();
+  /**
+   * <code>repeated string analyzers_on = 11;</code>
+   * @return The count of analyzersOn.
+   */
+  int getAnalyzersOnCount();
+  /**
+   * <code>repeated string analyzers_on = 11;</code>
+   * @param index The index of the element to return.
+   * @return The analyzersOn at the given index.
+   */
+  java.lang.String getAnalyzersOn(int index);
+  /**
+   * <code>repeated string analyzers_on = 11;</code>
+   * @param index The index of the value to return.
+   * @return The bytes of the analyzersOn at the given index.
+   */
+  com.google.protobuf.ByteString
+      getAnalyzersOnBytes(int index);
 }

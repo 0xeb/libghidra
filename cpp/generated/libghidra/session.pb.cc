@@ -26,6 +26,38 @@ namespace _pbi = ::google::protobuf::internal;
 namespace _fl = ::google::protobuf::internal::field_layout;
 namespace libghidra {
 
+inline constexpr TransactionRecord::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : open_subtransactions_{},
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        kind_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        position_{0u},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR TransactionRecord::TransactionRecord(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct TransactionRecordDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR TransactionRecordDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~TransactionRecordDefaultTypeInternal() {}
+  union {
+    TransactionRecord _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 TransactionRecordDefaultTypeInternal _TransactionRecord_default_instance_;
+
 inline constexpr ShutdownResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : accepted_{false},
@@ -75,6 +107,67 @@ struct ShutdownRequestDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ShutdownRequestDefaultTypeInternal _ShutdownRequest_default_instance_;
+
+inline constexpr SetProgramOptionResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : previous_value_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        applied_{false},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR SetProgramOptionResponse::SetProgramOptionResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct SetProgramOptionResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR SetProgramOptionResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~SetProgramOptionResponseDefaultTypeInternal() {}
+  union {
+    SetProgramOptionResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SetProgramOptionResponseDefaultTypeInternal _SetProgramOptionResponse_default_instance_;
+
+inline constexpr SetProgramOptionRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : category_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        value_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR SetProgramOptionRequest::SetProgramOptionRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct SetProgramOptionRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR SetProgramOptionRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~SetProgramOptionRequestDefaultTypeInternal() {}
+  union {
+    SetProgramOptionRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SetProgramOptionRequestDefaultTypeInternal _SetProgramOptionRequest_default_instance_;
 
 inline constexpr SaveProgramResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -159,6 +252,50 @@ struct ProjectFileDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ProjectFileDefaultTypeInternal _ProjectFile_default_instance_;
+
+inline constexpr ProgramOptionRecord::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : allowed_values_{},
+        category_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        value_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        type_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        description_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        default_value_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        settable_{false},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ProgramOptionRecord::ProgramOptionRecord(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ProgramOptionRecordDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ProgramOptionRecordDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ProgramOptionRecordDefaultTypeInternal() {}
+  union {
+    ProgramOptionRecord _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ProgramOptionRecordDefaultTypeInternal _ProgramOptionRecord_default_instance_;
 
 inline constexpr PerfBenchmarkRecord::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -331,7 +468,6 @@ inline constexpr OpenProgramRequest::Impl_::Impl_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
         base_address_{::uint64_t{0u}},
-        analyze_{false},
         read_only_{false},
         _cached_size_{0} {}
 
@@ -384,6 +520,24 @@ struct LoaderArgDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 LoaderArgDefaultTypeInternal _LoaderArg_default_instance_;
+              template <typename>
+PROTOBUF_CONSTEXPR ListTransactionsRequest::ListTransactionsRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::internal::ZeroFieldsBase(_class_data_.base()){}
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::internal::ZeroFieldsBase() {
+}
+#endif  // PROTOBUF_CUSTOM_VTABLE
+struct ListTransactionsRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListTransactionsRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListTransactionsRequestDefaultTypeInternal() {}
+  union {
+    ListTransactionsRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListTransactionsRequestDefaultTypeInternal _ListTransactionsRequest_default_instance_;
 
 inline constexpr ListProjectFilesRequest::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -410,6 +564,36 @@ struct ListProjectFilesRequestDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListProjectFilesRequestDefaultTypeInternal _ListProjectFilesRequest_default_instance_;
+
+inline constexpr ListProgramOptionsRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : category_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        name_filter_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ListProgramOptionsRequest::ListProgramOptionsRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ListProgramOptionsRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListProgramOptionsRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListProgramOptionsRequestDefaultTypeInternal() {}
+  union {
+    ListProgramOptionsRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListProgramOptionsRequestDefaultTypeInternal _ListProgramOptionsRequest_default_instance_;
               template <typename>
 PROTOBUF_CONSTEXPR ListPerfBenchmarksRequest::ListPerfBenchmarksRequest(::_pbi::ConstantInitialized)
 #if defined(PROTOBUF_CUSTOM_VTABLE)
@@ -428,34 +612,6 @@ struct ListPerfBenchmarksRequestDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListPerfBenchmarksRequestDefaultTypeInternal _ListPerfBenchmarksRequest_default_instance_;
-
-inline constexpr ImportProgramResponse::Impl_::Impl_(
-    ::_pbi::ConstantInitialized) noexcept
-      : program_paths_{},
-        primary_program_path_(
-            &::google::protobuf::internal::fixed_address_empty_string,
-            ::_pbi::ConstantInitialized()),
-        _cached_size_{0} {}
-
-template <typename>
-PROTOBUF_CONSTEXPR ImportProgramResponse::ImportProgramResponse(::_pbi::ConstantInitialized)
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-    : ::google::protobuf::Message(_class_data_.base()),
-#else   // PROTOBUF_CUSTOM_VTABLE
-    : ::google::protobuf::Message(),
-#endif  // PROTOBUF_CUSTOM_VTABLE
-      _impl_(::_pbi::ConstantInitialized()) {
-}
-struct ImportProgramResponseDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR ImportProgramResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
-  ~ImportProgramResponseDefaultTypeInternal() {}
-  union {
-    ImportProgramResponse _instance;
-  };
-};
-
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
-    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ImportProgramResponseDefaultTypeInternal _ImportProgramResponse_default_instance_;
 
 inline constexpr GetRevisionResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -748,6 +904,35 @@ struct ClearPerfBenchmarksRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ClearPerfBenchmarksRequestDefaultTypeInternal _ClearPerfBenchmarksRequest_default_instance_;
 
+inline constexpr AnalyzerPatternMatch::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : options_{},
+        pattern_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        enabled_{false},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AnalyzerPatternMatch::AnalyzerPatternMatch(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct AnalyzerPatternMatchDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AnalyzerPatternMatchDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AnalyzerPatternMatchDefaultTypeInternal() {}
+  union {
+    AnalyzerPatternMatch _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AnalyzerPatternMatchDefaultTypeInternal _AnalyzerPatternMatch_default_instance_;
+
 inline constexpr AddPerfBenchmarkResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : added_{false},
@@ -772,6 +957,31 @@ struct AddPerfBenchmarkResponseDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AddPerfBenchmarkResponseDefaultTypeInternal _AddPerfBenchmarkResponse_default_instance_;
+
+inline constexpr ListTransactionsResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : transactions_{},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ListTransactionsResponse::ListTransactionsResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ListTransactionsResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListTransactionsResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListTransactionsResponseDefaultTypeInternal() {}
+  union {
+    ListTransactionsResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListTransactionsResponseDefaultTypeInternal _ListTransactionsResponse_default_instance_;
 
 inline constexpr ListProjectFilesResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -798,6 +1008,31 @@ struct ListProjectFilesResponseDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListProjectFilesResponseDefaultTypeInternal _ListProjectFilesResponse_default_instance_;
 
+inline constexpr ListProgramOptionsResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : options_{},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ListProgramOptionsResponse::ListProgramOptionsResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ListProgramOptionsResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ListProgramOptionsResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ListProgramOptionsResponseDefaultTypeInternal() {}
+  union {
+    ListProgramOptionsResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListProgramOptionsResponseDefaultTypeInternal _ListProgramOptionsResponse_default_instance_;
+
 inline constexpr ListPerfBenchmarksResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : records_{},
@@ -823,9 +1058,40 @@ struct ListPerfBenchmarksResponseDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ListPerfBenchmarksResponseDefaultTypeInternal _ListPerfBenchmarksResponse_default_instance_;
 
+inline constexpr ImportProgramResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : program_paths_{},
+        analyzer_matches_{},
+        primary_program_path_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR ImportProgramResponse::ImportProgramResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct ImportProgramResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ImportProgramResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ImportProgramResponseDefaultTypeInternal() {}
+  union {
+    ImportProgramResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ImportProgramResponseDefaultTypeInternal _ImportProgramResponse_default_instance_;
+
 inline constexpr ImportProgramRequest::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : loader_args_{},
+        analyzers_off_{},
+        analyzers_on_{},
         source_path_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
@@ -911,7 +1177,6 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramRequest, _impl_.project_path_),
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramRequest, _impl_.project_name_),
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramRequest, _impl_.program_path_),
-        PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramRequest, _impl_.analyze_),
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramRequest, _impl_.read_only_),
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramRequest, _impl_.language_id_),
         PROTOBUF_FIELD_OFFSET(::libghidra::OpenProgramRequest, _impl_.compiler_spec_id_),
@@ -1036,6 +1301,19 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::libghidra::ImportProgramRequest, _impl_.compiler_spec_id_),
         PROTOBUF_FIELD_OFFSET(::libghidra::ImportProgramRequest, _impl_.loader_class_),
         PROTOBUF_FIELD_OFFSET(::libghidra::ImportProgramRequest, _impl_.loader_args_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ImportProgramRequest, _impl_.analyzers_off_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ImportProgramRequest, _impl_.analyzers_on_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::AnalyzerPatternMatch, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::AnalyzerPatternMatch, _impl_.pattern_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::AnalyzerPatternMatch, _impl_.enabled_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::AnalyzerPatternMatch, _impl_.options_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::ImportProgramResponse, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -1046,6 +1324,7 @@ const ::uint32_t
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::ImportProgramResponse, _impl_.program_paths_),
         PROTOBUF_FIELD_OFFSET(::libghidra::ImportProgramResponse, _impl_.primary_program_path_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ImportProgramResponse, _impl_.analyzer_matches_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::CloseProgramRequest, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -1228,41 +1507,135 @@ const ::uint32_t
         ~0u,  // no _split_
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::DeletePerfBenchmarkResponse, _impl_.deleted_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ProgramOptionRecord, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ProgramOptionRecord, _impl_.category_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ProgramOptionRecord, _impl_.name_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ProgramOptionRecord, _impl_.value_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ProgramOptionRecord, _impl_.type_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ProgramOptionRecord, _impl_.description_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ProgramOptionRecord, _impl_.default_value_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ProgramOptionRecord, _impl_.settable_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ProgramOptionRecord, _impl_.allowed_values_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListProgramOptionsRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListProgramOptionsRequest, _impl_.category_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListProgramOptionsRequest, _impl_.name_filter_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListProgramOptionsResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListProgramOptionsResponse, _impl_.options_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetProgramOptionRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetProgramOptionRequest, _impl_.category_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetProgramOptionRequest, _impl_.name_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetProgramOptionRequest, _impl_.value_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetProgramOptionResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetProgramOptionResponse, _impl_.applied_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SetProgramOptionResponse, _impl_.previous_value_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::TransactionRecord, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::TransactionRecord, _impl_.position_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::TransactionRecord, _impl_.name_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::TransactionRecord, _impl_.kind_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::TransactionRecord, _impl_.open_subtransactions_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListTransactionsRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListTransactionsResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListTransactionsResponse, _impl_.transactions_),
 };
 
 static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::libghidra::OpenProgramRequest)},
-        {17, -1, -1, sizeof(::libghidra::OpenProgramResponse)},
-        {34, -1, -1, sizeof(::libghidra::OpenProjectRequest)},
-        {46, -1, -1, sizeof(::libghidra::OpenProjectResponse)},
-        {57, -1, -1, sizeof(::libghidra::CloseProjectRequest)},
-        {66, -1, -1, sizeof(::libghidra::CloseProjectResponse)},
-        {75, -1, -1, sizeof(::libghidra::ProjectFile)},
-        {90, -1, -1, sizeof(::libghidra::ListProjectFilesRequest)},
-        {100, -1, -1, sizeof(::libghidra::ListProjectFilesResponse)},
-        {109, -1, -1, sizeof(::libghidra::LoaderArg)},
-        {119, -1, -1, sizeof(::libghidra::ImportProgramRequest)},
-        {136, -1, -1, sizeof(::libghidra::ImportProgramResponse)},
-        {146, -1, -1, sizeof(::libghidra::CloseProgramRequest)},
-        {155, -1, -1, sizeof(::libghidra::CloseProgramResponse)},
-        {164, -1, -1, sizeof(::libghidra::SaveProgramRequest)},
-        {172, -1, -1, sizeof(::libghidra::SaveProgramResponse)},
-        {181, -1, -1, sizeof(::libghidra::DiscardProgramRequest)},
-        {189, -1, -1, sizeof(::libghidra::DiscardProgramResponse)},
-        {198, -1, -1, sizeof(::libghidra::GetRevisionRequest)},
-        {206, -1, -1, sizeof(::libghidra::GetRevisionResponse)},
-        {220, -1, -1, sizeof(::libghidra::ShutdownRequest)},
-        {229, -1, -1, sizeof(::libghidra::ShutdownResponse)},
-        {238, -1, -1, sizeof(::libghidra::PerfBenchmarkRecord)},
-        {256, 265, -1, sizeof(::libghidra::AddPerfBenchmarkRequest)},
-        {266, -1, -1, sizeof(::libghidra::AddPerfBenchmarkResponse)},
-        {275, -1, -1, sizeof(::libghidra::ListPerfBenchmarksRequest)},
-        {283, -1, -1, sizeof(::libghidra::ListPerfBenchmarksResponse)},
-        {292, -1, -1, sizeof(::libghidra::ClearPerfBenchmarksRequest)},
-        {300, -1, -1, sizeof(::libghidra::ClearPerfBenchmarksResponse)},
-        {310, -1, -1, sizeof(::libghidra::DeletePerfBenchmarkRequest)},
-        {319, -1, -1, sizeof(::libghidra::DeletePerfBenchmarkResponse)},
+        {16, -1, -1, sizeof(::libghidra::OpenProgramResponse)},
+        {33, -1, -1, sizeof(::libghidra::OpenProjectRequest)},
+        {45, -1, -1, sizeof(::libghidra::OpenProjectResponse)},
+        {56, -1, -1, sizeof(::libghidra::CloseProjectRequest)},
+        {65, -1, -1, sizeof(::libghidra::CloseProjectResponse)},
+        {74, -1, -1, sizeof(::libghidra::ProjectFile)},
+        {89, -1, -1, sizeof(::libghidra::ListProjectFilesRequest)},
+        {99, -1, -1, sizeof(::libghidra::ListProjectFilesResponse)},
+        {108, -1, -1, sizeof(::libghidra::LoaderArg)},
+        {118, -1, -1, sizeof(::libghidra::ImportProgramRequest)},
+        {137, -1, -1, sizeof(::libghidra::AnalyzerPatternMatch)},
+        {148, -1, -1, sizeof(::libghidra::ImportProgramResponse)},
+        {159, -1, -1, sizeof(::libghidra::CloseProgramRequest)},
+        {168, -1, -1, sizeof(::libghidra::CloseProgramResponse)},
+        {177, -1, -1, sizeof(::libghidra::SaveProgramRequest)},
+        {185, -1, -1, sizeof(::libghidra::SaveProgramResponse)},
+        {194, -1, -1, sizeof(::libghidra::DiscardProgramRequest)},
+        {202, -1, -1, sizeof(::libghidra::DiscardProgramResponse)},
+        {211, -1, -1, sizeof(::libghidra::GetRevisionRequest)},
+        {219, -1, -1, sizeof(::libghidra::GetRevisionResponse)},
+        {233, -1, -1, sizeof(::libghidra::ShutdownRequest)},
+        {242, -1, -1, sizeof(::libghidra::ShutdownResponse)},
+        {251, -1, -1, sizeof(::libghidra::PerfBenchmarkRecord)},
+        {269, 278, -1, sizeof(::libghidra::AddPerfBenchmarkRequest)},
+        {279, -1, -1, sizeof(::libghidra::AddPerfBenchmarkResponse)},
+        {288, -1, -1, sizeof(::libghidra::ListPerfBenchmarksRequest)},
+        {296, -1, -1, sizeof(::libghidra::ListPerfBenchmarksResponse)},
+        {305, -1, -1, sizeof(::libghidra::ClearPerfBenchmarksRequest)},
+        {313, -1, -1, sizeof(::libghidra::ClearPerfBenchmarksResponse)},
+        {323, -1, -1, sizeof(::libghidra::DeletePerfBenchmarkRequest)},
+        {332, -1, -1, sizeof(::libghidra::DeletePerfBenchmarkResponse)},
+        {341, -1, -1, sizeof(::libghidra::ProgramOptionRecord)},
+        {357, -1, -1, sizeof(::libghidra::ListProgramOptionsRequest)},
+        {367, -1, -1, sizeof(::libghidra::ListProgramOptionsResponse)},
+        {376, -1, -1, sizeof(::libghidra::SetProgramOptionRequest)},
+        {387, -1, -1, sizeof(::libghidra::SetProgramOptionResponse)},
+        {397, -1, -1, sizeof(::libghidra::TransactionRecord)},
+        {409, -1, -1, sizeof(::libghidra::ListTransactionsRequest)},
+        {417, -1, -1, sizeof(::libghidra::ListTransactionsResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_OpenProgramRequest_default_instance_._instance,
@@ -1276,6 +1649,7 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_ListProjectFilesResponse_default_instance_._instance,
     &::libghidra::_LoaderArg_default_instance_._instance,
     &::libghidra::_ImportProgramRequest_default_instance_._instance,
+    &::libghidra::_AnalyzerPatternMatch_default_instance_._instance,
     &::libghidra::_ImportProgramResponse_default_instance_._instance,
     &::libghidra::_CloseProgramRequest_default_instance_._instance,
     &::libghidra::_CloseProgramResponse_default_instance_._instance,
@@ -1296,107 +1670,143 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_ClearPerfBenchmarksResponse_default_instance_._instance,
     &::libghidra::_DeletePerfBenchmarkRequest_default_instance_._instance,
     &::libghidra::_DeletePerfBenchmarkResponse_default_instance_._instance,
+    &::libghidra::_ProgramOptionRecord_default_instance_._instance,
+    &::libghidra::_ListProgramOptionsRequest_default_instance_._instance,
+    &::libghidra::_ListProgramOptionsResponse_default_instance_._instance,
+    &::libghidra::_SetProgramOptionRequest_default_instance_._instance,
+    &::libghidra::_SetProgramOptionResponse_default_instance_._instance,
+    &::libghidra::_TransactionRecord_default_instance_._instance,
+    &::libghidra::_ListTransactionsRequest_default_instance_._instance,
+    &::libghidra::_ListTransactionsResponse_default_instance_._instance,
 };
 const char descriptor_table_protodef_libghidra_2fsession_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
     "\n\027libghidra/session.proto\022\tlibghidra\032\026li"
-    "bghidra/common.proto\"\317\001\n\022OpenProgramRequ"
+    "bghidra/common.proto\"\315\001\n\022OpenProgramRequ"
     "est\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_nam"
-    "e\030\002 \001(\t\022\024\n\014program_path\030\003 \001(\t\022\017\n\007analyze"
-    "\030\004 \001(\010\022\021\n\tread_only\030\005 \001(\010\022\023\n\013language_id"
-    "\030\006 \001(\t\022\030\n\020compiler_spec_id\030\007 \001(\t\022\016\n\006form"
-    "at\030\010 \001(\t\022\024\n\014base_address\030\t \001(\004\"\321\001\n\023OpenP"
-    "rogramResponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013"
-    "language_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t"
-    "\022\022\n\nimage_base\030\005 \001(\004\022\013\n\003md5\030\006 \001(\t\022\016\n\006sha"
-    "256\030\007 \001(\t\022\031\n\021executable_format\030\010 \001(\t\022\023\n\013"
-    "entry_point\030\t \001(\004\022\027\n\017has_entry_point\030\n \001"
-    "(\010\"c\n\022OpenProjectRequest\022\024\n\014project_path"
-    "\030\001 \001(\t\022\024\n\014project_name\030\002 \001(\t\022\016\n\006create\030\003"
-    " \001(\010\022\021\n\tread_only\030\004 \001(\010\"R\n\023OpenProjectRe"
-    "sponse\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_"
-    "name\030\002 \001(\t\022\017\n\007created\030\003 \001(\010\"I\n\023CloseProj"
-    "ectRequest\0222\n\017shutdown_policy\030\001 \001(\0162\031.li"
-    "bghidra.ShutdownPolicy\"&\n\024CloseProjectRe"
-    "sponse\022\016\n\006closed\030\001 \001(\010\"\230\001\n\013ProjectFile\022\014"
-    "\n\004path\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\023\n\013folder_pat"
-    "h\030\003 \001(\t\022\024\n\014content_type\030\004 \001(\t\022\033\n\023domain_"
-    "object_class\030\005 \001(\t\022\021\n\tis_folder\030\006 \001(\010\022\022\n"
-    "\nis_program\030\007 \001(\010\"I\n\027ListProjectFilesReq"
-    "uest\022\027\n\017include_folders\030\001 \001(\010\022\025\n\rprogram"
-    "s_only\030\002 \001(\010\"A\n\030ListProjectFilesResponse"
-    "\022%\n\005files\030\001 \003(\0132\026.libghidra.ProjectFile\""
-    "(\n\tLoaderArg\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001("
-    "\t\"\362\001\n\024ImportProgramRequest\022\023\n\013source_pat"
-    "h\030\001 \001(\t\022\033\n\023project_folder_path\030\002 \001(\t\022\024\n\014"
-    "program_name\030\003 \001(\t\022\021\n\toverwrite\030\004 \001(\010\022\017\n"
-    "\007analyze\030\005 \001(\010\022\023\n\013language_id\030\006 \001(\t\022\030\n\020c"
-    "ompiler_spec_id\030\007 \001(\t\022\024\n\014loader_class\030\010 "
-    "\001(\t\022)\n\013loader_args\030\t \003(\0132\024.libghidra.Loa"
-    "derArg\"L\n\025ImportProgramResponse\022\025\n\rprogr"
-    "am_paths\030\001 \003(\t\022\034\n\024primary_program_path\030\002"
-    " \001(\t\"I\n\023CloseProgramRequest\0222\n\017shutdown_"
-    "policy\030\002 \001(\0162\031.libghidra.ShutdownPolicy\""
-    "&\n\024CloseProgramResponse\022\016\n\006closed\030\001 \001(\010\""
-    "\024\n\022SaveProgramRequest\"$\n\023SaveProgramResp"
-    "onse\022\r\n\005saved\030\001 \001(\010\"\027\n\025DiscardProgramReq"
-    "uest\"+\n\026DiscardProgramResponse\022\021\n\tdiscar"
-    "ded\030\001 \001(\010\"\024\n\022GetRevisionRequest\"\244\001\n\023GetR"
-    "evisionResponse\022\022\n\nprogram_id\030\001 \001(\004\022\033\n\023m"
-    "odification_number\030\002 \001(\004\022\024\n\014program_path"
-    "\030\003 \001(\t\022\017\n\007file_id\030\004 \001(\t\022\024\n\014file_version\030"
-    "\005 \001(\005\022\037\n\027file_last_modified_time\030\006 \001(\003\"E"
-    "\n\017ShutdownRequest\0222\n\017shutdown_policy\030\001 \001"
-    "(\0162\031.libghidra.ShutdownPolicy\"$\n\020Shutdow"
-    "nResponse\022\020\n\010accepted\030\001 \001(\010\"\352\001\n\023PerfBenc"
-    "hmarkRecord\022\020\n\010bench_id\030\001 \001(\t\022\024\n\014query_f"
-    "amily\030\002 \001(\t\022\027\n\017dataset_profile\030\003 \001(\t\022\023\n\013"
-    "cold_ms_p50\030\004 \001(\001\022\023\n\013cold_ms_p95\030\005 \001(\001\022\023"
-    "\n\013warm_ms_p50\030\006 \001(\001\022\023\n\013warm_ms_p95\030\007 \001(\001"
-    "\022\026\n\016throughput_qps\030\010 \001(\001\022\026\n\016regression_p"
-    "ct\030\t \001(\001\022\016\n\006status\030\n \001(\t\"I\n\027AddPerfBench"
-    "markRequest\022.\n\006record\030\001 \001(\0132\036.libghidra."
-    "PerfBenchmarkRecord\")\n\030AddPerfBenchmarkR"
-    "esponse\022\r\n\005added\030\001 \001(\010\"\033\n\031ListPerfBenchm"
-    "arksRequest\"M\n\032ListPerfBenchmarksRespons"
-    "e\022/\n\007records\030\001 \003(\0132\036.libghidra.PerfBench"
-    "markRecord\"\034\n\032ClearPerfBenchmarksRequest"
-    "\"E\n\033ClearPerfBenchmarksResponse\022\017\n\007clear"
-    "ed\030\001 \001(\010\022\025\n\rremoved_count\030\002 \001(\r\".\n\032Delet"
-    "ePerfBenchmarkRequest\022\020\n\010bench_id\030\001 \001(\t\""
-    ".\n\033DeletePerfBenchmarkResponse\022\017\n\007delete"
-    "d\030\001 \001(\0102\303\t\n\016SessionService\022L\n\013OpenProjec"
-    "t\022\035.libghidra.OpenProjectRequest\032\036.libgh"
-    "idra.OpenProjectResponse\022O\n\014CloseProject"
-    "\022\036.libghidra.CloseProjectRequest\032\037.libgh"
-    "idra.CloseProjectResponse\022[\n\020ListProject"
-    "Files\022\".libghidra.ListProjectFilesReques"
-    "t\032#.libghidra.ListProjectFilesResponse\022R"
-    "\n\rImportProgram\022\037.libghidra.ImportProgra"
-    "mRequest\032 .libghidra.ImportProgramRespon"
-    "se\022L\n\013OpenProgram\022\035.libghidra.OpenProgra"
-    "mRequest\032\036.libghidra.OpenProgramResponse"
-    "\022O\n\014CloseProgram\022\036.libghidra.CloseProgra"
-    "mRequest\032\037.libghidra.CloseProgramRespons"
-    "e\022L\n\013SaveProgram\022\035.libghidra.SaveProgram"
-    "Request\032\036.libghidra.SaveProgramResponse\022"
-    "U\n\016DiscardProgram\022 .libghidra.DiscardPro"
-    "gramRequest\032!.libghidra.DiscardProgramRe"
-    "sponse\022L\n\013GetRevision\022\035.libghidra.GetRev"
-    "isionRequest\032\036.libghidra.GetRevisionResp"
-    "onse\022C\n\010Shutdown\022\032.libghidra.ShutdownReq"
-    "uest\032\033.libghidra.ShutdownResponse\022[\n\020Add"
-    "PerfBenchmark\022\".libghidra.AddPerfBenchma"
-    "rkRequest\032#.libghidra.AddPerfBenchmarkRe"
-    "sponse\022a\n\022ListPerfBenchmarks\022$.libghidra"
-    ".ListPerfBenchmarksRequest\032%.libghidra.L"
-    "istPerfBenchmarksResponse\022d\n\023ClearPerfBe"
-    "nchmarks\022%.libghidra.ClearPerfBenchmarks"
-    "Request\032&.libghidra.ClearPerfBenchmarksR"
-    "esponse\022d\n\023DeletePerfBenchmark\022%.libghid"
-    "ra.DeletePerfBenchmarkRequest\032&.libghidr"
-    "a.DeletePerfBenchmarkResponseB\033\n\tlibghid"
-    "raB\014SessionProtoP\001b\006proto3"
+    "e\030\002 \001(\t\022\024\n\014program_path\030\003 \001(\t\022\021\n\tread_on"
+    "ly\030\005 \001(\010\022\023\n\013language_id\030\006 \001(\t\022\030\n\020compile"
+    "r_spec_id\030\007 \001(\t\022\016\n\006format\030\010 \001(\t\022\024\n\014base_"
+    "address\030\t \001(\004J\004\010\004\020\005R\007analyze\"\321\001\n\023OpenPro"
+    "gramResponse\022\024\n\014program_name\030\002 \001(\t\022\023\n\013la"
+    "nguage_id\030\003 \001(\t\022\025\n\rcompiler_spec\030\004 \001(\t\022\022"
+    "\n\nimage_base\030\005 \001(\004\022\013\n\003md5\030\006 \001(\t\022\016\n\006sha25"
+    "6\030\007 \001(\t\022\031\n\021executable_format\030\010 \001(\t\022\023\n\013en"
+    "try_point\030\t \001(\004\022\027\n\017has_entry_point\030\n \001(\010"
+    "\"c\n\022OpenProjectRequest\022\024\n\014project_path\030\001"
+    " \001(\t\022\024\n\014project_name\030\002 \001(\t\022\016\n\006create\030\003 \001"
+    "(\010\022\021\n\tread_only\030\004 \001(\010\"R\n\023OpenProjectResp"
+    "onse\022\024\n\014project_path\030\001 \001(\t\022\024\n\014project_na"
+    "me\030\002 \001(\t\022\017\n\007created\030\003 \001(\010\"I\n\023CloseProjec"
+    "tRequest\0222\n\017shutdown_policy\030\001 \001(\0162\031.libg"
+    "hidra.ShutdownPolicy\"&\n\024CloseProjectResp"
+    "onse\022\016\n\006closed\030\001 \001(\010\"\230\001\n\013ProjectFile\022\014\n\004"
+    "path\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\023\n\013folder_path\030"
+    "\003 \001(\t\022\024\n\014content_type\030\004 \001(\t\022\033\n\023domain_ob"
+    "ject_class\030\005 \001(\t\022\021\n\tis_folder\030\006 \001(\010\022\022\n\ni"
+    "s_program\030\007 \001(\010\"I\n\027ListProjectFilesReque"
+    "st\022\027\n\017include_folders\030\001 \001(\010\022\025\n\rprograms_"
+    "only\030\002 \001(\010\"A\n\030ListProjectFilesResponse\022%"
+    "\n\005files\030\001 \003(\0132\026.libghidra.ProjectFile\"(\n"
+    "\tLoaderArg\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\""
+    "\237\002\n\024ImportProgramRequest\022\023\n\013source_path\030"
+    "\001 \001(\t\022\033\n\023project_folder_path\030\002 \001(\t\022\024\n\014pr"
+    "ogram_name\030\003 \001(\t\022\021\n\toverwrite\030\004 \001(\010\022\017\n\007a"
+    "nalyze\030\005 \001(\010\022\023\n\013language_id\030\006 \001(\t\022\030\n\020com"
+    "piler_spec_id\030\007 \001(\t\022\024\n\014loader_class\030\010 \001("
+    "\t\022)\n\013loader_args\030\t \003(\0132\024.libghidra.Loade"
+    "rArg\022\025\n\ranalyzers_off\030\n \003(\t\022\024\n\014analyzers"
+    "_on\030\013 \003(\t\"I\n\024AnalyzerPatternMatch\022\017\n\007pat"
+    "tern\030\001 \001(\t\022\017\n\007enabled\030\002 \001(\010\022\017\n\007options\030\003"
+    " \003(\t\"\207\001\n\025ImportProgramResponse\022\025\n\rprogra"
+    "m_paths\030\001 \003(\t\022\034\n\024primary_program_path\030\002 "
+    "\001(\t\0229\n\020analyzer_matches\030\003 \003(\0132\037.libghidr"
+    "a.AnalyzerPatternMatch\"I\n\023CloseProgramRe"
+    "quest\0222\n\017shutdown_policy\030\002 \001(\0162\031.libghid"
+    "ra.ShutdownPolicy\"&\n\024CloseProgramRespons"
+    "e\022\016\n\006closed\030\001 \001(\010\"\024\n\022SaveProgramRequest\""
+    "$\n\023SaveProgramResponse\022\r\n\005saved\030\001 \001(\010\"\027\n"
+    "\025DiscardProgramRequest\"+\n\026DiscardProgram"
+    "Response\022\021\n\tdiscarded\030\001 \001(\010\"\024\n\022GetRevisi"
+    "onRequest\"\244\001\n\023GetRevisionResponse\022\022\n\npro"
+    "gram_id\030\001 \001(\004\022\033\n\023modification_number\030\002 \001"
+    "(\004\022\024\n\014program_path\030\003 \001(\t\022\017\n\007file_id\030\004 \001("
+    "\t\022\024\n\014file_version\030\005 \001(\005\022\037\n\027file_last_mod"
+    "ified_time\030\006 \001(\003\"E\n\017ShutdownRequest\0222\n\017s"
+    "hutdown_policy\030\001 \001(\0162\031.libghidra.Shutdow"
+    "nPolicy\"$\n\020ShutdownResponse\022\020\n\010accepted\030"
+    "\001 \001(\010\"\352\001\n\023PerfBenchmarkRecord\022\020\n\010bench_i"
+    "d\030\001 \001(\t\022\024\n\014query_family\030\002 \001(\t\022\027\n\017dataset"
+    "_profile\030\003 \001(\t\022\023\n\013cold_ms_p50\030\004 \001(\001\022\023\n\013c"
+    "old_ms_p95\030\005 \001(\001\022\023\n\013warm_ms_p50\030\006 \001(\001\022\023\n"
+    "\013warm_ms_p95\030\007 \001(\001\022\026\n\016throughput_qps\030\010 \001"
+    "(\001\022\026\n\016regression_pct\030\t \001(\001\022\016\n\006status\030\n \001"
+    "(\t\"I\n\027AddPerfBenchmarkRequest\022.\n\006record\030"
+    "\001 \001(\0132\036.libghidra.PerfBenchmarkRecord\")\n"
+    "\030AddPerfBenchmarkResponse\022\r\n\005added\030\001 \001(\010"
+    "\"\033\n\031ListPerfBenchmarksRequest\"M\n\032ListPer"
+    "fBenchmarksResponse\022/\n\007records\030\001 \003(\0132\036.l"
+    "ibghidra.PerfBenchmarkRecord\"\034\n\032ClearPer"
+    "fBenchmarksRequest\"E\n\033ClearPerfBenchmark"
+    "sResponse\022\017\n\007cleared\030\001 \001(\010\022\025\n\rremoved_co"
+    "unt\030\002 \001(\r\".\n\032DeletePerfBenchmarkRequest\022"
+    "\020\n\010bench_id\030\001 \001(\t\".\n\033DeletePerfBenchmark"
+    "Response\022\017\n\007deleted\030\001 \001(\010\"\250\001\n\023ProgramOpt"
+    "ionRecord\022\020\n\010category\030\001 \001(\t\022\014\n\004name\030\002 \001("
+    "\t\022\r\n\005value\030\003 \001(\t\022\014\n\004type\030\004 \001(\t\022\023\n\013descri"
+    "ption\030\005 \001(\t\022\025\n\rdefault_value\030\006 \001(\t\022\020\n\010se"
+    "ttable\030\007 \001(\010\022\026\n\016allowed_values\030\010 \003(\t\"B\n\031"
+    "ListProgramOptionsRequest\022\020\n\010category\030\001 "
+    "\001(\t\022\023\n\013name_filter\030\002 \001(\t\"M\n\032ListProgramO"
+    "ptionsResponse\022/\n\007options\030\001 \003(\0132\036.libghi"
+    "dra.ProgramOptionRecord\"H\n\027SetProgramOpt"
+    "ionRequest\022\020\n\010category\030\001 \001(\t\022\014\n\004name\030\002 \001"
+    "(\t\022\r\n\005value\030\003 \001(\t\"C\n\030SetProgramOptionRes"
+    "ponse\022\017\n\007applied\030\001 \001(\010\022\026\n\016previous_value"
+    "\030\002 \001(\t\"_\n\021TransactionRecord\022\020\n\010position\030"
+    "\001 \001(\r\022\014\n\004name\030\002 \001(\t\022\014\n\004kind\030\003 \001(\t\022\034\n\024ope"
+    "n_subtransactions\030\004 \003(\t\"\031\n\027ListTransacti"
+    "onsRequest\"N\n\030ListTransactionsResponse\0222"
+    "\n\014transactions\030\001 \003(\0132\034.libghidra.Transac"
+    "tionRecord2\340\013\n\016SessionService\022L\n\013OpenPro"
+    "ject\022\035.libghidra.OpenProjectRequest\032\036.li"
+    "bghidra.OpenProjectResponse\022O\n\014CloseProj"
+    "ect\022\036.libghidra.CloseProjectRequest\032\037.li"
+    "bghidra.CloseProjectResponse\022[\n\020ListProj"
+    "ectFiles\022\".libghidra.ListProjectFilesReq"
+    "uest\032#.libghidra.ListProjectFilesRespons"
+    "e\022R\n\rImportProgram\022\037.libghidra.ImportPro"
+    "gramRequest\032 .libghidra.ImportProgramRes"
+    "ponse\022L\n\013OpenProgram\022\035.libghidra.OpenPro"
+    "gramRequest\032\036.libghidra.OpenProgramRespo"
+    "nse\022O\n\014CloseProgram\022\036.libghidra.ClosePro"
+    "gramRequest\032\037.libghidra.CloseProgramResp"
+    "onse\022L\n\013SaveProgram\022\035.libghidra.SaveProg"
+    "ramRequest\032\036.libghidra.SaveProgramRespon"
+    "se\022U\n\016DiscardProgram\022 .libghidra.Discard"
+    "ProgramRequest\032!.libghidra.DiscardProgra"
+    "mResponse\022L\n\013GetRevision\022\035.libghidra.Get"
+    "RevisionRequest\032\036.libghidra.GetRevisionR"
+    "esponse\022C\n\010Shutdown\022\032.libghidra.Shutdown"
+    "Request\032\033.libghidra.ShutdownResponse\022[\n\020"
+    "AddPerfBenchmark\022\".libghidra.AddPerfBenc"
+    "hmarkRequest\032#.libghidra.AddPerfBenchmar"
+    "kResponse\022a\n\022ListPerfBenchmarks\022$.libghi"
+    "dra.ListPerfBenchmarksRequest\032%.libghidr"
+    "a.ListPerfBenchmarksResponse\022d\n\023ClearPer"
+    "fBenchmarks\022%.libghidra.ClearPerfBenchma"
+    "rksRequest\032&.libghidra.ClearPerfBenchmar"
+    "ksResponse\022d\n\023DeletePerfBenchmark\022%.libg"
+    "hidra.DeletePerfBenchmarkRequest\032&.libgh"
+    "idra.DeletePerfBenchmarkResponse\022a\n\022List"
+    "ProgramOptions\022$.libghidra.ListProgramOp"
+    "tionsRequest\032%.libghidra.ListProgramOpti"
+    "onsResponse\022[\n\020SetProgramOption\022\".libghi"
+    "dra.SetProgramOptionRequest\032#.libghidra."
+    "SetProgramOptionResponse\022[\n\020ListTransact"
+    "ions\022\".libghidra.ListTransactionsRequest"
+    "\032#.libghidra.ListTransactionsResponseB\033\n"
+    "\tlibghidraB\014SessionProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2fsession_2eproto_deps[1] =
     {
@@ -1406,13 +1816,13 @@ static ::absl::once_flag descriptor_table_libghidra_2fsession_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fsession_2eproto = {
     false,
     false,
-    3906,
+    5034,
     descriptor_table_protodef_libghidra_2fsession_2eproto,
     "libghidra/session.proto",
     &descriptor_table_libghidra_2fsession_2eproto_once,
     descriptor_table_libghidra_2fsession_2eproto_deps,
     1,
-    31,
+    40,
     schemas,
     file_default_instances,
     TableStruct_libghidra_2fsession_2eproto::offsets,
@@ -1542,15 +1952,15 @@ const ::google::protobuf::internal::ClassData* OpenProgramRequest::GetClassData(
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<4, 9, 0, 114, 2> OpenProgramRequest::_table_ = {
+const ::_pbi::TcParseTable<4, 8, 0, 114, 2> OpenProgramRequest::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
     9, 120,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294966784,  // skipmap
+    4294966792,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    9,  // num_field_entries
+    8,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     _class_data_.base(),
@@ -1570,9 +1980,7 @@ const ::_pbi::TcParseTable<4, 9, 0, 114, 2> OpenProgramRequest::_table_ = {
     // string program_path = 3;
     {::_pbi::TcParser::FastUS1,
      {26, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramRequest, _impl_.program_path_)}},
-    // bool analyze = 4;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(OpenProgramRequest, _impl_.analyze_), 63>(),
-     {32, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramRequest, _impl_.analyze_)}},
+    {::_pbi::TcParser::MiniParse, {}},
     // bool read_only = 5;
     {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(OpenProgramRequest, _impl_.read_only_), 63>(),
      {40, 63, 0, PROTOBUF_FIELD_OFFSET(OpenProgramRequest, _impl_.read_only_)}},
@@ -1606,9 +2014,6 @@ const ::_pbi::TcParseTable<4, 9, 0, 114, 2> OpenProgramRequest::_table_ = {
     // string program_path = 3;
     {PROTOBUF_FIELD_OFFSET(OpenProgramRequest, _impl_.program_path_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
-    // bool analyze = 4;
-    {PROTOBUF_FIELD_OFFSET(OpenProgramRequest, _impl_.analyze_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
     // bool read_only = 5;
     {PROTOBUF_FIELD_OFFSET(OpenProgramRequest, _impl_.read_only_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kBool)},
@@ -1627,7 +2032,7 @@ const ::_pbi::TcParseTable<4, 9, 0, 114, 2> OpenProgramRequest::_table_ = {
   }},
   // no aux_entries
   {{
-    "\34\14\14\14\0\0\13\20\6\0\0\0\0\0\0\0"
+    "\34\14\14\14\0\13\20\6\0\0\0\0\0\0\0\0"
     "libghidra.OpenProgramRequest"
     "project_path"
     "project_name"
@@ -1694,13 +2099,6 @@ PROTOBUF_NOINLINE void OpenProgramRequest::Clear() {
             ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
                 _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.OpenProgramRequest.program_path");
             target = stream->WriteStringMaybeAliased(3, _s, target);
-          }
-
-          // bool analyze = 4;
-          if (this_._internal_analyze() != 0) {
-            target = stream->EnsureSpace(target);
-            target = ::_pbi::WireFormatLite::WriteBoolToArray(
-                4, this_._internal_analyze(), target);
           }
 
           // bool read_only = 5;
@@ -1801,10 +2199,6 @@ PROTOBUF_NOINLINE void OpenProgramRequest::Clear() {
               total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
                   this_._internal_base_address());
             }
-            // bool analyze = 4;
-            if (this_._internal_analyze() != 0) {
-              total_size += 2;
-            }
             // bool read_only = 5;
             if (this_._internal_read_only() != 0) {
               total_size += 2;
@@ -1842,9 +2236,6 @@ void OpenProgramRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, cons
   }
   if (from._internal_base_address() != 0) {
     _this->_impl_.base_address_ = from._impl_.base_address_;
-  }
-  if (from._internal_analyze() != 0) {
-    _this->_impl_.analyze_ = from._impl_.analyze_;
   }
   if (from._internal_read_only() != 0) {
     _this->_impl_.read_only_ = from._impl_.read_only_;
@@ -4532,6 +4923,8 @@ inline PROTOBUF_NDEBUG_INLINE ImportProgramRequest::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
     const Impl_& from, const ::libghidra::ImportProgramRequest& from_msg)
       : loader_args_{visibility, arena, from.loader_args_},
+        analyzers_off_{visibility, arena, from.analyzers_off_},
+        analyzers_on_{visibility, arena, from.analyzers_on_},
         source_path_(arena, from.source_path_),
         project_folder_path_(arena, from.project_folder_path_),
         program_name_(arena, from.program_name_),
@@ -4567,6 +4960,8 @@ inline PROTOBUF_NDEBUG_INLINE ImportProgramRequest::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility,
     ::google::protobuf::Arena* arena)
       : loader_args_{visibility, arena},
+        analyzers_off_{visibility, arena},
+        analyzers_on_{visibility, arena},
         source_path_(arena),
         project_folder_path_(arena),
         program_name_(arena),
@@ -4611,6 +5006,14 @@ constexpr auto ImportProgramRequest::InternalNewImpl_() {
           decltype(ImportProgramRequest::_impl_.loader_args_)::
               InternalGetArenaOffset(
                   ::google::protobuf::Message::internal_visibility()),
+      PROTOBUF_FIELD_OFFSET(ImportProgramRequest, _impl_.analyzers_off_) +
+          decltype(ImportProgramRequest::_impl_.analyzers_off_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+      PROTOBUF_FIELD_OFFSET(ImportProgramRequest, _impl_.analyzers_on_) +
+          decltype(ImportProgramRequest::_impl_.analyzers_on_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
   });
   if (arena_bits.has_value()) {
     return ::google::protobuf::internal::MessageCreator::CopyInit(
@@ -4649,15 +5052,15 @@ const ::google::protobuf::internal::ClassData* ImportProgramRequest::GetClassDat
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<4, 9, 1, 128, 2> ImportProgramRequest::_table_ = {
+const ::_pbi::TcParseTable<4, 11, 1, 153, 2> ImportProgramRequest::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    9, 120,  // max_field_number, fast_idx_mask
+    11, 120,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294966784,  // skipmap
+    4294965248,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    9,  // num_field_entries
+    11,  // num_field_entries
     1,  // num_aux_entries
     offsetof(decltype(_table_), aux_entries),
     _class_data_.base(),
@@ -4695,8 +5098,12 @@ const ::_pbi::TcParseTable<4, 9, 1, 128, 2> ImportProgramRequest::_table_ = {
     // repeated .libghidra.LoaderArg loader_args = 9;
     {::_pbi::TcParser::FastMtR1,
      {74, 63, 0, PROTOBUF_FIELD_OFFSET(ImportProgramRequest, _impl_.loader_args_)}},
-    {::_pbi::TcParser::MiniParse, {}},
-    {::_pbi::TcParser::MiniParse, {}},
+    // repeated string analyzers_off = 10;
+    {::_pbi::TcParser::FastUR1,
+     {82, 63, 0, PROTOBUF_FIELD_OFFSET(ImportProgramRequest, _impl_.analyzers_off_)}},
+    // repeated string analyzers_on = 11;
+    {::_pbi::TcParser::FastUR1,
+     {90, 63, 0, PROTOBUF_FIELD_OFFSET(ImportProgramRequest, _impl_.analyzers_on_)}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
@@ -4731,10 +5138,16 @@ const ::_pbi::TcParseTable<4, 9, 1, 128, 2> ImportProgramRequest::_table_ = {
     // repeated .libghidra.LoaderArg loader_args = 9;
     {PROTOBUF_FIELD_OFFSET(ImportProgramRequest, _impl_.loader_args_), 0, 0,
     (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+    // repeated string analyzers_off = 10;
+    {PROTOBUF_FIELD_OFFSET(ImportProgramRequest, _impl_.analyzers_off_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kUtf8String | ::_fl::kRepSString)},
+    // repeated string analyzers_on = 11;
+    {PROTOBUF_FIELD_OFFSET(ImportProgramRequest, _impl_.analyzers_on_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kUtf8String | ::_fl::kRepSString)},
   }}, {{
     {::_pbi::TcParser::GetTable<::libghidra::LoaderArg>()},
   }}, {{
-    "\36\13\23\14\0\0\13\20\14\0\0\0\0\0\0\0"
+    "\36\13\23\14\0\0\13\20\14\0\15\14\0\0\0\0"
     "libghidra.ImportProgramRequest"
     "source_path"
     "project_folder_path"
@@ -4742,6 +5155,8 @@ const ::_pbi::TcParseTable<4, 9, 1, 128, 2> ImportProgramRequest::_table_ = {
     "language_id"
     "compiler_spec_id"
     "loader_class"
+    "analyzers_off"
+    "analyzers_on"
   }},
 };
 
@@ -4753,6 +5168,8 @@ PROTOBUF_NOINLINE void ImportProgramRequest::Clear() {
   (void) cached_has_bits;
 
   _impl_.loader_args_.Clear();
+  _impl_.analyzers_off_.Clear();
+  _impl_.analyzers_on_.Clear();
   _impl_.source_path_.ClearToEmpty();
   _impl_.project_folder_path_.ClearToEmpty();
   _impl_.program_name_.ClearToEmpty();
@@ -4853,6 +5270,22 @@ PROTOBUF_NOINLINE void ImportProgramRequest::Clear() {
                     target, stream);
           }
 
+          // repeated string analyzers_off = 10;
+          for (int i = 0, n = this_._internal_analyzers_off_size(); i < n; ++i) {
+            const auto& s = this_._internal_analyzers_off().Get(i);
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                s.data(), static_cast<int>(s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ImportProgramRequest.analyzers_off");
+            target = stream->WriteString(10, s, target);
+          }
+
+          // repeated string analyzers_on = 11;
+          for (int i = 0, n = this_._internal_analyzers_on_size(); i < n; ++i) {
+            const auto& s = this_._internal_analyzers_on().Get(i);
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                s.data(), static_cast<int>(s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ImportProgramRequest.analyzers_on");
+            target = stream->WriteString(11, s, target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -4883,6 +5316,24 @@ PROTOBUF_NOINLINE void ImportProgramRequest::Clear() {
               total_size += 1UL * this_._internal_loader_args_size();
               for (const auto& msg : this_._internal_loader_args()) {
                 total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+            // repeated string analyzers_off = 10;
+            {
+              total_size +=
+                  1 * ::google::protobuf::internal::FromIntSize(this_._internal_analyzers_off().size());
+              for (int i = 0, n = this_._internal_analyzers_off().size(); i < n; ++i) {
+                total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+                    this_._internal_analyzers_off().Get(i));
+              }
+            }
+            // repeated string analyzers_on = 11;
+            {
+              total_size +=
+                  1 * ::google::protobuf::internal::FromIntSize(this_._internal_analyzers_on().size());
+              for (int i = 0, n = this_._internal_analyzers_on().size(); i < n; ++i) {
+                total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+                    this_._internal_analyzers_on().Get(i));
               }
             }
           }
@@ -4940,6 +5391,8 @@ void ImportProgramRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, co
 
   _this->_internal_mutable_loader_args()->MergeFrom(
       from._internal_loader_args());
+  _this->_internal_mutable_analyzers_off()->MergeFrom(from._internal_analyzers_off());
+  _this->_internal_mutable_analyzers_on()->MergeFrom(from._internal_analyzers_on());
   if (!from._internal_source_path().empty()) {
     _this->_internal_set_source_path(from._internal_source_path());
   }
@@ -4981,6 +5434,8 @@ void ImportProgramRequest::InternalSwap(ImportProgramRequest* PROTOBUF_RESTRICT 
   ABSL_DCHECK_EQ(arena, other->GetArena());
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   _impl_.loader_args_.InternalSwap(&other->_impl_.loader_args_);
+  _impl_.analyzers_off_.InternalSwap(&other->_impl_.analyzers_off_);
+  _impl_.analyzers_on_.InternalSwap(&other->_impl_.analyzers_on_);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.source_path_, &other->_impl_.source_path_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.project_folder_path_, &other->_impl_.project_folder_path_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.program_name_, &other->_impl_.program_name_, arena);
@@ -4996,6 +5451,306 @@ void ImportProgramRequest::InternalSwap(ImportProgramRequest* PROTOBUF_RESTRICT 
 }
 
 ::google::protobuf::Metadata ImportProgramRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class AnalyzerPatternMatch::_Internal {
+ public:
+};
+
+AnalyzerPatternMatch::AnalyzerPatternMatch(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.AnalyzerPatternMatch)
+}
+inline PROTOBUF_NDEBUG_INLINE AnalyzerPatternMatch::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::AnalyzerPatternMatch& from_msg)
+      : options_{visibility, arena, from.options_},
+        pattern_(arena, from.pattern_),
+        _cached_size_{0} {}
+
+AnalyzerPatternMatch::AnalyzerPatternMatch(
+    ::google::protobuf::Arena* arena,
+    const AnalyzerPatternMatch& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  AnalyzerPatternMatch* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  _impl_.enabled_ = from._impl_.enabled_;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.AnalyzerPatternMatch)
+}
+inline PROTOBUF_NDEBUG_INLINE AnalyzerPatternMatch::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : options_{visibility, arena},
+        pattern_(arena),
+        _cached_size_{0} {}
+
+inline void AnalyzerPatternMatch::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.enabled_ = {};
+}
+AnalyzerPatternMatch::~AnalyzerPatternMatch() {
+  // @@protoc_insertion_point(destructor:libghidra.AnalyzerPatternMatch)
+  SharedDtor(*this);
+}
+inline void AnalyzerPatternMatch::SharedDtor(MessageLite& self) {
+  AnalyzerPatternMatch& this_ = static_cast<AnalyzerPatternMatch&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.pattern_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* AnalyzerPatternMatch::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) AnalyzerPatternMatch(arena);
+}
+constexpr auto AnalyzerPatternMatch::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(AnalyzerPatternMatch, _impl_.options_) +
+          decltype(AnalyzerPatternMatch::_impl_.options_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::CopyInit(
+        sizeof(AnalyzerPatternMatch), alignof(AnalyzerPatternMatch), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&AnalyzerPatternMatch::PlacementNew_,
+                                 sizeof(AnalyzerPatternMatch),
+                                 alignof(AnalyzerPatternMatch));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull AnalyzerPatternMatch::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_AnalyzerPatternMatch_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &AnalyzerPatternMatch::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<AnalyzerPatternMatch>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &AnalyzerPatternMatch::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<AnalyzerPatternMatch>(), &AnalyzerPatternMatch::ByteSizeLong,
+            &AnalyzerPatternMatch::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(AnalyzerPatternMatch, _impl_._cached_size_),
+        false,
+    },
+    &AnalyzerPatternMatch::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* AnalyzerPatternMatch::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 3, 0, 53, 2> AnalyzerPatternMatch::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    3, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967288,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    3,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::AnalyzerPatternMatch>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // string pattern = 1;
+    {::_pbi::TcParser::FastUS1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(AnalyzerPatternMatch, _impl_.pattern_)}},
+    // bool enabled = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AnalyzerPatternMatch, _impl_.enabled_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(AnalyzerPatternMatch, _impl_.enabled_)}},
+    // repeated string options = 3;
+    {::_pbi::TcParser::FastUR1,
+     {26, 63, 0, PROTOBUF_FIELD_OFFSET(AnalyzerPatternMatch, _impl_.options_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // string pattern = 1;
+    {PROTOBUF_FIELD_OFFSET(AnalyzerPatternMatch, _impl_.pattern_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // bool enabled = 2;
+    {PROTOBUF_FIELD_OFFSET(AnalyzerPatternMatch, _impl_.enabled_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // repeated string options = 3;
+    {PROTOBUF_FIELD_OFFSET(AnalyzerPatternMatch, _impl_.options_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kUtf8String | ::_fl::kRepSString)},
+  }},
+  // no aux_entries
+  {{
+    "\36\7\0\7\0\0\0\0"
+    "libghidra.AnalyzerPatternMatch"
+    "pattern"
+    "options"
+  }},
+};
+
+PROTOBUF_NOINLINE void AnalyzerPatternMatch::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.AnalyzerPatternMatch)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.options_.Clear();
+  _impl_.pattern_.ClearToEmpty();
+  _impl_.enabled_ = false;
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* AnalyzerPatternMatch::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const AnalyzerPatternMatch& this_ = static_cast<const AnalyzerPatternMatch&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* AnalyzerPatternMatch::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const AnalyzerPatternMatch& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.AnalyzerPatternMatch)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // string pattern = 1;
+          if (!this_._internal_pattern().empty()) {
+            const std::string& _s = this_._internal_pattern();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.AnalyzerPatternMatch.pattern");
+            target = stream->WriteStringMaybeAliased(1, _s, target);
+          }
+
+          // bool enabled = 2;
+          if (this_._internal_enabled() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                2, this_._internal_enabled(), target);
+          }
+
+          // repeated string options = 3;
+          for (int i = 0, n = this_._internal_options_size(); i < n; ++i) {
+            const auto& s = this_._internal_options().Get(i);
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                s.data(), static_cast<int>(s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.AnalyzerPatternMatch.options");
+            target = stream->WriteString(3, s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.AnalyzerPatternMatch)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t AnalyzerPatternMatch::ByteSizeLong(const MessageLite& base) {
+          const AnalyzerPatternMatch& this_ = static_cast<const AnalyzerPatternMatch&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t AnalyzerPatternMatch::ByteSizeLong() const {
+          const AnalyzerPatternMatch& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.AnalyzerPatternMatch)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated string options = 3;
+            {
+              total_size +=
+                  1 * ::google::protobuf::internal::FromIntSize(this_._internal_options().size());
+              for (int i = 0, n = this_._internal_options().size(); i < n; ++i) {
+                total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+                    this_._internal_options().Get(i));
+              }
+            }
+          }
+           {
+            // string pattern = 1;
+            if (!this_._internal_pattern().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_pattern());
+            }
+            // bool enabled = 2;
+            if (this_._internal_enabled() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void AnalyzerPatternMatch::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<AnalyzerPatternMatch*>(&to_msg);
+  auto& from = static_cast<const AnalyzerPatternMatch&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.AnalyzerPatternMatch)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_options()->MergeFrom(from._internal_options());
+  if (!from._internal_pattern().empty()) {
+    _this->_internal_set_pattern(from._internal_pattern());
+  }
+  if (from._internal_enabled() != 0) {
+    _this->_impl_.enabled_ = from._impl_.enabled_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void AnalyzerPatternMatch::CopyFrom(const AnalyzerPatternMatch& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.AnalyzerPatternMatch)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void AnalyzerPatternMatch::InternalSwap(AnalyzerPatternMatch* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.options_.InternalSwap(&other->_impl_.options_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.pattern_, &other->_impl_.pattern_, arena);
+        swap(_impl_.enabled_, other->_impl_.enabled_);
+}
+
+::google::protobuf::Metadata AnalyzerPatternMatch::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // ===================================================================
@@ -5017,6 +5772,7 @@ inline PROTOBUF_NDEBUG_INLINE ImportProgramResponse::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
     const Impl_& from, const ::libghidra::ImportProgramResponse& from_msg)
       : program_paths_{visibility, arena, from.program_paths_},
+        analyzer_matches_{visibility, arena, from.analyzer_matches_},
         primary_program_path_(arena, from.primary_program_path_),
         _cached_size_{0} {}
 
@@ -5040,6 +5796,7 @@ inline PROTOBUF_NDEBUG_INLINE ImportProgramResponse::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility,
     ::google::protobuf::Arena* arena)
       : program_paths_{visibility, arena},
+        analyzer_matches_{visibility, arena},
         primary_program_path_(arena),
         _cached_size_{0} {}
 
@@ -5066,6 +5823,10 @@ constexpr auto ImportProgramResponse::InternalNewImpl_() {
   constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
       PROTOBUF_FIELD_OFFSET(ImportProgramResponse, _impl_.program_paths_) +
           decltype(ImportProgramResponse::_impl_.program_paths_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+      PROTOBUF_FIELD_OFFSET(ImportProgramResponse, _impl_.analyzer_matches_) +
+          decltype(ImportProgramResponse::_impl_.analyzer_matches_)::
               InternalGetArenaOffset(
                   ::google::protobuf::Message::internal_visibility()),
   });
@@ -5106,17 +5867,17 @@ const ::google::protobuf::internal::ClassData* ImportProgramResponse::GetClassDa
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<1, 2, 0, 73, 2> ImportProgramResponse::_table_ = {
+const ::_pbi::TcParseTable<2, 3, 1, 73, 2> ImportProgramResponse::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    2, 8,  // max_field_number, fast_idx_mask
+    3, 24,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967292,  // skipmap
+    4294967288,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    2,  // num_field_entries
-    0,  // num_aux_entries
-    offsetof(decltype(_table_), field_names),  // no aux_entries
+    3,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
     _class_data_.base(),
     nullptr,  // post_loop_handler
     ::_pbi::TcParser::GenericFallback,  // fallback
@@ -5124,12 +5885,16 @@ const ::_pbi::TcParseTable<1, 2, 0, 73, 2> ImportProgramResponse::_table_ = {
     ::_pbi::TcParser::GetTable<::libghidra::ImportProgramResponse>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
-    // string primary_program_path = 2;
-    {::_pbi::TcParser::FastUS1,
-     {18, 63, 0, PROTOBUF_FIELD_OFFSET(ImportProgramResponse, _impl_.primary_program_path_)}},
+    {::_pbi::TcParser::MiniParse, {}},
     // repeated string program_paths = 1;
     {::_pbi::TcParser::FastUR1,
      {10, 63, 0, PROTOBUF_FIELD_OFFSET(ImportProgramResponse, _impl_.program_paths_)}},
+    // string primary_program_path = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(ImportProgramResponse, _impl_.primary_program_path_)}},
+    // repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;
+    {::_pbi::TcParser::FastMtR1,
+     {26, 63, 0, PROTOBUF_FIELD_OFFSET(ImportProgramResponse, _impl_.analyzer_matches_)}},
   }}, {{
     65535, 65535
   }}, {{
@@ -5139,9 +5904,12 @@ const ::_pbi::TcParseTable<1, 2, 0, 73, 2> ImportProgramResponse::_table_ = {
     // string primary_program_path = 2;
     {PROTOBUF_FIELD_OFFSET(ImportProgramResponse, _impl_.primary_program_path_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
-  }},
-  // no aux_entries
-  {{
+    // repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;
+    {PROTOBUF_FIELD_OFFSET(ImportProgramResponse, _impl_.analyzer_matches_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::AnalyzerPatternMatch>()},
+  }}, {{
     "\37\15\24\0\0\0\0\0"
     "libghidra.ImportProgramResponse"
     "program_paths"
@@ -5157,6 +5925,7 @@ PROTOBUF_NOINLINE void ImportProgramResponse::Clear() {
   (void) cached_has_bits;
 
   _impl_.program_paths_.Clear();
+  _impl_.analyzer_matches_.Clear();
   _impl_.primary_program_path_.ClearToEmpty();
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
@@ -5190,6 +5959,17 @@ PROTOBUF_NOINLINE void ImportProgramResponse::Clear() {
             ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
                 _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ImportProgramResponse.primary_program_path");
             target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          // repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_analyzer_matches_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_analyzer_matches().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    3, repfield, repfield.GetCachedSize(),
+                    target, stream);
           }
 
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
@@ -5226,6 +6006,13 @@ PROTOBUF_NOINLINE void ImportProgramResponse::Clear() {
                     this_._internal_program_paths().Get(i));
               }
             }
+            // repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;
+            {
+              total_size += 1UL * this_._internal_analyzer_matches_size();
+              for (const auto& msg : this_._internal_analyzer_matches()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
           }
            {
             // string primary_program_path = 2;
@@ -5247,6 +6034,8 @@ void ImportProgramResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, c
   (void) cached_has_bits;
 
   _this->_internal_mutable_program_paths()->MergeFrom(from._internal_program_paths());
+  _this->_internal_mutable_analyzer_matches()->MergeFrom(
+      from._internal_analyzer_matches());
   if (!from._internal_primary_program_path().empty()) {
     _this->_internal_set_primary_program_path(from._internal_primary_program_path());
   }
@@ -5267,6 +6056,7 @@ void ImportProgramResponse::InternalSwap(ImportProgramResponse* PROTOBUF_RESTRIC
   ABSL_DCHECK_EQ(arena, other->GetArena());
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   _impl_.program_paths_.InternalSwap(&other->_impl_.program_paths_);
+  _impl_.analyzer_matches_.InternalSwap(&other->_impl_.analyzer_matches_);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.primary_program_path_, &other->_impl_.primary_program_path_, arena);
 }
 
@@ -9231,6 +10021,2165 @@ void DeletePerfBenchmarkResponse::InternalSwap(DeletePerfBenchmarkResponse* PROT
 }
 
 ::google::protobuf::Metadata DeletePerfBenchmarkResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ProgramOptionRecord::_Internal {
+ public:
+};
+
+ProgramOptionRecord::ProgramOptionRecord(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ProgramOptionRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE ProgramOptionRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::ProgramOptionRecord& from_msg)
+      : allowed_values_{visibility, arena, from.allowed_values_},
+        category_(arena, from.category_),
+        name_(arena, from.name_),
+        value_(arena, from.value_),
+        type_(arena, from.type_),
+        description_(arena, from.description_),
+        default_value_(arena, from.default_value_),
+        _cached_size_{0} {}
+
+ProgramOptionRecord::ProgramOptionRecord(
+    ::google::protobuf::Arena* arena,
+    const ProgramOptionRecord& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ProgramOptionRecord* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  _impl_.settable_ = from._impl_.settable_;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ProgramOptionRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE ProgramOptionRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : allowed_values_{visibility, arena},
+        category_(arena),
+        name_(arena),
+        value_(arena),
+        type_(arena),
+        description_(arena),
+        default_value_(arena),
+        _cached_size_{0} {}
+
+inline void ProgramOptionRecord::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.settable_ = {};
+}
+ProgramOptionRecord::~ProgramOptionRecord() {
+  // @@protoc_insertion_point(destructor:libghidra.ProgramOptionRecord)
+  SharedDtor(*this);
+}
+inline void ProgramOptionRecord::SharedDtor(MessageLite& self) {
+  ProgramOptionRecord& this_ = static_cast<ProgramOptionRecord&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.category_.Destroy();
+  this_._impl_.name_.Destroy();
+  this_._impl_.value_.Destroy();
+  this_._impl_.type_.Destroy();
+  this_._impl_.description_.Destroy();
+  this_._impl_.default_value_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* ProgramOptionRecord::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ProgramOptionRecord(arena);
+}
+constexpr auto ProgramOptionRecord::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.allowed_values_) +
+          decltype(ProgramOptionRecord::_impl_.allowed_values_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::CopyInit(
+        sizeof(ProgramOptionRecord), alignof(ProgramOptionRecord), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&ProgramOptionRecord::PlacementNew_,
+                                 sizeof(ProgramOptionRecord),
+                                 alignof(ProgramOptionRecord));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ProgramOptionRecord::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ProgramOptionRecord_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ProgramOptionRecord::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ProgramOptionRecord>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ProgramOptionRecord::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ProgramOptionRecord>(), &ProgramOptionRecord::ByteSizeLong,
+            &ProgramOptionRecord::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_._cached_size_),
+        false,
+    },
+    &ProgramOptionRecord::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ProgramOptionRecord::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 8, 0, 105, 2> ProgramOptionRecord::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    8, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967040,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    8,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ProgramOptionRecord>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // repeated string allowed_values = 8;
+    {::_pbi::TcParser::FastUR1,
+     {66, 63, 0, PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.allowed_values_)}},
+    // string category = 1;
+    {::_pbi::TcParser::FastUS1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.category_)}},
+    // string name = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.name_)}},
+    // string value = 3;
+    {::_pbi::TcParser::FastUS1,
+     {26, 63, 0, PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.value_)}},
+    // string type = 4;
+    {::_pbi::TcParser::FastUS1,
+     {34, 63, 0, PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.type_)}},
+    // string description = 5;
+    {::_pbi::TcParser::FastUS1,
+     {42, 63, 0, PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.description_)}},
+    // string default_value = 6;
+    {::_pbi::TcParser::FastUS1,
+     {50, 63, 0, PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.default_value_)}},
+    // bool settable = 7;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ProgramOptionRecord, _impl_.settable_), 63>(),
+     {56, 63, 0, PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.settable_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // string category = 1;
+    {PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.category_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string name = 2;
+    {PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.name_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string value = 3;
+    {PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.value_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string type = 4;
+    {PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string description = 5;
+    {PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.description_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string default_value = 6;
+    {PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.default_value_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // bool settable = 7;
+    {PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.settable_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // repeated string allowed_values = 8;
+    {PROTOBUF_FIELD_OFFSET(ProgramOptionRecord, _impl_.allowed_values_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kUtf8String | ::_fl::kRepSString)},
+  }},
+  // no aux_entries
+  {{
+    "\35\10\4\5\4\13\15\0\16\0\0\0\0\0\0\0"
+    "libghidra.ProgramOptionRecord"
+    "category"
+    "name"
+    "value"
+    "type"
+    "description"
+    "default_value"
+    "allowed_values"
+  }},
+};
+
+PROTOBUF_NOINLINE void ProgramOptionRecord::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ProgramOptionRecord)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.allowed_values_.Clear();
+  _impl_.category_.ClearToEmpty();
+  _impl_.name_.ClearToEmpty();
+  _impl_.value_.ClearToEmpty();
+  _impl_.type_.ClearToEmpty();
+  _impl_.description_.ClearToEmpty();
+  _impl_.default_value_.ClearToEmpty();
+  _impl_.settable_ = false;
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ProgramOptionRecord::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ProgramOptionRecord& this_ = static_cast<const ProgramOptionRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ProgramOptionRecord::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ProgramOptionRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ProgramOptionRecord)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // string category = 1;
+          if (!this_._internal_category().empty()) {
+            const std::string& _s = this_._internal_category();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ProgramOptionRecord.category");
+            target = stream->WriteStringMaybeAliased(1, _s, target);
+          }
+
+          // string name = 2;
+          if (!this_._internal_name().empty()) {
+            const std::string& _s = this_._internal_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ProgramOptionRecord.name");
+            target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          // string value = 3;
+          if (!this_._internal_value().empty()) {
+            const std::string& _s = this_._internal_value();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ProgramOptionRecord.value");
+            target = stream->WriteStringMaybeAliased(3, _s, target);
+          }
+
+          // string type = 4;
+          if (!this_._internal_type().empty()) {
+            const std::string& _s = this_._internal_type();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ProgramOptionRecord.type");
+            target = stream->WriteStringMaybeAliased(4, _s, target);
+          }
+
+          // string description = 5;
+          if (!this_._internal_description().empty()) {
+            const std::string& _s = this_._internal_description();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ProgramOptionRecord.description");
+            target = stream->WriteStringMaybeAliased(5, _s, target);
+          }
+
+          // string default_value = 6;
+          if (!this_._internal_default_value().empty()) {
+            const std::string& _s = this_._internal_default_value();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ProgramOptionRecord.default_value");
+            target = stream->WriteStringMaybeAliased(6, _s, target);
+          }
+
+          // bool settable = 7;
+          if (this_._internal_settable() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                7, this_._internal_settable(), target);
+          }
+
+          // repeated string allowed_values = 8;
+          for (int i = 0, n = this_._internal_allowed_values_size(); i < n; ++i) {
+            const auto& s = this_._internal_allowed_values().Get(i);
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                s.data(), static_cast<int>(s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ProgramOptionRecord.allowed_values");
+            target = stream->WriteString(8, s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ProgramOptionRecord)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ProgramOptionRecord::ByteSizeLong(const MessageLite& base) {
+          const ProgramOptionRecord& this_ = static_cast<const ProgramOptionRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ProgramOptionRecord::ByteSizeLong() const {
+          const ProgramOptionRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ProgramOptionRecord)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated string allowed_values = 8;
+            {
+              total_size +=
+                  1 * ::google::protobuf::internal::FromIntSize(this_._internal_allowed_values().size());
+              for (int i = 0, n = this_._internal_allowed_values().size(); i < n; ++i) {
+                total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+                    this_._internal_allowed_values().Get(i));
+              }
+            }
+          }
+           {
+            // string category = 1;
+            if (!this_._internal_category().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_category());
+            }
+            // string name = 2;
+            if (!this_._internal_name().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_name());
+            }
+            // string value = 3;
+            if (!this_._internal_value().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_value());
+            }
+            // string type = 4;
+            if (!this_._internal_type().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_type());
+            }
+            // string description = 5;
+            if (!this_._internal_description().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_description());
+            }
+            // string default_value = 6;
+            if (!this_._internal_default_value().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_default_value());
+            }
+            // bool settable = 7;
+            if (this_._internal_settable() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ProgramOptionRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ProgramOptionRecord*>(&to_msg);
+  auto& from = static_cast<const ProgramOptionRecord&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ProgramOptionRecord)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_allowed_values()->MergeFrom(from._internal_allowed_values());
+  if (!from._internal_category().empty()) {
+    _this->_internal_set_category(from._internal_category());
+  }
+  if (!from._internal_name().empty()) {
+    _this->_internal_set_name(from._internal_name());
+  }
+  if (!from._internal_value().empty()) {
+    _this->_internal_set_value(from._internal_value());
+  }
+  if (!from._internal_type().empty()) {
+    _this->_internal_set_type(from._internal_type());
+  }
+  if (!from._internal_description().empty()) {
+    _this->_internal_set_description(from._internal_description());
+  }
+  if (!from._internal_default_value().empty()) {
+    _this->_internal_set_default_value(from._internal_default_value());
+  }
+  if (from._internal_settable() != 0) {
+    _this->_impl_.settable_ = from._impl_.settable_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ProgramOptionRecord::CopyFrom(const ProgramOptionRecord& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ProgramOptionRecord)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ProgramOptionRecord::InternalSwap(ProgramOptionRecord* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.allowed_values_.InternalSwap(&other->_impl_.allowed_values_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.category_, &other->_impl_.category_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.value_, &other->_impl_.value_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.type_, &other->_impl_.type_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.description_, &other->_impl_.description_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.default_value_, &other->_impl_.default_value_, arena);
+        swap(_impl_.settable_, other->_impl_.settable_);
+}
+
+::google::protobuf::Metadata ProgramOptionRecord::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListProgramOptionsRequest::_Internal {
+ public:
+};
+
+ListProgramOptionsRequest::ListProgramOptionsRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListProgramOptionsRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE ListProgramOptionsRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::ListProgramOptionsRequest& from_msg)
+      : category_(arena, from.category_),
+        name_filter_(arena, from.name_filter_),
+        _cached_size_{0} {}
+
+ListProgramOptionsRequest::ListProgramOptionsRequest(
+    ::google::protobuf::Arena* arena,
+    const ListProgramOptionsRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListProgramOptionsRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListProgramOptionsRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE ListProgramOptionsRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : category_(arena),
+        name_filter_(arena),
+        _cached_size_{0} {}
+
+inline void ListProgramOptionsRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+}
+ListProgramOptionsRequest::~ListProgramOptionsRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.ListProgramOptionsRequest)
+  SharedDtor(*this);
+}
+inline void ListProgramOptionsRequest::SharedDtor(MessageLite& self) {
+  ListProgramOptionsRequest& this_ = static_cast<ListProgramOptionsRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.category_.Destroy();
+  this_._impl_.name_filter_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* ListProgramOptionsRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListProgramOptionsRequest(arena);
+}
+constexpr auto ListProgramOptionsRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(ListProgramOptionsRequest),
+                                            alignof(ListProgramOptionsRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListProgramOptionsRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListProgramOptionsRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListProgramOptionsRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ListProgramOptionsRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListProgramOptionsRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ListProgramOptionsRequest>(), &ListProgramOptionsRequest::ByteSizeLong,
+            &ListProgramOptionsRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListProgramOptionsRequest, _impl_._cached_size_),
+        false,
+    },
+    &ListProgramOptionsRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListProgramOptionsRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 0, 63, 2> ListProgramOptionsRequest::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListProgramOptionsRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // string name_filter = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(ListProgramOptionsRequest, _impl_.name_filter_)}},
+    // string category = 1;
+    {::_pbi::TcParser::FastUS1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(ListProgramOptionsRequest, _impl_.category_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // string category = 1;
+    {PROTOBUF_FIELD_OFFSET(ListProgramOptionsRequest, _impl_.category_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string name_filter = 2;
+    {PROTOBUF_FIELD_OFFSET(ListProgramOptionsRequest, _impl_.name_filter_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\43\10\13\0\0\0\0\0"
+    "libghidra.ListProgramOptionsRequest"
+    "category"
+    "name_filter"
+  }},
+};
+
+PROTOBUF_NOINLINE void ListProgramOptionsRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ListProgramOptionsRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.category_.ClearToEmpty();
+  _impl_.name_filter_.ClearToEmpty();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ListProgramOptionsRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ListProgramOptionsRequest& this_ = static_cast<const ListProgramOptionsRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ListProgramOptionsRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ListProgramOptionsRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ListProgramOptionsRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // string category = 1;
+          if (!this_._internal_category().empty()) {
+            const std::string& _s = this_._internal_category();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ListProgramOptionsRequest.category");
+            target = stream->WriteStringMaybeAliased(1, _s, target);
+          }
+
+          // string name_filter = 2;
+          if (!this_._internal_name_filter().empty()) {
+            const std::string& _s = this_._internal_name_filter();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.ListProgramOptionsRequest.name_filter");
+            target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ListProgramOptionsRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ListProgramOptionsRequest::ByteSizeLong(const MessageLite& base) {
+          const ListProgramOptionsRequest& this_ = static_cast<const ListProgramOptionsRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ListProgramOptionsRequest::ByteSizeLong() const {
+          const ListProgramOptionsRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ListProgramOptionsRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string category = 1;
+            if (!this_._internal_category().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_category());
+            }
+            // string name_filter = 2;
+            if (!this_._internal_name_filter().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_name_filter());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ListProgramOptionsRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ListProgramOptionsRequest*>(&to_msg);
+  auto& from = static_cast<const ListProgramOptionsRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ListProgramOptionsRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_category().empty()) {
+    _this->_internal_set_category(from._internal_category());
+  }
+  if (!from._internal_name_filter().empty()) {
+    _this->_internal_set_name_filter(from._internal_name_filter());
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ListProgramOptionsRequest::CopyFrom(const ListProgramOptionsRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ListProgramOptionsRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ListProgramOptionsRequest::InternalSwap(ListProgramOptionsRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.category_, &other->_impl_.category_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_filter_, &other->_impl_.name_filter_, arena);
+}
+
+::google::protobuf::Metadata ListProgramOptionsRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListProgramOptionsResponse::_Internal {
+ public:
+};
+
+ListProgramOptionsResponse::ListProgramOptionsResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListProgramOptionsResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListProgramOptionsResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::ListProgramOptionsResponse& from_msg)
+      : options_{visibility, arena, from.options_},
+        _cached_size_{0} {}
+
+ListProgramOptionsResponse::ListProgramOptionsResponse(
+    ::google::protobuf::Arena* arena,
+    const ListProgramOptionsResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListProgramOptionsResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListProgramOptionsResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListProgramOptionsResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : options_{visibility, arena},
+        _cached_size_{0} {}
+
+inline void ListProgramOptionsResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+}
+ListProgramOptionsResponse::~ListProgramOptionsResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.ListProgramOptionsResponse)
+  SharedDtor(*this);
+}
+inline void ListProgramOptionsResponse::SharedDtor(MessageLite& self) {
+  ListProgramOptionsResponse& this_ = static_cast<ListProgramOptionsResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* ListProgramOptionsResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListProgramOptionsResponse(arena);
+}
+constexpr auto ListProgramOptionsResponse::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(ListProgramOptionsResponse, _impl_.options_) +
+          decltype(ListProgramOptionsResponse::_impl_.options_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::ZeroInit(
+        sizeof(ListProgramOptionsResponse), alignof(ListProgramOptionsResponse), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&ListProgramOptionsResponse::PlacementNew_,
+                                 sizeof(ListProgramOptionsResponse),
+                                 alignof(ListProgramOptionsResponse));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListProgramOptionsResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListProgramOptionsResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListProgramOptionsResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ListProgramOptionsResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListProgramOptionsResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ListProgramOptionsResponse>(), &ListProgramOptionsResponse::ByteSizeLong,
+            &ListProgramOptionsResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListProgramOptionsResponse, _impl_._cached_size_),
+        false,
+    },
+    &ListProgramOptionsResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListProgramOptionsResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 1, 0, 2> ListProgramOptionsResponse::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListProgramOptionsResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // repeated .libghidra.ProgramOptionRecord options = 1;
+    {::_pbi::TcParser::FastMtR1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(ListProgramOptionsResponse, _impl_.options_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // repeated .libghidra.ProgramOptionRecord options = 1;
+    {PROTOBUF_FIELD_OFFSET(ListProgramOptionsResponse, _impl_.options_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::ProgramOptionRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void ListProgramOptionsResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ListProgramOptionsResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.options_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ListProgramOptionsResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ListProgramOptionsResponse& this_ = static_cast<const ListProgramOptionsResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ListProgramOptionsResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ListProgramOptionsResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ListProgramOptionsResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // repeated .libghidra.ProgramOptionRecord options = 1;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_options_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_options().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    1, repfield, repfield.GetCachedSize(),
+                    target, stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ListProgramOptionsResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ListProgramOptionsResponse::ByteSizeLong(const MessageLite& base) {
+          const ListProgramOptionsResponse& this_ = static_cast<const ListProgramOptionsResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ListProgramOptionsResponse::ByteSizeLong() const {
+          const ListProgramOptionsResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ListProgramOptionsResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated .libghidra.ProgramOptionRecord options = 1;
+            {
+              total_size += 1UL * this_._internal_options_size();
+              for (const auto& msg : this_._internal_options()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ListProgramOptionsResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ListProgramOptionsResponse*>(&to_msg);
+  auto& from = static_cast<const ListProgramOptionsResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ListProgramOptionsResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_options()->MergeFrom(
+      from._internal_options());
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ListProgramOptionsResponse::CopyFrom(const ListProgramOptionsResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ListProgramOptionsResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ListProgramOptionsResponse::InternalSwap(ListProgramOptionsResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.options_.InternalSwap(&other->_impl_.options_);
+}
+
+::google::protobuf::Metadata ListProgramOptionsResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class SetProgramOptionRequest::_Internal {
+ public:
+};
+
+SetProgramOptionRequest::SetProgramOptionRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.SetProgramOptionRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE SetProgramOptionRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::SetProgramOptionRequest& from_msg)
+      : category_(arena, from.category_),
+        name_(arena, from.name_),
+        value_(arena, from.value_),
+        _cached_size_{0} {}
+
+SetProgramOptionRequest::SetProgramOptionRequest(
+    ::google::protobuf::Arena* arena,
+    const SetProgramOptionRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SetProgramOptionRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.SetProgramOptionRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE SetProgramOptionRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : category_(arena),
+        name_(arena),
+        value_(arena),
+        _cached_size_{0} {}
+
+inline void SetProgramOptionRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+}
+SetProgramOptionRequest::~SetProgramOptionRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.SetProgramOptionRequest)
+  SharedDtor(*this);
+}
+inline void SetProgramOptionRequest::SharedDtor(MessageLite& self) {
+  SetProgramOptionRequest& this_ = static_cast<SetProgramOptionRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.category_.Destroy();
+  this_._impl_.name_.Destroy();
+  this_._impl_.value_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* SetProgramOptionRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) SetProgramOptionRequest(arena);
+}
+constexpr auto SetProgramOptionRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(SetProgramOptionRequest),
+                                            alignof(SetProgramOptionRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull SetProgramOptionRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_SetProgramOptionRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &SetProgramOptionRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<SetProgramOptionRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &SetProgramOptionRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<SetProgramOptionRequest>(), &SetProgramOptionRequest::ByteSizeLong,
+            &SetProgramOptionRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(SetProgramOptionRequest, _impl_._cached_size_),
+        false,
+    },
+    &SetProgramOptionRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* SetProgramOptionRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 3, 0, 59, 2> SetProgramOptionRequest::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    3, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967288,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    3,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::SetProgramOptionRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // string category = 1;
+    {::_pbi::TcParser::FastUS1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(SetProgramOptionRequest, _impl_.category_)}},
+    // string name = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(SetProgramOptionRequest, _impl_.name_)}},
+    // string value = 3;
+    {::_pbi::TcParser::FastUS1,
+     {26, 63, 0, PROTOBUF_FIELD_OFFSET(SetProgramOptionRequest, _impl_.value_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // string category = 1;
+    {PROTOBUF_FIELD_OFFSET(SetProgramOptionRequest, _impl_.category_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string name = 2;
+    {PROTOBUF_FIELD_OFFSET(SetProgramOptionRequest, _impl_.name_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string value = 3;
+    {PROTOBUF_FIELD_OFFSET(SetProgramOptionRequest, _impl_.value_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\41\10\4\5\0\0\0\0"
+    "libghidra.SetProgramOptionRequest"
+    "category"
+    "name"
+    "value"
+  }},
+};
+
+PROTOBUF_NOINLINE void SetProgramOptionRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.SetProgramOptionRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.category_.ClearToEmpty();
+  _impl_.name_.ClearToEmpty();
+  _impl_.value_.ClearToEmpty();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* SetProgramOptionRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const SetProgramOptionRequest& this_ = static_cast<const SetProgramOptionRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* SetProgramOptionRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const SetProgramOptionRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.SetProgramOptionRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // string category = 1;
+          if (!this_._internal_category().empty()) {
+            const std::string& _s = this_._internal_category();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.SetProgramOptionRequest.category");
+            target = stream->WriteStringMaybeAliased(1, _s, target);
+          }
+
+          // string name = 2;
+          if (!this_._internal_name().empty()) {
+            const std::string& _s = this_._internal_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.SetProgramOptionRequest.name");
+            target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          // string value = 3;
+          if (!this_._internal_value().empty()) {
+            const std::string& _s = this_._internal_value();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.SetProgramOptionRequest.value");
+            target = stream->WriteStringMaybeAliased(3, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.SetProgramOptionRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t SetProgramOptionRequest::ByteSizeLong(const MessageLite& base) {
+          const SetProgramOptionRequest& this_ = static_cast<const SetProgramOptionRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t SetProgramOptionRequest::ByteSizeLong() const {
+          const SetProgramOptionRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.SetProgramOptionRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string category = 1;
+            if (!this_._internal_category().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_category());
+            }
+            // string name = 2;
+            if (!this_._internal_name().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_name());
+            }
+            // string value = 3;
+            if (!this_._internal_value().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_value());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void SetProgramOptionRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<SetProgramOptionRequest*>(&to_msg);
+  auto& from = static_cast<const SetProgramOptionRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.SetProgramOptionRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_category().empty()) {
+    _this->_internal_set_category(from._internal_category());
+  }
+  if (!from._internal_name().empty()) {
+    _this->_internal_set_name(from._internal_name());
+  }
+  if (!from._internal_value().empty()) {
+    _this->_internal_set_value(from._internal_value());
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void SetProgramOptionRequest::CopyFrom(const SetProgramOptionRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.SetProgramOptionRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void SetProgramOptionRequest::InternalSwap(SetProgramOptionRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.category_, &other->_impl_.category_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.value_, &other->_impl_.value_, arena);
+}
+
+::google::protobuf::Metadata SetProgramOptionRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class SetProgramOptionResponse::_Internal {
+ public:
+};
+
+SetProgramOptionResponse::SetProgramOptionResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.SetProgramOptionResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE SetProgramOptionResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::SetProgramOptionResponse& from_msg)
+      : previous_value_(arena, from.previous_value_),
+        _cached_size_{0} {}
+
+SetProgramOptionResponse::SetProgramOptionResponse(
+    ::google::protobuf::Arena* arena,
+    const SetProgramOptionResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SetProgramOptionResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  _impl_.applied_ = from._impl_.applied_;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.SetProgramOptionResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE SetProgramOptionResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : previous_value_(arena),
+        _cached_size_{0} {}
+
+inline void SetProgramOptionResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.applied_ = {};
+}
+SetProgramOptionResponse::~SetProgramOptionResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.SetProgramOptionResponse)
+  SharedDtor(*this);
+}
+inline void SetProgramOptionResponse::SharedDtor(MessageLite& self) {
+  SetProgramOptionResponse& this_ = static_cast<SetProgramOptionResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.previous_value_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* SetProgramOptionResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) SetProgramOptionResponse(arena);
+}
+constexpr auto SetProgramOptionResponse::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(SetProgramOptionResponse),
+                                            alignof(SetProgramOptionResponse));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull SetProgramOptionResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_SetProgramOptionResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &SetProgramOptionResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<SetProgramOptionResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &SetProgramOptionResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<SetProgramOptionResponse>(), &SetProgramOptionResponse::ByteSizeLong,
+            &SetProgramOptionResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(SetProgramOptionResponse, _impl_._cached_size_),
+        false,
+    },
+    &SetProgramOptionResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* SetProgramOptionResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 0, 57, 2> SetProgramOptionResponse::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::SetProgramOptionResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // string previous_value = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(SetProgramOptionResponse, _impl_.previous_value_)}},
+    // bool applied = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SetProgramOptionResponse, _impl_.applied_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(SetProgramOptionResponse, _impl_.applied_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // bool applied = 1;
+    {PROTOBUF_FIELD_OFFSET(SetProgramOptionResponse, _impl_.applied_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // string previous_value = 2;
+    {PROTOBUF_FIELD_OFFSET(SetProgramOptionResponse, _impl_.previous_value_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\42\0\16\0\0\0\0\0"
+    "libghidra.SetProgramOptionResponse"
+    "previous_value"
+  }},
+};
+
+PROTOBUF_NOINLINE void SetProgramOptionResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.SetProgramOptionResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.previous_value_.ClearToEmpty();
+  _impl_.applied_ = false;
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* SetProgramOptionResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const SetProgramOptionResponse& this_ = static_cast<const SetProgramOptionResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* SetProgramOptionResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const SetProgramOptionResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.SetProgramOptionResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // bool applied = 1;
+          if (this_._internal_applied() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                1, this_._internal_applied(), target);
+          }
+
+          // string previous_value = 2;
+          if (!this_._internal_previous_value().empty()) {
+            const std::string& _s = this_._internal_previous_value();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.SetProgramOptionResponse.previous_value");
+            target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.SetProgramOptionResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t SetProgramOptionResponse::ByteSizeLong(const MessageLite& base) {
+          const SetProgramOptionResponse& this_ = static_cast<const SetProgramOptionResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t SetProgramOptionResponse::ByteSizeLong() const {
+          const SetProgramOptionResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.SetProgramOptionResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string previous_value = 2;
+            if (!this_._internal_previous_value().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_previous_value());
+            }
+            // bool applied = 1;
+            if (this_._internal_applied() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void SetProgramOptionResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<SetProgramOptionResponse*>(&to_msg);
+  auto& from = static_cast<const SetProgramOptionResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.SetProgramOptionResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_previous_value().empty()) {
+    _this->_internal_set_previous_value(from._internal_previous_value());
+  }
+  if (from._internal_applied() != 0) {
+    _this->_impl_.applied_ = from._impl_.applied_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void SetProgramOptionResponse::CopyFrom(const SetProgramOptionResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.SetProgramOptionResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void SetProgramOptionResponse::InternalSwap(SetProgramOptionResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.previous_value_, &other->_impl_.previous_value_, arena);
+        swap(_impl_.applied_, other->_impl_.applied_);
+}
+
+::google::protobuf::Metadata SetProgramOptionResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class TransactionRecord::_Internal {
+ public:
+};
+
+TransactionRecord::TransactionRecord(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.TransactionRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE TransactionRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::TransactionRecord& from_msg)
+      : open_subtransactions_{visibility, arena, from.open_subtransactions_},
+        name_(arena, from.name_),
+        kind_(arena, from.kind_),
+        _cached_size_{0} {}
+
+TransactionRecord::TransactionRecord(
+    ::google::protobuf::Arena* arena,
+    const TransactionRecord& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  TransactionRecord* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  _impl_.position_ = from._impl_.position_;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.TransactionRecord)
+}
+inline PROTOBUF_NDEBUG_INLINE TransactionRecord::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : open_subtransactions_{visibility, arena},
+        name_(arena),
+        kind_(arena),
+        _cached_size_{0} {}
+
+inline void TransactionRecord::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.position_ = {};
+}
+TransactionRecord::~TransactionRecord() {
+  // @@protoc_insertion_point(destructor:libghidra.TransactionRecord)
+  SharedDtor(*this);
+}
+inline void TransactionRecord::SharedDtor(MessageLite& self) {
+  TransactionRecord& this_ = static_cast<TransactionRecord&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.name_.Destroy();
+  this_._impl_.kind_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* TransactionRecord::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) TransactionRecord(arena);
+}
+constexpr auto TransactionRecord::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_.open_subtransactions_) +
+          decltype(TransactionRecord::_impl_.open_subtransactions_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::CopyInit(
+        sizeof(TransactionRecord), alignof(TransactionRecord), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&TransactionRecord::PlacementNew_,
+                                 sizeof(TransactionRecord),
+                                 alignof(TransactionRecord));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull TransactionRecord::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_TransactionRecord_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &TransactionRecord::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<TransactionRecord>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &TransactionRecord::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<TransactionRecord>(), &TransactionRecord::ByteSizeLong,
+            &TransactionRecord::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_._cached_size_),
+        false,
+    },
+    &TransactionRecord::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* TransactionRecord::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 4, 0, 64, 2> TransactionRecord::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    4, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967280,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    4,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::TransactionRecord>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // repeated string open_subtransactions = 4;
+    {::_pbi::TcParser::FastUR1,
+     {34, 63, 0, PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_.open_subtransactions_)}},
+    // uint32 position = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(TransactionRecord, _impl_.position_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_.position_)}},
+    // string name = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_.name_)}},
+    // string kind = 3;
+    {::_pbi::TcParser::FastUS1,
+     {26, 63, 0, PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_.kind_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint32 position = 1;
+    {PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_.position_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // string name = 2;
+    {PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_.name_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string kind = 3;
+    {PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_.kind_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // repeated string open_subtransactions = 4;
+    {PROTOBUF_FIELD_OFFSET(TransactionRecord, _impl_.open_subtransactions_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kUtf8String | ::_fl::kRepSString)},
+  }},
+  // no aux_entries
+  {{
+    "\33\0\4\4\24\0\0\0"
+    "libghidra.TransactionRecord"
+    "name"
+    "kind"
+    "open_subtransactions"
+  }},
+};
+
+PROTOBUF_NOINLINE void TransactionRecord::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.TransactionRecord)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.open_subtransactions_.Clear();
+  _impl_.name_.ClearToEmpty();
+  _impl_.kind_.ClearToEmpty();
+  _impl_.position_ = 0u;
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* TransactionRecord::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const TransactionRecord& this_ = static_cast<const TransactionRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* TransactionRecord::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const TransactionRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.TransactionRecord)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint32 position = 1;
+          if (this_._internal_position() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                1, this_._internal_position(), target);
+          }
+
+          // string name = 2;
+          if (!this_._internal_name().empty()) {
+            const std::string& _s = this_._internal_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.TransactionRecord.name");
+            target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          // string kind = 3;
+          if (!this_._internal_kind().empty()) {
+            const std::string& _s = this_._internal_kind();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.TransactionRecord.kind");
+            target = stream->WriteStringMaybeAliased(3, _s, target);
+          }
+
+          // repeated string open_subtransactions = 4;
+          for (int i = 0, n = this_._internal_open_subtransactions_size(); i < n; ++i) {
+            const auto& s = this_._internal_open_subtransactions().Get(i);
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                s.data(), static_cast<int>(s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.TransactionRecord.open_subtransactions");
+            target = stream->WriteString(4, s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.TransactionRecord)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t TransactionRecord::ByteSizeLong(const MessageLite& base) {
+          const TransactionRecord& this_ = static_cast<const TransactionRecord&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t TransactionRecord::ByteSizeLong() const {
+          const TransactionRecord& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.TransactionRecord)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated string open_subtransactions = 4;
+            {
+              total_size +=
+                  1 * ::google::protobuf::internal::FromIntSize(this_._internal_open_subtransactions().size());
+              for (int i = 0, n = this_._internal_open_subtransactions().size(); i < n; ++i) {
+                total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+                    this_._internal_open_subtransactions().Get(i));
+              }
+            }
+          }
+           {
+            // string name = 2;
+            if (!this_._internal_name().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_name());
+            }
+            // string kind = 3;
+            if (!this_._internal_kind().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_kind());
+            }
+            // uint32 position = 1;
+            if (this_._internal_position() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_position());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void TransactionRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<TransactionRecord*>(&to_msg);
+  auto& from = static_cast<const TransactionRecord&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.TransactionRecord)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_open_subtransactions()->MergeFrom(from._internal_open_subtransactions());
+  if (!from._internal_name().empty()) {
+    _this->_internal_set_name(from._internal_name());
+  }
+  if (!from._internal_kind().empty()) {
+    _this->_internal_set_kind(from._internal_kind());
+  }
+  if (from._internal_position() != 0) {
+    _this->_impl_.position_ = from._impl_.position_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void TransactionRecord::CopyFrom(const TransactionRecord& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.TransactionRecord)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void TransactionRecord::InternalSwap(TransactionRecord* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.open_subtransactions_.InternalSwap(&other->_impl_.open_subtransactions_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.kind_, &other->_impl_.kind_, arena);
+        swap(_impl_.position_, other->_impl_.position_);
+}
+
+::google::protobuf::Metadata TransactionRecord::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListTransactionsRequest::_Internal {
+ public:
+};
+
+ListTransactionsRequest::ListTransactionsRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::internal::ZeroFieldsBase(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::internal::ZeroFieldsBase(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListTransactionsRequest)
+}
+ListTransactionsRequest::ListTransactionsRequest(
+    ::google::protobuf::Arena* arena,
+    const ListTransactionsRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::internal::ZeroFieldsBase(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::internal::ZeroFieldsBase(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListTransactionsRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListTransactionsRequest)
+}
+
+inline void* ListTransactionsRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListTransactionsRequest(arena);
+}
+constexpr auto ListTransactionsRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(ListTransactionsRequest),
+                                            alignof(ListTransactionsRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListTransactionsRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListTransactionsRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListTransactionsRequest::MergeImpl,
+        ::google::protobuf::internal::ZeroFieldsBase::GetNewImpl<ListTransactionsRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListTransactionsRequest::SharedDtor,
+        ::google::protobuf::internal::ZeroFieldsBase::GetClearImpl<ListTransactionsRequest>(), &ListTransactionsRequest::ByteSizeLong,
+            &ListTransactionsRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListTransactionsRequest, _impl_._cached_size_),
+        false,
+    },
+    &ListTransactionsRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListTransactionsRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 0, 0, 0, 2> ListTransactionsRequest::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    0, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967295,  // skipmap
+    offsetof(decltype(_table_), field_names),  // no field_entries
+    0,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListTransactionsRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }},
+  // no field_entries, or aux_entries
+  {{
+  }},
+};
+
+
+
+
+
+
+
+
+::google::protobuf::Metadata ListTransactionsRequest::GetMetadata() const {
+  return ::google::protobuf::internal::ZeroFieldsBase::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class ListTransactionsResponse::_Internal {
+ public:
+};
+
+ListTransactionsResponse::ListTransactionsResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.ListTransactionsResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListTransactionsResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::ListTransactionsResponse& from_msg)
+      : transactions_{visibility, arena, from.transactions_},
+        _cached_size_{0} {}
+
+ListTransactionsResponse::ListTransactionsResponse(
+    ::google::protobuf::Arena* arena,
+    const ListTransactionsResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  ListTransactionsResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.ListTransactionsResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE ListTransactionsResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : transactions_{visibility, arena},
+        _cached_size_{0} {}
+
+inline void ListTransactionsResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+}
+ListTransactionsResponse::~ListTransactionsResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.ListTransactionsResponse)
+  SharedDtor(*this);
+}
+inline void ListTransactionsResponse::SharedDtor(MessageLite& self) {
+  ListTransactionsResponse& this_ = static_cast<ListTransactionsResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* ListTransactionsResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) ListTransactionsResponse(arena);
+}
+constexpr auto ListTransactionsResponse::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(ListTransactionsResponse, _impl_.transactions_) +
+          decltype(ListTransactionsResponse::_impl_.transactions_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::ZeroInit(
+        sizeof(ListTransactionsResponse), alignof(ListTransactionsResponse), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&ListTransactionsResponse::PlacementNew_,
+                                 sizeof(ListTransactionsResponse),
+                                 alignof(ListTransactionsResponse));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull ListTransactionsResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_ListTransactionsResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &ListTransactionsResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<ListTransactionsResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &ListTransactionsResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<ListTransactionsResponse>(), &ListTransactionsResponse::ByteSizeLong,
+            &ListTransactionsResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(ListTransactionsResponse, _impl_._cached_size_),
+        false,
+    },
+    &ListTransactionsResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsession_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* ListTransactionsResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 1, 0, 2> ListTransactionsResponse::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::ListTransactionsResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // repeated .libghidra.TransactionRecord transactions = 1;
+    {::_pbi::TcParser::FastMtR1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(ListTransactionsResponse, _impl_.transactions_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // repeated .libghidra.TransactionRecord transactions = 1;
+    {PROTOBUF_FIELD_OFFSET(ListTransactionsResponse, _impl_.transactions_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::TransactionRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void ListTransactionsResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.ListTransactionsResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.transactions_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* ListTransactionsResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const ListTransactionsResponse& this_ = static_cast<const ListTransactionsResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* ListTransactionsResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const ListTransactionsResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.ListTransactionsResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // repeated .libghidra.TransactionRecord transactions = 1;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_transactions_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_transactions().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    1, repfield, repfield.GetCachedSize(),
+                    target, stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.ListTransactionsResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t ListTransactionsResponse::ByteSizeLong(const MessageLite& base) {
+          const ListTransactionsResponse& this_ = static_cast<const ListTransactionsResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t ListTransactionsResponse::ByteSizeLong() const {
+          const ListTransactionsResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.ListTransactionsResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated .libghidra.TransactionRecord transactions = 1;
+            {
+              total_size += 1UL * this_._internal_transactions_size();
+              for (const auto& msg : this_._internal_transactions()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void ListTransactionsResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<ListTransactionsResponse*>(&to_msg);
+  auto& from = static_cast<const ListTransactionsResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.ListTransactionsResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_transactions()->MergeFrom(
+      from._internal_transactions());
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ListTransactionsResponse::CopyFrom(const ListTransactionsResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.ListTransactionsResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void ListTransactionsResponse::InternalSwap(ListTransactionsResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.transactions_.InternalSwap(&other->_impl_.transactions_);
+}
+
+::google::protobuf::Metadata ListTransactionsResponse::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // @@protoc_insertion_point(namespace_scope)

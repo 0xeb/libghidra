@@ -237,7 +237,6 @@ int main(int argc, char* argv[]) {
 
     ghidra::OpenProgramRequest open;
     open.program_path = imported.value->primary_program_path;
-    open.analyze = false;
     auto opened = h->OpenProgram(open);
     if (!opened.ok()) {
       fprintf(stderr, "OpenProgram: %s\n", opened.status.message.c_str());

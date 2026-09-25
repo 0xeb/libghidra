@@ -212,7 +212,6 @@ class LocalClient:
         d = self._call(
             self._client.open_program,
             program_path=request.program_path,
-            analyze=request.analyze,
             read_only=request.read_only,
             project_path=request.project_path,
             project_name=request.project_name,

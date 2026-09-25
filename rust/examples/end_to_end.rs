@@ -153,7 +153,6 @@ fn main() {
     };
     if let Err(e) = h.open_program(&ghidra::OpenProgramRequest {
         program_path: imported.primary_program_path,
-        analyze: false,
         ..Default::default()
     }) {
         eprintln!("Open failed: {e}");

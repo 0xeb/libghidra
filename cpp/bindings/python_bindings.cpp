@@ -258,7 +258,6 @@ NB_MODULE(_libghidra, m) {
       // --- Session ---
       .def("open_program", [](IClient& self,
                                const std::string& program_path,
-                               bool analyze,
                                bool read_only,
                                const std::string& project_path,
                                const std::string& project_name,
@@ -268,7 +267,6 @@ NB_MODULE(_libghidra, m) {
                                uint64_t base_address) {
         OpenProgramRequest req;
         req.program_path = program_path;
-        req.analyze = analyze;
         req.read_only = read_only;
         req.project_path = project_path;
         req.project_name = project_name;
@@ -284,7 +282,6 @@ NB_MODULE(_libghidra, m) {
         d["image_base"] = resp.image_base;
         return d;
       }, nb::arg("program_path"),
-         nb::arg("analyze") = false,
          nb::arg("read_only") = false,
          nb::arg("project_path") = "",
          nb::arg("project_name") = "",

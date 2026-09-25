@@ -42,7 +42,6 @@ pub(crate) mod ffi {
         fn open_program_json(
             self: &LocalClientHandle,
             program_path: &str,
-            analyze: bool,
             read_only: bool,
             project_path: &str,
             project_name: &str,

@@ -46,7 +46,8 @@ public final class SessionServiceHandler {
 			SessionContract.ImportProgramRequest request) {
 		if (request == null) {
 			request = new SessionContract.ImportProgramRequest(
-				"", "", "", false, false, "", "", "", java.util.List.of());
+				"", "", "", false, false, "", "", "", java.util.List.of(),
+				java.util.List.of(), java.util.List.of());
 		}
 		return runtime.importProgram(request);
 	}
@@ -55,7 +56,7 @@ public final class SessionServiceHandler {
 			SessionContract.OpenProgramRequest request) {
 		if (request == null) {
 			request = new SessionContract.OpenProgramRequest(
-				"", "", "", false, false, "", "", "", 0L);
+				"", "", "", false, "", "", "", 0L);
 		}
 		return runtime.openProgram(request);
 	}
@@ -123,6 +124,30 @@ public final class SessionServiceHandler {
 			request = new SessionContract.DeletePerfBenchmarkRequest(null);
 		}
 		return runtime.deletePerfBenchmark(request);
+	}
+
+	public SessionContract.ListProgramOptionsResponse listProgramOptions(
+			SessionContract.ListProgramOptionsRequest request) {
+		if (request == null) {
+			request = new SessionContract.ListProgramOptionsRequest("", "");
+		}
+		return runtime.listProgramOptions(request);
+	}
+
+	public SessionContract.SetProgramOptionResponse setProgramOption(
+			SessionContract.SetProgramOptionRequest request) {
+		if (request == null) {
+			request = new SessionContract.SetProgramOptionRequest("", "", "");
+		}
+		return runtime.setProgramOption(request);
+	}
+
+	public SessionContract.ListTransactionsResponse listTransactions(
+			SessionContract.ListTransactionsRequest request) {
+		if (request == null) {
+			request = new SessionContract.ListTransactionsRequest();
+		}
+		return runtime.listTransactions(request);
 	}
 
 	public SessionContract.ShutdownResponse shutdown(SessionContract.ShutdownRequest request) {

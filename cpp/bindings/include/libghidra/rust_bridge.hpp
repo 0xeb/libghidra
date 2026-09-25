@@ -50,7 +50,6 @@ class LocalClientHandle {
 
   // --- Session ----------------------------------------------------------
   rust::String open_program_json(rust::Str program_path,
-                                 bool analyze,
                                  bool read_only,
                                  rust::Str project_path,
                                  rust::Str project_name,

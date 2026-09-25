@@ -46,12 +46,6 @@ public interface OpenProgramRequestOrBuilder extends
       getProgramPathBytes();
 
   /**
-   * <code>bool analyze = 4;</code>
-   * @return The analyze.
-   */
-  boolean getAnalyze();
-
-  /**
    * <code>bool read_only = 5;</code>
    * @return The readOnly.
    */

@@ -1,7 +1,7 @@
 # libghidra Proto Contracts
 
 This directory is the source of truth for all external API contracts. The current
-contracts define 90 typed domain RPCs across 9 service areas, plus one generic
+contracts define 110 typed domain RPCs across 10 service areas, plus one generic
 transport RPC.
 
 ## Service Catalog
@@ -9,9 +9,10 @@ transport RPC.
 | Proto file | Service | RPCs | Description |
 |-----------|---------|------|-------------|
 | `health.proto` | HealthService | 2 | `GetStatus`, `GetCapabilities` |
-| `session.proto` | SessionService | 6 | Shared active-program control: `OpenProgram`, `CloseProgram`, `SaveProgram`, `DiscardProgram`, `GetRevision`, `Shutdown` |
-| `memory.proto` | MemoryService | 4 | `ReadBytes`, `WriteBytes`, `PatchBytesBatch`, `ListMemoryBlocks` |
-| `functions.proto` | FunctionsService | 15 | Functions, CFG, structural analysis, and function tags |
+| `session.proto` | SessionService | 17 | Project and program lifecycle (`OpenProject`, `CloseProject`, `ListProjectFiles`, `ImportProgram`, `OpenProgram`, `CloseProgram`, `SaveProgram`, `DiscardProgram`, `GetRevision`, `Shutdown`), perf benchmarks (`Add`/`List`/`Clear`/`DeletePerfBenchmark`), program options (`ListProgramOptions`, `SetProgramOption`) and transaction history (`ListTransactions`) |
+| `analysis.proto` | AnalysisService | 3 | Background auto-analysis jobs: `StartAnalysis`, `ListAnalysisJobs`, `CancelAnalysis` |
+| `memory.proto` | MemoryService | 8 | `ReadBytes`, `WriteBytes`, `PatchBytesBatch`, `ListMemoryBlocks`, `CreateMemoryBlock`, `RemoveMemoryBlock`, `MoveMemoryBlock`, `SetMemoryBlockAttributes` |
+| `functions.proto` | FunctionsService | 17 | Functions, leaf functions, CFG, structural analysis, stack frames, and function tags |
 | `symbols.proto` | SymbolsService | 4 | `GetSymbol`, `ListSymbols`, `RenameSymbol`, `DeleteSymbol` |
 | `xrefs.proto` | XrefsService | 1 | `ListXrefs` |
 | `types.proto` | TypesService | 34 | Types, aliases, enums, members, function signatures, parameters, locals, data type application, declaration parsing |
@@ -20,7 +21,7 @@ transport RPC.
 | `common.proto` | — | 0 | Shared types: `ErrorDetail`, `Pagination`, `AddressRange`, `ShutdownPolicy` |
 | `rpc.proto` | RpcService | 1 | Generic `Call` — `RpcRequest`/`RpcResponse` envelope |
 
-**Total: 90 domain service RPCs + 1 transport RPC = 91 RPCs**
+**Total: 110 domain service RPCs + 1 transport RPC = 111 RPCs**
 
 Client SDKs may expose convenience names that differ from the wire RPC name. For
 example, the wire RPC is `DecompilerService/DecompileFunction`, while SDKs expose

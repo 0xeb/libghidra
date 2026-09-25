@@ -125,7 +125,6 @@ impl LocalClient {
             .handle
             .open_program_json(
                 &request.program_path,
-                request.analyze,
                 request.read_only,
                 &request.project_path,
                 &request.project_name,

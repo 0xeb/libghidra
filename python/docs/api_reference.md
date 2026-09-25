@@ -108,7 +108,7 @@ for c in caps:
 
 ---
 
-## Session (10 methods)
+## Session (13 methods)
 
 ### `open_project(request) -> OpenProjectResponse`
 
@@ -167,12 +167,11 @@ resp = client.open_program(ghidra.OpenProgramRequest(
     project_path="C:/ghidra_projects",
     project_name="firmware",
     program_path="/picture_decoder.pe",
-    analyze=True,
 ))
 print(f"Opened: {resp.program_name} (base=0x{resp.image_base:x})")
 ```
 
-**Parameters:** `request: OpenProgramRequest` with fields `project_path`, `project_name`, `program_path`, `analyze`, `read_only`.
+**Parameters:** `request: OpenProgramRequest` with fields `project_path`, `project_name`, `program_path`, `read_only`. Opening never analyzes; use `start_analysis`.
 
 **Returns:** `OpenProgramResponse` with fields `program_name: str`, `language_id: str`, `compiler_spec: str`, `image_base: int`.
 
@@ -222,6 +221,74 @@ resp = client.shutdown(ghidra.ShutdownPolicy.SAVE)
 ```
 
 **Returns:** `ShutdownResponse` with `accepted: bool`.
+
+### `list_program_options(category="", name_filter="") -> list[ProgramOptionRecord]`
+
+List the current program's options, every category (`"Analyzers"`,
+`"Program Information"`, ...), or one exact `category`. `name_filter` is a
+case-insensitive substring. Listing is a pure read.
+
+```python
+for opt in client.list_program_options("Analyzers"):
+    if opt.type == "boolean" and opt.settable and "." not in opt.name:
+        print(opt.name, opt.value)          # analyzer on/off toggles
+```
+
+**Returns:** `ProgramOptionRecord` with `category`, `name`, `value`, `type`
+(`boolean`, `int`, `long`, `double`, `float`, `string`, `enum`, `file`, ...),
+`description`, `default_value`, `settable`, `allowed_values` (enum constants).
+
+### `set_program_option(category, name, value) -> SetProgramOptionResponse`
+
+Set one option; the host coerces `value` to the option's type. A value the type
+rejects, a read-only category, or a non-scalar option raises `GhidraError`
+(`invalid_argument`). Only `Analyzers` options are settable.
+
+```python
+client.set_program_option("Analyzers", "Objective-C 2 Class", "false")
+```
+
+### `list_transactions() -> list[TransactionRecord]`
+
+Undo history (`kind="undo"`, `position` 1 = most recent), undone entries
+(`"redo"`), and the transaction in progress (`"open"`, position 0).
+
+### `import_program` analyzer patterns
+
+`ImportProgramRequest.analyzers_off` / `analyzers_on` switch analyzer toggles for
+every loaded program before analysis (`*` = glob, otherwise substring,
+case-insensitive). `ImportProgramResponse.analyzer_matches` reports what each
+pattern matched.
+
+---
+
+## Analysis (3 methods)
+
+Background auto-analysis. A job owns the program while it runs: every other
+program call fails with `analysis_running` (poll `list_analysis_jobs`).
+
+### `start_analysis(mode="changed") -> AnalysisJobRecord`
+
+`"all"` re-runs every enabled analyzer; `"changed"` runs only the work queued by
+edits made since the program was opened. Returns at once with a running job.
+
+### `list_analysis_jobs() -> list[AnalysisJobRecord]`
+
+Jobs of the current program: `job_id`, `mode`, `state` (`running`, `done`,
+`error`, `cancelled`), `started_unix_ms`, `ended_unix_ms`, `elapsed_ms`, `message`.
+
+### `cancel_analysis(job_id=0) -> bool`
+
+Cancel a job (0 = whichever is running). Work already done is kept.
+
+```python
+job = client.start_analysis("all")
+while True:
+    state = next(j for j in client.list_analysis_jobs() if j.job_id == job.job_id).state
+    if state != "running":
+        break
+    time.sleep(1)
+```
 
 ---
 

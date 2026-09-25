@@ -42,4 +42,13 @@ public interface SessionOperations {
 
 	SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
 		SessionContract.DeletePerfBenchmarkRequest request);
+
+	SessionContract.ListProgramOptionsResponse listProgramOptions(
+		SessionContract.ListProgramOptionsRequest request);
+
+	SessionContract.SetProgramOptionResponse setProgramOption(
+		SessionContract.SetProgramOptionRequest request);
+
+	SessionContract.ListTransactionsResponse listTransactions(
+		SessionContract.ListTransactionsRequest request);
 }

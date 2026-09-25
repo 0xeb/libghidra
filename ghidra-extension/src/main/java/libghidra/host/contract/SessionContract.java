@@ -22,7 +22,6 @@ public final class SessionContract {
 		String projectPath,
 		String projectName,
 		String programPath,
-		boolean analyze,
 		boolean readOnly,
 		String languageId,
 		String compilerSpecId,
@@ -92,12 +91,22 @@ public final class SessionContract {
 		String languageId,
 		String compilerSpecId,
 		String loaderClass,
-		java.util.List<LoaderArg> loaderArgs) {
+		java.util.List<LoaderArg> loaderArgs,
+		java.util.List<String> analyzersOff,
+		java.util.List<String> analyzersOn) {
+	}
+
+	/** Which analyzer toggles one import pattern matched, across every loaded program. */
+	public record AnalyzerPatternMatch(
+		String pattern,
+		boolean enabled,
+		java.util.List<String> options) {
 	}
 
 	public record ImportProgramResponse(
 		java.util.List<String> programPaths,
-		String primaryProgramPath) {
+		String primaryProgramPath,
+		java.util.List<AnalyzerPatternMatch> analyzerMatches) {
 	}
 
 	public record CloseProgramRequest(
@@ -177,5 +186,47 @@ public final class SessionContract {
 	}
 
 	public record DeletePerfBenchmarkResponse(boolean deleted) {
+	}
+
+	/**
+	 * One entry of the current program's options. {@code type} is the Ghidra OptionType in
+	 * lower case without its _TYPE suffix; ENUM values are constant names, listed in
+	 * {@code allowedValues}.
+	 */
+	public record ProgramOptionRecord(
+		String category,
+		String name,
+		String value,
+		String type,
+		String description,
+		String defaultValue,
+		boolean settable,
+		java.util.List<String> allowedValues) {
+	}
+
+	public record ListProgramOptionsRequest(String category, String nameFilter) {
+	}
+
+	public record ListProgramOptionsResponse(java.util.List<ProgramOptionRecord> options) {
+	}
+
+	public record SetProgramOptionRequest(String category, String name, String value) {
+	}
+
+	public record SetProgramOptionResponse(boolean applied, String previousValue) {
+	}
+
+	/** kind is "undo", "redo" or "open"; see session.proto TransactionRecord. */
+	public record TransactionRecord(
+		int position,
+		String name,
+		String kind,
+		java.util.List<String> openSubtransactions) {
+	}
+
+	public record ListTransactionsRequest() {
+	}
+
+	public record ListTransactionsResponse(java.util.List<TransactionRecord> transactions) {
 	}
 }

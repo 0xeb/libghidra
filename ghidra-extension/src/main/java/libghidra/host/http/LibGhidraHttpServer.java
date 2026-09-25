@@ -24,6 +24,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
+import libghidra.host.contract.AnalysisContract;
 import libghidra.host.contract.FunctionsContract;
 import libghidra.host.contract.HealthContract;
 import libghidra.host.contract.ListingContract;
@@ -67,6 +68,18 @@ public final class LibGhidraHttpServer {
 			SessionContract.ClearPerfBenchmarksRequest request);
 		SessionContract.DeletePerfBenchmarkResponse deletePerfBenchmark(
 			SessionContract.DeletePerfBenchmarkRequest request);
+		SessionContract.ListProgramOptionsResponse listProgramOptions(
+			SessionContract.ListProgramOptionsRequest request);
+		SessionContract.SetProgramOptionResponse setProgramOption(
+			SessionContract.SetProgramOptionRequest request);
+		SessionContract.ListTransactionsResponse listTransactions(
+			SessionContract.ListTransactionsRequest request);
+		AnalysisContract.StartAnalysisResponse startAnalysis(
+			AnalysisContract.StartAnalysisRequest request);
+		AnalysisContract.ListAnalysisJobsResponse listAnalysisJobs(
+			AnalysisContract.ListAnalysisJobsRequest request);
+		AnalysisContract.CancelAnalysisResponse cancelAnalysis(
+			AnalysisContract.CancelAnalysisRequest request);
 		MemoryContract.ReadBytesResponse readBytes(MemoryContract.ReadBytesRequest request);
 		MemoryContract.WriteBytesResponse writeBytes(MemoryContract.WriteBytesRequest request);
 		MemoryContract.PatchBytesBatchResponse patchBytes(MemoryContract.PatchBytesBatchRequest request);
@@ -363,18 +376,10 @@ public final class LibGhidraHttpServer {
 			"POST /cancel (cancel RPCs already executing)\n" +
 			"\n" +
 			"Method names currently implemented over /rpc:\n" +
-			"- libghidra.HealthService/GetStatus\n" +
-			"- libghidra.HealthService/GetCapabilities\n" +
-			"- libghidra.SessionService/OpenProject\n" +
-			"- libghidra.SessionService/CloseProject\n" +
-			"- libghidra.SessionService/ListProjectFiles\n" +
-			"- libghidra.SessionService/ImportProgram\n" +
-			"- libghidra.SessionService/OpenProgram\n" +
-			"- libghidra.SessionService/CloseProgram\n" +
-			"- libghidra.SessionService/SaveProgram\n" +
-			"- libghidra.SessionService/DiscardProgram\n" +
-			"- libghidra.SessionService/GetRevision\n" +
-			"- libghidra.SessionService/Shutdown\n" +
+			"- libghidra.HealthService/*\n" +
+			"- libghidra.SessionService/* (project/program lifecycle, save/discard, revision,\n" +
+			"  program options, transaction history, perf benchmarks)\n" +
+			"- libghidra.AnalysisService/* (background auto-analysis jobs)\n" +
 			"- libghidra.MemoryService/*\n" +
 			"- libghidra.FunctionsService/*\n" +
 			"- libghidra.SymbolsService/*\n" +

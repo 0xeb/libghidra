@@ -165,17 +165,6 @@ private static final long serialVersionUID = 0L;
     }
   }
 
-  public static final int ANALYZE_FIELD_NUMBER = 4;
-  private boolean analyze_ = false;
-  /**
-   * <code>bool analyze = 4;</code>
-   * @return The analyze.
-   */
-  @java.lang.Override
-  public boolean getAnalyze() {
-    return analyze_;
-  }
-
   public static final int READ_ONLY_FIELD_NUMBER = 5;
   private boolean readOnly_ = false;
   /**
@@ -338,9 +327,6 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(programPath_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 3, programPath_);
     }
-    if (analyze_ != false) {
-      output.writeBool(4, analyze_);
-    }
     if (readOnly_ != false) {
       output.writeBool(5, readOnly_);
     }
@@ -373,10 +359,6 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(programPath_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(3, programPath_);
-    }
-    if (analyze_ != false) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(4, analyze_);
     }
     if (readOnly_ != false) {
       size += com.google.protobuf.CodedOutputStream
@@ -416,8 +398,6 @@ private static final long serialVersionUID = 0L;
         .equals(other.getProjectName())) return false;
     if (!getProgramPath()
         .equals(other.getProgramPath())) return false;
-    if (getAnalyze()
-        != other.getAnalyze()) return false;
     if (getReadOnly()
         != other.getReadOnly()) return false;
     if (!getLanguageId()
@@ -445,9 +425,6 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getProjectName().hashCode();
     hash = (37 * hash) + PROGRAM_PATH_FIELD_NUMBER;
     hash = (53 * hash) + getProgramPath().hashCode();
-    hash = (37 * hash) + ANALYZE_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getAnalyze());
     hash = (37 * hash) + READ_ONLY_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getReadOnly());
@@ -594,7 +571,6 @@ private static final long serialVersionUID = 0L;
       projectPath_ = "";
       projectName_ = "";
       programPath_ = "";
-      analyze_ = false;
       readOnly_ = false;
       languageId_ = "";
       compilerSpecId_ = "";
@@ -643,21 +619,18 @@ private static final long serialVersionUID = 0L;
         result.programPath_ = programPath_;
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
-        result.analyze_ = analyze_;
-      }
-      if (((from_bitField0_ & 0x00000010) != 0)) {
         result.readOnly_ = readOnly_;
       }
-      if (((from_bitField0_ & 0x00000020) != 0)) {
+      if (((from_bitField0_ & 0x00000010) != 0)) {
         result.languageId_ = languageId_;
       }
-      if (((from_bitField0_ & 0x00000040) != 0)) {
+      if (((from_bitField0_ & 0x00000020) != 0)) {
         result.compilerSpecId_ = compilerSpecId_;
       }
-      if (((from_bitField0_ & 0x00000080) != 0)) {
+      if (((from_bitField0_ & 0x00000040) != 0)) {
         result.format_ = format_;
       }
-      if (((from_bitField0_ & 0x00000100) != 0)) {
+      if (((from_bitField0_ & 0x00000080) != 0)) {
         result.baseAddress_ = baseAddress_;
       }
     }
@@ -689,25 +662,22 @@ private static final long serialVersionUID = 0L;
         bitField0_ |= 0x00000004;
         onChanged();
       }
-      if (other.getAnalyze() != false) {
-        setAnalyze(other.getAnalyze());
-      }
       if (other.getReadOnly() != false) {
         setReadOnly(other.getReadOnly());
       }
       if (!other.getLanguageId().isEmpty()) {
         languageId_ = other.languageId_;
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000010;
         onChanged();
       }
       if (!other.getCompilerSpecId().isEmpty()) {
         compilerSpecId_ = other.compilerSpecId_;
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000020;
         onChanged();
       }
       if (!other.getFormat().isEmpty()) {
         format_ = other.format_;
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000040;
         onChanged();
       }
       if (other.getBaseAddress() != 0L) {
@@ -754,34 +724,29 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000004;
               break;
             } // case 26
-            case 32: {
-              analyze_ = input.readBool();
-              bitField0_ |= 0x00000008;
-              break;
-            } // case 32
             case 40: {
               readOnly_ = input.readBool();
-              bitField0_ |= 0x00000010;
+              bitField0_ |= 0x00000008;
               break;
             } // case 40
             case 50: {
               languageId_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000010;
               break;
             } // case 50
             case 58: {
               compilerSpecId_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000040;
+              bitField0_ |= 0x00000020;
               break;
             } // case 58
             case 66: {
               format_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000080;
+              bitField0_ |= 0x00000040;
               break;
             } // case 66
             case 72: {
               baseAddress_ = input.readUInt64();
-              bitField0_ |= 0x00000100;
+              bitField0_ |= 0x00000080;
               break;
             } // case 72
             default: {
@@ -1017,38 +982,6 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private boolean analyze_ ;
-    /**
-     * <code>bool analyze = 4;</code>
-     * @return The analyze.
-     */
-    @java.lang.Override
-    public boolean getAnalyze() {
-      return analyze_;
-    }
-    /**
-     * <code>bool analyze = 4;</code>
-     * @param value The analyze to set.
-     * @return This builder for chaining.
-     */
-    public Builder setAnalyze(boolean value) {
-
-      analyze_ = value;
-      bitField0_ |= 0x00000008;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>bool analyze = 4;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearAnalyze() {
-      bitField0_ = (bitField0_ & ~0x00000008);
-      analyze_ = false;
-      onChanged();
-      return this;
-    }
-
     private boolean readOnly_ ;
     /**
      * <code>bool read_only = 5;</code>
@@ -1066,7 +999,7 @@ private static final long serialVersionUID = 0L;
     public Builder setReadOnly(boolean value) {
 
       readOnly_ = value;
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
@@ -1075,7 +1008,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearReadOnly() {
-      bitField0_ = (bitField0_ & ~0x00000010);
+      bitField0_ = (bitField0_ & ~0x00000008);
       readOnly_ = false;
       onChanged();
       return this;
@@ -1124,7 +1057,7 @@ private static final long serialVersionUID = 0L;
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       languageId_ = value;
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
@@ -1134,7 +1067,7 @@ private static final long serialVersionUID = 0L;
      */
     public Builder clearLanguageId() {
       languageId_ = getDefaultInstance().getLanguageId();
-      bitField0_ = (bitField0_ & ~0x00000020);
+      bitField0_ = (bitField0_ & ~0x00000010);
       onChanged();
       return this;
     }
@@ -1148,7 +1081,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
       languageId_ = value;
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
@@ -1196,7 +1129,7 @@ private static final long serialVersionUID = 0L;
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       compilerSpecId_ = value;
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
@@ -1206,7 +1139,7 @@ private static final long serialVersionUID = 0L;
      */
     public Builder clearCompilerSpecId() {
       compilerSpecId_ = getDefaultInstance().getCompilerSpecId();
-      bitField0_ = (bitField0_ & ~0x00000040);
+      bitField0_ = (bitField0_ & ~0x00000020);
       onChanged();
       return this;
     }
@@ -1220,7 +1153,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
       compilerSpecId_ = value;
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
@@ -1268,7 +1201,7 @@ private static final long serialVersionUID = 0L;
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       format_ = value;
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
@@ -1278,7 +1211,7 @@ private static final long serialVersionUID = 0L;
      */
     public Builder clearFormat() {
       format_ = getDefaultInstance().getFormat();
-      bitField0_ = (bitField0_ & ~0x00000080);
+      bitField0_ = (bitField0_ & ~0x00000040);
       onChanged();
       return this;
     }
@@ -1292,7 +1225,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
       format_ = value;
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
@@ -1314,7 +1247,7 @@ private static final long serialVersionUID = 0L;
     public Builder setBaseAddress(long value) {
 
       baseAddress_ = value;
-      bitField0_ |= 0x00000100;
+      bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
@@ -1323,7 +1256,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearBaseAddress() {
-      bitField0_ = (bitField0_ & ~0x00000100);
+      bitField0_ = (bitField0_ & ~0x00000080);
       baseAddress_ = 0L;
       onChanged();
       return this;

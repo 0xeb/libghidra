@@ -77,7 +77,6 @@ fn main() {
             project_path: project_dir.clone(),
             project_name: project_name.clone(),
             program_path: program_path.clone(),
-            analyze: false,
             read_only: false,
             ..Default::default()
         }) {

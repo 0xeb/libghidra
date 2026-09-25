@@ -128,3 +128,6 @@ pub type Dominator = DominatorRecord;
 pub type PostDominator = PostDominatorRecord;
 pub type Loop = LoopRecord;
 pub type DecompileToken = DecompileTokenRecord;
+pub type ProgramOption = ProgramOptionRecord;
+pub type Transaction = TransactionRecord;
+pub type AnalysisJob = AnalysisJobRecord;

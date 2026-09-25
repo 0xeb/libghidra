@@ -9,16 +9,17 @@ package libghidra.host.runtime;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import generic.stl.Pair;
+import ghidra.app.plugin.core.analysis.AutoAnalysisManager;
 import ghidra.app.util.importer.ProgramLoader;
 import ghidra.app.util.opinion.LoadResults;
 import ghidra.app.util.opinion.Loaded;
-import ghidra.base.project.GhidraProject;
 import ghidra.framework.model.DomainFile;
 import ghidra.framework.model.DomainFolder;
 import ghidra.framework.model.Project;
@@ -100,6 +101,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 
 	public void bindProgram(Program program, String mode) {
 		state.bindProgram(program, mode);
+		ensureAnalysisManager(program);
 	}
 
 	public void bindProgram(Program program, String mode, String programPath) {
@@ -111,6 +113,17 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			knownProgramFiles.put(normalizedPath, program.getDomainFile());
 		}
 		state.bindProgram(program, mode, programPath);
+		ensureAnalysisManager(program);
+	}
+
+	// Headless hosts create the program's AutoAnalysisManager up front: it registers the
+	// analyzer options (measured: 1 option before, 127 after, no revision change) and
+	// queues analysis work for later edits, which a "changed" analysis job then runs.
+	// Without a PluginTool it never starts analysis by itself. GUI hosts already have one.
+	private void ensureAnalysisManager(Program program) {
+		if (program != null && controlMode != ControlMode.ATTACHED_GUI) {
+			AutoAnalysisManager.getAnalysisManager(program);
+		}
 	}
 
 	public void unbindProgram(Program program) {
@@ -229,7 +242,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			SessionContract.ImportProgramRequest safeRequest = request != null
 					? request
 					: new SessionContract.ImportProgramRequest(
-						"", "", "", false, false, "", "", "", List.of());
+						"", "", "", false, false, "", "", "", List.of(), List.of(), List.of());
 			String sourcePath = safeRequest.sourcePath() != null ? safeRequest.sourcePath().trim() : "";
 			if (sourcePath.isBlank()) {
 				throw new SessionRpcException("invalid_argument", "source_path is required");
@@ -246,11 +259,16 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 				try (LoadResults<Program> results = buildProgramLoader(targetProject, safeRequest, source, folderPath)
 					.load()) {
 					List<String> paths = new ArrayList<>();
+					List<SessionContract.AnalyzerPatternMatch> matches = new ArrayList<>();
 					for (Loaded<Program> loaded : results) {
 						Program loadedProgram = loaded.getDomainObject(programConsumer);
 						try {
+							// Overrides land before analysis and are saved with the program,
+							// for every loaded program (libraries included), not just the first.
+							ProgramOptionsSupport.applyAnalyzerPatterns(loadedProgram,
+								safeRequest.analyzersOff(), safeRequest.analyzersOn(), matches);
 							if (safeRequest.analyze()) {
-								analyzeImportedProgram(loadedProgram);
+								analyzeProgramLocked(loadedProgram, true, "libghidra import analysis");
 							}
 							DomainFile saved = loaded.save(taskMonitor);
 							String path = ManagedProgramSupport.normalizeProgramPath(saved.getPathname());
@@ -262,7 +280,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 						}
 					}
 					String primary = paths.isEmpty() ? "" : paths.get(0);
-					return new SessionContract.ImportProgramResponse(paths, primary);
+					return new SessionContract.ImportProgramResponse(paths, primary, matches);
 				}
 			}
 			catch (Exception e) {
@@ -335,6 +353,8 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 
 	@Override
 	public SessionContract.ShutdownResponse shutdown(SessionContract.ShutdownRequest request) {
+		// A running analysis job owns the program; stop it rather than refuse to shut down.
+		state.cancelAnalysisAndWait();
 		try (LockScope ignored = writeLock()) {
 			SessionContract.ShutdownPolicy policy = request != null
 					? request.shutdownPolicy()
@@ -425,6 +445,60 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 					flushProgramEvents(program);
 				}
 			}
+		}
+	}
+
+	@Override
+	public SessionContract.ListProgramOptionsResponse listProgramOptions(
+			SessionContract.ListProgramOptionsRequest request) {
+		try (LockScope ignored = readLock()) {
+			Program program = requireProgram();
+			return new SessionContract.ListProgramOptionsResponse(ProgramOptionsSupport.list(
+				program,
+				request != null ? request.category() : "",
+				request != null ? request.nameFilter() : ""));
+		}
+	}
+
+	@Override
+	public SessionContract.SetProgramOptionResponse setProgramOption(
+			SessionContract.SetProgramOptionRequest request) {
+		try (LockScope ignored = writeLock()) {
+			Program program = requireProgram();
+			String previous = ProgramOptionsSupport.set(
+				program,
+				request != null ? request.category() : "",
+				request != null ? request.name() : "",
+				request != null ? request.value() : "");
+			flushProgramEvents(program);
+			return new SessionContract.SetProgramOptionResponse(true, previous);
+		}
+	}
+
+	@Override
+	public SessionContract.ListTransactionsResponse listTransactions(
+			SessionContract.ListTransactionsRequest request) {
+		try (LockScope ignored = readLock()) {
+			Program program = requireProgram();
+			List<SessionContract.TransactionRecord> out = new ArrayList<>();
+			TransactionInfo open = program.getCurrentTransactionInfo();
+			if (open != null) {
+				List<String> subs = open.getOpenSubTransactions();
+				out.add(new SessionContract.TransactionRecord(0, nullableString(open.getDescription()),
+					"open", subs != null ? new ArrayList<>(subs) : List.of()));
+			}
+			// Both lists are newest first: position 1 is the next undo (or redo).
+			int position = 1;
+			for (String name : program.getAllUndoNames()) {
+				out.add(new SessionContract.TransactionRecord(position++, nullableString(name), "undo",
+					Collections.emptyList()));
+			}
+			position = 1;
+			for (String name : program.getAllRedoNames()) {
+				out.add(new SessionContract.TransactionRecord(position++, nullableString(name), "redo",
+					Collections.emptyList()));
+			}
+			return new SessionContract.ListTransactionsResponse(out);
 		}
 	}
 
@@ -672,11 +746,13 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		return builder;
 	}
 
-	private void analyzeImportedProgram(Program program) {
-		int tx = program.startTransaction("libghidra import analysis");
+	// Synchronous analysis on the RPC thread, which already holds the write lock. The
+	// request's cancellation monitor lets /cancel stop it.
+	private void analyzeProgramLocked(Program program, boolean all, String description) {
+		int tx = program.startTransaction(description);
 		boolean commit = false;
 		try {
-			GhidraProject.analyze(program);
+			ProgramOptionsSupport.analyze(program, all, RequestCancellation.taskMonitor());
 			commit = true;
 		}
 		finally {

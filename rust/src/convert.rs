@@ -148,6 +148,56 @@ impl From<pb::FunctionFrameRecord> for models::FunctionFrameRecord {
     }
 }
 
+impl From<pb::AnalyzerPatternMatch> for models::AnalyzerPatternMatch {
+    fn from(r: pb::AnalyzerPatternMatch) -> Self {
+        Self {
+            pattern: r.pattern,
+            enabled: r.enabled,
+            options: r.options,
+        }
+    }
+}
+
+impl From<pb::ProgramOptionRecord> for models::ProgramOptionRecord {
+    fn from(r: pb::ProgramOptionRecord) -> Self {
+        Self {
+            category: r.category,
+            name: r.name,
+            value: r.value,
+            type_name: r.r#type,
+            description: r.description,
+            default_value: r.default_value,
+            settable: r.settable,
+            allowed_values: r.allowed_values,
+        }
+    }
+}
+
+impl From<pb::TransactionRecord> for models::TransactionRecord {
+    fn from(r: pb::TransactionRecord) -> Self {
+        Self {
+            position: r.position,
+            name: r.name,
+            kind: r.kind,
+            open_subtransactions: r.open_subtransactions,
+        }
+    }
+}
+
+impl From<pb::AnalysisJobRecord> for models::AnalysisJobRecord {
+    fn from(r: pb::AnalysisJobRecord) -> Self {
+        Self {
+            job_id: r.job_id,
+            mode: r.mode,
+            state: r.state,
+            started_unix_ms: r.started_unix_ms,
+            ended_unix_ms: r.ended_unix_ms,
+            elapsed_ms: r.elapsed_ms,
+            message: r.message,
+        }
+    }
+}
+
 impl From<pb::PerfBenchmarkRecord> for models::PerfBenchmarkRecord {
     fn from(r: pb::PerfBenchmarkRecord) -> Self {
         Self {

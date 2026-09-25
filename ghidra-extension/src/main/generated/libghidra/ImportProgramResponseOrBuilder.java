@@ -45,4 +45,28 @@ public interface ImportProgramResponseOrBuilder extends
    */
   com.google.protobuf.ByteString
       getPrimaryProgramPathBytes();
+
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  java.util.List<libghidra.AnalyzerPatternMatch> 
+      getAnalyzerMatchesList();
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  libghidra.AnalyzerPatternMatch getAnalyzerMatches(int index);
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  int getAnalyzerMatchesCount();
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  java.util.List<? extends libghidra.AnalyzerPatternMatchOrBuilder> 
+      getAnalyzerMatchesOrBuilderList();
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  libghidra.AnalyzerPatternMatchOrBuilder getAnalyzerMatchesOrBuilder(
+      int index);
 }

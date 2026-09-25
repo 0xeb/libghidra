@@ -18,6 +18,7 @@ from google.protobuf import any_pb2
 from google.protobuf.message import Message
 
 from . import (
+    analysis_pb2,
     common_pb2,
     decompiler_pb2,
     functions_pb2,
@@ -32,6 +33,8 @@ from . import (
 )
 from .errors import ErrorCode, GhidraError
 from .models import (
+    AnalysisJobRecord,
+    AnalyzerPatternMatch,
     AddBookmarkResponse,
     AddBreakpointResponse,
     AddTypeEnumMemberResponse,
@@ -180,6 +183,9 @@ from .models import (
     ClearPerfBenchmarksResponse,
     FunctionFrameRecord,
     PerfBenchmarkRecord,
+    ProgramOptionRecord,
+    SetProgramOptionResponse,
+    TransactionRecord,
     StackVariableRecord,
 )
 
@@ -443,6 +449,8 @@ class GhidraClient:
                 session_pb2.LoaderArg(name=arg.name, value=arg.value)
                 for arg in request.loader_args
             ],
+            analyzers_off=list(request.analyzers_off),
+            analyzers_on=list(request.analyzers_on),
         )
         resp = self._call_rpc(
             "libghidra.SessionService/ImportProgram",
@@ -452,6 +460,12 @@ class GhidraClient:
         return ImportProgramResponse(
             program_paths=list(resp.program_paths),
             primary_program_path=resp.primary_program_path,
+            analyzer_matches=[
+                AnalyzerPatternMatch(
+                    pattern=m.pattern, enabled=m.enabled, options=list(m.options)
+                )
+                for m in resp.analyzer_matches
+            ],
         )
 
     def open_program(self, request: OpenProgramRequest) -> OpenProgramResponse:
@@ -459,7 +473,6 @@ class GhidraClient:
             project_path=request.project_path,
             project_name=request.project_name,
             program_path=request.program_path,
-            analyze=request.analyze,
             read_only=request.read_only,
             language_id=request.language_id,
             compiler_spec_id=request.compiler_spec_id,
@@ -574,6 +587,72 @@ class GhidraClient:
             session_pb2.DeletePerfBenchmarkResponse,
         )
         return resp.deleted
+
+    # =========================================================================
+    # Program options, transaction history, analysis jobs
+    # =========================================================================
+
+    def list_program_options(
+        self, category: str = "", name_filter: str = ""
+    ) -> list[ProgramOptionRecord]:
+        req = session_pb2.ListProgramOptionsRequest(category=category, name_filter=name_filter)
+        resp = self._call_rpc(
+            "libghidra.SessionService/ListProgramOptions",
+            req,
+            session_pb2.ListProgramOptionsResponse,
+        )
+        return [_program_option_from_pb(r) for r in resp.options]
+
+    def set_program_option(self, category: str, name: str, value: str) -> SetProgramOptionResponse:
+        req = session_pb2.SetProgramOptionRequest(category=category, name=name, value=value)
+        resp = self._call_rpc(
+            "libghidra.SessionService/SetProgramOption",
+            req,
+            session_pb2.SetProgramOptionResponse,
+        )
+        return SetProgramOptionResponse(applied=resp.applied, previous_value=resp.previous_value)
+
+    def list_transactions(self) -> list[TransactionRecord]:
+        req = session_pb2.ListTransactionsRequest()
+        resp = self._call_rpc(
+            "libghidra.SessionService/ListTransactions",
+            req,
+            session_pb2.ListTransactionsResponse,
+        )
+        return [_transaction_from_pb(r) for r in resp.transactions]
+
+    def start_analysis(self, mode: str = "changed") -> AnalysisJobRecord:
+        """Start a background analysis job ("changed" or "all") and return at once.
+
+        While it runs the job owns the program: other program calls fail with
+        ``analysis_running``. Follow it with :meth:`list_analysis_jobs`.
+        """
+        req = analysis_pb2.StartAnalysisRequest(mode=mode)
+        resp = self._call_rpc(
+            "libghidra.AnalysisService/StartAnalysis",
+            req,
+            analysis_pb2.StartAnalysisResponse,
+        )
+        return _analysis_job_from_pb(resp.job)
+
+    def list_analysis_jobs(self) -> list[AnalysisJobRecord]:
+        req = analysis_pb2.ListAnalysisJobsRequest()
+        resp = self._call_rpc(
+            "libghidra.AnalysisService/ListAnalysisJobs",
+            req,
+            analysis_pb2.ListAnalysisJobsResponse,
+        )
+        return [_analysis_job_from_pb(r) for r in resp.jobs]
+
+    def cancel_analysis(self, job_id: int = 0) -> bool:
+        """Cancel a job (0 = whichever is running); True if one was signalled."""
+        req = analysis_pb2.CancelAnalysisRequest(job_id=job_id)
+        resp = self._call_rpc(
+            "libghidra.AnalysisService/CancelAnalysis",
+            req,
+            analysis_pb2.CancelAnalysisResponse,
+        )
+        return resp.cancelled
 
     # =========================================================================
     # Memory
@@ -1990,6 +2069,40 @@ def _frame_from_pb(pb_frame: functions_pb2.FunctionFrameRecord) -> FunctionFrame
             )
             for v in pb_frame.stack_variables
         ],
+    )
+
+
+def _program_option_from_pb(pb_rec: session_pb2.ProgramOptionRecord) -> ProgramOptionRecord:
+    return ProgramOptionRecord(
+        category=pb_rec.category,
+        name=pb_rec.name,
+        value=pb_rec.value,
+        type=pb_rec.type,
+        description=pb_rec.description,
+        default_value=pb_rec.default_value,
+        settable=pb_rec.settable,
+        allowed_values=list(pb_rec.allowed_values),
+    )
+
+
+def _transaction_from_pb(pb_rec: session_pb2.TransactionRecord) -> TransactionRecord:
+    return TransactionRecord(
+        position=pb_rec.position,
+        name=pb_rec.name,
+        kind=pb_rec.kind,
+        open_subtransactions=list(pb_rec.open_subtransactions),
+    )
+
+
+def _analysis_job_from_pb(pb_rec: analysis_pb2.AnalysisJobRecord) -> AnalysisJobRecord:
+    return AnalysisJobRecord(
+        job_id=pb_rec.job_id,
+        mode=pb_rec.mode,
+        state=pb_rec.state,
+        started_unix_ms=pb_rec.started_unix_ms,
+        ended_unix_ms=pb_rec.ended_unix_ms,
+        elapsed_ms=pb_rec.elapsed_ms,
+        message=pb_rec.message,
     )
 
 

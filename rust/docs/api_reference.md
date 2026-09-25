@@ -2,7 +2,7 @@
 
 Comprehensive reference for the `libghidra` Rust crate -- a synchronous HTTP client for Ghidra program databases via the LibGhidraHost RPC layer.
 
-Comprehensive method coverage across 9 service areas, plus auto-pagination helpers.
+Comprehensive method coverage across 10 service areas, plus auto-pagination helpers.
 
 ## Quick Start
 
@@ -119,7 +119,7 @@ for c in &caps {
 
 ---
 
-## Session (10 methods)
+## Session (13 methods)
 
 ### `fn open_project(&self, request: &OpenProjectRequest) -> Result<OpenProjectResponse>`
 
@@ -173,7 +173,6 @@ let req = ghidra::OpenProgramRequest {
     project_path: "C:/ghidra_projects".into(),
     project_name: "firmware".into(),
     program_path: "/picture_decoder.pe".into(),
-    analyze: true,
     ..Default::default()
 };
 let resp = client.open_program(&req)?;
@@ -213,6 +212,53 @@ println!("Program: {}, modification: {}", rev.program_id, rev.modification_numbe
 ```rust
 client.shutdown(ghidra::ShutdownPolicy::Save)?;
 ```
+
+### `fn list_program_options(&self, category: &str, name_filter: &str) -> Result<Vec<ProgramOptionRecord>>`
+
+List the current program's options, every category or one exact `category`
+(`"Analyzers"`, `"Program Information"`, ...); `name_filter` is a
+case-insensitive substring. A pure read. `type_name` is the Ghidra option type in
+lower case (`boolean`, `int`, `enum`, ...); `allowed_values` lists enum constants.
+
+### `fn set_program_option(&self, category: &str, name: &str, value: &str) -> Result<SetProgramOptionResponse>`
+
+Typed write of one option; a value the type rejects, a read-only category or a
+non-scalar option is an `invalid_argument` error. Only `Analyzers` options are
+settable.
+
+```rust
+client.set_program_option("Analyzers", "Objective-C 2 Class", "false")?;
+```
+
+### `fn list_transactions(&self) -> Result<Vec<TransactionRecord>>`
+
+Undo history (`kind == "undo"`, position 1 = most recent), undone entries
+(`"redo"`), and the open transaction (`"open"`, position 0).
+
+`ImportProgramRequest::analyzers_off` / `analyzers_on` switch analyzer toggles for
+every loaded program before analysis; `ImportProgramResponse::analyzer_matches`
+reports what each pattern matched.
+
+---
+
+## Analysis (3 methods)
+
+A job owns the program while it runs: every other program call fails with
+`analysis_running`; poll `list_analysis_jobs`.
+
+### `fn start_analysis(&self, mode: &str) -> Result<AnalysisJobRecord>`
+
+`"all"` re-runs every enabled analyzer; `"changed"` runs only the work queued by
+edits since the program was opened. Returns at once with a running job.
+
+### `fn list_analysis_jobs(&self) -> Result<Vec<AnalysisJobRecord>>`
+
+Jobs of the current program with `state` `running` / `done` / `error` /
+`cancelled` and their timing.
+
+### `fn cancel_analysis(&self, job_id: u64) -> Result<bool>`
+
+Cancel a job (0 = whichever is running); work already done is kept.
 
 ---
 

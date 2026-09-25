@@ -17,6 +17,15 @@ public final class LockScope implements AutoCloseable {
 		lock.lock();
 	}
 
+	private LockScope(Lock lock, boolean alreadyHeld) {
+		this.lock = lock;
+	}
+
+	/** Wrap a lock the caller has already acquired; {@link #close()} releases it. */
+	static LockScope adopt(Lock lock) {
+		return new LockScope(lock, true);
+	}
+
 	@Override
 	public void close() {
 		lock.unlock();

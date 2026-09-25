@@ -68,6 +68,15 @@ class HttpClient final : public IClient {
   StatusOr<ClearPerfBenchmarksResponse> ClearPerfBenchmarks() override;
   StatusOr<DeletePerfBenchmarkResponse> DeletePerfBenchmark(
       const std::string& bench_id) override;
+  StatusOr<ListProgramOptionsResponse> ListProgramOptions(
+      const std::string& category, const std::string& name_filter) override;
+  StatusOr<SetProgramOptionResponse> SetProgramOption(const std::string& category,
+                                                      const std::string& name,
+                                                      const std::string& value) override;
+  StatusOr<ListTransactionsResponse> ListTransactions() override;
+  StatusOr<StartAnalysisResponse> StartAnalysis(const std::string& mode) override;
+  StatusOr<ListAnalysisJobsResponse> ListAnalysisJobs() override;
+  StatusOr<CancelAnalysisResponse> CancelAnalysis(std::uint64_t job_id) override;
 
   StatusOr<ReadBytesResponse> ReadBytes(std::uint64_t address, std::uint32_t length) override;
   StatusOr<WriteBytesResponse> WriteBytes(std::uint64_t address,

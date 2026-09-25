@@ -74,7 +74,6 @@ static InstanceResult analyze_instance(const std::string& label,
 
     ghidra::OpenProgramRequest open;
     open.program_path = imported.value->primary_program_path;
-    open.analyze = false;
     auto opened = h->OpenProgram(open);
     if (!opened.ok()) {
       result.error = "OpenProgram: " + opened.status.message;

@@ -64,7 +64,6 @@ int main(int argc, char* argv[]) {
       open.project_path = argv[2];
       open.project_name = argv[3];
       open.program_path = program_path;
-      open.analyze = false;
       open.read_only = false;
 
       auto opened = host->OpenProgram(open);

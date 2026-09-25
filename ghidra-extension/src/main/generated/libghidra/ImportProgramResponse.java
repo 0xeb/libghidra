@@ -30,6 +30,7 @@ private static final long serialVersionUID = 0L;
     programPaths_ =
         com.google.protobuf.LazyStringArrayList.emptyList();
     primaryProgramPath_ = "";
+    analyzerMatches_ = java.util.Collections.emptyList();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -121,6 +122,47 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int ANALYZER_MATCHES_FIELD_NUMBER = 3;
+  @SuppressWarnings("serial")
+  private java.util.List<libghidra.AnalyzerPatternMatch> analyzerMatches_;
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  @java.lang.Override
+  public java.util.List<libghidra.AnalyzerPatternMatch> getAnalyzerMatchesList() {
+    return analyzerMatches_;
+  }
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  @java.lang.Override
+  public java.util.List<? extends libghidra.AnalyzerPatternMatchOrBuilder> 
+      getAnalyzerMatchesOrBuilderList() {
+    return analyzerMatches_;
+  }
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  @java.lang.Override
+  public int getAnalyzerMatchesCount() {
+    return analyzerMatches_.size();
+  }
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  @java.lang.Override
+  public libghidra.AnalyzerPatternMatch getAnalyzerMatches(int index) {
+    return analyzerMatches_.get(index);
+  }
+  /**
+   * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+   */
+  @java.lang.Override
+  public libghidra.AnalyzerPatternMatchOrBuilder getAnalyzerMatchesOrBuilder(
+      int index) {
+    return analyzerMatches_.get(index);
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -140,6 +182,9 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(primaryProgramPath_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 2, primaryProgramPath_);
+    }
+    for (int i = 0; i < analyzerMatches_.size(); i++) {
+      output.writeMessage(3, analyzerMatches_.get(i));
     }
     getUnknownFields().writeTo(output);
   }
@@ -161,6 +206,10 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(primaryProgramPath_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(2, primaryProgramPath_);
     }
+    for (int i = 0; i < analyzerMatches_.size(); i++) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(3, analyzerMatches_.get(i));
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -180,6 +229,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getProgramPathsList())) return false;
     if (!getPrimaryProgramPath()
         .equals(other.getPrimaryProgramPath())) return false;
+    if (!getAnalyzerMatchesList()
+        .equals(other.getAnalyzerMatchesList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -197,6 +248,10 @@ private static final long serialVersionUID = 0L;
     }
     hash = (37 * hash) + PRIMARY_PROGRAM_PATH_FIELD_NUMBER;
     hash = (53 * hash) + getPrimaryProgramPath().hashCode();
+    if (getAnalyzerMatchesCount() > 0) {
+      hash = (37 * hash) + ANALYZER_MATCHES_FIELD_NUMBER;
+      hash = (53 * hash) + getAnalyzerMatchesList().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -331,6 +386,13 @@ private static final long serialVersionUID = 0L;
       programPaths_ =
           com.google.protobuf.LazyStringArrayList.emptyList();
       primaryProgramPath_ = "";
+      if (analyzerMatchesBuilder_ == null) {
+        analyzerMatches_ = java.util.Collections.emptyList();
+      } else {
+        analyzerMatches_ = null;
+        analyzerMatchesBuilder_.clear();
+      }
+      bitField0_ = (bitField0_ & ~0x00000004);
       return this;
     }
 
@@ -357,9 +419,22 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public libghidra.ImportProgramResponse buildPartial() {
       libghidra.ImportProgramResponse result = new libghidra.ImportProgramResponse(this);
+      buildPartialRepeatedFields(result);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartialRepeatedFields(libghidra.ImportProgramResponse result) {
+      if (analyzerMatchesBuilder_ == null) {
+        if (((bitField0_ & 0x00000004) != 0)) {
+          analyzerMatches_ = java.util.Collections.unmodifiableList(analyzerMatches_);
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.analyzerMatches_ = analyzerMatches_;
+      } else {
+        result.analyzerMatches_ = analyzerMatchesBuilder_.build();
+      }
     }
 
     private void buildPartial0(libghidra.ImportProgramResponse result) {
@@ -400,6 +475,32 @@ private static final long serialVersionUID = 0L;
         bitField0_ |= 0x00000002;
         onChanged();
       }
+      if (analyzerMatchesBuilder_ == null) {
+        if (!other.analyzerMatches_.isEmpty()) {
+          if (analyzerMatches_.isEmpty()) {
+            analyzerMatches_ = other.analyzerMatches_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureAnalyzerMatchesIsMutable();
+            analyzerMatches_.addAll(other.analyzerMatches_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.analyzerMatches_.isEmpty()) {
+          if (analyzerMatchesBuilder_.isEmpty()) {
+            analyzerMatchesBuilder_.dispose();
+            analyzerMatchesBuilder_ = null;
+            analyzerMatches_ = other.analyzerMatches_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+            analyzerMatchesBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 getAnalyzerMatchesFieldBuilder() : null;
+          } else {
+            analyzerMatchesBuilder_.addAllMessages(other.analyzerMatches_);
+          }
+        }
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -437,6 +538,19 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000002;
               break;
             } // case 18
+            case 26: {
+              libghidra.AnalyzerPatternMatch m =
+                  input.readMessage(
+                      libghidra.AnalyzerPatternMatch.parser(),
+                      extensionRegistry);
+              if (analyzerMatchesBuilder_ == null) {
+                ensureAnalyzerMatchesIsMutable();
+                analyzerMatches_.add(m);
+              } else {
+                analyzerMatchesBuilder_.addMessage(m);
+              }
+              break;
+            } // case 26
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -635,6 +749,246 @@ private static final long serialVersionUID = 0L;
       bitField0_ |= 0x00000002;
       onChanged();
       return this;
+    }
+
+    private java.util.List<libghidra.AnalyzerPatternMatch> analyzerMatches_ =
+      java.util.Collections.emptyList();
+    private void ensureAnalyzerMatchesIsMutable() {
+      if (!((bitField0_ & 0x00000004) != 0)) {
+        analyzerMatches_ = new java.util.ArrayList<libghidra.AnalyzerPatternMatch>(analyzerMatches_);
+        bitField0_ |= 0x00000004;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilder<
+        libghidra.AnalyzerPatternMatch, libghidra.AnalyzerPatternMatch.Builder, libghidra.AnalyzerPatternMatchOrBuilder> analyzerMatchesBuilder_;
+
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public java.util.List<libghidra.AnalyzerPatternMatch> getAnalyzerMatchesList() {
+      if (analyzerMatchesBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(analyzerMatches_);
+      } else {
+        return analyzerMatchesBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public int getAnalyzerMatchesCount() {
+      if (analyzerMatchesBuilder_ == null) {
+        return analyzerMatches_.size();
+      } else {
+        return analyzerMatchesBuilder_.getCount();
+      }
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public libghidra.AnalyzerPatternMatch getAnalyzerMatches(int index) {
+      if (analyzerMatchesBuilder_ == null) {
+        return analyzerMatches_.get(index);
+      } else {
+        return analyzerMatchesBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public Builder setAnalyzerMatches(
+        int index, libghidra.AnalyzerPatternMatch value) {
+      if (analyzerMatchesBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureAnalyzerMatchesIsMutable();
+        analyzerMatches_.set(index, value);
+        onChanged();
+      } else {
+        analyzerMatchesBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public Builder setAnalyzerMatches(
+        int index, libghidra.AnalyzerPatternMatch.Builder builderForValue) {
+      if (analyzerMatchesBuilder_ == null) {
+        ensureAnalyzerMatchesIsMutable();
+        analyzerMatches_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        analyzerMatchesBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public Builder addAnalyzerMatches(libghidra.AnalyzerPatternMatch value) {
+      if (analyzerMatchesBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureAnalyzerMatchesIsMutable();
+        analyzerMatches_.add(value);
+        onChanged();
+      } else {
+        analyzerMatchesBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public Builder addAnalyzerMatches(
+        int index, libghidra.AnalyzerPatternMatch value) {
+      if (analyzerMatchesBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureAnalyzerMatchesIsMutable();
+        analyzerMatches_.add(index, value);
+        onChanged();
+      } else {
+        analyzerMatchesBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public Builder addAnalyzerMatches(
+        libghidra.AnalyzerPatternMatch.Builder builderForValue) {
+      if (analyzerMatchesBuilder_ == null) {
+        ensureAnalyzerMatchesIsMutable();
+        analyzerMatches_.add(builderForValue.build());
+        onChanged();
+      } else {
+        analyzerMatchesBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public Builder addAnalyzerMatches(
+        int index, libghidra.AnalyzerPatternMatch.Builder builderForValue) {
+      if (analyzerMatchesBuilder_ == null) {
+        ensureAnalyzerMatchesIsMutable();
+        analyzerMatches_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        analyzerMatchesBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public Builder addAllAnalyzerMatches(
+        java.lang.Iterable<? extends libghidra.AnalyzerPatternMatch> values) {
+      if (analyzerMatchesBuilder_ == null) {
+        ensureAnalyzerMatchesIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, analyzerMatches_);
+        onChanged();
+      } else {
+        analyzerMatchesBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public Builder clearAnalyzerMatches() {
+      if (analyzerMatchesBuilder_ == null) {
+        analyzerMatches_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+      } else {
+        analyzerMatchesBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public Builder removeAnalyzerMatches(int index) {
+      if (analyzerMatchesBuilder_ == null) {
+        ensureAnalyzerMatchesIsMutable();
+        analyzerMatches_.remove(index);
+        onChanged();
+      } else {
+        analyzerMatchesBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public libghidra.AnalyzerPatternMatch.Builder getAnalyzerMatchesBuilder(
+        int index) {
+      return getAnalyzerMatchesFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public libghidra.AnalyzerPatternMatchOrBuilder getAnalyzerMatchesOrBuilder(
+        int index) {
+      if (analyzerMatchesBuilder_ == null) {
+        return analyzerMatches_.get(index);  } else {
+        return analyzerMatchesBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public java.util.List<? extends libghidra.AnalyzerPatternMatchOrBuilder> 
+         getAnalyzerMatchesOrBuilderList() {
+      if (analyzerMatchesBuilder_ != null) {
+        return analyzerMatchesBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(analyzerMatches_);
+      }
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public libghidra.AnalyzerPatternMatch.Builder addAnalyzerMatchesBuilder() {
+      return getAnalyzerMatchesFieldBuilder().addBuilder(
+          libghidra.AnalyzerPatternMatch.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public libghidra.AnalyzerPatternMatch.Builder addAnalyzerMatchesBuilder(
+        int index) {
+      return getAnalyzerMatchesFieldBuilder().addBuilder(
+          index, libghidra.AnalyzerPatternMatch.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .libghidra.AnalyzerPatternMatch analyzer_matches = 3;</code>
+     */
+    public java.util.List<libghidra.AnalyzerPatternMatch.Builder> 
+         getAnalyzerMatchesBuilderList() {
+      return getAnalyzerMatchesFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        libghidra.AnalyzerPatternMatch, libghidra.AnalyzerPatternMatch.Builder, libghidra.AnalyzerPatternMatchOrBuilder> 
+        getAnalyzerMatchesFieldBuilder() {
+      if (analyzerMatchesBuilder_ == null) {
+        analyzerMatchesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            libghidra.AnalyzerPatternMatch, libghidra.AnalyzerPatternMatch.Builder, libghidra.AnalyzerPatternMatchOrBuilder>(
+                analyzerMatches_,
+                ((bitField0_ & 0x00000004) != 0),
+                getParentForChildren(),
+                isClean());
+        analyzerMatches_ = null;
+      }
+      return analyzerMatchesBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:libghidra.ImportProgramResponse)

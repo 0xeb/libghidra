@@ -34,6 +34,10 @@ private static final long serialVersionUID = 0L;
     compilerSpecId_ = "";
     loaderClass_ = "";
     loaderArgs_ = java.util.Collections.emptyList();
+    analyzersOff_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
+    analyzersOn_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -346,6 +350,108 @@ private static final long serialVersionUID = 0L;
     return loaderArgs_.get(index);
   }
 
+  public static final int ANALYZERS_OFF_FIELD_NUMBER = 10;
+  @SuppressWarnings("serial")
+  private com.google.protobuf.LazyStringArrayList analyzersOff_ =
+      com.google.protobuf.LazyStringArrayList.emptyList();
+  /**
+   * <pre>
+   * Analyzer on/off patterns applied to every loaded program before analysis runs.
+   * Each pattern matches the analyzer toggles of the "Analyzers" option category
+   * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+   * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+   * </pre>
+   *
+   * <code>repeated string analyzers_off = 10;</code>
+   * @return A list containing the analyzersOff.
+   */
+  public com.google.protobuf.ProtocolStringList
+      getAnalyzersOffList() {
+    return analyzersOff_;
+  }
+  /**
+   * <pre>
+   * Analyzer on/off patterns applied to every loaded program before analysis runs.
+   * Each pattern matches the analyzer toggles of the "Analyzers" option category
+   * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+   * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+   * </pre>
+   *
+   * <code>repeated string analyzers_off = 10;</code>
+   * @return The count of analyzersOff.
+   */
+  public int getAnalyzersOffCount() {
+    return analyzersOff_.size();
+  }
+  /**
+   * <pre>
+   * Analyzer on/off patterns applied to every loaded program before analysis runs.
+   * Each pattern matches the analyzer toggles of the "Analyzers" option category
+   * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+   * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+   * </pre>
+   *
+   * <code>repeated string analyzers_off = 10;</code>
+   * @param index The index of the element to return.
+   * @return The analyzersOff at the given index.
+   */
+  public java.lang.String getAnalyzersOff(int index) {
+    return analyzersOff_.get(index);
+  }
+  /**
+   * <pre>
+   * Analyzer on/off patterns applied to every loaded program before analysis runs.
+   * Each pattern matches the analyzer toggles of the "Analyzers" option category
+   * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+   * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+   * </pre>
+   *
+   * <code>repeated string analyzers_off = 10;</code>
+   * @param index The index of the value to return.
+   * @return The bytes of the analyzersOff at the given index.
+   */
+  public com.google.protobuf.ByteString
+      getAnalyzersOffBytes(int index) {
+    return analyzersOff_.getByteString(index);
+  }
+
+  public static final int ANALYZERS_ON_FIELD_NUMBER = 11;
+  @SuppressWarnings("serial")
+  private com.google.protobuf.LazyStringArrayList analyzersOn_ =
+      com.google.protobuf.LazyStringArrayList.emptyList();
+  /**
+   * <code>repeated string analyzers_on = 11;</code>
+   * @return A list containing the analyzersOn.
+   */
+  public com.google.protobuf.ProtocolStringList
+      getAnalyzersOnList() {
+    return analyzersOn_;
+  }
+  /**
+   * <code>repeated string analyzers_on = 11;</code>
+   * @return The count of analyzersOn.
+   */
+  public int getAnalyzersOnCount() {
+    return analyzersOn_.size();
+  }
+  /**
+   * <code>repeated string analyzers_on = 11;</code>
+   * @param index The index of the element to return.
+   * @return The analyzersOn at the given index.
+   */
+  public java.lang.String getAnalyzersOn(int index) {
+    return analyzersOn_.get(index);
+  }
+  /**
+   * <code>repeated string analyzers_on = 11;</code>
+   * @param index The index of the value to return.
+   * @return The bytes of the analyzersOn at the given index.
+   */
+  public com.google.protobuf.ByteString
+      getAnalyzersOnBytes(int index) {
+    return analyzersOn_.getByteString(index);
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -387,6 +493,12 @@ private static final long serialVersionUID = 0L;
     for (int i = 0; i < loaderArgs_.size(); i++) {
       output.writeMessage(9, loaderArgs_.get(i));
     }
+    for (int i = 0; i < analyzersOff_.size(); i++) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 10, analyzersOff_.getRaw(i));
+    }
+    for (int i = 0; i < analyzersOn_.size(); i++) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 11, analyzersOn_.getRaw(i));
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -426,6 +538,22 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(9, loaderArgs_.get(i));
     }
+    {
+      int dataSize = 0;
+      for (int i = 0; i < analyzersOff_.size(); i++) {
+        dataSize += computeStringSizeNoTag(analyzersOff_.getRaw(i));
+      }
+      size += dataSize;
+      size += 1 * getAnalyzersOffList().size();
+    }
+    {
+      int dataSize = 0;
+      for (int i = 0; i < analyzersOn_.size(); i++) {
+        dataSize += computeStringSizeNoTag(analyzersOn_.getRaw(i));
+      }
+      size += dataSize;
+      size += 1 * getAnalyzersOnList().size();
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -459,6 +587,10 @@ private static final long serialVersionUID = 0L;
         .equals(other.getLoaderClass())) return false;
     if (!getLoaderArgsList()
         .equals(other.getLoaderArgsList())) return false;
+    if (!getAnalyzersOffList()
+        .equals(other.getAnalyzersOffList())) return false;
+    if (!getAnalyzersOnList()
+        .equals(other.getAnalyzersOnList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -491,6 +623,14 @@ private static final long serialVersionUID = 0L;
     if (getLoaderArgsCount() > 0) {
       hash = (37 * hash) + LOADER_ARGS_FIELD_NUMBER;
       hash = (53 * hash) + getLoaderArgsList().hashCode();
+    }
+    if (getAnalyzersOffCount() > 0) {
+      hash = (37 * hash) + ANALYZERS_OFF_FIELD_NUMBER;
+      hash = (53 * hash) + getAnalyzersOffList().hashCode();
+    }
+    if (getAnalyzersOnCount() > 0) {
+      hash = (37 * hash) + ANALYZERS_ON_FIELD_NUMBER;
+      hash = (53 * hash) + getAnalyzersOnList().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -638,6 +778,10 @@ private static final long serialVersionUID = 0L;
         loaderArgsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000100);
+      analyzersOff_ =
+          com.google.protobuf.LazyStringArrayList.emptyList();
+      analyzersOn_ =
+          com.google.protobuf.LazyStringArrayList.emptyList();
       return this;
     }
 
@@ -707,6 +851,14 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000080) != 0)) {
         result.loaderClass_ = loaderClass_;
+      }
+      if (((from_bitField0_ & 0x00000200) != 0)) {
+        analyzersOff_.makeImmutable();
+        result.analyzersOff_ = analyzersOff_;
+      }
+      if (((from_bitField0_ & 0x00000400) != 0)) {
+        analyzersOn_.makeImmutable();
+        result.analyzersOn_ = analyzersOn_;
       }
     }
 
@@ -783,6 +935,26 @@ private static final long serialVersionUID = 0L;
             loaderArgsBuilder_.addAllMessages(other.loaderArgs_);
           }
         }
+      }
+      if (!other.analyzersOff_.isEmpty()) {
+        if (analyzersOff_.isEmpty()) {
+          analyzersOff_ = other.analyzersOff_;
+          bitField0_ |= 0x00000200;
+        } else {
+          ensureAnalyzersOffIsMutable();
+          analyzersOff_.addAll(other.analyzersOff_);
+        }
+        onChanged();
+      }
+      if (!other.analyzersOn_.isEmpty()) {
+        if (analyzersOn_.isEmpty()) {
+          analyzersOn_ = other.analyzersOn_;
+          bitField0_ |= 0x00000400;
+        } else {
+          ensureAnalyzersOnIsMutable();
+          analyzersOn_.addAll(other.analyzersOn_);
+        }
+        onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -863,6 +1035,18 @@ private static final long serialVersionUID = 0L;
               }
               break;
             } // case 74
+            case 82: {
+              java.lang.String s = input.readStringRequireUtf8();
+              ensureAnalyzersOffIsMutable();
+              analyzersOff_.add(s);
+              break;
+            } // case 82
+            case 90: {
+              java.lang.String s = input.readStringRequireUtf8();
+              ensureAnalyzersOnIsMutable();
+              analyzersOn_.add(s);
+              break;
+            } // case 90
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1614,6 +1798,291 @@ private static final long serialVersionUID = 0L;
         loaderArgs_ = null;
       }
       return loaderArgsBuilder_;
+    }
+
+    private com.google.protobuf.LazyStringArrayList analyzersOff_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
+    private void ensureAnalyzersOffIsMutable() {
+      if (!analyzersOff_.isModifiable()) {
+        analyzersOff_ = new com.google.protobuf.LazyStringArrayList(analyzersOff_);
+      }
+      bitField0_ |= 0x00000200;
+    }
+    /**
+     * <pre>
+     * Analyzer on/off patterns applied to every loaded program before analysis runs.
+     * Each pattern matches the analyzer toggles of the "Analyzers" option category
+     * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+     * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+     * </pre>
+     *
+     * <code>repeated string analyzers_off = 10;</code>
+     * @return A list containing the analyzersOff.
+     */
+    public com.google.protobuf.ProtocolStringList
+        getAnalyzersOffList() {
+      analyzersOff_.makeImmutable();
+      return analyzersOff_;
+    }
+    /**
+     * <pre>
+     * Analyzer on/off patterns applied to every loaded program before analysis runs.
+     * Each pattern matches the analyzer toggles of the "Analyzers" option category
+     * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+     * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+     * </pre>
+     *
+     * <code>repeated string analyzers_off = 10;</code>
+     * @return The count of analyzersOff.
+     */
+    public int getAnalyzersOffCount() {
+      return analyzersOff_.size();
+    }
+    /**
+     * <pre>
+     * Analyzer on/off patterns applied to every loaded program before analysis runs.
+     * Each pattern matches the analyzer toggles of the "Analyzers" option category
+     * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+     * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+     * </pre>
+     *
+     * <code>repeated string analyzers_off = 10;</code>
+     * @param index The index of the element to return.
+     * @return The analyzersOff at the given index.
+     */
+    public java.lang.String getAnalyzersOff(int index) {
+      return analyzersOff_.get(index);
+    }
+    /**
+     * <pre>
+     * Analyzer on/off patterns applied to every loaded program before analysis runs.
+     * Each pattern matches the analyzer toggles of the "Analyzers" option category
+     * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+     * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+     * </pre>
+     *
+     * <code>repeated string analyzers_off = 10;</code>
+     * @param index The index of the value to return.
+     * @return The bytes of the analyzersOff at the given index.
+     */
+    public com.google.protobuf.ByteString
+        getAnalyzersOffBytes(int index) {
+      return analyzersOff_.getByteString(index);
+    }
+    /**
+     * <pre>
+     * Analyzer on/off patterns applied to every loaded program before analysis runs.
+     * Each pattern matches the analyzer toggles of the "Analyzers" option category
+     * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+     * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+     * </pre>
+     *
+     * <code>repeated string analyzers_off = 10;</code>
+     * @param index The index to set the value at.
+     * @param value The analyzersOff to set.
+     * @return This builder for chaining.
+     */
+    public Builder setAnalyzersOff(
+        int index, java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      ensureAnalyzersOffIsMutable();
+      analyzersOff_.set(index, value);
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Analyzer on/off patterns applied to every loaded program before analysis runs.
+     * Each pattern matches the analyzer toggles of the "Analyzers" option category
+     * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+     * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+     * </pre>
+     *
+     * <code>repeated string analyzers_off = 10;</code>
+     * @param value The analyzersOff to add.
+     * @return This builder for chaining.
+     */
+    public Builder addAnalyzersOff(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      ensureAnalyzersOffIsMutable();
+      analyzersOff_.add(value);
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Analyzer on/off patterns applied to every loaded program before analysis runs.
+     * Each pattern matches the analyzer toggles of the "Analyzers" option category
+     * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+     * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+     * </pre>
+     *
+     * <code>repeated string analyzers_off = 10;</code>
+     * @param values The analyzersOff to add.
+     * @return This builder for chaining.
+     */
+    public Builder addAllAnalyzersOff(
+        java.lang.Iterable<java.lang.String> values) {
+      ensureAnalyzersOffIsMutable();
+      com.google.protobuf.AbstractMessageLite.Builder.addAll(
+          values, analyzersOff_);
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Analyzer on/off patterns applied to every loaded program before analysis runs.
+     * Each pattern matches the analyzer toggles of the "Analyzers" option category
+     * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+     * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+     * </pre>
+     *
+     * <code>repeated string analyzers_off = 10;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearAnalyzersOff() {
+      analyzersOff_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
+      bitField0_ = (bitField0_ & ~0x00000200);;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Analyzer on/off patterns applied to every loaded program before analysis runs.
+     * Each pattern matches the analyzer toggles of the "Analyzers" option category
+     * (BOOLEAN options whose name has no '.'), case-insensitively: a pattern containing
+     * '*' is a glob, anything else is a substring. "on" patterns apply after "off".
+     * </pre>
+     *
+     * <code>repeated string analyzers_off = 10;</code>
+     * @param value The bytes of the analyzersOff to add.
+     * @return This builder for chaining.
+     */
+    public Builder addAnalyzersOffBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      ensureAnalyzersOffIsMutable();
+      analyzersOff_.add(value);
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+
+    private com.google.protobuf.LazyStringArrayList analyzersOn_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
+    private void ensureAnalyzersOnIsMutable() {
+      if (!analyzersOn_.isModifiable()) {
+        analyzersOn_ = new com.google.protobuf.LazyStringArrayList(analyzersOn_);
+      }
+      bitField0_ |= 0x00000400;
+    }
+    /**
+     * <code>repeated string analyzers_on = 11;</code>
+     * @return A list containing the analyzersOn.
+     */
+    public com.google.protobuf.ProtocolStringList
+        getAnalyzersOnList() {
+      analyzersOn_.makeImmutable();
+      return analyzersOn_;
+    }
+    /**
+     * <code>repeated string analyzers_on = 11;</code>
+     * @return The count of analyzersOn.
+     */
+    public int getAnalyzersOnCount() {
+      return analyzersOn_.size();
+    }
+    /**
+     * <code>repeated string analyzers_on = 11;</code>
+     * @param index The index of the element to return.
+     * @return The analyzersOn at the given index.
+     */
+    public java.lang.String getAnalyzersOn(int index) {
+      return analyzersOn_.get(index);
+    }
+    /**
+     * <code>repeated string analyzers_on = 11;</code>
+     * @param index The index of the value to return.
+     * @return The bytes of the analyzersOn at the given index.
+     */
+    public com.google.protobuf.ByteString
+        getAnalyzersOnBytes(int index) {
+      return analyzersOn_.getByteString(index);
+    }
+    /**
+     * <code>repeated string analyzers_on = 11;</code>
+     * @param index The index to set the value at.
+     * @param value The analyzersOn to set.
+     * @return This builder for chaining.
+     */
+    public Builder setAnalyzersOn(
+        int index, java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      ensureAnalyzersOnIsMutable();
+      analyzersOn_.set(index, value);
+      bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string analyzers_on = 11;</code>
+     * @param value The analyzersOn to add.
+     * @return This builder for chaining.
+     */
+    public Builder addAnalyzersOn(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      ensureAnalyzersOnIsMutable();
+      analyzersOn_.add(value);
+      bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string analyzers_on = 11;</code>
+     * @param values The analyzersOn to add.
+     * @return This builder for chaining.
+     */
+    public Builder addAllAnalyzersOn(
+        java.lang.Iterable<java.lang.String> values) {
+      ensureAnalyzersOnIsMutable();
+      com.google.protobuf.AbstractMessageLite.Builder.addAll(
+          values, analyzersOn_);
+      bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string analyzers_on = 11;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearAnalyzersOn() {
+      analyzersOn_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
+      bitField0_ = (bitField0_ & ~0x00000400);;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string analyzers_on = 11;</code>
+     * @param value The bytes of the analyzersOn to add.
+     * @return This builder for chaining.
+     */
+    public Builder addAnalyzersOnBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      ensureAnalyzersOnIsMutable();
+      analyzersOn_.add(value);
+      bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
     }
 
     // @@protoc_insertion_point(builder_scope:libghidra.ImportProgramRequest)

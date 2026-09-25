@@ -43,7 +43,6 @@ resp = client.open_program(ghidra.OpenProgramRequest(
     project_path="C:/ghidra_projects",
     project_name="MyProject",
     program_path="binary.exe",
-    analyze=True,
 ))
 print(f"Opened: {resp.program_name}")
 
