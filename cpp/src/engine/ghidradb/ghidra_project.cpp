@@ -11,7 +11,9 @@
 #include "address_map.h"
 #include "memory_image.h"
 
+#include <cstdio>   // std::snprintf (big ref-list table name)
 #include <cstdlib>  // std::strtoull (image-base parse)
+#include <map>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -28,6 +30,148 @@ static constexpr int SYMBOL_TYPE_FUNCTION = 5;
 static constexpr int SYMBOL_NAME_COL      = 0;
 static constexpr int SYMBOL_ADDR_COL      = 1;
 static constexpr int SYMBOL_TYPE_COL      = 3;
+
+// Reference index (ReferenceDBManager / FromAdapterV0). "FROM REFS" is keyed by
+// the from-address key; column 0 is the ref count and column 1 a packed RefListV0
+// blob, or null when the list overflowed into "FromBigRefList_<hex key>" (one row
+// per ref: To, Flags, Type, OpIndex, SymbolID, Offset -- BigRefListV0).
+static constexpr int FROM_REFS_COUNT_COL = 0;
+static constexpr int FROM_REFS_DATA_COL  = 1;
+static constexpr int BIG_REFS_TO_COL     = 0;
+static constexpr int BIG_REFS_TYPE_COL   = 2;
+
+// Namespace bodies (NamespaceManager's AddressRangeMapDB "SCOPE ADDRESSES"):
+// key = range start key, column 0 = range end key, column 1 = namespace id.
+// A function's namespace id is its symbol id (the Symbols record key).
+static constexpr int SCOPE_TO_COL    = 0;
+static constexpr int SCOPE_VALUE_COL = 1;
+
+// RefListFlagsV0 bits that add optional fields to a packed ref.
+static constexpr uint8_t REF_IS_OFFSET     = 0x04;
+static constexpr uint8_t REF_HAS_SYMBOL_ID = 0x08;
+static constexpr uint8_t REF_IS_SHIFT      = 0x10;
+
+// RefType bytes whose FlowType sets isCall() (RefType.java).
+static bool isCallRefType(int8_t t) {
+    switch (t) {
+        case 3:   // UNCONDITIONAL_CALL
+        case 4:   // CONDITIONAL_CALL
+        case 8:   // COMPUTED_CALL
+        case 10:  // CALL_TERMINATOR
+        case 13:  // CONDITIONAL_COMPUTED_CALL
+        case 14:  // CONDITIONAL_CALL_TERMINATOR
+        case 15:  // COMPUTED_CALL_TERMINATOR
+        case 16:  // CALL_OVERRIDE_UNCONDITIONAL
+        case 18:  // CALLOTHER_OVERRIDE_CALL
+            return true;
+        default:
+            return false;
+    }
+}
+
+struct PackedRef {
+    int64_t to_key;
+    int8_t type;
+};
+
+// Decode a RefListV0 blob (RefListV0.decode): per ref an 8-byte big-endian
+// to-address key, flags, type, operand index, then an 8-byte symbol id and an
+// 8-byte offset/shift when the flags say so. False on a malformed blob.
+static bool decodeRefList(const std::vector<uint8_t>& d, int count,
+                          std::vector<PackedRef>& out) {
+    size_t at = 0;
+    for (int i = 0; i < count; ++i) {
+        if (at + 11 > d.size()) return false;
+        uint64_t key = 0;
+        for (int b = 0; b < 8; ++b) key = (key << 8) | d[at + b];
+        at += 8;
+        const uint8_t flags = d[at++];
+        const int8_t type = static_cast<int8_t>(d[at++]);
+        ++at;  // operand index
+        if (flags & REF_HAS_SYMBOL_ID) at += 8;
+        if (flags & (REF_IS_OFFSET | REF_IS_SHIFT)) at += 8;
+        if (at > d.size()) return false;
+        out.push_back({static_cast<int64_t>(key), type});
+    }
+    return at == d.size();
+}
+
+// Set FunctionEntry::makes_call from Ghidra's own reference index, so offline
+// leaf listing matches the live host (FunctionsRuntime.hasOutgoingCall): a
+// function calls iff a reference FROM its body has a call RefType and a
+// destination offset != 0. AddressDecoder::decodeAddress returns the raw offset
+// for external/stack/register keys, which is the same offset Ghidra compares.
+// Leaves has_reference_index false (and every makes_call false) when either
+// table is absent, so the caller can refuse instead of guessing.
+static void markCallingFunctions(BufferFile& bf, const std::vector<MasterTableEntry>& tables,
+                                 const AddressDecoder& addr_dec,
+                                 const std::map<int64_t, size_t>& function_by_id,
+                                 ProjectData& data) {
+    auto table = [&](const std::string& name) -> const MasterTableEntry* {
+        for (auto& t : tables)
+            if (t.name == name && t.indexed_column == -1) return &t;
+        return nullptr;
+    };
+    const MasterTableEntry* scope = table("Range Map - SCOPE ADDRESSES");
+    const MasterTableEntry* from = table("FROM REFS");
+    if (scope == nullptr || from == nullptr) return;
+
+    // Body ranges -> owning function. Function bodies never overlap in Ghidra.
+    std::map<uint64_t, std::pair<uint64_t, size_t>> body_by_start;
+    BTreeReader(bf).iterateRecords(scope->root_buffer_id, scope->schema,
+        [&](const Record& rec) -> bool {
+            if (rec.fields.size() <= SCOPE_VALUE_COL) return true;
+            auto it = function_by_id.find(rec.fields[SCOPE_VALUE_COL].asLong());
+            if (it == function_by_id.end()) return true;
+            body_by_start[addr_dec.decodeAddress(rec.key.asLong())] = {
+                addr_dec.decodeAddress(rec.fields[SCOPE_TO_COL].asLong()), it->second};
+            return true;
+        });
+    auto owner = [&](uint64_t addr) -> FunctionEntry* {
+        auto it = body_by_start.upper_bound(addr);
+        if (it == body_by_start.begin()) return nullptr;
+        --it;
+        return addr <= it->second.first ? &data.functions[it->second.second] : nullptr;
+    };
+
+    std::vector<PackedRef> refs;
+    BTreeReader(bf).iterateRecords(from->root_buffer_id, from->schema,
+        [&](const Record& rec) -> bool {
+            if (rec.fields.size() <= FROM_REFS_DATA_COL) return true;
+            const int64_t from_key = rec.key.asLong();
+            if (!addr_dec.isMemoryAddress(from_key)) return true;
+            FunctionEntry* fn = owner(addr_dec.decodeAddress(from_key));
+            if (fn == nullptr || fn->makes_call) return true;
+
+            refs.clear();
+            const FieldValue& blob = rec.fields[FROM_REFS_DATA_COL];
+            if (blob.is_null) {
+                char name[48];
+                std::snprintf(name, sizeof name, "FromBigRefList_%llx",
+                              static_cast<unsigned long long>(from_key));
+                if (const MasterTableEntry* big = table(name)) {
+                    BTreeReader(bf).iterateRecords(big->root_buffer_id, big->schema,
+                        [&](const Record& row) -> bool {
+                            if (row.fields.size() > BIG_REFS_TYPE_COL)
+                                refs.push_back({row.fields[BIG_REFS_TO_COL].asLong(),
+                                                row.fields[BIG_REFS_TYPE_COL].byte_val});
+                            return true;
+                        });
+                }
+            } else if (!decodeRefList(blob.binary_val,
+                                      rec.fields[FROM_REFS_COUNT_COL].asInt(), refs)) {
+                return true;
+            }
+            for (const PackedRef& ref : refs) {
+                if (isCallRefType(ref.type) && addr_dec.decodeAddress(ref.to_key) != 0) {
+                    fn->makes_call = true;
+                    break;
+                }
+            }
+            return true;
+        });
+    data.has_reference_index = true;
+}
 
 // -----------------------------------------------------------------------
 // .gpr / index parsing
@@ -249,7 +393,9 @@ ProjectData GhidraProject::extract() {
         }
     }
 
-    // Read symbols (the "Symbols" table)
+    // Read symbols (the "Symbols" table). The record key is the symbol id, which
+    // is also the function's namespace id in the body range map below.
+    std::map<int64_t, size_t> function_by_id;
     for (auto& t : tables) {
         if (t.name == "Symbols" && t.indexed_column == -1) {
             BTreeReader reader(bf);
@@ -269,11 +415,14 @@ ProjectData GhidraProject::extract() {
                     if (!addr_dec.isMemoryAddress(addr_key)) return true;
                     uint64_t addr = addr_dec.decodeAddress(addr_key);
 
-                    data.functions.push_back({name, addr});
+                    function_by_id[rec.key.asLong()] = data.functions.size();
+                    data.functions.push_back({name, addr, false});
                     return true;
                 });
         }
     }
+
+    markCallingFunctions(bf, tables, addr_dec, function_by_id, data);
 
     // Sort functions by address
     std::sort(data.functions.begin(), data.functions.end(),

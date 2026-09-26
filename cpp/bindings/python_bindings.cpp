@@ -324,6 +324,15 @@ NB_MODULE(_libghidra, m) {
       }, nb::arg("range_start") = 0, nb::arg("range_end") = 0,
          nb::arg("limit") = 0, nb::arg("offset") = 0)
 
+      .def("list_leaf_functions", [](IClient& self,
+                                      uint64_t range_start,
+                                      uint64_t range_end,
+                                      int limit, int offset) {
+        auto resp = unwrap(self.ListLeafFunctions(range_start, range_end, limit, offset));
+        return to_list(resp.functions);
+      }, nb::arg("range_start") = 0, nb::arg("range_end") = 0,
+         nb::arg("limit") = 0, nb::arg("offset") = 0)
+
       .def("rename_function", [](IClient& self, uint64_t address, const std::string& name) {
         auto resp = unwrap(self.RenameFunction(address, name));
         nb::dict d;

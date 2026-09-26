@@ -569,6 +569,29 @@ impl GhidraClient {
         })
     }
 
+    /// Functions that make no call, resolved by the host from Ghidra's
+    /// reference index.
+    pub fn list_leaf_functions(
+        &self,
+        range_start: u64,
+        range_end: u64,
+        limit: i32,
+        offset: i32,
+    ) -> Result<ListFunctionsResponse> {
+        let req = pb::ListFunctionsRequest {
+            range: Self::address_range(range_start, range_end),
+            page: Self::pagination(limit, offset),
+        };
+        let resp: pb::ListFunctionsResponse = self.call_rpc(
+            "libghidra.FunctionsService/ListLeafFunctions",
+            &req,
+            "libghidra.ListFunctionsRequest",
+        )?;
+        Ok(ListFunctionsResponse {
+            functions: resp.functions.into_iter().map(Into::into).collect(),
+        })
+    }
+
     pub fn rename_function(&self, address: u64, new_name: &str) -> Result<RenameFunctionResponse> {
         let req = pb::RenameFunctionRequest {
             address,

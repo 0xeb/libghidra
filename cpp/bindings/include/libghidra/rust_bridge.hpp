@@ -68,6 +68,10 @@ class LocalClientHandle {
                                    uint64_t range_end,
                                    int32_t limit,
                                    int32_t offset) const;
+  rust::String list_leaf_functions_json(uint64_t range_start,
+                                        uint64_t range_end,
+                                        int32_t limit,
+                                        int32_t offset) const;
   rust::String rename_function_json(uint64_t address,
                                     rust::Str new_name) const;
   rust::String list_basic_blocks_json(uint64_t range_start,

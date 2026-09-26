@@ -446,6 +446,14 @@ rust::String LocalClientHandle::list_functions_json(uint64_t range_start,
   return encode_list(resp.functions);
 }
 
+rust::String LocalClientHandle::list_leaf_functions_json(uint64_t range_start,
+                                                         uint64_t range_end,
+                                                         int32_t limit,
+                                                         int32_t offset) const {
+  auto resp = unwrap(impl_->ListLeafFunctions(range_start, range_end, limit, offset));
+  return encode_list(resp.functions);
+}
+
 rust::String LocalClientHandle::rename_function_json(uint64_t address,
                                                      rust::Str new_name) const {
   auto resp = unwrap(impl_->RenameFunction(address, str_of(new_name)));

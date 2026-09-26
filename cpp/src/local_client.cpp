@@ -75,7 +75,9 @@ class LocalClient final : public IClient {
         {"health", "supported", ""},
         {"session", "supported", ""},
         {"decompiler", "supported", decompiler_note},
-        {"functions", "supported", "basic blocks and CFG edges via decompilation"},
+        {"functions", "supported",
+         "basic blocks and CFG edges via decompilation; leaf functions from a "
+         "project's reference index"},
         {"symbols", "supported", "rename (functions), delete (all)"},
         {"types", "supported", "full CRUD including aliases, member comments"},
         {"signatures", "supported", "full mutation via prototype rebuild"},
@@ -369,6 +371,35 @@ class LocalClient final : public IClient {
 
     ListFunctionsResponse resp;
     resp.functions = paginate(all, limit, offset);
+    return StatusOr<ListFunctionsResponse>::FromValue(std::move(resp));
+  }
+
+  // Leaves come from the reference index Ghidra recorded during analysis, read
+  // out of the project db -- the same rule the live host applies -- so both
+  // backends return the same set. The decompiler's own call graph is not used:
+  // it classifies import thunks and lowered tail calls differently. A program
+  // loaded from a bare binary has no such index, so it refuses rather than guess.
+  StatusOr<ListFunctionsResponse> ListLeafFunctions(std::uint64_t range_start,
+                                                    std::uint64_t range_end,
+                                                    int limit, int offset) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<ListFunctionsResponse>();
+
+    std::vector<std::uint64_t> leaves;
+    if (!pool_->primary().projectLeafEntries(leaves)) {
+      return StatusOr<ListFunctionsResponse>::FromError(
+          "NOT_SUPPORTED",
+          "ListLeafFunctions needs a program opened from a Ghidra project "
+          "(project_path): it reads the reference index Ghidra recorded during analysis");
+    }
+    std::vector<FunctionRecord> matched;
+    for (auto& f : pool_->primaryAdapter().listFunctions(range_start, range_end)) {
+      if (std::binary_search(leaves.begin(), leaves.end(), f.entry_address))
+        matched.push_back(std::move(f));
+    }
+
+    ListFunctionsResponse resp;
+    resp.functions = paginate(matched, limit, offset);
     return StatusOr<ListFunctionsResponse>::FromValue(std::move(resp));
   }
 

@@ -1,6 +1,6 @@
 # LocalClient API Reference
 
-Reference for the libghidra C++ LocalClient in the `0.0.3` release -- an offline binary analysis engine embedding Ghidra's Sleigh decompiler. No Java, no network, no running Ghidra instance required.
+Reference for the libghidra C++ LocalClient -- an offline binary analysis engine embedding Ghidra's Sleigh decompiler. No Java, no network, no running Ghidra instance required.
 
 ## Overview
 
@@ -8,17 +8,24 @@ LocalClient implements the shared `IClient` surface backed by Ghidra's C++ decom
 
 All methods return `StatusOr<T>` -- check `.ok()`, then access `.value`.
 
-### Out of scope: program-wide enumeration
+### Program-wide enumeration depends on how the program was opened
 
 `IClient` is the shared API for both `HttpClient` (talks to a running Ghidra instance) and
-`LocalClient` (this header — standalone C++ decompiler). Methods that *enumerate everything in
-the analyzed program* — `ListFunctions`, `ListBasicBlocks`, `ListCfgEdges`, `ListXrefs`,
-`ListDefinedStrings` — only have meaningful semantics on top of Ghidra's analysis pass, which
-runs in the Java side of the live host. The standalone decompiler does not run an analysis
-pass, so those calls always return empty results in local mode by design. Drive `LocalClient`
-with **explicit addresses** (`GetDecompilation(addr)`, `ListInstructions(start, end)`,
-`ReadBytes(addr, n)`, `RenameFunction(addr, name)`); if you need program-wide enumeration,
-route the call through `HttpClient` against a Ghidra host.
+`LocalClient` (this header — standalone C++ decompiler). The standalone decompiler runs no
+analysis pass of its own, so what it can enumerate depends on its input:
+
+- **From a Ghidra project** (`OpenProgramRequest::project_path`): functions come from the
+  project db's symbol table, `ListXrefs` derives call and data references by decompiling
+  them, and `ListLeafFunctions` reads the reference index Ghidra recorded during analysis —
+  the same rule the live host applies, so both backends return the same set.
+- **From a bare binary** (`program_path`): only loader symbols (PE/ELF exports and imports)
+  are known, so enumeration is thin, and `ListLeafFunctions` returns `NOT_SUPPORTED` because
+  there is no reference index to read. Drive it with **explicit addresses**
+  (`GetDecompilation(addr)`, `ListInstructions(start, end)`, `ReadBytes(addr, n)`,
+  `RenameFunction(addr, name)`), or route enumeration through `HttpClient` against a host.
+
+`range_end` is an **inclusive** upper bound on every list method, exactly as on the live
+host: `(addr, addr)` is a point lookup, and `range_end = 0` or `UINT64_MAX` means "all".
 
 ### Out-of-band cancellation (HTTP)
 
@@ -312,7 +319,7 @@ StatusOr<ListFunctionsResponse> ListFunctions(
     uint64_t range_start, uint64_t range_end, int limit, int offset)
 ```
 
-Lists functions in an address range. `limit=0` returns all. `range_start=0, range_end=UINT64_MAX` covers everything.
+Lists functions whose entry lies in `[range_start, range_end]`. `limit=0` returns all. `range_start=0, range_end=UINT64_MAX` covers everything.
 
 ```cpp
 auto funcs = client->ListFunctions(0, UINT64_MAX, 10, 0);
@@ -328,6 +335,22 @@ StatusOr<RenameFunctionResponse> RenameFunction(uint64_t address, const string& 
 ```
 
 Renames the function at `address`. Increments revision.
+
+### ListLeafFunctions
+
+```cpp
+StatusOr<ListFunctionsResponse> ListLeafFunctions(
+    uint64_t range_start, uint64_t range_end, int limit, int offset)
+```
+
+Functions that make no call: no reference from their body has a call type. The answer is
+read from the reference index Ghidra recorded during analysis, so it matches the live host
+exactly (import thunks, which Ghidra records as jumps, are leaves). Needs a program opened
+from a Ghidra project; a bare binary returns `NOT_SUPPORTED`.
+
+```cpp
+auto leaves = client->ListLeafFunctions(0, 0, 0, 0);
+```
 
 ### ListBasicBlocks
 

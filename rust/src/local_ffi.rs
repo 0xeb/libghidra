@@ -64,6 +64,13 @@ pub(crate) mod ffi {
             limit: i32,
             offset: i32,
         ) -> Result<String>;
+        fn list_leaf_functions_json(
+            self: &LocalClientHandle,
+            range_start: u64,
+            range_end: u64,
+            limit: i32,
+            offset: i32,
+        ) -> Result<String>;
         fn rename_function_json(
             self: &LocalClientHandle,
             address: u64,

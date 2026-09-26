@@ -202,6 +202,29 @@ impl LocalClient {
         })
     }
 
+    /// Functions that make no call, from the reference index Ghidra recorded
+    /// during analysis. Needs a program opened from a Ghidra project
+    /// (`project_path`); a bare binary returns `NOT_SUPPORTED`.
+    pub fn list_leaf_functions(
+        &self,
+        range_start: u64,
+        range_end: u64,
+        limit: i32,
+        offset: i32,
+    ) -> Result<ListFunctionsResponse> {
+        let v =
+            call_json(
+                self.handle
+                    .list_leaf_functions_json(range_start, range_end, limit, offset),
+            )?;
+        Ok(ListFunctionsResponse {
+            functions: v
+                .as_array()
+                .map(|arr| arr.iter().map(decode_function).collect())
+                .unwrap_or_default(),
+        })
+    }
+
     pub fn rename_function(&self, address: u64, new_name: &str) -> Result<RenameFunctionResponse> {
         let v = call_json(self.handle.rename_function_json(address, new_name))?;
         Ok(RenameFunctionResponse {

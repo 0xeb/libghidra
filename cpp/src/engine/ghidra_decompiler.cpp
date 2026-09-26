@@ -13,6 +13,7 @@
 #include "../symbol_entry.hpp"
 
 #include <algorithm>
+#include <optional>
 #include <atomic>
 #include <cstdio>
 #include <filesystem>
@@ -70,6 +71,8 @@ struct Decompiler::Impl {
     bool usingEmbeddedSpecs = false;
     OverlayLoadImage *overlay = nullptr;  // owned by arch (replaces arch->loader)
     std::string bootstrapTempPath;        // scratch file used only to build a raw arch
+    // Leaf entry points from the project's reference index (loadProject only).
+    std::optional<std::vector<uint64_t>> projectLeaves;
 
     // Tear down the Architecture and null the cached overlay TOGETHER.
     // ~Architecture deletes arch->loader (== overlay once writeBytes installs it,
@@ -80,6 +83,7 @@ struct Decompiler::Impl {
         delete arch;
         arch = nullptr;
         overlay = nullptr;
+        projectLeaves.reset();
         // The bootstrap loader (held open by arch until now) is gone; drop its
         // scratch file. Safe to remove after the arch — and thus the loader's
         // file handle — is destroyed (matters on Windows, which can't unlink an
@@ -975,7 +979,22 @@ bool Decompiler::loadProject(const std::string& gpr_path, const std::string& bin
     }
     (void)named;
 
+    if (data.has_reference_index) {
+        std::vector<uint64_t> leaves;
+        for (auto& func : data.functions)
+            if (!func.makes_call) leaves.push_back(func.address);
+        std::sort(leaves.begin(), leaves.end());
+        impl_->projectLeaves = std::move(leaves);
+    }
+
     impl_->lastError.clear();
+    return true;
+}
+
+bool Decompiler::projectLeafEntries(std::vector<uint64_t>& out) const
+{
+    if (!impl_->projectLeaves) return false;
+    out = *impl_->projectLeaves;
     return true;
 }
 

@@ -38,10 +38,11 @@ int analysis_clear_count = 0;
 
 namespace {
 
-// "List all" range convention, unified with the RPC host and the C++/Python
-// clients: range_end is an exclusive upper bound and range_end == 0 is the
-// "all addresses" sentinel, normalized to the full 64-bit space. A real
-// range_end filters; (0, 0) and (0, UINT64_MAX) both mean "everything".
+// "List all" range convention, matching the live Java host: range_end is an
+// INCLUSIVE upper bound (the host stops only once an address is past it -- the
+// proto's convention; ghidrasql converts to its own exclusive model at its
+// boundary), and range_end == 0 is the "all addresses" sentinel, normalized to
+// the full 64-bit space. (0, 0) and (0, UINT64_MAX) both mean "everything".
 constexpr std::uint64_t kAllRangeEnd = UINT64_MAX;
 
 std::uint64_t normalize_range_end(std::uint64_t range_end) {
@@ -225,7 +226,7 @@ std::vector<FunctionRecord> ArchAdapter::listFunctions(std::uint64_t range_start
 
     for (std::size_t i = 0; i < fns.size(); i++) {
       // Apply range filter; range_end is normalized so (0,0) == all.
-      if (fns[i].addr < range_start || fns[i].addr >= range_end) continue;
+      if (fns[i].addr < range_start || fns[i].addr > range_end) continue;
 
       FunctionRecord rec;
       rec.entry_address = fns[i].addr;
@@ -315,7 +316,7 @@ std::vector<SymbolRecord> ArchAdapter::listSymbols(std::uint64_t range_start,
       }
       std::uint64_t addr = mapped->getAddr().getOffset();
 
-      if (addr < range_start || addr >= range_end) {
+      if (addr < range_start || addr > range_end) {
         ++it;
         continue;
       }
@@ -548,7 +549,7 @@ std::vector<InstructionRecord> ArchAdapter::listInstructions(
   std::vector<InstructionRecord> result;
   if (!arch_) return result;
   range_end = normalize_range_end(range_end);
-  if (range_start >= range_end) return result;
+  if (range_start > range_end) return result;
 
   // Bound an unbounded (limit <= 0) sweep so a normalized "all" range cannot
   // walk the whole address space. getInstruction() already breaks at the first
@@ -559,12 +560,14 @@ std::vector<InstructionRecord> ArchAdapter::listInstructions(
     std::uint64_t cur = range_start;
     int count = 0;
 
-    while (cur < range_end && count < effective_limit) {
+    while (cur <= range_end && count < effective_limit) {
       auto insn = getInstruction(cur);
       if (!insn || insn->length == 0) break;
 
       result.push_back(std::move(*insn));
-      cur += result.back().length;
+      const std::uint64_t next = cur + result.back().length;
+      if (next < cur) break;  // wrapped past the top of the address space
+      cur = next;
       ++count;
     }
   } catch (...) {
@@ -1316,7 +1319,7 @@ std::vector<ArchAdapter::CommentEntry> ArchAdapter::getComments(
 
   for (const auto& [key, text] : comments_) {
     std::uint64_t addr = key.first;
-    if (addr < range_start || addr >= range_end) continue;
+    if (addr < range_start || addr > range_end) continue;
     result.push_back({addr, key.second, text});
   }
 
@@ -1360,7 +1363,7 @@ std::vector<ArchAdapter::DataItemEntry> ArchAdapter::listDataItems(
       }
       std::uint64_t addr = mapped->getAddr().getOffset();
 
-      if (addr < range_start || addr >= range_end) {
+      if (addr < range_start || addr > range_end) {
         ++it;
         continue;
       }

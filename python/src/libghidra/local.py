@@ -247,6 +247,16 @@ class LocalClient:
         items = self._call(self._client.list_functions, range_start, range_end, limit, offset)
         return ListFunctionsResponse(functions=[_to_function(d) for d in items])
 
+    def list_leaf_functions(self, range_start: int = 0, range_end: int = 0,
+                            limit: int = 0, offset: int = 0) -> ListFunctionsResponse:
+        """Functions that make no call, from the reference index Ghidra recorded.
+
+        Needs a program opened from a Ghidra project (``project_path``); a bare
+        binary raises NOT_SUPPORTED.
+        """
+        items = self._call(self._client.list_leaf_functions, range_start, range_end, limit, offset)
+        return ListFunctionsResponse(functions=[_to_function(d) for d in items])
+
     def rename_function(self, address: int, new_name: str) -> RenameFunctionResponse:
         d = self._call(self._client.rename_function, address, new_name)
         return RenameFunctionResponse(**d)

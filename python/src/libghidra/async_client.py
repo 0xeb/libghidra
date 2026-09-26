@@ -305,9 +305,9 @@ class AsyncGhidraClient:
     @staticmethod
     def _address_range(start: int, end: int) -> common_pb2.AddressRange:
         # end == 0 is the "list all" sentinel: the host treats range_end as an
-        # exclusive upper bound and an unsigned value, so 0 would select an empty
-        # range. Normalize it to the full 64-bit space (matches the C++ client's
-        # range_end = UINT64_MAX convention).
+        # INCLUSIVE unsigned upper bound, so a literal 0 would select at most
+        # address 0. Normalize it to the full 64-bit space (matches the C++
+        # client's range_end = UINT64_MAX convention).
         if end == 0:
             end = 0xFFFFFFFFFFFFFFFF
         return common_pb2.AddressRange(start=start, end=end)
@@ -571,6 +571,14 @@ class AsyncGhidraClient:
             range=self._address_range(range_start, range_end), page=self._pagination(limit, offset),
         )
         resp = await self._call_rpc("libghidra.FunctionsService/ListFunctions", req, functions_pb2.ListFunctionsResponse)
+        return ListFunctionsResponse(functions=[_to_function(f) for f in resp.functions])
+
+    async def list_leaf_functions(self, range_start: int = 0, range_end: int = 0, limit: int = 0, offset: int = 0) -> ListFunctionsResponse:
+        """Functions that make no call, resolved by the host from Ghidra's reference index."""
+        req = functions_pb2.ListFunctionsRequest(
+            range=self._address_range(range_start, range_end), page=self._pagination(limit, offset),
+        )
+        resp = await self._call_rpc("libghidra.FunctionsService/ListLeafFunctions", req, functions_pb2.ListFunctionsResponse)
         return ListFunctionsResponse(functions=[_to_function(f) for f in resp.functions])
 
     async def rename_function(self, address: int, new_name: str) -> RenameFunctionResponse:

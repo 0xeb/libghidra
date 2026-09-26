@@ -25,11 +25,19 @@ struct ProjectInfo {
 struct FunctionEntry {
     std::string name;
     uint64_t address;
+    // True when a reference FROM an address in the function's body has a call
+    // RefType and a destination whose offset is non-zero -- the exact rule the
+    // live host uses for ListLeafFunctions. Meaningful only when
+    // ProjectData::has_reference_index is set.
+    bool makes_call = false;
 };
 
 struct ProjectData {
     ProjectInfo info;
     std::vector<FunctionEntry> functions;
+    // The db carried Ghidra's reference index ("FROM REFS") and namespace bodies
+    // ("Range Map - SCOPE ADDRESSES"), so FunctionEntry::makes_call is exact.
+    bool has_reference_index = false;
 };
 
 class MemoryImage;  // ghidradb/memory_image.h

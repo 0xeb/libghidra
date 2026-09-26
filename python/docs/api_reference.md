@@ -380,6 +380,17 @@ for f in funcs.functions:
     print(f"0x{f.entry_address:x}  {f.name}")
 ```
 
+### `list_leaf_functions(range_start=0, range_end=0, limit=0, offset=0) -> ListFunctionsResponse`
+
+Functions that make no call: no reference from their body has a call type. The host
+resolves this from Ghidra's reference index; `LocalClient` reads the same index out of a
+Ghidra project, so both return the same set. `LocalClient` on a bare binary raises
+`NOT_SUPPORTED` (it has no reference index).
+
+```python
+leaves = client.list_leaf_functions()
+```
+
 ### `rename_function(address, new_name) -> RenameFunctionResponse`
 
 Rename a function.
@@ -1046,9 +1057,10 @@ page2 = client.list_functions(limit=100, offset=100)
 
 ### Address ranges
 
-List methods that accept `range_start` / `range_end` filter results to the half-open
-interval `[range_start, range_end)`. `range_end` is an **exclusive** upper bound and is
-treated as an unsigned 64-bit value.
+List methods that accept `range_start` / `range_end` filter results to the closed
+interval `[range_start, range_end]`: `range_end` is an **inclusive** upper bound (an item
+starting exactly at `range_end` is included) and is treated as an unsigned 64-bit value.
+Both backends agree, so `range_start == range_end` is a point lookup.
 
 `range_end = 0` is the **"all addresses"** sentinel: the client normalizes it to the full
 64-bit space (`UINT64_MAX`), so the defaults (`range_start=0, range_end=0`) list every
@@ -1056,10 +1068,11 @@ matching item. To filter, pass a real range:
 
 ```python
 all_funcs = client.list_functions()                    # range_end=0 -> all addresses
-in_range  = client.list_functions(range_start=0x140001000, range_end=0x140002000)
+in_range  = client.list_functions(range_start=0x140001000, range_end=0x140001fff)
+one       = client.list_functions(range_start=0x140001000, range_end=0x140001000)
 ```
 
-> A literal `range_end` that is not the full-space sentinel selects exactly `[start, end)`.
+> A literal `range_end` that is not the full-space sentinel selects exactly `[start, end]`.
 > Because `0` means "all", you cannot request an empty range by passing `range_end=0`.
 
 ### ShutdownPolicy

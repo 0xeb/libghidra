@@ -112,6 +112,13 @@ public:
     /// executable path.
     bool loadProject(const std::string& gpr_path, const std::string& binary_override = "");
 
+    /// Entry points of the functions the loaded project records as leaves: no
+    /// reference from their body has a call RefType, read from Ghidra's own
+    /// reference index -- the live host's rule, not the decompiler's call graph.
+    /// Returns false (out untouched) unless the program came from loadProject()
+    /// on a project db carrying that index.
+    bool projectLeafEntries(std::vector<uint64_t>& out) const;
+
     // ----- State Persistence -----
 
     /// Save the full decompiler state (types, symbols, overrides) to XML.

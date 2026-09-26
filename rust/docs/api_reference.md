@@ -332,6 +332,16 @@ if let Some(f) = &resp.function {
 let funcs = client.list_functions(0, u64::MAX, 20, 0)?;
 ```
 
+### `fn list_leaf_functions(&self, range_start: u64, range_end: u64, limit: i32, offset: i32) -> Result<ListFunctionsResponse>`
+
+Functions that make no call, from Ghidra's reference index. `LocalClient` reads the same
+index out of a Ghidra project, so both backends agree; on a bare binary it returns
+`ErrorCode::NotSupported`.
+
+```rust
+let leaves = client.list_leaf_functions(0, u64::MAX, 0, 0)?;
+```
+
 ### `fn rename_function(&self, address: u64, new_name: &str) -> Result<RenameFunctionResponse>`
 
 ```rust
