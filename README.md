@@ -1,5 +1,12 @@
 # libghidra
 
+<p align="center">
+  <a href="https://github.com/0xeb/libghidra/releases/latest"><img alt="Download libghidra" src="https://img.shields.io/badge/Download-libghidra-1e6fd9?style=for-the-badge"></a>
+  <a href="https://paypal.me/EliasBachaalany"><img alt="Donate with PayPal" src="https://img.shields.io/badge/Donate-PayPal-0070e0?style=for-the-badge&logo=paypal&logoColor=white"></a>
+  <a href="https://buymeacoffee.com/0xeb"><img alt="Buy Me a Coffee" src="https://img.shields.io/badge/Buy_Me_a_Coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black"></a>
+  <a href="https://github.com/0xeb/libghidra"><img alt="Star libghidra on GitHub" src="https://img.shields.io/github/stars/0xeb/libghidra?style=for-the-badge&logo=github&label=Star&color=24292f"></a>
+</p>
+
 Typed API for Ghidra program databases. Query functions, types, memory, decompiler output, and more from C++, Python, or Rust -- without touching Java.
 
 Current release: `0.0.9` alpha. The API is usable, but still evolving.
@@ -463,6 +470,18 @@ loading `<stdint.h>`.
   new data automatically; older rc wheels (rc1-rc7) hashed the host binary's
   mtime and could leave a stale cache. If you upgraded from one of those, run
   `rm -rf ~/.ghidracpp` once.
+
+## Support
+
+If libghidra saves you time, a donation funds the next release, and a star helps others find it.
+
+<p>
+  <a href="https://paypal.me/EliasBachaalany"><img alt="Donate with PayPal" src="https://img.shields.io/badge/Donate-PayPal-0070e0?style=for-the-badge&logo=paypal&logoColor=white"></a>
+  <a href="https://buymeacoffee.com/0xeb"><img alt="Buy Me a Coffee" src="https://img.shields.io/badge/Buy_Me_a_Coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black"></a>
+  <a href="https://github.com/0xeb/libghidra"><img alt="Star libghidra on GitHub" src="https://img.shields.io/github/stars/0xeb/libghidra?style=for-the-badge&logo=github&label=Star&color=24292f"></a>
+</p>
+
+Bug reports with a minimal reproduction are just as valuable.
 
 ## License and Terms of Use
 
