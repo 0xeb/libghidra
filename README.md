@@ -9,8 +9,6 @@
 
 Typed API for Ghidra program databases. Query functions, types, memory, decompiler output, and more from C++, Python, or Rust -- without touching Java.
 
-Current release: `0.0.9` alpha. The API is usable, but still evolving.
-
 Two backends behind one interface:
 
 | | **Remote** (`HttpClient`) | **Local** (`LocalClient`) |
