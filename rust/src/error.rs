@@ -26,7 +26,32 @@ pub enum ErrorCode {
     ParseError,
     ApiError,
     NotSupported,
+    /// No program is open: the session has nothing to read (`not_loaded`).
+    /// A missing item is not an error -- the record comes back absent.
+    NotLoaded,
     ConfigError,
+    // The rest of the RPC vocabulary documented on RpcResponse.error_code
+    // (rpc.proto). A write either has its effect or fails with one of these.
+    /// No memory block contains the address (`unmapped_address`).
+    UnmappedAddress,
+    /// The request is malformed or names the wrong kind of thing (`invalid_argument`).
+    InvalidArgument,
+    /// The name a create or rename asks for is taken (`duplicate_name`).
+    DuplicateName,
+    /// The block exists but holds no bytes (`uninitialized_memory`).
+    UninitializedMemory,
+    /// The host is busy with conflicting state (`access_conflict`).
+    AccessConflict,
+    /// An analysis job owns the program (`analysis_running`).
+    AnalysisRunning,
+    /// The request or job was cancelled (`cancelled`).
+    Cancelled,
+    /// The method name is not an RPC (`unknown_method`).
+    UnknownMethod,
+    /// The payload does not decode as the method's request (`invalid_payload`).
+    InvalidPayload,
+    /// A type named as an argument does not resolve (`unknown_type`).
+    UnknownType,
     Other(String),
 }
 
@@ -66,7 +91,18 @@ impl ErrorCode {
             "parse_error" => Self::ParseError,
             "config_error" => Self::ConfigError,
             "api_error" => Self::ApiError,
-            "NOT_SUPPORTED" => Self::NotSupported,
+            "not_supported" => Self::NotSupported,
+            "not_loaded" => Self::NotLoaded,
+            "unmapped_address" => Self::UnmappedAddress,
+            "invalid_argument" => Self::InvalidArgument,
+            "duplicate_name" => Self::DuplicateName,
+            "uninitialized_memory" => Self::UninitializedMemory,
+            "access_conflict" => Self::AccessConflict,
+            "analysis_running" => Self::AnalysisRunning,
+            "cancelled" => Self::Cancelled,
+            "unknown_method" => Self::UnknownMethod,
+            "invalid_payload" => Self::InvalidPayload,
+            "unknown_type" => Self::UnknownType,
             other => Self::Other(other.to_string()),
         }
     }
@@ -90,8 +126,19 @@ impl ErrorCode {
             Self::EncodeError => "encode_error",
             Self::ParseError => "parse_error",
             Self::ApiError => "api_error",
-            Self::NotSupported => "NOT_SUPPORTED",
+            Self::NotSupported => "not_supported",
+            Self::NotLoaded => "not_loaded",
             Self::ConfigError => "config_error",
+            Self::UnmappedAddress => "unmapped_address",
+            Self::InvalidArgument => "invalid_argument",
+            Self::DuplicateName => "duplicate_name",
+            Self::UninitializedMemory => "uninitialized_memory",
+            Self::AccessConflict => "access_conflict",
+            Self::AnalysisRunning => "analysis_running",
+            Self::Cancelled => "cancelled",
+            Self::UnknownMethod => "unknown_method",
+            Self::InvalidPayload => "invalid_payload",
+            Self::UnknownType => "unknown_type",
             Self::Other(s) => s.as_str(),
         }
     }

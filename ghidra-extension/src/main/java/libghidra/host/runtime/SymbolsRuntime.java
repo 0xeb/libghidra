@@ -17,7 +17,7 @@ import ghidra.program.model.symbol.Symbol;
 import ghidra.program.model.symbol.SymbolIterator;
 import ghidra.program.model.symbol.SymbolTable;
 import ghidra.program.model.symbol.SymbolType;
-import ghidra.util.Msg;
+import ghidra.program.model.symbol.SymbolUtilities;
 import ghidra.util.exception.DuplicateNameException;
 import ghidra.util.exception.InvalidInputException;
 import libghidra.host.contract.SymbolsContract;
@@ -31,8 +31,9 @@ public final class SymbolsRuntime extends RuntimeSupport implements SymbolsOpera
 	@Override
 	public SymbolsContract.GetSymbolResponse getSymbol(SymbolsContract.GetSymbolRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
+			// No program open is an error (not_loaded), never "not found".
+			Program program = requireProgram();
+			if (request == null) {
 				return new SymbolsContract.GetSymbolResponse(null);
 			}
 			try {
@@ -144,25 +145,42 @@ public final class SymbolsRuntime extends RuntimeSupport implements SymbolsOpera
 		}
 	}
 
+	/**
+	 * Renames a symbol at a mapped address. With {@code oldName} set it renames exactly
+	 * the symbol of that name there, primary or not ({@code not_found} when the address
+	 * has none), which is how a secondary label is renamed. Unset, it renames the primary
+	 * symbol, or creates a label when the address has none (the upsert
+	 * {@code INSERT INTO names} relies on). An unmapped address is
+	 * {@code unmapped_address}: no label is ever created outside the program's memory.
+	 */
 	@Override
 	public SymbolsContract.RenameSymbolResponse renameSymbol(
 			SymbolsContract.RenameSymbolRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new SymbolsContract.RenameSymbolResponse(false, "");
-			}
-			String newName = request.newName() != null ? request.newName().trim() : "";
-			if (newName.isEmpty()) {
-				return new SymbolsContract.RenameSymbolResponse(false, "");
+			Program program = requireProgram();
+			requireRequest(request);
+			String newName = requireText(request.newName(), "new symbol name");
+			String oldName = request.oldName() != null
+				? requireText(request.oldName(), "old symbol name")
+				: null;
+			Address address = requireMappedAddress(program, request.address());
+			SymbolTable symTable = program.getSymbolTable();
+			Symbol named = null;
+			if (oldName != null) {
+				named = symbolNamed(symTable, address, oldName);
+				if (named == null) {
+					throw SessionRpcException.notFound("no symbol named '" + oldName + "' at 0x" +
+						Long.toHexString(request.address()));
+				}
 			}
 			int tx = program.startTransaction("libghidra rename symbol");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
-				SymbolTable symTable = program.getSymbolTable();
-				Symbol symbol = symTable.getPrimarySymbol(address);
-				if (symbol == null || symbol.isDeleted()) {
+				Symbol symbol = named != null ? named : symTable.getPrimarySymbol(address);
+				if (named != null) {
+					symbol.setName(newName, SourceType.USER_DEFINED);
+				}
+				else if (symbol == null || symbol.isDeleted()) {
 					symbol = symTable.createLabel(address, newName, SourceType.USER_DEFINED);
 				}
 				else {
@@ -172,8 +190,7 @@ public final class SymbolsRuntime extends RuntimeSupport implements SymbolsOpera
 				return new SymbolsContract.RenameSymbolResponse(true, nullableString(symbol.getName()));
 			}
 			catch (IllegalArgumentException | DuplicateNameException | InvalidInputException e) {
-				Msg.error(this, "renameSymbol failed: " + e.getMessage(), e);
-				return new SymbolsContract.RenameSymbolResponse(false, "");
+				throw SessionRpcException.from("rename symbol", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -181,18 +198,82 @@ public final class SymbolsRuntime extends RuntimeSupport implements SymbolsOpera
 		}
 	}
 
+	/**
+	 * Adds the label {@code name} at a mapped address through Ghidra's
+	 * {@link SymbolTable#createLabel}; it never renames another label. The address keeps
+	 * the symbols it has, and the new label is primary only when it had none (Ghidra's
+	 * rule). One case is Ghidra's own and kept: on a function that still has its default
+	 * name ({@code FUN_...}), the label becomes the function's name.
+	 *
+	 * Errors: {@code invalid_argument} for a blank or invalid name; {@code unmapped_address}
+	 * outside every memory block; {@code duplicate_name} when a symbol of that name is
+	 * already at the address (Ghidra would silently return it).
+	 */
+	@Override
+	public SymbolsContract.CreateLabelResponse createLabel(
+			SymbolsContract.CreateLabelRequest request) {
+		try (LockScope ignored = writeLock()) {
+			Program program = requireProgram();
+			requireRequest(request);
+			String name = requireText(request.name(), "label name");
+			try {
+				SymbolUtilities.validateName(name);
+			}
+			catch (InvalidInputException e) {
+				throw SessionRpcException.from("create label", e);
+			}
+			Address address = requireMappedAddress(program, request.address());
+			SymbolTable symTable = program.getSymbolTable();
+			Symbol same = symbolNamed(symTable, address, name);
+			if (same != null && !same.isDynamic()) {
+				throw SessionRpcException.duplicateName("a symbol named '" + name +
+					"' is already at 0x" + Long.toHexString(request.address()));
+			}
+			int tx = program.startTransaction("libghidra create label");
+			boolean commit = false;
+			try {
+				Symbol symbol = symTable.createLabel(address, name, SourceType.USER_DEFINED);
+				commit = true;
+				return new SymbolsContract.CreateLabelResponse(true,
+					RuntimeMappers.toSymbolRecord(symbol));
+			}
+			catch (IllegalArgumentException | InvalidInputException e) {
+				throw SessionRpcException.from("create label", e);
+			}
+			finally {
+				program.endTransaction(tx, commit);
+			}
+		}
+	}
+
+	/** The live symbol at {@code address} whose name (or namespaced name) is {@code name}. */
+	private static Symbol symbolNamed(SymbolTable symTable, Address address, String name) {
+		for (Symbol symbol : symTable.getSymbols(address)) {
+			if (symbol == null || symbol.isDeleted()) {
+				continue;
+			}
+			if (name.equals(symbol.getName()) || name.equals(symbol.getName(true))) {
+				return symbol;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Deletes the symbols at an address (only those named {@code name} when it is set).
+	 * A function's own symbol loses its name and the function stays (removeSymbolSpecial).
+	 * Nothing to delete is {@code not_found}.
+	 */
 	@Override
 	public SymbolsContract.DeleteSymbolResponse deleteSymbol(
 			SymbolsContract.DeleteSymbolRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new SymbolsContract.DeleteSymbolResponse(false, 0);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			Address address = requireMappedAddress(program, request.address());
 			int tx = program.startTransaction("libghidra delete symbol");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
 				SymbolTable symbolTable = program.getSymbolTable();
 				String filterName = request.name() != null ? request.name().trim() : "";
 				int deletedCount = 0;
@@ -217,14 +298,16 @@ public final class SymbolsRuntime extends RuntimeSupport implements SymbolsOpera
 					}
 				}
 				if (deletedCount <= 0) {
-					return new SymbolsContract.DeleteSymbolResponse(false, 0);
+					throw SessionRpcException.notFound(filterName.isEmpty()
+						? "no symbol to delete at 0x" + Long.toHexString(request.address())
+						: "no symbol named '" + filterName + "' at 0x" +
+							Long.toHexString(request.address()));
 				}
 				commit = true;
 				return new SymbolsContract.DeleteSymbolResponse(true, deletedCount);
 			}
 			catch (IllegalArgumentException e) {
-				Msg.error(this, "deleteSymbol failed: " + e.getMessage(), e);
-				return new SymbolsContract.DeleteSymbolResponse(false, 0);
+				throw SessionRpcException.from("delete symbol", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);

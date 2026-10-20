@@ -73,6 +73,11 @@ message DecompileFunctionRequest {
   uint32 timeout_ms = 3;
 }
 
+// Not found: `decompilation` is unset when no function contains the address.
+// A function the decompiler cannot finish is a record with completed = false
+// and error_message set.
+// With no program open the call fails with the RpcResponse error code
+// "not_loaded".
 message DecompileFunctionResponse {
   DecompileRecord decompilation = 1;
 }
@@ -127,6 +132,9 @@ message GetPcodeRequest {
   PcodeMaturity maturity = 4;   // requested rung (default HIGH)
 }
 
+// Not found: `pcode` is unset when no function contains the address.
+// With no program open the call fails with the RpcResponse error code
+// "not_loaded".
 message GetPcodeResponse {
   PcodeRecord pcode = 1;
 }

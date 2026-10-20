@@ -50,6 +50,14 @@ public final class FunctionsServiceHandler {
 		return runtime.listLeafFunctions(request);
 	}
 
+	public FunctionsContract.CreateFunctionResponse createFunction(
+			FunctionsContract.CreateFunctionRequest request) {
+		if (request == null) {
+			request = new FunctionsContract.CreateFunctionRequest(0L, null);
+		}
+		return runtime.createFunction(request);
+	}
+
 	public FunctionsContract.RenameFunctionResponse renameFunction(
 			FunctionsContract.RenameFunctionRequest request) {
 		if (request == null) {

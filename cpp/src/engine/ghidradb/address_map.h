@@ -46,6 +46,11 @@ public:
     // Check if a key represents a real code/data address (types 1 or 2)
     bool isMemoryAddress(int64_t key) const;
 
+    // The address space a memory-address key belongs to ("ram", an overlay
+    // space, ...), from the ADDRESS MAP row of its base id. Empty for a legacy
+    // key or an unknown base id.
+    std::string spaceName(int64_t key) const;
+
     // Set the program image-base offset added to RELOCATABLE default-space keys.
     // Ghidra stores function-symbol address keys image-base-relative (AddressMapDB
     // RELOCATABLE decode adds baseImageOffset), so the offline reader must apply the
@@ -57,6 +62,8 @@ public:
 private:
     // Base addresses indexed by their ID
     std::map<int32_t, uint64_t> base_addresses_;
+    // Address space of each base id
+    std::map<int32_t, std::string> base_spaces_;
     uint64_t image_base_offset_ = 0;
 };
 

@@ -616,6 +616,34 @@ struct CreateFunctionTagRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CreateFunctionTagRequestDefaultTypeInternal _CreateFunctionTagRequest_default_instance_;
 
+inline constexpr CreateFunctionRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        address_{::uint64_t{0u}} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR CreateFunctionRequest::CreateFunctionRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct CreateFunctionRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR CreateFunctionRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~CreateFunctionRequestDefaultTypeInternal() {}
+  union {
+    CreateFunctionRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CreateFunctionRequestDefaultTypeInternal _CreateFunctionRequest_default_instance_;
+
 inline constexpr CFGEdgeRecord::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : edge_kind_(
@@ -1172,6 +1200,32 @@ struct FunctionFrameRecordDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 FunctionFrameRecordDefaultTypeInternal _FunctionFrameRecord_default_instance_;
 
+inline constexpr CreateFunctionResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        function_{nullptr},
+        created_{false} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR CreateFunctionResponse::CreateFunctionResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct CreateFunctionResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR CreateFunctionResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~CreateFunctionResponseDefaultTypeInternal() {}
+  union {
+    CreateFunctionResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CreateFunctionResponseDefaultTypeInternal _CreateFunctionResponse_default_instance_;
+
 inline constexpr ListSwitchTablesResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : switch_tables_{},
@@ -1306,6 +1360,30 @@ const ::uint32_t
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::RenameFunctionResponse, _impl_.renamed_),
         PROTOBUF_FIELD_OFFSET(::libghidra::RenameFunctionResponse, _impl_.name_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateFunctionRequest, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateFunctionRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateFunctionRequest, _impl_.address_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateFunctionRequest, _impl_.name_),
+        ~0u,
+        0,
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateFunctionResponse, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateFunctionResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateFunctionResponse, _impl_.created_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateFunctionResponse, _impl_.function_),
+        ~0u,
+        0,
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::BasicBlockRecord, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -1715,43 +1793,45 @@ static const ::_pbi::MigrationSchema
         {48, -1, -1, sizeof(::libghidra::ListFunctionsResponse)},
         {57, -1, -1, sizeof(::libghidra::RenameFunctionRequest)},
         {67, -1, -1, sizeof(::libghidra::RenameFunctionResponse)},
-        {77, -1, -1, sizeof(::libghidra::BasicBlockRecord)},
-        {90, 100, -1, sizeof(::libghidra::ListBasicBlocksRequest)},
-        {102, -1, -1, sizeof(::libghidra::ListBasicBlocksResponse)},
-        {111, -1, -1, sizeof(::libghidra::CFGEdgeRecord)},
-        {123, 133, -1, sizeof(::libghidra::ListCFGEdgesRequest)},
-        {135, -1, -1, sizeof(::libghidra::ListCFGEdgesResponse)},
-        {144, -1, -1, sizeof(::libghidra::FunctionTagRecord)},
-        {154, -1, -1, sizeof(::libghidra::ListFunctionTagsRequest)},
-        {162, -1, -1, sizeof(::libghidra::ListFunctionTagsResponse)},
-        {171, -1, -1, sizeof(::libghidra::CreateFunctionTagRequest)},
-        {181, -1, -1, sizeof(::libghidra::CreateFunctionTagResponse)},
-        {190, -1, -1, sizeof(::libghidra::DeleteFunctionTagRequest)},
-        {199, -1, -1, sizeof(::libghidra::DeleteFunctionTagResponse)},
-        {208, -1, -1, sizeof(::libghidra::FunctionTagMappingRecord)},
-        {218, -1, -1, sizeof(::libghidra::ListFunctionTagMappingsRequest)},
-        {227, -1, -1, sizeof(::libghidra::ListFunctionTagMappingsResponse)},
-        {236, -1, -1, sizeof(::libghidra::TagFunctionRequest)},
-        {246, -1, -1, sizeof(::libghidra::TagFunctionResponse)},
-        {255, -1, -1, sizeof(::libghidra::UntagFunctionRequest)},
-        {265, -1, -1, sizeof(::libghidra::UntagFunctionResponse)},
-        {274, -1, -1, sizeof(::libghidra::SwitchCaseRecord)},
-        {284, -1, -1, sizeof(::libghidra::SwitchTableRecord)},
-        {297, 307, -1, sizeof(::libghidra::ListSwitchTablesRequest)},
-        {309, -1, -1, sizeof(::libghidra::ListSwitchTablesResponse)},
-        {318, -1, -1, sizeof(::libghidra::DominatorRecord)},
-        {331, 341, -1, sizeof(::libghidra::ListDominatorsRequest)},
-        {343, -1, -1, sizeof(::libghidra::ListDominatorsResponse)},
-        {352, -1, -1, sizeof(::libghidra::PostDominatorRecord)},
-        {365, 375, -1, sizeof(::libghidra::ListPostDominatorsRequest)},
-        {377, -1, -1, sizeof(::libghidra::ListPostDominatorsResponse)},
-        {386, -1, -1, sizeof(::libghidra::LoopRecord)},
-        {400, 410, -1, sizeof(::libghidra::ListLoopsRequest)},
-        {412, -1, -1, sizeof(::libghidra::ListLoopsResponse)},
-        {421, -1, -1, sizeof(::libghidra::StackVariableRecord)},
-        {437, -1, -1, sizeof(::libghidra::FunctionFrameRecord)},
-        {454, 464, -1, sizeof(::libghidra::ListFunctionFramesRequest)},
-        {466, -1, -1, sizeof(::libghidra::ListFunctionFramesResponse)},
+        {77, 87, -1, sizeof(::libghidra::CreateFunctionRequest)},
+        {89, 99, -1, sizeof(::libghidra::CreateFunctionResponse)},
+        {101, -1, -1, sizeof(::libghidra::BasicBlockRecord)},
+        {114, 124, -1, sizeof(::libghidra::ListBasicBlocksRequest)},
+        {126, -1, -1, sizeof(::libghidra::ListBasicBlocksResponse)},
+        {135, -1, -1, sizeof(::libghidra::CFGEdgeRecord)},
+        {147, 157, -1, sizeof(::libghidra::ListCFGEdgesRequest)},
+        {159, -1, -1, sizeof(::libghidra::ListCFGEdgesResponse)},
+        {168, -1, -1, sizeof(::libghidra::FunctionTagRecord)},
+        {178, -1, -1, sizeof(::libghidra::ListFunctionTagsRequest)},
+        {186, -1, -1, sizeof(::libghidra::ListFunctionTagsResponse)},
+        {195, -1, -1, sizeof(::libghidra::CreateFunctionTagRequest)},
+        {205, -1, -1, sizeof(::libghidra::CreateFunctionTagResponse)},
+        {214, -1, -1, sizeof(::libghidra::DeleteFunctionTagRequest)},
+        {223, -1, -1, sizeof(::libghidra::DeleteFunctionTagResponse)},
+        {232, -1, -1, sizeof(::libghidra::FunctionTagMappingRecord)},
+        {242, -1, -1, sizeof(::libghidra::ListFunctionTagMappingsRequest)},
+        {251, -1, -1, sizeof(::libghidra::ListFunctionTagMappingsResponse)},
+        {260, -1, -1, sizeof(::libghidra::TagFunctionRequest)},
+        {270, -1, -1, sizeof(::libghidra::TagFunctionResponse)},
+        {279, -1, -1, sizeof(::libghidra::UntagFunctionRequest)},
+        {289, -1, -1, sizeof(::libghidra::UntagFunctionResponse)},
+        {298, -1, -1, sizeof(::libghidra::SwitchCaseRecord)},
+        {308, -1, -1, sizeof(::libghidra::SwitchTableRecord)},
+        {321, 331, -1, sizeof(::libghidra::ListSwitchTablesRequest)},
+        {333, -1, -1, sizeof(::libghidra::ListSwitchTablesResponse)},
+        {342, -1, -1, sizeof(::libghidra::DominatorRecord)},
+        {355, 365, -1, sizeof(::libghidra::ListDominatorsRequest)},
+        {367, -1, -1, sizeof(::libghidra::ListDominatorsResponse)},
+        {376, -1, -1, sizeof(::libghidra::PostDominatorRecord)},
+        {389, 399, -1, sizeof(::libghidra::ListPostDominatorsRequest)},
+        {401, -1, -1, sizeof(::libghidra::ListPostDominatorsResponse)},
+        {410, -1, -1, sizeof(::libghidra::LoopRecord)},
+        {424, 434, -1, sizeof(::libghidra::ListLoopsRequest)},
+        {436, -1, -1, sizeof(::libghidra::ListLoopsResponse)},
+        {445, -1, -1, sizeof(::libghidra::StackVariableRecord)},
+        {461, -1, -1, sizeof(::libghidra::FunctionFrameRecord)},
+        {478, 488, -1, sizeof(::libghidra::ListFunctionFramesRequest)},
+        {490, -1, -1, sizeof(::libghidra::ListFunctionFramesResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_FunctionRecord_default_instance_._instance,
@@ -1761,6 +1841,8 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_ListFunctionsResponse_default_instance_._instance,
     &::libghidra::_RenameFunctionRequest_default_instance_._instance,
     &::libghidra::_RenameFunctionResponse_default_instance_._instance,
+    &::libghidra::_CreateFunctionRequest_default_instance_._instance,
+    &::libghidra::_CreateFunctionResponse_default_instance_._instance,
     &::libghidra::_BasicBlockRecord_default_instance_._instance,
     &::libghidra::_ListBasicBlocksRequest_default_instance_._instance,
     &::libghidra::_ListBasicBlocksResponse_default_instance_._instance,
@@ -1817,129 +1899,135 @@ const char descriptor_table_protodef_libghidra_2ffunctions_2eproto[] ABSL_ATTRIB
     "ghidra.FunctionRecord\":\n\025RenameFunctionR"
     "equest\022\017\n\007address\030\002 \001(\004\022\020\n\010new_name\030\003 \001("
     "\t\"7\n\026RenameFunctionResponse\022\017\n\007renamed\030\001"
-    " \001(\010\022\014\n\004name\030\002 \001(\t\"}\n\020BasicBlockRecord\022\026"
-    "\n\016function_entry\030\001 \001(\004\022\025\n\rstart_address\030"
-    "\002 \001(\004\022\023\n\013end_address\030\003 \001(\004\022\021\n\tin_degree\030"
-    "\004 \001(\r\022\022\n\nout_degree\030\005 \001(\r\"e\n\026ListBasicBl"
-    "ocksRequest\022&\n\005range\030\002 \001(\0132\027.libghidra.A"
+    " \001(\010\022\014\n\004name\030\002 \001(\t\"D\n\025CreateFunctionRequ"
+    "est\022\017\n\007address\030\002 \001(\004\022\021\n\004name\030\003 \001(\tH\000\210\001\001B"
+    "\007\n\005_name\"V\n\026CreateFunctionResponse\022\017\n\007cr"
+    "eated\030\001 \001(\010\022+\n\010function\030\002 \001(\0132\031.libghidr"
+    "a.FunctionRecord\"}\n\020BasicBlockRecord\022\026\n\016"
+    "function_entry\030\001 \001(\004\022\025\n\rstart_address\030\002 "
+    "\001(\004\022\023\n\013end_address\030\003 \001(\004\022\021\n\tin_degree\030\004 "
+    "\001(\r\022\022\n\nout_degree\030\005 \001(\r\"e\n\026ListBasicBloc"
+    "ksRequest\022&\n\005range\030\002 \001(\0132\027.libghidra.Add"
+    "ressRange\022#\n\004page\030\003 \001(\0132\025.libghidra.Pagi"
+    "nation\"F\n\027ListBasicBlocksResponse\022+\n\006blo"
+    "cks\030\001 \003(\0132\033.libghidra.BasicBlockRecord\"l"
+    "\n\rCFGEdgeRecord\022\026\n\016function_entry\030\001 \001(\004\022"
+    "\027\n\017src_block_start\030\002 \001(\004\022\027\n\017dst_block_st"
+    "art\030\003 \001(\004\022\021\n\tedge_kind\030\004 \001(\t\"b\n\023ListCFGE"
+    "dgesRequest\022&\n\005range\030\002 \001(\0132\027.libghidra.A"
     "ddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra.Pa"
-    "gination\"F\n\027ListBasicBlocksResponse\022+\n\006b"
-    "locks\030\001 \003(\0132\033.libghidra.BasicBlockRecord"
-    "\"l\n\rCFGEdgeRecord\022\026\n\016function_entry\030\001 \001("
-    "\004\022\027\n\017src_block_start\030\002 \001(\004\022\027\n\017dst_block_"
-    "start\030\003 \001(\004\022\021\n\tedge_kind\030\004 \001(\t\"b\n\023ListCF"
-    "GEdgesRequest\022&\n\005range\030\002 \001(\0132\027.libghidra"
-    ".AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra."
-    "Pagination\"\?\n\024ListCFGEdgesResponse\022\'\n\005ed"
-    "ges\030\001 \003(\0132\030.libghidra.CFGEdgeRecord\"2\n\021F"
-    "unctionTagRecord\022\014\n\004name\030\001 \001(\t\022\017\n\007commen"
-    "t\030\002 \001(\t\"\031\n\027ListFunctionTagsRequest\"F\n\030Li"
-    "stFunctionTagsResponse\022*\n\004tags\030\001 \003(\0132\034.l"
-    "ibghidra.FunctionTagRecord\"9\n\030CreateFunc"
-    "tionTagRequest\022\014\n\004name\030\002 \001(\t\022\017\n\007comment\030"
-    "\003 \001(\t\",\n\031CreateFunctionTagResponse\022\017\n\007cr"
-    "eated\030\001 \001(\010\"(\n\030DeleteFunctionTagRequest\022"
-    "\014\n\004name\030\002 \001(\t\",\n\031DeleteFunctionTagRespon"
-    "se\022\017\n\007deleted\030\001 \001(\010\"D\n\030FunctionTagMappin"
-    "gRecord\022\026\n\016function_entry\030\001 \001(\004\022\020\n\010tag_n"
-    "ame\030\002 \001(\t\"8\n\036ListFunctionTagMappingsRequ"
-    "est\022\026\n\016function_entry\030\002 \001(\004\"X\n\037ListFunct"
-    "ionTagMappingsResponse\0225\n\010mappings\030\001 \003(\013"
-    "2#.libghidra.FunctionTagMappingRecord\">\n"
-    "\022TagFunctionRequest\022\026\n\016function_entry\030\002 "
-    "\001(\004\022\020\n\010tag_name\030\003 \001(\t\"&\n\023TagFunctionResp"
-    "onse\022\017\n\007updated\030\001 \001(\010\"@\n\024UntagFunctionRe"
-    "quest\022\026\n\016function_entry\030\002 \001(\004\022\020\n\010tag_nam"
-    "e\030\003 \001(\t\"(\n\025UntagFunctionResponse\022\017\n\007upda"
-    "ted\030\001 \001(\010\"9\n\020SwitchCaseRecord\022\r\n\005value\030\001"
-    " \001(\003\022\026\n\016target_address\030\002 \001(\004\"\234\001\n\021SwitchT"
-    "ableRecord\022\026\n\016function_entry\030\001 \001(\004\022\026\n\016sw"
-    "itch_address\030\002 \001(\004\022\022\n\ncase_count\030\003 \001(\r\022*"
-    "\n\005cases\030\004 \003(\0132\033.libghidra.SwitchCaseReco"
-    "rd\022\027\n\017default_address\030\005 \001(\004\"f\n\027ListSwitc"
-    "hTablesRequest\022&\n\005range\030\002 \001(\0132\027.libghidr"
+    "gination\"\?\n\024ListCFGEdgesResponse\022\'\n\005edge"
+    "s\030\001 \003(\0132\030.libghidra.CFGEdgeRecord\"2\n\021Fun"
+    "ctionTagRecord\022\014\n\004name\030\001 \001(\t\022\017\n\007comment\030"
+    "\002 \001(\t\"\031\n\027ListFunctionTagsRequest\"F\n\030List"
+    "FunctionTagsResponse\022*\n\004tags\030\001 \003(\0132\034.lib"
+    "ghidra.FunctionTagRecord\"9\n\030CreateFuncti"
+    "onTagRequest\022\014\n\004name\030\002 \001(\t\022\017\n\007comment\030\003 "
+    "\001(\t\",\n\031CreateFunctionTagResponse\022\017\n\007crea"
+    "ted\030\001 \001(\010\"(\n\030DeleteFunctionTagRequest\022\014\n"
+    "\004name\030\002 \001(\t\",\n\031DeleteFunctionTagResponse"
+    "\022\017\n\007deleted\030\001 \001(\010\"D\n\030FunctionTagMappingR"
+    "ecord\022\026\n\016function_entry\030\001 \001(\004\022\020\n\010tag_nam"
+    "e\030\002 \001(\t\"8\n\036ListFunctionTagMappingsReques"
+    "t\022\026\n\016function_entry\030\002 \001(\004\"X\n\037ListFunctio"
+    "nTagMappingsResponse\0225\n\010mappings\030\001 \003(\0132#"
+    ".libghidra.FunctionTagMappingRecord\">\n\022T"
+    "agFunctionRequest\022\026\n\016function_entry\030\002 \001("
+    "\004\022\020\n\010tag_name\030\003 \001(\t\"&\n\023TagFunctionRespon"
+    "se\022\017\n\007updated\030\001 \001(\010\"@\n\024UntagFunctionRequ"
+    "est\022\026\n\016function_entry\030\002 \001(\004\022\020\n\010tag_name\030"
+    "\003 \001(\t\"(\n\025UntagFunctionResponse\022\017\n\007update"
+    "d\030\001 \001(\010\"9\n\020SwitchCaseRecord\022\r\n\005value\030\001 \001"
+    "(\003\022\026\n\016target_address\030\002 \001(\004\"\234\001\n\021SwitchTab"
+    "leRecord\022\026\n\016function_entry\030\001 \001(\004\022\026\n\016swit"
+    "ch_address\030\002 \001(\004\022\022\n\ncase_count\030\003 \001(\r\022*\n\005"
+    "cases\030\004 \003(\0132\033.libghidra.SwitchCaseRecord"
+    "\022\027\n\017default_address\030\005 \001(\004\"f\n\027ListSwitchT"
+    "ablesRequest\022&\n\005range\030\002 \001(\0132\027.libghidra."
+    "AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra.P"
+    "agination\"O\n\030ListSwitchTablesResponse\0223\n"
+    "\rswitch_tables\030\001 \003(\0132\034.libghidra.SwitchT"
+    "ableRecord\"w\n\017DominatorRecord\022\026\n\016functio"
+    "n_entry\030\001 \001(\004\022\025\n\rblock_address\030\002 \001(\004\022\024\n\014"
+    "idom_address\030\003 \001(\004\022\r\n\005depth\030\004 \001(\r\022\020\n\010is_"
+    "entry\030\005 \001(\010\"d\n\025ListDominatorsRequest\022&\n\005"
+    "range\030\002 \001(\0132\027.libghidra.AddressRange\022#\n\004"
+    "page\030\003 \001(\0132\025.libghidra.Pagination\"H\n\026Lis"
+    "tDominatorsResponse\022.\n\ndominators\030\001 \003(\0132"
+    "\032.libghidra.DominatorRecord\"{\n\023PostDomin"
+    "atorRecord\022\026\n\016function_entry\030\001 \001(\004\022\025\n\rbl"
+    "ock_address\030\002 \001(\004\022\025\n\ripdom_address\030\003 \001(\004"
+    "\022\r\n\005depth\030\004 \001(\r\022\017\n\007is_exit\030\005 \001(\010\"h\n\031List"
+    "PostDominatorsRequest\022&\n\005range\030\002 \001(\0132\027.l"
+    "ibghidra.AddressRange\022#\n\004page\030\003 \001(\0132\025.li"
+    "bghidra.Pagination\"U\n\032ListPostDominators"
+    "Response\0227\n\017post_dominators\030\001 \003(\0132\036.libg"
+    "hidra.PostDominatorRecord\"\215\001\n\nLoopRecord"
+    "\022\026\n\016function_entry\030\001 \001(\004\022\026\n\016header_addre"
+    "ss\030\002 \001(\004\022\030\n\020back_edge_source\030\003 \001(\004\022\021\n\tlo"
+    "op_kind\030\004 \001(\t\022\023\n\013block_count\030\005 \001(\r\022\r\n\005de"
+    "pth\030\006 \001(\r\"_\n\020ListLoopsRequest\022&\n\005range\030\002"
+    " \001(\0132\027.libghidra.AddressRange\022#\n\004page\030\003 "
+    "\001(\0132\025.libghidra.Pagination\"9\n\021ListLoopsR"
+    "esponse\022$\n\005loops\030\001 \003(\0132\025.libghidra.LoopR"
+    "ecord\"\257\001\n\023StackVariableRecord\022\016\n\006var_id\030"
+    "\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\021\n\tdata_type\030\003 \001(\t\022\024"
+    "\n\014stack_offset\030\004 \001(\003\022\014\n\004size\030\005 \001(\r\022\024\n\014is"
+    "_parameter\030\006 \001(\010\022\030\n\020first_use_offset\030\007 \001"
+    "(\005\022\023\n\013source_type\030\010 \001(\t\"\227\002\n\023FunctionFram"
+    "eRecord\022\026\n\016function_entry\030\001 \001(\004\022\022\n\nframe"
+    "_size\030\002 \001(\003\022\022\n\nlocal_size\030\003 \001(\003\022\026\n\016param"
+    "eter_size\030\004 \001(\003\022\030\n\020parameter_offset\030\005 \001("
+    "\003\022\035\n\025return_address_offset\030\006 \001(\003\022\026\n\016grow"
+    "s_negative\030\007 \001(\010\022\036\n\026stack_pointer_regist"
+    "er\030\010 \001(\t\0227\n\017stack_variables\030\t \003(\0132\036.libg"
+    "hidra.StackVariableRecord\"h\n\031ListFunctio"
+    "nFramesRequest\022&\n\005range\030\002 \001(\0132\027.libghidr"
     "a.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra"
-    ".Pagination\"O\n\030ListSwitchTablesResponse\022"
-    "3\n\rswitch_tables\030\001 \003(\0132\034.libghidra.Switc"
-    "hTableRecord\"w\n\017DominatorRecord\022\026\n\016funct"
-    "ion_entry\030\001 \001(\004\022\025\n\rblock_address\030\002 \001(\004\022\024"
-    "\n\014idom_address\030\003 \001(\004\022\r\n\005depth\030\004 \001(\r\022\020\n\010i"
-    "s_entry\030\005 \001(\010\"d\n\025ListDominatorsRequest\022&"
-    "\n\005range\030\002 \001(\0132\027.libghidra.AddressRange\022#"
-    "\n\004page\030\003 \001(\0132\025.libghidra.Pagination\"H\n\026L"
-    "istDominatorsResponse\022.\n\ndominators\030\001 \003("
-    "\0132\032.libghidra.DominatorRecord\"{\n\023PostDom"
-    "inatorRecord\022\026\n\016function_entry\030\001 \001(\004\022\025\n\r"
-    "block_address\030\002 \001(\004\022\025\n\ripdom_address\030\003 \001"
-    "(\004\022\r\n\005depth\030\004 \001(\r\022\017\n\007is_exit\030\005 \001(\010\"h\n\031Li"
-    "stPostDominatorsRequest\022&\n\005range\030\002 \001(\0132\027"
-    ".libghidra.AddressRange\022#\n\004page\030\003 \001(\0132\025."
-    "libghidra.Pagination\"U\n\032ListPostDominato"
-    "rsResponse\0227\n\017post_dominators\030\001 \003(\0132\036.li"
-    "bghidra.PostDominatorRecord\"\215\001\n\nLoopReco"
-    "rd\022\026\n\016function_entry\030\001 \001(\004\022\026\n\016header_add"
-    "ress\030\002 \001(\004\022\030\n\020back_edge_source\030\003 \001(\004\022\021\n\t"
-    "loop_kind\030\004 \001(\t\022\023\n\013block_count\030\005 \001(\r\022\r\n\005"
-    "depth\030\006 \001(\r\"_\n\020ListLoopsRequest\022&\n\005range"
-    "\030\002 \001(\0132\027.libghidra.AddressRange\022#\n\004page\030"
-    "\003 \001(\0132\025.libghidra.Pagination\"9\n\021ListLoop"
-    "sResponse\022$\n\005loops\030\001 \003(\0132\025.libghidra.Loo"
-    "pRecord\"\257\001\n\023StackVariableRecord\022\016\n\006var_i"
-    "d\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\021\n\tdata_type\030\003 \001(\t"
-    "\022\024\n\014stack_offset\030\004 \001(\003\022\014\n\004size\030\005 \001(\r\022\024\n\014"
-    "is_parameter\030\006 \001(\010\022\030\n\020first_use_offset\030\007"
-    " \001(\005\022\023\n\013source_type\030\010 \001(\t\"\227\002\n\023FunctionFr"
-    "ameRecord\022\026\n\016function_entry\030\001 \001(\004\022\022\n\nfra"
-    "me_size\030\002 \001(\003\022\022\n\nlocal_size\030\003 \001(\003\022\026\n\016par"
-    "ameter_size\030\004 \001(\003\022\030\n\020parameter_offset\030\005 "
-    "\001(\003\022\035\n\025return_address_offset\030\006 \001(\003\022\026\n\016gr"
-    "ows_negative\030\007 \001(\010\022\036\n\026stack_pointer_regi"
-    "ster\030\010 \001(\t\0227\n\017stack_variables\030\t \003(\0132\036.li"
-    "bghidra.StackVariableRecord\"h\n\031ListFunct"
-    "ionFramesRequest\022&\n\005range\030\002 \001(\0132\027.libghi"
-    "dra.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghid"
-    "ra.Pagination\"L\n\032ListFunctionFramesRespo"
-    "nse\022.\n\006frames\030\001 \003(\0132\036.libghidra.Function"
-    "FrameRecord2\201\014\n\020FunctionsService\022L\n\013GetF"
-    "unction\022\035.libghidra.GetFunctionRequest\032\036"
-    ".libghidra.GetFunctionResponse\022R\n\rListFu"
-    "nctions\022\037.libghidra.ListFunctionsRequest"
-    "\032 .libghidra.ListFunctionsResponse\022V\n\021Li"
-    "stLeafFunctions\022\037.libghidra.ListFunction"
-    "sRequest\032 .libghidra.ListFunctionsRespon"
-    "se\022U\n\016RenameFunction\022 .libghidra.RenameF"
-    "unctionRequest\032!.libghidra.RenameFunctio"
-    "nResponse\022X\n\017ListBasicBlocks\022!.libghidra"
-    ".ListBasicBlocksRequest\032\".libghidra.List"
-    "BasicBlocksResponse\022O\n\014ListCFGEdges\022\036.li"
-    "bghidra.ListCFGEdgesRequest\032\037.libghidra."
-    "ListCFGEdgesResponse\022[\n\020ListFunctionTags"
-    "\022\".libghidra.ListFunctionTagsRequest\032#.l"
-    "ibghidra.ListFunctionTagsResponse\022^\n\021Cre"
-    "ateFunctionTag\022#.libghidra.CreateFunctio"
-    "nTagRequest\032$.libghidra.CreateFunctionTa"
-    "gResponse\022^\n\021DeleteFunctionTag\022#.libghid"
-    "ra.DeleteFunctionTagRequest\032$.libghidra."
-    "DeleteFunctionTagResponse\022p\n\027ListFunctio"
-    "nTagMappings\022).libghidra.ListFunctionTag"
-    "MappingsRequest\032*.libghidra.ListFunction"
-    "TagMappingsResponse\022L\n\013TagFunction\022\035.lib"
-    "ghidra.TagFunctionRequest\032\036.libghidra.Ta"
-    "gFunctionResponse\022R\n\rUntagFunction\022\037.lib"
-    "ghidra.UntagFunctionRequest\032 .libghidra."
-    "UntagFunctionResponse\022[\n\020ListSwitchTable"
-    "s\022\".libghidra.ListSwitchTablesRequest\032#."
-    "libghidra.ListSwitchTablesResponse\022U\n\016Li"
-    "stDominators\022 .libghidra.ListDominatorsR"
-    "equest\032!.libghidra.ListDominatorsRespons"
-    "e\022a\n\022ListPostDominators\022$.libghidra.List"
-    "PostDominatorsRequest\032%.libghidra.ListPo"
-    "stDominatorsResponse\022F\n\tListLoops\022\033.libg"
-    "hidra.ListLoopsRequest\032\034.libghidra.ListL"
-    "oopsResponse\022a\n\022ListFunctionFrames\022$.lib"
-    "ghidra.ListFunctionFramesRequest\032%.libgh"
-    "idra.ListFunctionFramesResponseB\035\n\tlibgh"
-    "idraB\016FunctionsProtoP\001b\006proto3"
+    ".Pagination\"L\n\032ListFunctionFramesRespons"
+    "e\022.\n\006frames\030\001 \003(\0132\036.libghidra.FunctionFr"
+    "ameRecord2\330\014\n\020FunctionsService\022L\n\013GetFun"
+    "ction\022\035.libghidra.GetFunctionRequest\032\036.l"
+    "ibghidra.GetFunctionResponse\022R\n\rListFunc"
+    "tions\022\037.libghidra.ListFunctionsRequest\032 "
+    ".libghidra.ListFunctionsResponse\022V\n\021List"
+    "LeafFunctions\022\037.libghidra.ListFunctionsR"
+    "equest\032 .libghidra.ListFunctionsResponse"
+    "\022U\n\016CreateFunction\022 .libghidra.CreateFun"
+    "ctionRequest\032!.libghidra.CreateFunctionR"
+    "esponse\022U\n\016RenameFunction\022 .libghidra.Re"
+    "nameFunctionRequest\032!.libghidra.RenameFu"
+    "nctionResponse\022X\n\017ListBasicBlocks\022!.libg"
+    "hidra.ListBasicBlocksRequest\032\".libghidra"
+    ".ListBasicBlocksResponse\022O\n\014ListCFGEdges"
+    "\022\036.libghidra.ListCFGEdgesRequest\032\037.libgh"
+    "idra.ListCFGEdgesResponse\022[\n\020ListFunctio"
+    "nTags\022\".libghidra.ListFunctionTagsReques"
+    "t\032#.libghidra.ListFunctionTagsResponse\022^"
+    "\n\021CreateFunctionTag\022#.libghidra.CreateFu"
+    "nctionTagRequest\032$.libghidra.CreateFunct"
+    "ionTagResponse\022^\n\021DeleteFunctionTag\022#.li"
+    "bghidra.DeleteFunctionTagRequest\032$.libgh"
+    "idra.DeleteFunctionTagResponse\022p\n\027ListFu"
+    "nctionTagMappings\022).libghidra.ListFuncti"
+    "onTagMappingsRequest\032*.libghidra.ListFun"
+    "ctionTagMappingsResponse\022L\n\013TagFunction\022"
+    "\035.libghidra.TagFunctionRequest\032\036.libghid"
+    "ra.TagFunctionResponse\022R\n\rUntagFunction\022"
+    "\037.libghidra.UntagFunctionRequest\032 .libgh"
+    "idra.UntagFunctionResponse\022[\n\020ListSwitch"
+    "Tables\022\".libghidra.ListSwitchTablesReque"
+    "st\032#.libghidra.ListSwitchTablesResponse\022"
+    "U\n\016ListDominators\022 .libghidra.ListDomina"
+    "torsRequest\032!.libghidra.ListDominatorsRe"
+    "sponse\022a\n\022ListPostDominators\022$.libghidra"
+    ".ListPostDominatorsRequest\032%.libghidra.L"
+    "istPostDominatorsResponse\022F\n\tListLoops\022\033"
+    ".libghidra.ListLoopsRequest\032\034.libghidra."
+    "ListLoopsResponse\022a\n\022ListFunctionFrames\022"
+    "$.libghidra.ListFunctionFramesRequest\032%."
+    "libghidra.ListFunctionFramesResponseB\035\n\t"
+    "libghidraB\016FunctionsProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2ffunctions_2eproto_deps[1] =
     {
@@ -1949,13 +2037,13 @@ static ::absl::once_flag descriptor_table_libghidra_2ffunctions_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2ffunctions_2eproto = {
     false,
     false,
-    5550,
+    5795,
     descriptor_table_protodef_libghidra_2ffunctions_2eproto,
     "libghidra/functions.proto",
     &descriptor_table_libghidra_2ffunctions_2eproto_once,
     descriptor_table_libghidra_2ffunctions_2eproto_deps,
     1,
-    44,
+    46,
     schemas,
     file_default_instances,
     TableStruct_libghidra_2ffunctions_2eproto::offsets,
@@ -3926,6 +4014,564 @@ void RenameFunctionResponse::InternalSwap(RenameFunctionResponse* PROTOBUF_RESTR
 }
 
 ::google::protobuf::Metadata RenameFunctionResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class CreateFunctionRequest::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<CreateFunctionRequest>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(CreateFunctionRequest, _impl_._has_bits_);
+};
+
+CreateFunctionRequest::CreateFunctionRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.CreateFunctionRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE CreateFunctionRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::CreateFunctionRequest& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        name_(arena, from.name_) {}
+
+CreateFunctionRequest::CreateFunctionRequest(
+    ::google::protobuf::Arena* arena,
+    const CreateFunctionRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  CreateFunctionRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  _impl_.address_ = from._impl_.address_;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.CreateFunctionRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE CreateFunctionRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        name_(arena) {}
+
+inline void CreateFunctionRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.address_ = {};
+}
+CreateFunctionRequest::~CreateFunctionRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.CreateFunctionRequest)
+  SharedDtor(*this);
+}
+inline void CreateFunctionRequest::SharedDtor(MessageLite& self) {
+  CreateFunctionRequest& this_ = static_cast<CreateFunctionRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.name_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* CreateFunctionRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) CreateFunctionRequest(arena);
+}
+constexpr auto CreateFunctionRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(CreateFunctionRequest),
+                                            alignof(CreateFunctionRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull CreateFunctionRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_CreateFunctionRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &CreateFunctionRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<CreateFunctionRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &CreateFunctionRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<CreateFunctionRequest>(), &CreateFunctionRequest::ByteSizeLong,
+            &CreateFunctionRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(CreateFunctionRequest, _impl_._cached_size_),
+        false,
+    },
+    &CreateFunctionRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2ffunctions_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* CreateFunctionRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 0, 44, 2> CreateFunctionRequest::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(CreateFunctionRequest, _impl_._has_bits_),
+    0, // no _extensions_
+    3, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967289,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::CreateFunctionRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // uint64 address = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(CreateFunctionRequest, _impl_.address_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(CreateFunctionRequest, _impl_.address_)}},
+    // optional string name = 3;
+    {::_pbi::TcParser::FastUS1,
+     {26, 0, 0, PROTOBUF_FIELD_OFFSET(CreateFunctionRequest, _impl_.name_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint64 address = 2;
+    {PROTOBUF_FIELD_OFFSET(CreateFunctionRequest, _impl_.address_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // optional string name = 3;
+    {PROTOBUF_FIELD_OFFSET(CreateFunctionRequest, _impl_.name_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\37\0\4\0\0\0\0\0"
+    "libghidra.CreateFunctionRequest"
+    "name"
+  }},
+};
+
+PROTOBUF_NOINLINE void CreateFunctionRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.CreateFunctionRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    _impl_.name_.ClearNonDefaultToEmpty();
+  }
+  _impl_.address_ = ::uint64_t{0u};
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* CreateFunctionRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const CreateFunctionRequest& this_ = static_cast<const CreateFunctionRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* CreateFunctionRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const CreateFunctionRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.CreateFunctionRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint64 address = 2;
+          if (this_._internal_address() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                2, this_._internal_address(), target);
+          }
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // optional string name = 3;
+          if (cached_has_bits & 0x00000001u) {
+            const std::string& _s = this_._internal_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.CreateFunctionRequest.name");
+            target = stream->WriteStringMaybeAliased(3, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.CreateFunctionRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t CreateFunctionRequest::ByteSizeLong(const MessageLite& base) {
+          const CreateFunctionRequest& this_ = static_cast<const CreateFunctionRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t CreateFunctionRequest::ByteSizeLong() const {
+          const CreateFunctionRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.CreateFunctionRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // optional string name = 3;
+            cached_has_bits = this_._impl_._has_bits_[0];
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_name());
+            }
+          }
+           {
+            // uint64 address = 2;
+            if (this_._internal_address() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_address());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void CreateFunctionRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<CreateFunctionRequest*>(&to_msg);
+  auto& from = static_cast<const CreateFunctionRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.CreateFunctionRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    _this->_internal_set_name(from._internal_name());
+  }
+  if (from._internal_address() != 0) {
+    _this->_impl_.address_ = from._impl_.address_;
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void CreateFunctionRequest::CopyFrom(const CreateFunctionRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.CreateFunctionRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void CreateFunctionRequest::InternalSwap(CreateFunctionRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+        swap(_impl_.address_, other->_impl_.address_);
+}
+
+::google::protobuf::Metadata CreateFunctionRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class CreateFunctionResponse::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<CreateFunctionResponse>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(CreateFunctionResponse, _impl_._has_bits_);
+};
+
+CreateFunctionResponse::CreateFunctionResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.CreateFunctionResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE CreateFunctionResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::CreateFunctionResponse& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0} {}
+
+CreateFunctionResponse::CreateFunctionResponse(
+    ::google::protobuf::Arena* arena,
+    const CreateFunctionResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  CreateFunctionResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.function_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::FunctionRecord>(
+                              arena, *from._impl_.function_)
+                        : nullptr;
+  _impl_.created_ = from._impl_.created_;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.CreateFunctionResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE CreateFunctionResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void CreateFunctionResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, function_),
+           0,
+           offsetof(Impl_, created_) -
+               offsetof(Impl_, function_) +
+               sizeof(Impl_::created_));
+}
+CreateFunctionResponse::~CreateFunctionResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.CreateFunctionResponse)
+  SharedDtor(*this);
+}
+inline void CreateFunctionResponse::SharedDtor(MessageLite& self) {
+  CreateFunctionResponse& this_ = static_cast<CreateFunctionResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  delete this_._impl_.function_;
+  this_._impl_.~Impl_();
+}
+
+inline void* CreateFunctionResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) CreateFunctionResponse(arena);
+}
+constexpr auto CreateFunctionResponse::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(CreateFunctionResponse),
+                                            alignof(CreateFunctionResponse));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull CreateFunctionResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_CreateFunctionResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &CreateFunctionResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<CreateFunctionResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &CreateFunctionResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<CreateFunctionResponse>(), &CreateFunctionResponse::ByteSizeLong,
+            &CreateFunctionResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(CreateFunctionResponse, _impl_._cached_size_),
+        false,
+    },
+    &CreateFunctionResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2ffunctions_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* CreateFunctionResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 1, 0, 2> CreateFunctionResponse::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(CreateFunctionResponse, _impl_._has_bits_),
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::CreateFunctionResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // .libghidra.FunctionRecord function = 2;
+    {::_pbi::TcParser::FastMtS1,
+     {18, 0, 0, PROTOBUF_FIELD_OFFSET(CreateFunctionResponse, _impl_.function_)}},
+    // bool created = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(CreateFunctionResponse, _impl_.created_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(CreateFunctionResponse, _impl_.created_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // bool created = 1;
+    {PROTOBUF_FIELD_OFFSET(CreateFunctionResponse, _impl_.created_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // .libghidra.FunctionRecord function = 2;
+    {PROTOBUF_FIELD_OFFSET(CreateFunctionResponse, _impl_.function_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::FunctionRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void CreateFunctionResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.CreateFunctionResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(_impl_.function_ != nullptr);
+    _impl_.function_->Clear();
+  }
+  _impl_.created_ = false;
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* CreateFunctionResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const CreateFunctionResponse& this_ = static_cast<const CreateFunctionResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* CreateFunctionResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const CreateFunctionResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.CreateFunctionResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // bool created = 1;
+          if (this_._internal_created() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                1, this_._internal_created(), target);
+          }
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // .libghidra.FunctionRecord function = 2;
+          if (cached_has_bits & 0x00000001u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                2, *this_._impl_.function_, this_._impl_.function_->GetCachedSize(), target,
+                stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.CreateFunctionResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t CreateFunctionResponse::ByteSizeLong(const MessageLite& base) {
+          const CreateFunctionResponse& this_ = static_cast<const CreateFunctionResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t CreateFunctionResponse::ByteSizeLong() const {
+          const CreateFunctionResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.CreateFunctionResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // .libghidra.FunctionRecord function = 2;
+            cached_has_bits = this_._impl_._has_bits_[0];
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.function_);
+            }
+          }
+           {
+            // bool created = 1;
+            if (this_._internal_created() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void CreateFunctionResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<CreateFunctionResponse*>(&to_msg);
+  auto& from = static_cast<const CreateFunctionResponse&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.CreateFunctionResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(from._impl_.function_ != nullptr);
+    if (_this->_impl_.function_ == nullptr) {
+      _this->_impl_.function_ =
+          ::google::protobuf::Message::CopyConstruct<::libghidra::FunctionRecord>(arena, *from._impl_.function_);
+    } else {
+      _this->_impl_.function_->MergeFrom(*from._impl_.function_);
+    }
+  }
+  if (from._internal_created() != 0) {
+    _this->_impl_.created_ = from._impl_.created_;
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void CreateFunctionResponse::CopyFrom(const CreateFunctionResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.CreateFunctionResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void CreateFunctionResponse::InternalSwap(CreateFunctionResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(CreateFunctionResponse, _impl_.created_)
+      + sizeof(CreateFunctionResponse::_impl_.created_)
+      - PROTOBUF_FIELD_OFFSET(CreateFunctionResponse, _impl_.function_)>(
+          reinterpret_cast<char*>(&_impl_.function_),
+          reinterpret_cast<char*>(&other->_impl_.function_));
+}
+
+::google::protobuf::Metadata CreateFunctionResponse::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // ===================================================================

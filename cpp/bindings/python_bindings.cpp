@@ -9,6 +9,7 @@
 // Uses stable ABI — one .pyd for all Python 3.12+.
 
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 #include <nanobind/stl/unique_ptr.h>
@@ -333,6 +334,15 @@ NB_MODULE(_libghidra, m) {
       }, nb::arg("range_start") = 0, nb::arg("range_end") = 0,
          nb::arg("limit") = 0, nb::arg("offset") = 0)
 
+      .def("create_function", [](IClient& self, uint64_t address,
+                                  std::optional<std::string> name) {
+        auto resp = unwrap(self.CreateFunction(address, name));
+        nb::dict d;
+        d["created"] = resp.created;
+        d["function"] = to_dict(resp.function);
+        return d;
+      }, nb::arg("address"), nb::arg("name") = nb::none())
+
       .def("rename_function", [](IClient& self, uint64_t address, const std::string& name) {
         auto resp = unwrap(self.RenameFunction(address, name));
         nb::dict d;
@@ -389,13 +399,22 @@ NB_MODULE(_libghidra, m) {
       }, nb::arg("range_start") = 0, nb::arg("range_end") = 0,
          nb::arg("limit") = 0, nb::arg("offset") = 0)
 
-      .def("rename_symbol", [](IClient& self, uint64_t address, const std::string& name) {
-        auto resp = unwrap(self.RenameSymbol(address, name));
+      .def("create_label", [](IClient& self, uint64_t address, const std::string& name) {
+        auto resp = unwrap(self.CreateLabel(address, name));
+        nb::dict d;
+        d["created"] = resp.created;
+        d["symbol"] = to_dict(resp.symbol);
+        return d;
+      }, nb::arg("address"), nb::arg("name"))
+
+      .def("rename_symbol", [](IClient& self, uint64_t address, const std::string& name,
+                                std::optional<std::string> old_name) {
+        auto resp = unwrap(self.RenameSymbol(address, name, old_name));
         nb::dict d;
         d["renamed"] = resp.renamed;
         d["name"] = resp.name;
         return d;
-      }, nb::arg("address"), nb::arg("new_name"))
+      }, nb::arg("address"), nb::arg("new_name"), nb::arg("old_name") = nb::none())
 
       // --- Memory ---
       .def("read_bytes", [](IClient& self, uint64_t address, uint32_t length) {

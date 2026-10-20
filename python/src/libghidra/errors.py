@@ -31,8 +31,22 @@ class ErrorCode(Enum):
     ENCODE_ERROR = "encode_error"
     PARSE_ERROR = "parse_error"
     API_ERROR = "api_error"
-    NOT_SUPPORTED = "NOT_SUPPORTED"
+    NOT_SUPPORTED = "not_supported"
+    # No program is open. A missing item is not an error: the record is None.
+    NOT_LOADED = "not_loaded"
     CONFIG_ERROR = "config_error"
+    # The rest of the RPC vocabulary documented on RpcResponse.error_code (rpc.proto).
+    # A write either has its effect or fails with one of these codes.
+    UNMAPPED_ADDRESS = "unmapped_address"
+    INVALID_ARGUMENT = "invalid_argument"
+    DUPLICATE_NAME = "duplicate_name"
+    UNINITIALIZED_MEMORY = "uninitialized_memory"
+    ACCESS_CONFLICT = "access_conflict"
+    ANALYSIS_RUNNING = "analysis_running"
+    CANCELLED = "cancelled"
+    UNKNOWN_METHOD = "unknown_method"
+    INVALID_PAYLOAD = "invalid_payload"
+    UNKNOWN_TYPE = "unknown_type"
     OTHER = "other"
 
     def is_retryable(self) -> bool:

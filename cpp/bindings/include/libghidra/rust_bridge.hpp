@@ -72,6 +72,8 @@ class LocalClientHandle {
                                         uint64_t range_end,
                                         int32_t limit,
                                         int32_t offset) const;
+  // `has_name` false takes the default name (cxx carries no Option<&str>).
+  rust::String create_function_json(uint64_t address, bool has_name, rust::Str name) const;
   rust::String rename_function_json(uint64_t address,
                                     rust::Str new_name) const;
   rust::String list_basic_blocks_json(uint64_t range_start,
@@ -98,8 +100,10 @@ class LocalClientHandle {
                                  uint64_t range_end,
                                  int32_t limit,
                                  int32_t offset) const;
-  rust::String rename_symbol_json(uint64_t address,
-                                  rust::Str new_name) const;
+  rust::String create_label_json(uint64_t address, rust::Str name) const;
+  // `has_old_name` false renames the primary symbol (or creates a label).
+  rust::String rename_symbol_json(uint64_t address, rust::Str new_name, bool has_old_name,
+                                  rust::Str old_name) const;
 
   // --- Memory -----------------------------------------------------------
   rust::Vec<uint8_t> read_bytes(uint64_t address, uint32_t length) const;

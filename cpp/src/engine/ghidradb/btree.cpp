@@ -331,6 +331,75 @@ bool BTreeReader::readVarKeyRecLeaf(const std::vector<uint8_t>& buf, const Schem
 }
 
 // -----------------------------------------------------------------------
+// FixedKey traversal (byte/short/int/fixed10 keys; e.g. "Calling Conventions",
+// whose key is a ByteField). Same shapes as the LongKey nodes with the 8-byte
+// key replaced by the key field's fixed width (FixedKeyNode.java).
+// -----------------------------------------------------------------------
+
+bool BTreeReader::traverseFixedKey(int32_t buffer_id, const Schema& schema, RecordCallback& cb) {
+    std::vector<uint8_t> buf;
+    if (!bf_.readBuffer(buffer_id, buf)) {
+        error_ = bf_.getError();
+        return false;
+    }
+    if (buf.empty()) {
+        error_ = "Empty buffer";
+        return false;
+    }
+    const int key_size = fixedFieldSize(schema.key_type);
+    if (key_size <= 0) {
+        error_ = "FixedKey node for a variable-length key type";
+        return false;
+    }
+
+    const int32_t key_count = readInt(buf.data() + 1);
+    switch (buf[0]) {
+        case FIXEDKEY_INTERIOR_NODE: {
+            // Entries after the 5-byte header: Key(key_size) + ChildID(4)
+            for (int32_t i = 0; i < key_count; i++) {
+                int32_t entry_off = LONGKEY_NODE_HEADER_SIZE + i * (key_size + 4);
+                if (!traverseFixedKey(readInt(buf.data() + entry_off + key_size), schema, cb))
+                    return false;
+            }
+            return true;
+        }
+        case FIXEDKEY_VAR_REC_NODE: {
+            // Entries after the 13-byte leaf header: Key + RecOffset(4) + IndFlag(1)
+            for (int32_t i = 0; i < key_count; i++) {
+                int32_t entry_off = LONGKEY_LEAF_HEADER_SIZE + i * (key_size + 5);
+                Record rec;
+                readField(buf.data(), entry_off, schema.key_type, rec.key);
+                int32_t rec_offset = readInt(buf.data() + entry_off + key_size);
+                if (buf[entry_off + key_size + 4] != 0) {
+                    std::vector<uint8_t> chain_data;
+                    if (!readChainedBuffer(readInt(buf.data() + rec_offset), chain_data))
+                        return false;
+                    rec.read(chain_data.data(), 0, schema);
+                } else {
+                    rec.read(buf.data(), rec_offset, schema);
+                }
+                if (!cb(rec)) return true;
+            }
+            return true;
+        }
+        case FIXEDKEY_FIXED_REC_NODE: {
+            // Entries after the 13-byte leaf header: Key + Record(fixed_length)
+            for (int32_t i = 0; i < key_count; i++) {
+                int32_t entry_off = LONGKEY_LEAF_HEADER_SIZE + i * (key_size + schema.fixed_length);
+                Record rec;
+                readField(buf.data(), entry_off, schema.key_type, rec.key);
+                rec.read(buf.data(), entry_off + key_size, schema);
+                if (!cb(rec)) return true;
+            }
+            return true;
+        }
+        default:
+            error_ = "Unexpected FixedKey node type: " + std::to_string(buf[0]);
+            return false;
+    }
+}
+
+// -----------------------------------------------------------------------
 // Top-level entry point
 // -----------------------------------------------------------------------
 
@@ -356,6 +425,8 @@ bool BTreeReader::iterateRecords(int32_t root_buffer_id, const Schema& schema, R
         return traverseLongKey(root_buffer_id, schema, cb);
     } else if (node_type == VARKEY_INTERIOR_NODE || node_type == VARKEY_REC_NODE) {
         return traverseVarKey(root_buffer_id, schema, cb);
+    } else if (node_type >= FIXEDKEY_INTERIOR_NODE && node_type <= FIXEDKEY_FIXED_REC_NODE) {
+        return traverseFixedKey(root_buffer_id, schema, cb);
     } else {
         error_ = "Unsupported root node type: " + std::to_string(node_type);
         return false;

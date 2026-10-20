@@ -26,6 +26,7 @@
 
 namespace ghidra_standalone {
 class Decompiler;
+enum class EngineError;
 }
 
 namespace libghidra::client::detail {
@@ -95,6 +96,9 @@ class DecompilerPool {
   /// Get error message from the primary instance.
   std::string getError() const;
 
+  /// Why the primary instance's last call failed.
+  ghidra_standalone::EngineError getErrorKind() const;
+
   /// Reset all adapters (e.g., after CloseProgram).
   void resetAdapters();
 
@@ -156,7 +160,7 @@ class DecompilerPool {
   }
 
   /// Broadcast a decompiler-level mutation to EVERY slot. Some mutations live on
-  /// the Decompiler (nameFunction/nameGlobal/setPrototype/defineStruct/defineEnum/
+  /// the Decompiler (renameFunction/applyDataType/setPrototype/defineStruct/defineEnum/
   /// writeBytes) rather than on ArchAdapter; they must still land on every slot so
   /// fan-out reads (ListDecompilations/ListXrefs on leased worker slots) stay
   /// coherent -- a slot-0-only write is invisible to them. Returns true only if

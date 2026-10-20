@@ -87,8 +87,8 @@ bool DecompilerPool::loadProject(const std::string& project_path,
 void DecompilerPool::loadState(const std::string& state_path) {
   // State only applies to primary — workers decompile from raw binary.
   slots_[0].decomp->loadState(state_path);
-  slots_[0].adapter =
-      std::make_unique<ArchAdapter>(slots_[0].decomp->getArchitecturePointer());
+  slots_[0].adapter = std::make_unique<ArchAdapter>(
+      slots_[0].decomp->getArchitecturePointer(), slots_[0].decomp.get());
 }
 
 bool DecompilerPool::saveState(const std::string& state_path) {
@@ -99,6 +99,10 @@ std::string DecompilerPool::getError() const {
   return slots_[0].decomp->getError();
 }
 
+ghidra_standalone::EngineError DecompilerPool::getErrorKind() const {
+  return slots_[0].decomp->getErrorKind();
+}
+
 void DecompilerPool::resetAdapters() {
   for (auto& slot : slots_) {
     slot.adapter.reset();
@@ -107,8 +111,8 @@ void DecompilerPool::resetAdapters() {
 
 void DecompilerPool::rebuildAdapters() {
   for (auto& slot : slots_) {
-    slot.adapter =
-        std::make_unique<ArchAdapter>(slot.decomp->getArchitecturePointer());
+    slot.adapter = std::make_unique<ArchAdapter>(slot.decomp->getArchitecturePointer(),
+                                                 slot.decomp.get());
   }
 }
 

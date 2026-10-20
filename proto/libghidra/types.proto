@@ -98,6 +98,9 @@ message GetTypeRequest {
   string path = 2;
 }
 
+// Not found: `type` is unset when no data type has that path or name.
+// With no program open the call fails with the RpcResponse error code
+// "not_loaded".
 message GetTypeResponse {
   TypeRecord type = 1;
 }
@@ -167,6 +170,9 @@ message GetFunctionSignatureRequest {
   uint64 address = 2;
 }
 
+// Not found: `signature` is unset when no function contains the address.
+// With no program open the call fails with the RpcResponse error code
+// "not_loaded".
 message GetFunctionSignatureResponse {
   FunctionSignatureRecord signature = 1;
 }
@@ -449,6 +455,10 @@ message ParseDeclarationsRequest {
   string source_text = 2;
 }
 
+// `types_created` counts the named types the text created (structures, unions,
+// enums, typedefs, function definitions) and `type_names` lists their paths; a
+// pointer or array type the text needed is not counted. All or nothing: text
+// that does not parse is the error parse_error and creates no type.
 message ParseDeclarationsResponse {
   int32 types_created = 1;
   repeated string type_names = 2;

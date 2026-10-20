@@ -1,0 +1,473 @@
+diff --git a/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/C/C.jj b/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/C/C.jj
+index 3b990dbaa8..6940d19f7f 100644
+--- a/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/C/C.jj
++++ b/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/C/C.jj
+@@ -1181,8 +1181,6 @@ TOKEN :
+     |
+     <EXTERN : "extern"> 
+     |
+-    <QUOTE_C : "\"C\"">
+-    |
+     <STRUCT : "struct"> 
+     |
+     <STATIC : "static"> 
+@@ -1540,7 +1538,8 @@ void LineDef() : {
+     Token lineTok, fileTok;
+ }
+ {
+-    (<LINE> | <LINEALT>)  ( lineTok= <LINENUMBER_LITERAL> )  ( fileTok= <PATH_LITERAL> ) [ (<INTEGER_LITERAL>)+ ]
++    // Line-marker flags belong to this directive, not the following declaration.
++    (<LINE> | <LINEALT>)  ( lineTok= <LINENUMBER_LITERAL> )  ( fileTok= <PATH_LITERAL> ) ( LOOKAHEAD(1) <INTEGER_LITERAL> )*
+     {
+         headerFileName= fileTok.image.substring(1, fileTok.image.length() - 1);
+         headerFileLine= Integer.parseInt(lineTok.image);
+@@ -1607,9 +1606,10 @@ Declaration DeclarationSpecifiers(Declaration specDT) : {
+ }
+ {
+     (    
++        LOOKAHEAD(StorageClassSpecifier(specDT))
+         specDT = StorageClassSpecifier(specDT) 
+         [
+-//            LOOKAHEAD(DeclarationSpecifiers(specDT))
++            LOOKAHEAD(DeclarationSpecifiers(specDT))
+             specDT= DeclarationSpecifiers(specDT) 
+         ]
+         |
+@@ -1876,17 +1876,17 @@ void AlignmentSpecifier() : { Declaration dt = new Declaration(); }
+ 
+ void AttributeList(Declaration dec) : { }
+ {
+-    AttributeToken(dec) [ ("," AttributeToken(dec))+ ]
++    AttributeToken(dec) ( LOOKAHEAD("," AttributeToken(dec)) "," AttributeToken(dec) )*
+ }
+ 
+ void AttributeToken(Declaration dec) : { }
+ {
+-    ( < IDENTIFIER > | TypeQualifier(dec) ) [ ":" ":" ( < IDENTIFIER > | TypeQualifier(dec) ) ] [ "(" ( < IDENTIFIER > | Constant() ) [ ( ","  (< IDENTIFIER > | Constant()) )+ ] ")" ] 
++    ( < IDENTIFIER > | TypeQualifier(dec) ) [ LOOKAHEAD(2) ":" ":" ( < IDENTIFIER > | TypeQualifier(dec) ) ] [ "(" ( < IDENTIFIER > | Constant() ) ( LOOKAHEAD(2) "," (< IDENTIFIER > | Constant()) )* ")" ]
+ }
+ 
+ void AttributeSpecList(Declaration dec) : {}
+ {
+-    ( AttributeSpec(dec) )+
++    ( LOOKAHEAD(AttributeSpec(dec)) AttributeSpec(dec) )+
+ }
+ 
+ void SubIdent(Declaration dec) : {
+@@ -1896,10 +1896,10 @@ void SubIdent(Declaration dec) : {
+ {
+     ( ( "(" [SubIdent(dec)] ")" ) |
+       (id=<IDENTIFIER> | TypeQualifier(dec)) [ ( "(" [SubIdent(dt)] ")") | ("=" SubIdent(dt)) ]
+-                   [ "," 
++                   [ LOOKAHEAD("," SubIdent(dt)) ","
+                         SubIdent(dt)   
+                        ] |            
+-      Constant() [ "," 
++      Constant() [ LOOKAHEAD("," SubIdent(dt)) ","
+                         SubIdent(dt)   
+                        ]
+     )
+@@ -1925,15 +1925,15 @@ void DeclSpecifier(Declaration dec) : {
+ }
+ {
+   "(" DeclSpecifier(dec) ")" |
+-      (id=<IDENTIFIER> { if (id != null && "noreturn".equals(id.image)) dec.addQualifier(NORETURN); } )+
+-                 [ "(" DeclConstant() ( DeclConstant() )* ")" ]
++      ( LOOKAHEAD(1) id=<IDENTIFIER> { if (id != null && "noreturn".equals(id.image)) dec.addQualifier(NORETURN); } )+
++                 [ LOOKAHEAD("(" DeclConstant()) "(" DeclConstant() ( LOOKAHEAD(DeclConstant()) DeclConstant() )* ")" ]
+ }
+ 
+ void DeclConstant() : {}
+ {
+     <INTEGER_LITERAL> |
+-    <IDENTIFIER> [ ":" <INTEGER_LITERAL> ] |
+-    ( "#" | ":" | <IDENTIFIER> | "(" ")" |  MultiLineString() )
++    <IDENTIFIER> [ LOOKAHEAD(2) ":" <INTEGER_LITERAL> ] |
++    ( "#" | ":" | "(" ")" |  MultiLineString() )
+ }
+ 
+ Token MultiLineString() : {
+@@ -1941,12 +1941,13 @@ Token MultiLineString() : {
+    Token r = null;
+ }
+ {
+-    (t = <STRING_LITERAL>
++    // Adjacent literals form one string; greedily consume the complete sequence.
++    ( LOOKAHEAD(1) t = <STRING_LITERAL>
+       {
+         if (r == null) {
+            r = t;
+         } else {
+-    	  r.image = r.image.substring(0,r.image.length()) + t.image.substring(1);
++            r.image = r.image.substring(0,r.image.length()-1) + t.image.substring(1);
+         }
+        }
+       )+
+@@ -1970,8 +1971,9 @@ void PragmaSpecifier() : {
+ {
+   LOOKAHEAD(3)
+   <POPEN> PragmaSpecifier() <PCLOSE> |
+-      id=<PIDENTIFIER> (<PIDENTIFIER> | <PINTEGER_LITERAL> | <PSTRING_LITERAL> | <PCOMMA> )*
+-          ([ <POPEN> [ (ds1=PragmaConstant())+ [ ( <PCOMMA> ds2=PragmaConstant() ) [ ( <PCOMMA> ds3=PragmaConstant() ) [ ( <PCOMMA> PragmaConstant() )+ ] ] ] ] <PCLOSE> ] ) 
++      // A pragma's unparenthesized text is intentionally consumed greedily.
++      id=<PIDENTIFIER> ( LOOKAHEAD(1) ( <PIDENTIFIER> | <PINTEGER_LITERAL> | <PSTRING_LITERAL> | <PCOMMA> ) )*
++          ([ LOOKAHEAD(2) <POPEN> [ ( LOOKAHEAD(PragmaConstant()) ds1=PragmaConstant())+ [ ( <PCOMMA> ds2=PragmaConstant() ) [ ( <PCOMMA> ds3=PragmaConstant() ) [ ( <PCOMMA> PragmaConstant() )+ ] ] ] ] <PCLOSE> ] )
+   {
+     if (id.image.equals("pack") && ds1 != null) {
+         Token newPackVal = ds1;
+@@ -2023,16 +2025,17 @@ Token PragmaConstant() : {
+   (
+     val=<PINTEGER_LITERAL>
+     |
+-    (<PSTAR> | <PPLUS> | <PMINUS> ) (PragmaConstant())*
++    (<PSTAR> | <PPLUS> | <PMINUS> ) ( LOOKAHEAD(PragmaConstant()) PragmaConstant())*
+     |
+-    ( <POPEN> (PragmaConstant())* <PCLOSE> )+
++    ( LOOKAHEAD(2) <POPEN> (PragmaConstant())* <PCLOSE> )+
+     |
+     (
+-      (val=<PIDENTIFIER>) [ <PSTRING_LITERAL> | (<PCOLON> (<PINTEGER_LITERAL> | <PIDENTIFIER> )+ ) ]
++      // A following quoted value or colon-qualified suffix belongs to this constant.
++      (val=<PIDENTIFIER>) [ LOOKAHEAD(1) ( <PSTRING_LITERAL> | (<PCOLON> ( LOOKAHEAD(1) ( <PINTEGER_LITERAL> | <PIDENTIFIER> ) )+ ) ) ]
+     )
+     |
+     (
+-      val=<PSTRING_LITERAL> ( <PIDENTIFIER> [<POPEN> <PCLOSE>] <PSTRING_LITERAL> )*
++      val=<PSTRING_LITERAL> ( LOOKAHEAD(<PIDENTIFIER> [<POPEN> <PCLOSE>] <PSTRING_LITERAL>) <PIDENTIFIER> [<POPEN> <PCLOSE>] <PSTRING_LITERAL> )*
+     )
+   )
+   {
+@@ -2076,7 +2079,7 @@ DataType StructOrUnionSpecifier() : {
+         LOOKAHEAD(3)
+         [ t= <IDENTIFIER>  [ ":" parent=<IDENTIFIER>]
+               { comp=defineNamedComposite(t, null, comp); } // no parent yet, since there are no guts
+-        ] "{" [StructDeclarationList(comp)] "}" [ AttributeSpecList(dec) ]
++        ] "{" [StructDeclarationList(comp)] "}" [ LOOKAHEAD(AttributeSpecList(dec)) AttributeSpecList(dec) ]
+         |
+         sname= <IDENTIFIER> 
+     )
+@@ -2167,15 +2170,16 @@ void StructDeclaration(Composite comp, CompositeHandler compositeHandler) : {
+     Declaration dec = new Declaration();
+ }
+ {
+-    LineDef() |
+-    StaticAssert() |
+-    PragmaSpec() |
++    LOOKAHEAD(LineDef()) LineDef() |
++    LOOKAHEAD(StaticAssert()) StaticAssert() |
++    LOOKAHEAD(PragmaSpec()) PragmaSpec() |
+     (   
+-        [ dt = SpecifierQualifierList() ]
++        [ LOOKAHEAD(SpecifierQualifierList()) dt = SpecifierQualifierList() ]
+         [
++            LOOKAHEAD(StructDeclaratorList(dt, comp, compositeHandler))
+             StructDeclaratorList(dt, comp, compositeHandler)     { dt= null; }
+         ]
+-        [ AttributeSpecList(dec) ]
++        [ LOOKAHEAD(AttributeSpecList(dec)) AttributeSpecList(dec) ]
+         ";" 
+     )
+     {
+@@ -2210,6 +2214,7 @@ Declaration SpecifierQualifierList() : {
+                 sdt = SpecifierQualifierList()
+             ]
+             [
++                LOOKAHEAD(TypeQualifier(sdt != null ? sdt : dt))
+                 sdt = TypeQualifier(sdt != null ? sdt : dt)
+             ]
+         )
+@@ -2354,7 +2359,7 @@ Declaration Declarator(Declaration dt, DataType container) : {
+ }
+ {
+     (
+-        [ dt = TypeQualifierList(dt) ]  [ dt = Pointer(dt) ] dec= DirectDeclarator(dt, container) [ AttributeSpecList(dec) ] 
++        [ LOOKAHEAD(TypeQualifierList(dt)) dt = TypeQualifierList(dt) ] [ LOOKAHEAD(Pointer(dt)) dt = Pointer(dt) ] dec= DirectDeclarator(dt, container) [ LOOKAHEAD(AttributeSpecList(dec)) AttributeSpecList(dec) ]
+     )
+     {
+         return dec;
+@@ -2383,7 +2388,7 @@ Declaration DirectDeclarator(Declaration dt, DataType container) : {
+         { lastDataType = dec.getDataType(); }
+         (
+             (
+-                "[" [ obj = ConditionalExpression() ] "]" 
++                LOOKAHEAD(2) "[" [ obj = ConditionalExpression() ] "]"
+                 {
+                     // make a new array given value on constant expression
+                     Integer size = getConstantValue(obj, 0);
+@@ -2452,7 +2457,7 @@ Declaration DirectDeclarator(Declaration dt, DataType container) : {
+ 
+ Declaration Pointer(Declaration dec) : {}
+ {
+-    ("*" | "&") [ dec = TypeQualifierList(dec) ] [ dec = Pointer(dec) ] 
++    ("*" | "&") [ LOOKAHEAD(TypeQualifierList(dec)) dec = TypeQualifierList(dec) ] [ LOOKAHEAD(Pointer(dec)) dec = Pointer(dec) ]
+     {
+         // TODO: is this right?
+         dec.setDataType(dtMgr.getPointer(dec.getDataType()));
+@@ -2462,7 +2467,7 @@ Declaration Pointer(Declaration dec) : {}
+ 
+ Declaration TypeQualifierList(Declaration dec) : {}
+ {
+-    ( dec = TypeQualifier(dec) )+
++    ( LOOKAHEAD(TypeQualifier(dec)) dec = TypeQualifier(dec) )+
+     {
+         return dec;
+     }
+@@ -2580,7 +2585,7 @@ void Initializer() : {}
+ 
+ void InitializerList() : {}
+ {
+-    [ Designation() ] Initializer() [ "," InitializerList() ]
++    [ Designation() ] Initializer() [ LOOKAHEAD("," InitializerList()) "," InitializerList() ]
+ }
+ 
+ void Designation() : { }
+@@ -2603,7 +2608,7 @@ Declaration TypeName() : {
+     Declaration dec = null;
+ }
+ {
+-    dec = SpecifierQualifierList() [ dec = AbstractDeclarator(new Declaration(dec)) ]
++    dec = SpecifierQualifierList() [ LOOKAHEAD(AbstractDeclarator(new Declaration(dec))) dec = AbstractDeclarator(new Declaration(dec)) ]
+     {
+        return dec;
+     }
+@@ -2616,7 +2621,7 @@ Declaration AbstractDeclarator(Declaration dt) : {
+     (
+         LOOKAHEAD(3)
+         dec = DirectAbstractDeclarator(dt) { return dec; } |
+-        dt = Pointer(dt) [dec= DirectAbstractDeclarator(dt) { return dec; }]
++        dt = Pointer(dt) [ LOOKAHEAD(DirectAbstractDeclarator(dt)) dec= DirectAbstractDeclarator(dt) { return dec; }]
+     )
+     { return new Declaration(dt); }
+ }
+@@ -2649,7 +2654,7 @@ Declaration DirectAbstractDeclarator(Declaration dt) : {
+ 
+     (
+         (
+-            "[" [ constObj = ConstantExpression() ] "]"
++            LOOKAHEAD(2) "[" [ constObj = ConstantExpression() ] "]"
+             {
+               // TODO: create an array
+                Integer size = getConstantValue(constObj, 0);
+@@ -2667,7 +2672,7 @@ Declaration DirectAbstractDeclarator(Declaration dt) : {
+         }
+     }
+    
+-    ( "(" [ paramDec = ParameterTypeList(funcDT, dt.getDataType()) ] ")"
++    ( LOOKAHEAD(2) "(" [ paramDec = ParameterTypeList(funcDT, dt.getDataType()) ] ")"
+         {
+            dec = (funcDT != null ? dec : paramDec);
+         }
+@@ -2759,7 +2764,7 @@ void AsmStatement() :
+ }
+ {
+   (
+-    <ASM> [TypeQualifier(dec)]
++    <ASM> [ LOOKAHEAD(TypeQualifier(dec)) TypeQualifier(dec)]
+     (
+       ( AsmLine() )
+     )
+@@ -2771,7 +2776,8 @@ void AsmLine() :
+     Declaration dec = new Declaration();
+ }
+ {
+-  (<IDENTIFIER> | <STRING_LITERAL> | <INTEGER_LITERAL> | <ATTRIBUTE> | BuiltInTypeSpecifier(dec) | "#" | "+" | "-" | "," | ":" | "*" | ("[" AsmLine() "]") | ( "(" AsmLine() ")" ) | ( "{" AsmLine() "}" ) )+
++  // Assembly text consumes its whole token sequence, stopping at the enclosing delimiter.
++  ( LOOKAHEAD(1) ( <IDENTIFIER> | <STRING_LITERAL> | <INTEGER_LITERAL> | <ATTRIBUTE> | BuiltInTypeSpecifier(dec) | "#" | "+" | "-" | "," | ":" | "*" | ("[" AsmLine() "]") | ( "(" AsmLine() ")" ) | ( "{" AsmLine() "}" ) ) )+
+ }
+ 
+ 
+@@ -2823,7 +2829,7 @@ Object AssignmentExpression() : {
+       |
+       LOOKAHEAD(3)
+       obj = ConditionalExpression()
+-    ) [ PragmaSpec() ]
++    ) [ LOOKAHEAD(PragmaSpec()) PragmaSpec() ]
+     {
+         return obj;
+     }
+@@ -3058,7 +3064,9 @@ Object PostfixExpression() : {
+ {
+     obj = PrimaryExpression() 
+     (
+-        ( "[" Expression() "]" )
++        LOOKAHEAD(2)
++        (
++        LOOKAHEAD(2) ( "[" Expression() "]" )
+         |
+         "(" 
+         [
+@@ -3074,6 +3082,7 @@ Object PostfixExpression() : {
+         "++" 
+         |
+         "--"      
++        )
+     )*
+     {
+         return obj;
+@@ -3153,13 +3162,13 @@ Object Constant() : {
+         |
+         t = <FLOATING_POINT_LITERAL>
+         {
+-            obj = new Double(t.image);
++            obj = Double.valueOf(t.image);
+         }
+         |
+         t = <CHARACTER_LITERAL>
+         {
+             if (t.image.length() == 1) {
+-              obj = new Character(t.image.charAt(0));
++              obj = Character.valueOf(t.image.charAt(0));
+             } else if (t.image.length() == 4) {
+               long cval = ((long)t.image.charAt(0) << 24) + ((long)t.image.charAt(1) << 16) + ((long)t.image.charAt(2) << 8) + ((long) t.image.charAt(3));
+               obj = Long.valueOf(cval);
+diff --git a/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/CPP/CPP.jj b/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/CPP/CPP.jj
+index c069535c1f..9e4bbba7d2 100644
+--- a/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/CPP/CPP.jj
++++ b/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/CPP/CPP.jj
+@@ -273,8 +273,8 @@ public class PreProcessor {
+ 				switch (this.kind) {
+ 					case PreProcessor.FP_NUMERIC:
+ 					case PreProcessor.FP_LITERAL:
+-						Double thisFP = new Double(this.image);
+-						Double zeroFP = new Double(0.0);
++						Double thisFP = Double.valueOf(this.image);
++						Double zeroFP = Double.valueOf(0.0);
+ 						comparison = thisFP.compareTo(zeroFP);
+ 						break;
+ 					case PreProcessor.INTEGER_LITERAL:
+@@ -307,24 +307,24 @@ public class PreProcessor {
+ 		}
+ 
+ 		int compareTo(PPToken that) {
+-			Double thisFP = new Double(0.0);
+-			Double thatFP = new Double(0.0);
++			Double thisFP = Double.valueOf(0.0);
++			Double thatFP = Double.valueOf(0.0);
+ 			String thisVal = null;
+ 			String thatVal = null;
+ 			try {
+ 				switch (this.kind) {
+ 					case PreProcessor.FP_NUMERIC:
+ 					case PreProcessor.FP_LITERAL:
+-						thisFP = new Double(this.image);
++						thisFP = Double.valueOf(this.image);
+ 						break;
+ 					case PreProcessor.NUMERIC:
+ 					case PreProcessor.INTEGER_LITERAL:
+-						thisFP = new Double(getLongValue(this.image).doubleValue());
++						thisFP = Double.valueOf(getLongValue(this.image).doubleValue());
+ 						break;
+ 					case PreProcessor.CHAR_NUMERIC:
+ 					case PreProcessor.CHAR_LITERAL:
+ 						char ch = getCharacterValue(this.image);
+-						thisFP = new Double((double)ch);
++						thisFP = Double.valueOf((double)ch);
+                         break;						
+ 					default:
+ 						PPToken replVal = (PPToken) getDef(this); // not a PPToken
+@@ -353,16 +353,16 @@ public class PreProcessor {
+ 				switch (that.kind) {
+ 					case PreProcessor.FP_NUMERIC:
+ 					case PreProcessor.FP_LITERAL:
+-						thatFP = new Double(that.image);
++						thatFP = Double.valueOf(that.image);
+ 						break;
+ 					case PreProcessor.NUMERIC:
+ 					case PreProcessor.INTEGER_LITERAL:
+-						thatFP = new Double(getLongValue(that.image).doubleValue());
++						thatFP = Double.valueOf(getLongValue(that.image).doubleValue());
+ 						break;
+ 					case PreProcessor.CHAR_NUMERIC:
+ 					case PreProcessor.CHAR_LITERAL:
+ 						char ch = getCharacterValue(this.image);
+-						thisFP = new Double((double)ch);
++						thisFP = Double.valueOf((double)ch);
+                         break;
+ 					default:
+ 						PPToken replVal = (PPToken) getDef(that); // not a PPToken
+@@ -1938,7 +1938,7 @@ PPToken Text() :
+ 
+                     u=<OTHER_TEXT> { bufAppendWithComment(buf,u,lastToken,false); lastToken = u; } )
+        [LOOKAHEAD(2)nl=NewLines() { bufAppendWithComment(buf,nl,lastToken,false); lastToken = null; }]
+-       [(LOOKAHEAD(2)(u=QuotedText() { bufAppendWithComment(buf,u,lastToken,true); lastToken = u; }
++       [LOOKAHEAD(QuotedText() | <OTHER_TEXT>) (LOOKAHEAD(2)(u=QuotedText() { bufAppendWithComment(buf,u,lastToken,true); lastToken = u; }
+                     [LOOKAHEAD(2) nl=NewLines(){ bufAppendWithComment(buf,nl,lastToken,false); lastToken = null; }] |
+                     u=<OTHER_TEXT> { bufAppendWithComment(buf,u,lastToken,false); lastToken = u; })
+            [LOOKAHEAD(2) nl=NewLines() { bufAppendWithComment(buf,nl,lastToken,false); lastToken = null; } ]
+@@ -1987,12 +1987,13 @@ PPToken NewLines() :
+ PPToken QuotedText() :
+ {Token t = null; Token r = null; }
+ {
+-    (t=<QUOTED_TEXT>
++    // Consume adjacent literals together, preserving their quotes for the C parser.
++    ( LOOKAHEAD(1) t=<QUOTED_TEXT>
+       {
+         if (r == null) {
+            r = t;
+         } else {
+-    	  r.image = r.image.substring(0,r.image.length()) + t.image.substring(1);
++            r.image += t.image;
+         }
+        }
+      )+
+diff --git a/Ghidra/Features/Base/src/test/java/ghidra/app/util/cparser/CParserTest.java b/Ghidra/Features/Base/src/test/java/ghidra/app/util/cparser/CParserTest.java
+index dde1e49fd8..02b5284066 100644
+--- a/Ghidra/Features/Base/src/test/java/ghidra/app/util/cparser/CParserTest.java
++++ b/Ghidra/Features/Base/src/test/java/ghidra/app/util/cparser/CParserTest.java
+@@ -31,6 +31,25 @@ import ghidra.program.model.lang.CompilerSpec;
+ import ghidra.test.AbstractGhidraHeadlessIntegrationTest;
+ 
+ public class CParserTest extends AbstractGhidraHeadlessIntegrationTest {
++	@Test
++	public void testSharedPrefixDeclaratorsAndAttributes() throws Exception {
++		CParser parser = new CParser();
++		Structure dt = (Structure) parser.parse(
++			"struct PrefixProbe { int a[2][3] [[deprecated]]; int b; };");
++		assertEquals(2, dt.getNumComponents());
++		assertEquals("a", dt.getComponent(0).getFieldName());
++		assertEquals(24, dt.getComponent(0).getLength());
++		assertEquals("b", dt.getComponent(1).getFieldName());
++		parser.parse("int values[] = {1,2,};");
++		parser.parse("extern \"C\" int call(const int * const *p, int (*cb)(int), ...);");
++	}
++
++	@Test
++	public void testAdjacentStringLiteralValue() throws Exception {
++		CParser parser = new CParser();
++		parser.ReInit(new java.io.StringReader("\"a\" \"b\""));
++		assertEquals("\"ab\"", parser.MultiLineString().image);
++	}
+ 
+ 	public CParserTest() {
+ 		super();
+diff --git a/Ghidra/Features/Base/src/test/java/ghidra/app/util/cparser/PreProcessorTest.java b/Ghidra/Features/Base/src/test/java/ghidra/app/util/cparser/PreProcessorTest.java
+index 5a1d087d61..929e7a7cd1 100644
+--- a/Ghidra/Features/Base/src/test/java/ghidra/app/util/cparser/PreProcessorTest.java
++++ b/Ghidra/Features/Base/src/test/java/ghidra/app/util/cparser/PreProcessorTest.java
+@@ -29,6 +29,16 @@ import ghidra.program.model.data.*;
+ import ghidra.program.model.data.Enum;
+ 
+ public class PreProcessorTest extends AbstractGenericTest {
++	@Test
++	public void testAdjacentQuotedTextPreservesBothLiterals() throws Exception {
++		PreProcessor probe = new PreProcessor(new String[0]);
++		java.io.File input = createTempFile("adjacent_literals");
++		java.nio.file.Files.writeString(input.toPath(), "const char *s = \"a\" \"b\";\n");
++		ByteArrayOutputStream output = new ByteArrayOutputStream();
++		probe.setOutputStream(output);
++		assertTrue(probe.parse(input.getAbsolutePath()));
++		assertTrue(output.toString("UTF-8").contains("\"a\"\"b\";"));
++	}
+ 	private static String resourceName = "PreProcessorTest.h";
+ 	private static CategoryPath path =
+ 		new CategoryPath(new CategoryPath("/PreProcessorTest.h"), "defines");
+@@ -107,7 +117,8 @@ public class PreProcessorTest extends AbstractGenericTest {
+ 	@Test
+ 	public void testHeaderParsed() throws Exception {
+ 
+-		String results = baos.toString("ASCII");
++		// Compare logical source lines independently of the checkout's line endings.
++		String results = baos.toString("ASCII").replace("\r\n", "\n");
+ 		int end = results.lastIndexOf(";") + 1;
+ 		String endStr = results.substring(end - 9, end);
+ 		assertEquals("theEnd();", endStr);

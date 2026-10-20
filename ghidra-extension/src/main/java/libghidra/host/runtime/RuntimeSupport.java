@@ -9,6 +9,8 @@ package libghidra.host.runtime;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.address.AddressOutOfBoundsException;
 import ghidra.program.model.listing.CommentType;
+import ghidra.program.model.listing.Function;
+import ghidra.program.model.listing.FunctionManager;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.mem.Memory;
 import ghidra.program.model.mem.MemoryAccessException;
@@ -49,9 +51,66 @@ abstract class RuntimeSupport {
 	protected final Program requireProgram() {
 		Program program = state.getCurrentProgram();
 		if (program == null) {
-			throw new SessionRpcException("not_loaded", "no current program");
+			throw new SessionRpcException(SessionRpcException.NOT_LOADED, "no current program");
 		}
 		return program;
+	}
+
+	/**
+	 * The request a write handler was given. The dispatcher always builds one; a
+	 * missing request can only come from an in-process caller and is a bad argument.
+	 */
+	protected static <T> T requireRequest(T request) {
+		if (request == null) {
+			throw SessionRpcException.invalidArgument("request is required");
+		}
+		return request;
+	}
+
+	/** {@code value} trimmed, or {@code invalid_argument} naming {@code what} when blank. */
+	protected static String requireText(String value, String what) {
+		String trimmed = value != null ? value.trim() : "";
+		if (trimmed.isEmpty()) {
+			throw SessionRpcException.invalidArgument(what + " is required");
+		}
+		return trimmed;
+	}
+
+	/**
+	 * The address at {@code offset}, which a memory block must contain. Any write that
+	 * names an address answers {@code unmapped_address} when none does, rather than
+	 * acting on (or creating something at) an address outside the program.
+	 */
+	protected static Address requireMappedAddress(Program program, long offset) {
+		Address address;
+		try {
+			address = toAddress(program, offset);
+		}
+		catch (IllegalArgumentException e) {
+			throw SessionRpcException.unmappedAddress(offset);
+		}
+		if (program.getMemory().getBlock(address) == null) {
+			throw SessionRpcException.unmappedAddress(offset);
+		}
+		return address;
+	}
+
+	/**
+	 * The function a function-scoped write acts on: the one that starts at, or
+	 * contains, {@code offset} (the same rule the reads use). {@code unmapped_address}
+	 * when no block contains it, {@code not_found} when no function does.
+	 */
+	protected static Function requireFunction(Program program, long offset) {
+		Address address = requireMappedAddress(program, offset);
+		FunctionManager functions = program.getFunctionManager();
+		Function function = functions.getFunctionAt(address);
+		if (function == null) {
+			function = functions.getFunctionContaining(address);
+		}
+		if (function == null) {
+			throw SessionRpcException.notFound("no function at 0x" + Long.toHexString(offset));
+		}
+		return function;
 	}
 
 	/**

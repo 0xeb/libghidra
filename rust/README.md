@@ -272,8 +272,8 @@ Both backends share the same record/response types in
 | Health | `get_status`, `get_capabilities` |
 | Session | `open_project`, `close_project`, `list_project_files`, `import_program`, `open_program`, `close_program`, `save_program`, `discard_program`, `get_revision`, `shutdown` (live) |
 | Memory | `read_bytes`, `write_bytes` (live), `patch_bytes_batch` (live), `list_memory_blocks` |
-| Functions | Function lookup/list/rename, basic blocks, CFG edges, structural analysis (live), function tags (live) |
-| Symbols | `get_symbol`, `list_symbols`, `rename_symbol`, `delete_symbol` (live) |
+| Functions | Function lookup/list/rename, `create_function` (live), basic blocks, CFG edges, structural analysis (live), function tags (live) |
+| Symbols | `get_symbol`, `list_symbols`, `create_label`, `rename_symbol`, `delete_symbol` (live) |
 | Xrefs | `list_xrefs` |
 | Types | Queries everywhere; mutations on the live backend |
 | Decompiler | `get_decompilation`, `list_decompilations` |

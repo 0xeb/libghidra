@@ -36,6 +36,15 @@ Binary protobuf over HTTP — **not gRPC**.
 - Response body: serialized `libghidra.RpcResponse` (contains serialized inner response or error)
 - Defined in `rpc.proto`
 
+### Not found
+
+A single-record read (`GetFunction`, `GetSymbol`, `GetInstruction`,
+`DecompileFunction`, `GetPcode`, `GetType`, `GetFunctionSignature`) that names
+nothing is a success whose record field is **unset** (`has_x()` is false; the
+SDKs return an empty optional / `None`). The host never sends a placeholder
+record. An error status is reserved for a request the host cannot serve: with
+no program open these reads fail with `not_loaded`, as every other read does.
+
 ## Codegen
 
 Pre-generated stubs are checked into the repository. **Hand-written code is never touched by regeneration** — generated files live in language-specific generated locations, with Python `_pb2.py` files checked into the package source tree.

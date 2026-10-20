@@ -74,10 +74,12 @@ fn main() {
     // 4. Rename the symbol
     let new_name = format!("{}_renamed", original_name);
     println!("\nRenaming '{}' -> '{}'...", original_name, new_name);
-    let rename = client.rename_symbol(addr, &new_name).unwrap_or_else(|e| {
-        eprintln!("RenameSymbol failed: {e}");
-        std::process::exit(1);
-    });
+    let rename = client
+        .rename_symbol(addr, &new_name, None)
+        .unwrap_or_else(|e| {
+            eprintln!("RenameSymbol failed: {e}");
+            std::process::exit(1);
+        });
     println!("  renamed={}, name=\"{}\"", rename.renamed, rename.name);
 
     // 5. Verify the rename
@@ -89,7 +91,7 @@ fn main() {
     // 6. Restore original name
     println!("\nRestoring original name '{}'...", original_name);
     let restore = client
-        .rename_symbol(addr, &original_name)
+        .rename_symbol(addr, &original_name, None)
         .unwrap_or_else(|e| {
             eprintln!("Restore failed: {e}");
             std::process::exit(1);

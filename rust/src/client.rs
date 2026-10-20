@@ -592,6 +592,30 @@ impl GhidraClient {
         })
     }
 
+    /// Define a function whose entry is `address`. `name: None` takes the backend's
+    /// default name (`FUN_<address>`). Errors: `UnmappedAddress`; `DuplicateName` when a
+    /// function already starts there; `InvalidArgument` when the address is not code or
+    /// cannot start a function.
+    pub fn create_function(
+        &self,
+        address: u64,
+        name: Option<&str>,
+    ) -> Result<CreateFunctionResponse> {
+        let req = pb::CreateFunctionRequest {
+            address,
+            name: name.map(str::to_string),
+        };
+        let resp: pb::CreateFunctionResponse = self.call_rpc(
+            "libghidra.FunctionsService/CreateFunction",
+            &req,
+            "libghidra.CreateFunctionRequest",
+        )?;
+        Ok(CreateFunctionResponse {
+            created: resp.created,
+            function: resp.function.map(Into::into),
+        })
+    }
+
     pub fn rename_function(&self, address: u64, new_name: &str) -> Result<RenameFunctionResponse> {
         let req = pb::RenameFunctionRequest {
             address,
@@ -769,10 +793,39 @@ impl GhidraClient {
         })
     }
 
-    pub fn rename_symbol(&self, address: u64, new_name: &str) -> Result<RenameSymbolResponse> {
+    /// Add the label `name` at `address`; it never renames another symbol. The address
+    /// keeps its symbols and the label is primary only when it had none. Errors:
+    /// `UnmappedAddress`; `DuplicateName` when a symbol of that name is already at the
+    /// address; `InvalidArgument` for a blank or invalid name.
+    pub fn create_label(&self, address: u64, name: &str) -> Result<CreateLabelResponse> {
+        let req = pb::CreateLabelRequest {
+            address,
+            name: name.to_string(),
+        };
+        let resp: pb::CreateLabelResponse = self.call_rpc(
+            "libghidra.SymbolsService/CreateLabel",
+            &req,
+            "libghidra.CreateLabelRequest",
+        )?;
+        Ok(CreateLabelResponse {
+            created: resp.created,
+            symbol: resp.symbol.map(Into::into),
+        })
+    }
+
+    /// Rename a symbol at `address`. `old_name: Some(..)` renames exactly the symbol of
+    /// that name, primary or not (`NotFound` when the address has none); `None` renames
+    /// the primary symbol, or creates a label when the address has none.
+    pub fn rename_symbol(
+        &self,
+        address: u64,
+        new_name: &str,
+        old_name: Option<&str>,
+    ) -> Result<RenameSymbolResponse> {
         let req = pb::RenameSymbolRequest {
             address,
             new_name: new_name.to_string(),
+            old_name: old_name.map(str::to_string),
         };
         let resp: pb::RenameSymbolResponse = self.call_rpc(
             "libghidra.SymbolsService/RenameSymbol",

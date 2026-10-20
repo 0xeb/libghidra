@@ -6,6 +6,14 @@
 package libghidra;
 
 /**
+ * <pre>
+ * Not found: `decompilation` is unset when no function contains the address.
+ * A function the decompiler cannot finish is a record with completed = false
+ * and error_message set.
+ * With no program open the call fails with the RpcResponse error code
+ * "not_loaded".
+ * </pre>
+ *
  * Protobuf type {@code libghidra.DecompileFunctionResponse}
  */
 public final class DecompileFunctionResponse extends
@@ -232,6 +240,14 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * Not found: `decompilation` is unset when no function contains the address.
+   * A function the decompiler cannot finish is a record with completed = false
+   * and error_message set.
+   * With no program open the call fails with the RpcResponse error code
+   * "not_loaded".
+   * </pre>
+   *
    * Protobuf type {@code libghidra.DecompileFunctionResponse}
    */
   public static final class Builder extends

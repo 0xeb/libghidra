@@ -36,6 +36,10 @@ message GetInstructionRequest {
   uint64 address = 2;
 }
 
+// Not found: `instruction` is unset unless an instruction of the listing
+// starts at the address (not inside one, not in data, not unmapped).
+// With no program open the call fails with the RpcResponse error code
+// "not_loaded".
 message GetInstructionResponse {
   InstructionRecord instruction = 1;
 }

@@ -42,6 +42,17 @@ public final class FunctionsContract {
 	public record ListFunctionsResponse(List<FunctionRecord> functions) {
 	}
 
+	/** {@code name} is null when the caller left it unset (the backend default name). */
+	public record CreateFunctionRequest(
+		long address,
+		String name) {
+	}
+
+	public record CreateFunctionResponse(
+		boolean created,
+		FunctionRecord function) {
+	}
+
 	public record RenameFunctionRequest(
 		long address,
 		String newName) {

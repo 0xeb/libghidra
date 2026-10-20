@@ -83,7 +83,7 @@ public final class AnalysisRuntime extends RuntimeSupport implements AnalysisOpe
 			AnalysisContract.StartAnalysisRequest request) {
 		if (!startSupported) {
 			throw new SessionRpcException(
-				"NOT_SUPPORTED",
+				SessionRpcException.NOT_SUPPORTED,
 				"start_analysis() is not supported for an attached GUI host; use Analysis > Auto Analyze");
 		}
 		String mode = normalizeMode(request != null ? request.mode() : "");
@@ -98,7 +98,7 @@ public final class AnalysisRuntime extends RuntimeSupport implements AnalysisOpe
 		worker.setDaemon(true);
 		if (!state.claimAnalysis(worker, id, monitor)) {
 			throw new SessionRpcException(
-				"analysis_running",
+				SessionRpcException.ANALYSIS_RUNNING,
 				"an analysis job is already running; poll ListAnalysisJobs or CancelAnalysis");
 		}
 		synchronized (history) {
@@ -127,11 +127,22 @@ public final class AnalysisRuntime extends RuntimeSupport implements AnalysisOpe
 		return new AnalysisContract.ListAnalysisJobsResponse(out);
 	}
 
+	/**
+	 * Cancels the running job ({@code job_id} 0 means whichever runs). No running job,
+	 * or a job id that is not the running one, is {@code not_found}. Lock-free on
+	 * purpose: the running job owns the program.
+	 */
 	@Override
 	public AnalysisContract.CancelAnalysisResponse cancelAnalysis(
 			AnalysisContract.CancelAnalysisRequest request) {
+		requireProgram();
 		long jobId = request != null ? request.jobId() : 0L;
-		return new AnalysisContract.CancelAnalysisResponse(state.cancelAnalysis(jobId));
+		if (!state.cancelAnalysis(jobId)) {
+			throw SessionRpcException.notFound(jobId == 0L
+				? "no analysis job is running"
+				: "analysis job " + jobId + " is not running");
+		}
+		return new AnalysisContract.CancelAnalysisResponse(true);
 	}
 
 	private void run(Program program, Job job, TaskMonitor monitor) {
@@ -190,6 +201,6 @@ public final class AnalysisRuntime extends RuntimeSupport implements AnalysisOpe
 			return MODE_ALL;
 		}
 		throw new SessionRpcException(
-			"invalid_argument", "analysis mode must be 'changed' or 'all', not '" + mode + "'");
+			SessionRpcException.INVALID_ARGUMENT, "analysis mode must be 'changed' or 'all', not '" + mode + "'");
 	}
 }

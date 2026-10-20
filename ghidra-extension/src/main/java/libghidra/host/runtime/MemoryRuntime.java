@@ -30,7 +30,7 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 		try (LockScope ignored = readLock()) {
 			Program program = currentProgram();
 			if (program == null) {
-				throw new SessionRpcException("not_loaded", "no current program");
+				throw new SessionRpcException(SessionRpcException.NOT_LOADED, "no current program");
 			}
 			if (request == null || request.length() <= 0) {
 				return new MemoryContract.ReadBytesResponse(new byte[0]);
@@ -44,7 +44,7 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 				// explicitly first so the error code/message is precise.
 				Memory memory = program.getMemory();
 				if (memory.getBlock(address) == null) {
-					throw new SessionRpcException("unmapped_address",
+					throw new SessionRpcException(SessionRpcException.UNMAPPED_ADDRESS,
 						"no memory block for address 0x" + Long.toHexString(request.address()));
 				}
 				int length = Math.max(0, request.length());
@@ -63,12 +63,12 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 				// not readable — e.g. a present-but-uninitialized block such as
 				// .bss (Memory.getBytes throws here). This is distinct from
 				// "unmapped": the address IS mapped, it just has no stored bytes.
-				throw new SessionRpcException("uninitialized_memory",
+				throw new SessionRpcException(SessionRpcException.UNINITIALIZED_MEMORY,
 					"read failed at 0x" + Long.toHexString(request.address()) + ": " + e.getMessage());
 			}
 			catch (IllegalArgumentException e) {
 				// The requested address does not resolve to any memory space.
-				throw new SessionRpcException("unmapped_address",
+				throw new SessionRpcException(SessionRpcException.UNMAPPED_ADDRESS,
 					"read failed at 0x" + Long.toHexString(request.address()) + ": " + e.getMessage());
 			}
 		}
@@ -77,12 +77,10 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 	@Override
 	public MemoryContract.WriteBytesResponse writeBytes(MemoryContract.WriteBytesRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				throw new SessionRpcException("not_loaded", "no current program");
-			}
-			if (request == null || request.data() == null || request.data().length == 0) {
-				return new MemoryContract.WriteBytesResponse(0);
+			Program program = requireProgram();
+			requireRequest(request);
+			if (request.data() == null || request.data().length == 0) {
+				throw SessionRpcException.invalidArgument("data is required");
 			}
 			int tx = program.startTransaction("libghidra write bytes");
 			boolean commit = false;
@@ -93,21 +91,19 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 				return new MemoryContract.WriteBytesResponse(request.data().length);
 			}
 			catch (MemoryAccessException e) {
-				// The block exists but the write is not permitted here — e.g. it
+				// The block exists but the write is not permitted here -- e.g. it
 				// overlaps defined instructions (checkRangeForInstructions throws).
 				// Distinct from "unmapped": the address IS backed by a block.
 				Msg.error(this, "writeBytes failed at 0x" +
 					Long.toHexString(request.address()) + ": " + e.getMessage(), e);
-				throw new SessionRpcException("access_conflict",
+				throw new SessionRpcException(SessionRpcException.ACCESS_CONFLICT,
 					"write failed at 0x" + Long.toHexString(request.address()) + ": " + e.getMessage());
 			}
 			catch (IllegalArgumentException e) {
 				// writeBytesForceWritable throws IllegalArgumentException when no
-				// block backs the address — a genuine unmapped write, not a
+				// block backs the address -- a genuine unmapped write, not a
 				// zero-bytes-written success.
-				Msg.error(this, "writeBytes failed at 0x" +
-					Long.toHexString(request.address()) + ": " + e.getMessage(), e);
-				throw new SessionRpcException("unmapped_address",
+				throw new SessionRpcException(SessionRpcException.UNMAPPED_ADDRESS,
 					"write failed at 0x" + Long.toHexString(request.address()) + ": " + e.getMessage());
 			}
 			finally {
@@ -116,14 +112,21 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 		}
 	}
 
+	/** Applies every patch or none: one bad patch rolls the whole batch back. */
 	@Override
 	public MemoryContract.PatchBytesBatchResponse patchBytesBatch(
 			MemoryContract.PatchBytesBatchRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null || request.patches() == null ||
-				request.patches().isEmpty()) {
-				return new MemoryContract.PatchBytesBatchResponse(0, 0);
+			Program program = requireProgram();
+			requireRequest(request);
+			if (request.patches() == null || request.patches().isEmpty()) {
+				throw SessionRpcException.invalidArgument("patches are required");
+			}
+			for (int i = 0; i < request.patches().size(); i++) {
+				MemoryContract.BytePatch patch = request.patches().get(i);
+				if (patch == null || patch.data() == null || patch.data().length == 0) {
+					throw SessionRpcException.invalidArgument("patch " + i + " has no data");
+				}
 			}
 			int tx = program.startTransaction("libghidra patch bytes batch");
 			boolean commit = false;
@@ -131,9 +134,6 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 				int patchCount = 0;
 				int bytesWritten = 0;
 				for (MemoryContract.BytePatch patch : request.patches()) {
-					if (patch == null || patch.data() == null || patch.data().length == 0) {
-						continue;
-					}
 					Address address = toAddress(program, patch.address());
 					writeBytesForceWritable(program, address, patch.data());
 					patchCount++;
@@ -144,16 +144,13 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 			}
 			catch (MemoryAccessException e) {
 				// The batch is atomic (single transaction): one bad patch rolls
-				// back ALL valid patches. Returning (0,0) would report that
-				// silent rollback as a no-error success, so surface it instead,
-				// mirroring the sibling writeBytes contract.
+				// back ALL valid patches, and the caller is told so.
 				Msg.error(this, "patchBytesBatch failed: " + e.getMessage(), e);
-				throw new SessionRpcException("access_conflict",
+				throw new SessionRpcException(SessionRpcException.ACCESS_CONFLICT,
 					"patch batch failed and was rolled back: " + e.getMessage());
 			}
 			catch (IllegalArgumentException e) {
-				Msg.error(this, "patchBytesBatch failed: " + e.getMessage(), e);
-				throw new SessionRpcException("unmapped_address",
+				throw new SessionRpcException(SessionRpcException.UNMAPPED_ADDRESS,
 					"patch batch failed and was rolled back: " + e.getMessage());
 			}
 			finally {
@@ -218,20 +215,17 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 			nullableString(block.getComment()));
 	}
 
+	/** Creates a block. Overlapping an existing block is {@code invalid_argument}. */
 	@Override
 	public MemoryContract.CreateMemoryBlockResponse createMemoryBlock(
 			MemoryContract.CreateMemoryBlockRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new MemoryContract.CreateMemoryBlockResponse(false, null, "not_loaded",
-					"no current program");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
 			// size is a proto uint64 carried in a Java long: a block >= 2^63 arrives
 			// as a negative long, so an unsigned compare is required. Only 0 is invalid.
 			if (request.size() == 0L) {
-				return new MemoryContract.CreateMemoryBlockResponse(false, null, "invalid_argument",
-					"size must be > 0");
+				throw SessionRpcException.invalidArgument("size must be > 0");
 			}
 			String name = (request.name() != null && !request.name().isBlank())
 				? request.name().trim()
@@ -252,9 +246,7 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 				return new MemoryContract.CreateMemoryBlockResponse(true, toRecord(block), "", "");
 			}
 			catch (Exception e) {
-				Msg.error(this, "createMemoryBlock failed: " + e.getMessage(), e);
-				return new MemoryContract.CreateMemoryBlockResponse(false, null, "create_error",
-					String.valueOf(e.getMessage()));
+				throw SessionRpcException.from("create memory block", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -266,28 +258,18 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 	public MemoryContract.RemoveMemoryBlockResponse removeMemoryBlock(
 			MemoryContract.RemoveMemoryBlockRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new MemoryContract.RemoveMemoryBlockResponse(false, "not_loaded",
-					"no current program");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			MemoryBlock block = requireBlock(program, request.address());
 			int tx = program.startTransaction("libghidra remove memory block");
 			boolean commit = false;
 			try {
-				Memory memory = program.getMemory();
-				MemoryBlock block = memory.getBlock(toAddress(program, request.address()));
-				if (block == null) {
-					return new MemoryContract.RemoveMemoryBlockResponse(false, "not_found",
-						"no memory block at 0x" + Long.toHexString(request.address()));
-				}
-				memory.removeBlock(block, TaskMonitor.DUMMY);
+				program.getMemory().removeBlock(block, TaskMonitor.DUMMY);
 				commit = true;
 				return new MemoryContract.RemoveMemoryBlockResponse(true, "", "");
 			}
 			catch (Exception e) {
-				Msg.error(this, "removeMemoryBlock failed: " + e.getMessage(), e);
-				return new MemoryContract.RemoveMemoryBlockResponse(false, "remove_error",
-					String.valueOf(e.getMessage()));
+				throw SessionRpcException.from("remove memory block", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -295,25 +277,23 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 		}
 	}
 
+	/** The block containing {@code address}; an address no block contains is unmapped. */
+	private static MemoryBlock requireBlock(Program program, long address) {
+		Address resolved = requireMappedAddress(program, address);
+		return program.getMemory().getBlock(resolved);
+	}
+
 	@Override
 	public MemoryContract.SetMemoryBlockAttributesResponse setMemoryBlockAttributes(
 			MemoryContract.SetMemoryBlockAttributesRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
-					"not_loaded", "no current program");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			MemoryBlock block = requireBlock(program, request.address());
 			int tx = program.startTransaction("libghidra set memory block attributes");
 			boolean commit = false;
 			try {
 				Memory memory = program.getMemory();
-				MemoryBlock block = memory.getBlock(toAddress(program, request.address()));
-				if (block == null) {
-					return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
-						"not_found",
-						"no memory block at 0x" + Long.toHexString(request.address()));
-				}
 				// Permissions and name are direct setters. Null means "leave alone".
 				if (request.isRead() != null) {
 					block.setRead(request.isRead());
@@ -330,14 +310,12 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 				if (request.endAddress() != null) {
 					String err = resizeBlock(memory, block, request.endAddress());
 					if (err != null) {
-						return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
-							"resize_error", err);
+						throw SessionRpcException.invalidArgument(err);
 					}
 					// split/join replace the handle; re-fetch from the (unchanged) start.
 					block = memory.getBlock(toAddress(program, block.getStart().getOffset()));
 					if (block == null) {
-						return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
-							"resize_error", "block vanished after resize");
+						throw SessionRpcException.internalError("block vanished after resize");
 					}
 				}
 				commit = true;
@@ -345,9 +323,7 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 					toRecord(block), "", "");
 			}
 			catch (Exception e) {
-				Msg.error(this, "setMemoryBlockAttributes failed: " + e.getMessage(), e);
-				return new MemoryContract.SetMemoryBlockAttributesResponse(false, null,
-					"set_attributes_error", String.valueOf(e.getMessage()));
+				throw SessionRpcException.from("set memory block attributes", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -413,42 +389,33 @@ public final class MemoryRuntime extends RuntimeSupport implements MemoryOperati
 		return null;
 	}
 
+	/** Moves a block. Moving it onto another block is {@code invalid_argument}. */
 	@Override
 	public MemoryContract.MoveMemoryBlockResponse moveMemoryBlock(
 			MemoryContract.MoveMemoryBlockRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new MemoryContract.MoveMemoryBlockResponse(false, null, "not_loaded",
-					"no current program");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			MemoryBlock block = requireBlock(program, request.address());
 			int tx = program.startTransaction("libghidra move memory block");
 			boolean commit = false;
 			try {
 				Memory memory = program.getMemory();
-				MemoryBlock block = memory.getBlock(toAddress(program, request.address()));
-				if (block == null) {
-					return new MemoryContract.MoveMemoryBlockResponse(false, null, "not_found",
-						"no memory block at 0x" + Long.toHexString(request.address()));
-				}
 				Address newStart = toAddress(program, request.newStartAddress());
 				memory.moveBlock(block, newStart, TaskMonitor.DUMMY);
 				// The pre-move `block` handle is stale once moveBlock relocates it;
 				// always re-fetch at the new start rather than serialize the old range.
 				MemoryBlock moved = memory.getBlock(newStart);
 				if (moved == null) {
-					return new MemoryContract.MoveMemoryBlockResponse(false, null, "move_error",
-						"block not found at new start 0x" + Long.toHexString(request.newStartAddress())
-							+ " after move");
+					throw SessionRpcException.internalError("block not found at new start 0x" +
+						Long.toHexString(request.newStartAddress()) + " after move");
 				}
 				commit = true;
 				return new MemoryContract.MoveMemoryBlockResponse(true,
 					toRecord(moved), "", "");
 			}
 			catch (Exception e) {
-				Msg.error(this, "moveMemoryBlock failed: " + e.getMessage(), e);
-				return new MemoryContract.MoveMemoryBlockResponse(false, null, "move_error",
-					String.valueOf(e.getMessage()));
+				throw SessionRpcException.from("move memory block", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);

@@ -50,6 +50,17 @@ def main() -> int:
         if len(programs) < 2:
             return 0
 
+        # Importing does not make a program active, and close_program() needs one
+        # (no active program is a not_loaded error), so open the first, then switch.
+        first = host.open_program(
+            ghidra.OpenProgramRequest(
+                project_path=args.project_dir,
+                project_name=args.project_name,
+                program_path=programs[0].path,
+            )
+        )
+        print(f"active  {programs[0].path} -> {first.program_name}")
+
         host.close_program(ghidra.ShutdownPolicy.SAVE)
         opened = host.open_program(
             ghidra.OpenProgramRequest(

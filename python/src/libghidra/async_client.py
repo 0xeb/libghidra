@@ -91,6 +91,8 @@ from .models import (
     CloseProgramResponse,
     CommentKind,
     CommentRecord,
+    CreateFunctionResponse,
+    CreateLabelResponse,
     CreateTypeAliasResponse,
     CreateTypeEnumResponse,
     CreateTypeResponse,
@@ -581,6 +583,17 @@ class AsyncGhidraClient:
         resp = await self._call_rpc("libghidra.FunctionsService/ListLeafFunctions", req, functions_pb2.ListFunctionsResponse)
         return ListFunctionsResponse(functions=[_to_function(f) for f in resp.functions])
 
+    async def create_function(self, address: int, name: str | None = None) -> CreateFunctionResponse:
+        """Define a function whose entry is ``address`` (see ``GhidraClient.create_function``)."""
+        req = functions_pb2.CreateFunctionRequest(address=address)
+        if name is not None:
+            req.name = name
+        resp = await self._call_rpc("libghidra.FunctionsService/CreateFunction", req, functions_pb2.CreateFunctionResponse)
+        return CreateFunctionResponse(
+            created=resp.created,
+            function=_to_function(resp.function) if resp.HasField("function") else None,
+        )
+
     async def rename_function(self, address: int, new_name: str) -> RenameFunctionResponse:
         req = functions_pb2.RenameFunctionRequest(address=address, new_name=new_name)
         resp = await self._call_rpc("libghidra.FunctionsService/RenameFunction", req, functions_pb2.RenameFunctionResponse)
@@ -672,8 +685,20 @@ class AsyncGhidraClient:
         resp = await self._call_rpc("libghidra.SymbolsService/ListSymbols", req, symbols_pb2.ListSymbolsResponse)
         return ListSymbolsResponse(symbols=[_to_symbol(s) for s in resp.symbols])
 
-    async def rename_symbol(self, address: int, new_name: str) -> RenameSymbolResponse:
+    async def create_label(self, address: int, name: str) -> CreateLabelResponse:
+        """Add the label ``name`` at ``address`` (see ``GhidraClient.create_label``)."""
+        req = symbols_pb2.CreateLabelRequest(address=address, name=name)
+        resp = await self._call_rpc("libghidra.SymbolsService/CreateLabel", req, symbols_pb2.CreateLabelResponse)
+        return CreateLabelResponse(
+            created=resp.created,
+            symbol=_to_symbol(resp.symbol) if resp.HasField("symbol") else None,
+        )
+
+    async def rename_symbol(self, address: int, new_name: str, old_name: str | None = None) -> RenameSymbolResponse:
+        """Rename a symbol at ``address`` (see ``GhidraClient.rename_symbol``)."""
         req = symbols_pb2.RenameSymbolRequest(address=address, new_name=new_name)
+        if old_name is not None:
+            req.old_name = old_name
         resp = await self._call_rpc("libghidra.SymbolsService/RenameSymbol", req, symbols_pb2.RenameSymbolResponse)
         return RenameSymbolResponse(renamed=resp.renamed, name=resp.name)
 

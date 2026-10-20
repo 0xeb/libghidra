@@ -6,7 +6,7 @@
 
 // annotated_decompile: Full-workflow demonstration of the libghidra local backend.
 //
-// Exercises: CreateType (structs), CreateTypeEnum (enums), RenameFunction,
+// Exercises: CreateType (structs), CreateTypeEnum (enums), CreateFunction,
 // SetFunctionSignature, SaveProgram, restore via re-OpenProgram.
 //
 // Usage: annotated_decompile <binary> [ghidra_root] [arch]
@@ -53,13 +53,13 @@ int main(int argc, char* argv[]) {
   std::cout << "CreateTypeEnum(status_t): " << (er.ok() ? "OK" : er.status.message)
             << "\n";
 
-  // --- Name functions ---
-  auto n1 = client->RenameFunction(0x1000, "process_packet");
-  std::cout << "RenameFunction(0x1000, process_packet): "
+  // --- Define the functions (a rename never creates one) ---
+  auto n1 = client->CreateFunction(0x1000, "process_packet");
+  std::cout << "CreateFunction(0x1000, process_packet): "
             << (n1.ok() ? "OK" : n1.status.message) << "\n";
 
-  auto n2 = client->RenameFunction(0x2000, "validate_checksum");
-  std::cout << "RenameFunction(0x2000, validate_checksum): "
+  auto n2 = client->CreateFunction(0x2000, "validate_checksum");
+  std::cout << "CreateFunction(0x2000, validate_checksum): "
             << (n2.ok() ? "OK" : n2.status.message) << "\n";
 
   // --- Set function prototype ---

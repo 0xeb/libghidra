@@ -29,7 +29,8 @@ enum NodeType : uint8_t {
 using RecordCallback = std::function<bool(const Record& record)>;
 
 // BTreeReader: reads tables from a .gbf buffer file.
-// Supports LongKey (types 0,1,2) and VarKey (types 3,4) node traversal.
+// Supports LongKey (types 0,1,2), VarKey (types 3,4) and FixedKey (types 5,6,7)
+// node traversal.
 class BTreeReader {
 public:
     explicit BTreeReader(BufferFile& bf) : bf_(bf) {}
@@ -66,6 +67,10 @@ private:
 
     // Read all records from a VarKey record leaf (type 4)
     bool readVarKeyRecLeaf(const std::vector<uint8_t>& buf, const Schema& schema, RecordCallback& cb);
+
+    // Recursive traversal for FixedKey nodes (types 5, 6, 7): fixed-width
+    // non-long keys such as the ByteField key of "Calling Conventions"
+    bool traverseFixedKey(int32_t buffer_id, const Schema& schema, RecordCallback& cb);
 
     // Read data from a chained buffer
     bool readChainedBuffer(int32_t buffer_id, std::vector<uint8_t>& out);

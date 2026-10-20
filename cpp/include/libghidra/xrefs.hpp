@@ -26,7 +26,7 @@ class IXrefsClient {
                                                   int limit,
                                                   int offset) {
     return StatusOr<ListXrefsResponse>::FromError(
-        "NOT_SUPPORTED", "exact destination xrefs are not implemented by this backend");
+        error_codes::kNotSupported, "exact destination xrefs are not implemented by this backend");
   }
 
   virtual StatusOr<ListXrefsResponse> ListXrefsFromFunction(
@@ -34,7 +34,7 @@ class IXrefsClient {
       int limit,
       int offset) {
     return StatusOr<ListXrefsResponse>::FromError(
-        "NOT_SUPPORTED", "exact function xrefs are not implemented by this backend");
+        error_codes::kNotSupported, "exact function xrefs are not implemented by this backend");
   }
 
   virtual StatusOr<ListXrefsResponse> ListXrefsToFunction(
@@ -42,7 +42,7 @@ class IXrefsClient {
       int limit,
       int offset) {
     return StatusOr<ListXrefsResponse>::FromError(
-        "NOT_SUPPORTED", "exact destination-function xrefs are not implemented by this backend");
+        error_codes::kNotSupported, "exact destination-function xrefs are not implemented by this backend");
   }
 };
 

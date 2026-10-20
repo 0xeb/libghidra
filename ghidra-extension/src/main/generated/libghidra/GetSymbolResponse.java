@@ -6,6 +6,13 @@
 package libghidra;
 
 /**
+ * <pre>
+ * Not found: `symbol` is unset when no memory block backs the address or no
+ * symbol is there.
+ * With no program open the call fails with the RpcResponse error code
+ * "not_loaded".
+ * </pre>
+ *
  * Protobuf type {@code libghidra.GetSymbolResponse}
  */
 public final class GetSymbolResponse extends
@@ -232,6 +239,13 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * Not found: `symbol` is unset when no memory block backs the address or no
+   * symbol is there.
+   * With no program open the call fails with the RpcResponse error code
+   * "not_loaded".
+   * </pre>
+   *
    * Protobuf type {@code libghidra.GetSymbolResponse}
    */
   public static final class Builder extends

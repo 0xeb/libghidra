@@ -33,6 +33,10 @@ message GetSymbolRequest {
   uint64 address = 2;
 }
 
+// Not found: `symbol` is unset when no memory block backs the address or no
+// symbol is there.
+// With no program open the call fails with the RpcResponse error code
+// "not_loaded".
 message GetSymbolResponse {
   SymbolRecord symbol = 1;
 }
@@ -51,11 +55,36 @@ message ListSymbolsResponse {
 message RenameSymbolRequest {
   uint64 address = 2;
   string new_name = 3;
+  // Which symbol at the address to rename. Set: exactly the symbol of that name
+  // (not_found if the address has none). Unset: the address's primary symbol.
+  optional string old_name = 4;
 }
 
 message RenameSymbolResponse {
   bool renamed = 1;
   string name = 2;
+}
+
+// Add a label `name` at `address`. It never renames: an address that already
+// has symbols keeps them and gains this one (primary only when the address had no
+// symbol). The label is USER_DEFINED in the global namespace.
+//
+// Errors (RpcResponse error_code):
+//   unmapped_address  no memory block contains the address
+//   duplicate_name    a symbol of that name is already at the address
+//   invalid_argument  the name is blank or not a valid symbol name
+//   not_loaded        no program is open
+//
+// Field 1 reserved for future common request context.
+message CreateLabelRequest {
+  uint64 address = 2;
+  string name = 3;
+}
+
+// On success `created` is true and `symbol` is the new label's record.
+message CreateLabelResponse {
+  bool created = 1;
+  SymbolRecord symbol = 2;
 }
 
 // Field 1 reserved for future common request context.
@@ -72,6 +101,7 @@ message DeleteSymbolResponse {
 service SymbolsService {
   rpc GetSymbol(GetSymbolRequest) returns (GetSymbolResponse);
   rpc ListSymbols(ListSymbolsRequest) returns (ListSymbolsResponse);
+  rpc CreateLabel(CreateLabelRequest) returns (CreateLabelResponse);
   rpc RenameSymbol(RenameSymbolRequest) returns (RenameSymbolResponse);
   rpc DeleteSymbol(DeleteSymbolRequest) returns (DeleteSymbolResponse);
 }

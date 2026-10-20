@@ -6,6 +6,13 @@
 package libghidra;
 
 /**
+ * <pre>
+ * `types_created` counts the named types the text created (structures, unions,
+ * enums, typedefs, function definitions) and `type_names` lists their paths; a
+ * pointer or array type the text needed is not counted. All or nothing: text
+ * that does not parse is the error parse_error and creates no type.
+ * </pre>
+ *
  * Protobuf type {@code libghidra.ParseDeclarationsResponse}
  */
 public final class ParseDeclarationsResponse extends
@@ -323,6 +330,13 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * `types_created` counts the named types the text created (structures, unions,
+   * enums, typedefs, function definitions) and `type_names` lists their paths; a
+   * pointer or array type the text needed is not counted. All or nothing: text
+   * that does not parse is the error parse_error and creates no type.
+   * </pre>
+   *
    * Protobuf type {@code libghidra.ParseDeclarationsResponse}
    */
   public static final class Builder extends

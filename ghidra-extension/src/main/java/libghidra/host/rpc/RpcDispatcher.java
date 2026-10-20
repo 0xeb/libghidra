@@ -37,10 +37,10 @@ public final class RpcDispatcher {
 
 	public libghidra.RpcResponse dispatch(libghidra.RpcRequest request) {
 		if (callbacks == null) {
-			return error("config_error", "callbacks not configured");
+			return error(SessionRpcException.CONFIG_ERROR, "callbacks not configured");
 		}
 		if (request == null || request.getMethod().isBlank()) {
-			return error("invalid_argument", "method is required");
+			return error(SessionRpcException.INVALID_ARGUMENT, "method is required");
 		}
 		try {
 			switch (request.getMethod()) {
@@ -110,6 +110,8 @@ public final class RpcDispatcher {
 					return functionsListFunctions(request);
 				case "libghidra.FunctionsService/ListLeafFunctions":
 					return functionsListLeafFunctions(request);
+				case "libghidra.FunctionsService/CreateFunction":
+					return functionsCreateFunction(request);
 				case "libghidra.FunctionsService/RenameFunction":
 					return functionsRenameFunction(request);
 				case "libghidra.FunctionsService/ListBasicBlocks":
@@ -142,6 +144,8 @@ public final class RpcDispatcher {
 					return symbolsGetSymbol(request);
 				case "libghidra.SymbolsService/ListSymbols":
 					return symbolsListSymbols(request);
+				case "libghidra.SymbolsService/CreateLabel":
+					return symbolsCreateLabel(request);
 				case "libghidra.SymbolsService/RenameSymbol":
 					return symbolsRenameSymbol(request);
 				case "libghidra.SymbolsService/DeleteSymbol":
@@ -265,11 +269,11 @@ public final class RpcDispatcher {
 				case "libghidra.TypesService/ParseDeclarations":
 					return typesParseDeclarations(request);
 				default:
-					return error("unknown_method", "unsupported method: " + request.getMethod());
+					return error(SessionRpcException.UNKNOWN_METHOD, "unsupported method: " + request.getMethod());
 			}
 		}
 		catch (InvalidProtocolBufferException e) {
-			return error("invalid_payload", e.getMessage());
+			return error(SessionRpcException.INVALID_PAYLOAD, e.getMessage());
 		}
 		catch (SessionRpcException e) {
 			return error(e.code(), e.getMessage());
@@ -279,7 +283,7 @@ public final class RpcDispatcher {
 			if (message == null || message.isBlank()) {
 				message = e.toString();
 			}
-			return error("internal_error", message);
+			return error(SessionRpcException.INTERNAL_ERROR, message);
 		}
 	}
 
@@ -349,6 +353,7 @@ public final class RpcDispatcher {
 		SessionContract.CloseProjectResponse response = callbacks.closeProject(
 			new SessionContract.CloseProjectRequest(
 				toPolicy(protoRequest.getShutdownPolicy())));
+		requireEffect(response != null && response.closed(), "CloseProject");
 		libghidra.CloseProjectResponse proto = libghidra.CloseProjectResponse.newBuilder()
 			.setClosed(response != null && response.closed())
 			.build();
@@ -464,6 +469,7 @@ public final class RpcDispatcher {
 		SessionContract.CloseProgramResponse response = callbacks.closeProgram(
 			new SessionContract.CloseProgramRequest(
 				toPolicy(protoRequest.getShutdownPolicy())));
+		requireEffect(response != null && response.closed(), "CloseProgram");
 		libghidra.CloseProgramResponse proto = libghidra.CloseProgramResponse.newBuilder()
 			.setClosed(response != null && response.closed())
 			.build();
@@ -477,6 +483,7 @@ public final class RpcDispatcher {
 			libghidra.SaveProgramRequest.getDefaultInstance());
 		SessionContract.SaveProgramResponse response = callbacks.saveProgram(
 			new SessionContract.SaveProgramRequest());
+		requireEffect(response != null && response.saved(), "SaveProgram");
 		libghidra.SaveProgramResponse proto = libghidra.SaveProgramResponse.newBuilder()
 			.setSaved(response != null && response.saved())
 			.build();
@@ -490,6 +497,7 @@ public final class RpcDispatcher {
 			libghidra.DiscardProgramRequest.getDefaultInstance());
 		SessionContract.DiscardProgramResponse response = callbacks.discardProgram(
 			new SessionContract.DiscardProgramRequest());
+		requireEffect(response != null && response.discarded(), "DiscardProgram");
 		libghidra.DiscardProgramResponse proto = libghidra.DiscardProgramResponse.newBuilder()
 			.setDiscarded(response != null && response.discarded())
 			.build();
@@ -522,6 +530,7 @@ public final class RpcDispatcher {
 			libghidra.ShutdownRequest.getDefaultInstance());
 		SessionContract.ShutdownResponse response = callbacks.shutdown(
 			new SessionContract.ShutdownRequest(toPolicy(protoRequest.getShutdownPolicy())));
+		requireEffect(response != null && response.accepted(), "Shutdown");
 		libghidra.ShutdownResponse proto = libghidra.ShutdownResponse.newBuilder()
 			.setAccepted(response != null && response.accepted())
 			.build();
@@ -538,6 +547,7 @@ public final class RpcDispatcher {
 			: null;
 		SessionContract.AddPerfBenchmarkResponse response = callbacks.addPerfBenchmark(
 			new SessionContract.AddPerfBenchmarkRequest(record));
+		requireEffect(response != null && response.added(), "AddPerfBenchmark");
 		libghidra.AddPerfBenchmarkResponse proto = libghidra.AddPerfBenchmarkResponse.newBuilder()
 			.setAdded(response != null && response.added())
 			.build();
@@ -571,6 +581,7 @@ public final class RpcDispatcher {
 			libghidra.ClearPerfBenchmarksRequest.getDefaultInstance());
 		SessionContract.ClearPerfBenchmarksResponse response = callbacks.clearPerfBenchmarks(
 			new SessionContract.ClearPerfBenchmarksRequest());
+		requireEffect(response != null && response.cleared(), "ClearPerfBenchmarks");
 		libghidra.ClearPerfBenchmarksResponse proto = libghidra.ClearPerfBenchmarksResponse.newBuilder()
 			.setCleared(response != null && response.cleared())
 			.setRemovedCount(response != null ? response.removedCount() : 0)
@@ -585,6 +596,7 @@ public final class RpcDispatcher {
 			libghidra.DeletePerfBenchmarkRequest.getDefaultInstance());
 		SessionContract.DeletePerfBenchmarkResponse response = callbacks.deletePerfBenchmark(
 			new SessionContract.DeletePerfBenchmarkRequest(protoRequest.getBenchId()));
+		requireEffect(response != null && response.deleted(), "DeletePerfBenchmark");
 		libghidra.DeletePerfBenchmarkResponse proto = libghidra.DeletePerfBenchmarkResponse.newBuilder()
 			.setDeleted(response != null && response.deleted())
 			.build();
@@ -629,6 +641,7 @@ public final class RpcDispatcher {
 		SessionContract.SetProgramOptionResponse response = callbacks.setProgramOption(
 			new SessionContract.SetProgramOptionRequest(
 				protoRequest.getCategory(), protoRequest.getName(), protoRequest.getValue()));
+		requireEffect(response != null && response.applied(), "SetProgramOption");
 		libghidra.SetProgramOptionResponse proto = libghidra.SetProgramOptionResponse.newBuilder()
 			.setApplied(response != null && response.applied())
 			.setPreviousValue(nullable(response != null ? response.previousValue() : null))
@@ -699,6 +712,7 @@ public final class RpcDispatcher {
 			libghidra.CancelAnalysisRequest.getDefaultInstance());
 		AnalysisContract.CancelAnalysisResponse response = callbacks.cancelAnalysis(
 			new AnalysisContract.CancelAnalysisRequest(protoRequest.getJobId()));
+		requireEffect(response != null && response.cancelled(), "CancelAnalysis");
 		libghidra.CancelAnalysisResponse proto = libghidra.CancelAnalysisResponse.newBuilder()
 			.setCancelled(response != null && response.cancelled())
 			.build();
@@ -866,14 +880,10 @@ public final class RpcDispatcher {
 				protoRequest.getIsExecute(),
 				protoRequest.getInitialized(),
 				protoRequest.getOverlay()));
-		if (response != null && !response.created() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "create_memory_block_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.created(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"CreateMemoryBlock");
 		libghidra.CreateMemoryBlockResponse.Builder out =
 			libghidra.CreateMemoryBlockResponse.newBuilder()
 				.setCreated(response != null && response.created());
@@ -890,14 +900,10 @@ public final class RpcDispatcher {
 			libghidra.RemoveMemoryBlockRequest.getDefaultInstance());
 		MemoryContract.RemoveMemoryBlockResponse response = callbacks.removeMemoryBlock(
 			new MemoryContract.RemoveMemoryBlockRequest(protoRequest.getAddress()));
-		if (response != null && !response.removed() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "remove_memory_block_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.removed(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"RemoveMemoryBlock");
 		libghidra.RemoveMemoryBlockResponse proto =
 			libghidra.RemoveMemoryBlockResponse.newBuilder()
 				.setRemoved(response != null && response.removed())
@@ -914,14 +920,10 @@ public final class RpcDispatcher {
 			new MemoryContract.MoveMemoryBlockRequest(
 				protoRequest.getAddress(),
 				protoRequest.getNewStartAddress()));
-		if (response != null && !response.moved() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "move_memory_block_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.moved(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"MoveMemoryBlock");
 		libghidra.MoveMemoryBlockResponse.Builder out =
 			libghidra.MoveMemoryBlockResponse.newBuilder()
 				.setMoved(response != null && response.moved());
@@ -949,14 +951,10 @@ public final class RpcDispatcher {
 					protoRequest.hasIsWrite() ? protoRequest.getIsWrite() : null,
 					protoRequest.hasIsExecute() ? protoRequest.getIsExecute() : null,
 					protoRequest.hasEndAddress() ? protoRequest.getEndAddress() : null));
-		if (response != null && !response.updated() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "set_memory_block_attributes_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.updated(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"SetMemoryBlockAttributes");
 		libghidra.SetMemoryBlockAttributesResponse.Builder out =
 			libghidra.SetMemoryBlockAttributesResponse.newBuilder()
 				.setUpdated(response != null && response.updated());
@@ -1033,6 +1031,23 @@ public final class RpcDispatcher {
 		return ok(out.build(), 0L);
 	}
 
+	private libghidra.RpcResponse functionsCreateFunction(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.CreateFunctionRequest protoRequest = unpackPayload(request,
+			libghidra.CreateFunctionRequest.class,
+			libghidra.CreateFunctionRequest.getDefaultInstance());
+		FunctionsContract.CreateFunctionResponse response = callbacks.createFunction(
+			new FunctionsContract.CreateFunctionRequest(
+				protoRequest.getAddress(),
+				protoRequest.hasName() ? protoRequest.getName() : null));
+		requireEffect(response != null && response.created() && response.function() != null,
+			"CreateFunction");
+		return ok(libghidra.CreateFunctionResponse.newBuilder()
+			.setCreated(true)
+			.setFunction(toFunctionRecord(response.function()))
+			.build(), 0L);
+	}
+
 	private libghidra.RpcResponse functionsRenameFunction(libghidra.RpcRequest request)
 			throws InvalidProtocolBufferException {
 		libghidra.RenameFunctionRequest protoRequest = unpackPayload(request,
@@ -1042,14 +1057,10 @@ public final class RpcDispatcher {
 			new FunctionsContract.RenameFunctionRequest(
 				protoRequest.getAddress(),
 				protoRequest.getNewName()));
-		if (response != null && !response.renamed() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "rename_function_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.renamed(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"RenameFunction");
 		libghidra.RenameFunctionResponse proto =
 			libghidra.RenameFunctionResponse.newBuilder()
 				.setRenamed(response != null && response.renamed())
@@ -1147,6 +1158,7 @@ public final class RpcDispatcher {
 			new FunctionsContract.CreateFunctionTagRequest(
 				protoRequest.getName(),
 				protoRequest.getComment()));
+		requireEffect(response != null && response.created(), "CreateFunctionTag");
 		return ok(libghidra.CreateFunctionTagResponse.newBuilder()
 			.setCreated(response != null && response.created())
 			.build(), 0L);
@@ -1160,6 +1172,7 @@ public final class RpcDispatcher {
 		FunctionsContract.DeleteFunctionTagResponse response = callbacks.deleteFunctionTag(
 			new FunctionsContract.DeleteFunctionTagRequest(
 				protoRequest.getName()));
+		requireEffect(response != null && response.deleted(), "DeleteFunctionTag");
 		return ok(libghidra.DeleteFunctionTagResponse.newBuilder()
 			.setDeleted(response != null && response.deleted())
 			.build(), 0L);
@@ -1195,6 +1208,7 @@ public final class RpcDispatcher {
 			new FunctionsContract.TagFunctionRequest(
 				protoRequest.getFunctionEntry(),
 				protoRequest.getTagName()));
+		requireEffect(response != null && response.updated(), "TagFunction");
 		return ok(libghidra.TagFunctionResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.build(), 0L);
@@ -1209,6 +1223,7 @@ public final class RpcDispatcher {
 			new FunctionsContract.UntagFunctionRequest(
 				protoRequest.getFunctionEntry(),
 				protoRequest.getTagName()));
+		requireEffect(response != null && response.updated(), "UntagFunction");
 		return ok(libghidra.UntagFunctionResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.build(), 0L);
@@ -1424,6 +1439,23 @@ public final class RpcDispatcher {
 		return ok(out.build(), 0L);
 	}
 
+	private libghidra.RpcResponse symbolsCreateLabel(libghidra.RpcRequest request)
+			throws InvalidProtocolBufferException {
+		libghidra.CreateLabelRequest protoRequest = unpackPayload(request,
+			libghidra.CreateLabelRequest.class,
+			libghidra.CreateLabelRequest.getDefaultInstance());
+		SymbolsContract.CreateLabelResponse response = callbacks.createLabel(
+			new SymbolsContract.CreateLabelRequest(
+				protoRequest.getAddress(),
+				protoRequest.getName()));
+		requireEffect(response != null && response.created() && response.symbol() != null,
+			"CreateLabel");
+		return ok(libghidra.CreateLabelResponse.newBuilder()
+			.setCreated(true)
+			.setSymbol(toSymbolRecord(response.symbol()))
+			.build(), 0L);
+	}
+
 	private libghidra.RpcResponse symbolsRenameSymbol(libghidra.RpcRequest request)
 			throws InvalidProtocolBufferException {
 		libghidra.RenameSymbolRequest protoRequest = unpackPayload(request,
@@ -1432,7 +1464,9 @@ public final class RpcDispatcher {
 		SymbolsContract.RenameSymbolResponse response = callbacks.renameSymbol(
 			new SymbolsContract.RenameSymbolRequest(
 				protoRequest.getAddress(),
-				protoRequest.getNewName()));
+				protoRequest.getNewName(),
+				protoRequest.hasOldName() ? protoRequest.getOldName() : null));
+		requireEffect(response != null && response.renamed(), "RenameSymbol");
 		libghidra.RenameSymbolResponse proto = libghidra.RenameSymbolResponse.newBuilder()
 			.setRenamed(response != null && response.renamed())
 			.setName(nullable(response != null ? response.name() : null))
@@ -1449,6 +1483,7 @@ public final class RpcDispatcher {
 			new SymbolsContract.DeleteSymbolRequest(
 				protoRequest.getAddress(),
 				protoRequest.getName()));
+		requireEffect(response != null && response.deleted(), "DeleteSymbol");
 		libghidra.DeleteSymbolResponse proto = libghidra.DeleteSymbolResponse.newBuilder()
 			.setDeleted(response != null && response.deleted())
 			.setDeletedCount(response != null ? response.deletedCount() : 0)
@@ -1496,11 +1531,14 @@ public final class RpcDispatcher {
 			new DecompilerContract.DecompileFunctionRequest(
 				protoRequest.getAddress(),
 				(int) protoRequest.getTimeoutMs()));
-		libghidra.DecompileFunctionResponse proto =
-			libghidra.DecompileFunctionResponse.newBuilder()
-				.setDecompilation(toDecompileRecord(response != null ? response.decompilation() : null))
-				.build();
-		return ok(proto, 0L);
+		// Not found (no function contains the address) leaves the field unset, so
+		// the client sees has_decompilation() == false -- never a blank record.
+		libghidra.DecompileFunctionResponse.Builder proto =
+			libghidra.DecompileFunctionResponse.newBuilder();
+		if (response != null && response.decompilation() != null) {
+			proto.setDecompilation(toDecompileRecord(response.decompilation()));
+		}
+		return ok(proto.build(), 0L);
 	}
 
 	private libghidra.RpcResponse decompilerGetPcode(libghidra.RpcRequest request)
@@ -1603,11 +1641,12 @@ public final class RpcDispatcher {
 		ListingContract.GetInstructionResponse response = callbacks.getInstruction(
 			new ListingContract.GetInstructionRequest(
 				protoRequest.getAddress()));
-		libghidra.GetInstructionResponse proto =
-			libghidra.GetInstructionResponse.newBuilder()
-				.setInstruction(toInstructionRecord(response != null ? response.instruction() : null))
-				.build();
-		return ok(proto, 0L);
+		// Not found (no instruction starts at the address) leaves the field unset.
+		libghidra.GetInstructionResponse.Builder proto = libghidra.GetInstructionResponse.newBuilder();
+		if (response != null && response.instruction() != null) {
+			proto.setInstruction(toInstructionRecord(response.instruction()));
+		}
+		return ok(proto.build(), 0L);
 	}
 
 	private libghidra.RpcResponse listingListInstructions(libghidra.RpcRequest request)
@@ -1697,14 +1736,10 @@ public final class RpcDispatcher {
 				protoRequest.getAddress(),
 				toCommentKind(protoRequest.getKind()),
 				protoRequest.getText()));
-		if (response != null && !response.updated() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "set_comment_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.updated(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"SetComment");
 		libghidra.SetCommentResponse proto = libghidra.SetCommentResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.build();
@@ -1720,14 +1755,10 @@ public final class RpcDispatcher {
 			new ListingContract.DeleteCommentRequest(
 				protoRequest.getAddress(),
 				toCommentKind(protoRequest.getKind())));
-		if (response != null && !response.deleted() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "delete_comment_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.deleted(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"DeleteComment");
 		libghidra.DeleteCommentResponse proto =
 			libghidra.DeleteCommentResponse.newBuilder()
 				.setDeleted(response != null && response.deleted())
@@ -1744,6 +1775,7 @@ public final class RpcDispatcher {
 			new ListingContract.RenameDataItemRequest(
 				protoRequest.getAddress(),
 				protoRequest.getNewName()));
+		requireEffect(response != null && response.updated(), "RenameDataItem");
 		libghidra.RenameDataItemResponse proto =
 			libghidra.RenameDataItemResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -1760,6 +1792,7 @@ public final class RpcDispatcher {
 		ListingContract.DeleteDataItemResponse response = callbacks.deleteDataItem(
 			new ListingContract.DeleteDataItemRequest(
 				protoRequest.getAddress()));
+		requireEffect(response != null && response.deleted(), "DeleteDataItem");
 		libghidra.DeleteDataItemResponse proto =
 			libghidra.DeleteDataItemResponse.newBuilder()
 				.setDeleted(response != null && response.deleted())
@@ -1832,6 +1865,7 @@ public final class RpcDispatcher {
 				protoRequest.getType(),
 				protoRequest.getCategory(),
 				protoRequest.getComment()));
+		requireEffect(response != null && response.updated(), "AddBookmark");
 		libghidra.AddBookmarkResponse proto = libghidra.AddBookmarkResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.build();
@@ -1848,6 +1882,7 @@ public final class RpcDispatcher {
 				protoRequest.getAddress(),
 				protoRequest.getType(),
 				protoRequest.getCategory()));
+		requireEffect(response != null && response.deleted(), "DeleteBookmark");
 		libghidra.DeleteBookmarkResponse proto =
 			libghidra.DeleteBookmarkResponse.newBuilder()
 				.setDeleted(response != null && response.deleted())
@@ -1896,6 +1931,7 @@ public final class RpcDispatcher {
 				protoRequest.getEnabled(),
 				protoRequest.getCondition(),
 				protoRequest.getGroup()));
+		requireEffect(response != null && response.updated(), "AddBreakpoint");
 		libghidra.AddBreakpointResponse proto = libghidra.AddBreakpointResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.build();
@@ -1911,6 +1947,7 @@ public final class RpcDispatcher {
 			new ListingContract.SetBreakpointEnabledRequest(
 				protoRequest.getAddress(),
 				protoRequest.getEnabled()));
+		requireEffect(response != null && response.updated(), "SetBreakpointEnabled");
 		libghidra.SetBreakpointEnabledResponse proto =
 			libghidra.SetBreakpointEnabledResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -1927,6 +1964,7 @@ public final class RpcDispatcher {
 			new ListingContract.SetBreakpointKindRequest(
 				protoRequest.getAddress(),
 				protoRequest.getKind()));
+		requireEffect(response != null && response.updated(), "SetBreakpointKind");
 		libghidra.SetBreakpointKindResponse proto =
 			libghidra.SetBreakpointKindResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -1943,6 +1981,7 @@ public final class RpcDispatcher {
 			new ListingContract.SetBreakpointSizeRequest(
 				protoRequest.getAddress(),
 				protoRequest.getSize()));
+		requireEffect(response != null && response.updated(), "SetBreakpointSize");
 		libghidra.SetBreakpointSizeResponse proto =
 			libghidra.SetBreakpointSizeResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -1959,6 +1998,7 @@ public final class RpcDispatcher {
 			new ListingContract.SetBreakpointConditionRequest(
 				protoRequest.getAddress(),
 				protoRequest.getCondition()));
+		requireEffect(response != null && response.updated(), "SetBreakpointCondition");
 		libghidra.SetBreakpointConditionResponse proto =
 			libghidra.SetBreakpointConditionResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -1975,6 +2015,7 @@ public final class RpcDispatcher {
 			new ListingContract.SetBreakpointGroupRequest(
 				protoRequest.getAddress(),
 				protoRequest.getGroup()));
+		requireEffect(response != null && response.updated(), "SetBreakpointGroup");
 		libghidra.SetBreakpointGroupResponse proto =
 			libghidra.SetBreakpointGroupResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -1990,6 +2031,7 @@ public final class RpcDispatcher {
 		ListingContract.DeleteBreakpointResponse response = callbacks.deleteBreakpoint(
 			new ListingContract.DeleteBreakpointRequest(
 				protoRequest.getAddress()));
+		requireEffect(response != null && response.deleted(), "DeleteBreakpoint");
 		libghidra.DeleteBreakpointResponse proto =
 			libghidra.DeleteBreakpointResponse.newBuilder()
 				.setDeleted(response != null && response.deleted())
@@ -2034,10 +2076,12 @@ public final class RpcDispatcher {
 		TypesContract.GetTypeResponse response = callbacks.getType(
 			new TypesContract.GetTypeRequest(
 				protoRequest.getPath()));
-		libghidra.GetTypeResponse proto = libghidra.GetTypeResponse.newBuilder()
-			.setType(toTypeRecord(response != null ? response.type() : null))
-			.build();
-		return ok(proto, 0L);
+		// Not found (no type at that path or name) leaves the field unset.
+		libghidra.GetTypeResponse.Builder proto = libghidra.GetTypeResponse.newBuilder();
+		if (response != null && response.type() != null) {
+			proto.setType(toTypeRecord(response.type()));
+		}
+		return ok(proto.build(), 0L);
 	}
 
 	private libghidra.RpcResponse typesListTypes(libghidra.RpcRequest request)
@@ -2179,11 +2223,13 @@ public final class RpcDispatcher {
 		TypesContract.GetFunctionSignatureResponse response = callbacks.getFunctionSignature(
 			new TypesContract.GetFunctionSignatureRequest(
 				protoRequest.getAddress()));
-		libghidra.GetFunctionSignatureResponse proto =
-			libghidra.GetFunctionSignatureResponse.newBuilder()
-				.setSignature(toSignatureRecord(response != null ? response.signature() : null))
-				.build();
-		return ok(proto, 0L);
+		// Not found (no function contains the address) leaves the field unset.
+		libghidra.GetFunctionSignatureResponse.Builder proto =
+			libghidra.GetFunctionSignatureResponse.newBuilder();
+		if (response != null && response.signature() != null) {
+			proto.setSignature(toSignatureRecord(response.signature()));
+		}
+		return ok(proto.build(), 0L);
 	}
 
 	private libghidra.RpcResponse typesListFunctionSignatures(libghidra.RpcRequest request)
@@ -2222,14 +2268,10 @@ public final class RpcDispatcher {
 				protoRequest.getAddress(),
 				protoRequest.getPrototype(),
 				protoRequest.getCallingConvention()));
-		if (response != null && !response.updated() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "set_function_signature_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.updated(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"SetFunctionSignature");
 		libghidra.SetFunctionSignatureResponse proto =
 			libghidra.SetFunctionSignatureResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2249,14 +2291,10 @@ public final class RpcDispatcher {
 				protoRequest.getAddress(),
 				protoRequest.getOrdinal(),
 				protoRequest.getNewName()));
-		if (response != null && !response.updated() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "rename_function_parameter_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.updated(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"RenameFunctionParameter");
 		libghidra.RenameFunctionParameterResponse proto =
 			libghidra.RenameFunctionParameterResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2275,14 +2313,10 @@ public final class RpcDispatcher {
 				protoRequest.getAddress(),
 				protoRequest.getOrdinal(),
 				protoRequest.getDataType()));
-		if (response != null && !response.updated() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "set_function_parameter_type_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.updated(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"SetFunctionParameterType");
 		libghidra.SetFunctionParameterTypeResponse proto =
 			libghidra.SetFunctionParameterTypeResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2301,14 +2335,10 @@ public final class RpcDispatcher {
 				protoRequest.getAddress(),
 				protoRequest.getLocalId(),
 				protoRequest.getNewName()));
-		if (response != null && !response.updated() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "rename_function_local_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.updated(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"RenameFunctionLocal");
 		libghidra.RenameFunctionLocalResponse proto =
 			libghidra.RenameFunctionLocalResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2328,14 +2358,10 @@ public final class RpcDispatcher {
 				protoRequest.getAddress(),
 				protoRequest.getLocalId(),
 				protoRequest.getDataType()));
-		if (response != null && !response.updated() && response.errorMessage() != null &&
-			!response.errorMessage().isBlank()) {
-			return error(
-				response.errorCode() != null && !response.errorCode().isBlank()
-					? response.errorCode()
-					: "set_function_local_type_failed",
-				response.errorMessage());
-		}
+		requireEffect(response != null && response.updated(),
+			response != null ? response.errorCode() : null,
+			response != null ? response.errorMessage() : null,
+			"SetFunctionLocalType");
 		libghidra.SetFunctionLocalTypeResponse proto =
 			libghidra.SetFunctionLocalTypeResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2354,6 +2380,7 @@ public final class RpcDispatcher {
 			new TypesContract.ApplyDataTypeRequest(
 				protoRequest.getAddress(),
 				protoRequest.getDataType()));
+		requireEffect(response != null && response.updated(), "ApplyDataType");
 		libghidra.ApplyDataTypeResponse proto = libghidra.ApplyDataTypeResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.setDataType(nullable(response != null ? response.dataType() : null))
@@ -2371,6 +2398,7 @@ public final class RpcDispatcher {
 				protoRequest.getName(),
 				protoRequest.getKind(),
 				protoRequest.getSize()));
+		requireEffect(response != null && response.updated(), "CreateType");
 		libghidra.CreateTypeResponse proto = libghidra.CreateTypeResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.build();
@@ -2385,6 +2413,7 @@ public final class RpcDispatcher {
 		TypesContract.DeleteTypeResponse response = callbacks.deleteType(
 			new TypesContract.DeleteTypeRequest(
 				protoRequest.getType()));
+		requireEffect(response != null && response.deleted(), "DeleteType");
 		libghidra.DeleteTypeResponse proto = libghidra.DeleteTypeResponse.newBuilder()
 			.setDeleted(response != null && response.deleted())
 			.build();
@@ -2400,6 +2429,7 @@ public final class RpcDispatcher {
 			new TypesContract.RenameTypeRequest(
 				protoRequest.getType(),
 				protoRequest.getNewName()));
+		requireEffect(response != null && response.updated(), "RenameType");
 		libghidra.RenameTypeResponse proto = libghidra.RenameTypeResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.setName(nullable(response != null ? response.name() : null))
@@ -2416,6 +2446,7 @@ public final class RpcDispatcher {
 			new TypesContract.CreateTypeAliasRequest(
 				protoRequest.getName(),
 				protoRequest.getTargetType()));
+		requireEffect(response != null && response.updated(), "CreateTypeAlias");
 		libghidra.CreateTypeAliasResponse proto = libghidra.CreateTypeAliasResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.build();
@@ -2430,6 +2461,7 @@ public final class RpcDispatcher {
 		TypesContract.DeleteTypeAliasResponse response = callbacks.deleteTypeAlias(
 			new TypesContract.DeleteTypeAliasRequest(
 				protoRequest.getType()));
+		requireEffect(response != null && response.deleted(), "DeleteTypeAlias");
 		libghidra.DeleteTypeAliasResponse proto = libghidra.DeleteTypeAliasResponse.newBuilder()
 			.setDeleted(response != null && response.deleted())
 			.build();
@@ -2445,6 +2477,7 @@ public final class RpcDispatcher {
 			new TypesContract.SetTypeAliasTargetRequest(
 				protoRequest.getType(),
 				protoRequest.getTargetType()));
+		requireEffect(response != null && response.updated(), "SetTypeAliasTarget");
 		libghidra.SetTypeAliasTargetResponse proto =
 			libghidra.SetTypeAliasTargetResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2462,6 +2495,7 @@ public final class RpcDispatcher {
 				protoRequest.getName(),
 				protoRequest.getWidth(),
 				protoRequest.getSigned()));
+		requireEffect(response != null && response.updated(), "CreateTypeEnum");
 		libghidra.CreateTypeEnumResponse proto = libghidra.CreateTypeEnumResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.build();
@@ -2476,6 +2510,7 @@ public final class RpcDispatcher {
 		TypesContract.DeleteTypeEnumResponse response = callbacks.deleteTypeEnum(
 			new TypesContract.DeleteTypeEnumRequest(
 				protoRequest.getType()));
+		requireEffect(response != null && response.deleted(), "DeleteTypeEnum");
 		libghidra.DeleteTypeEnumResponse proto = libghidra.DeleteTypeEnumResponse.newBuilder()
 			.setDeleted(response != null && response.deleted())
 			.build();
@@ -2492,6 +2527,7 @@ public final class RpcDispatcher {
 				protoRequest.getType(),
 				protoRequest.getName(),
 				protoRequest.getValue()));
+		requireEffect(response != null && response.updated(), "AddTypeEnumMember");
 		libghidra.AddTypeEnumMemberResponse proto =
 			libghidra.AddTypeEnumMemberResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2508,6 +2544,7 @@ public final class RpcDispatcher {
 			new TypesContract.DeleteTypeEnumMemberRequest(
 				protoRequest.getType(),
 				protoRequest.getOrdinal()));
+		requireEffect(response != null && response.deleted(), "DeleteTypeEnumMember");
 		libghidra.DeleteTypeEnumMemberResponse proto =
 			libghidra.DeleteTypeEnumMemberResponse.newBuilder()
 				.setDeleted(response != null && response.deleted())
@@ -2525,6 +2562,7 @@ public final class RpcDispatcher {
 				protoRequest.getType(),
 				protoRequest.getOrdinal(),
 				protoRequest.getNewName()));
+		requireEffect(response != null && response.updated(), "RenameTypeEnumMember");
 		libghidra.RenameTypeEnumMemberResponse proto =
 			libghidra.RenameTypeEnumMemberResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2542,6 +2580,7 @@ public final class RpcDispatcher {
 				protoRequest.getType(),
 				protoRequest.getOrdinal(),
 				protoRequest.getValue()));
+		requireEffect(response != null && response.updated(), "SetTypeEnumMemberValue");
 		libghidra.SetTypeEnumMemberValueResponse proto =
 			libghidra.SetTypeEnumMemberValueResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2560,6 +2599,7 @@ public final class RpcDispatcher {
 				protoRequest.getName(),
 				protoRequest.getMemberType(),
 				protoRequest.getSize()));
+		requireEffect(response != null && response.updated(), "AddTypeMember");
 		libghidra.AddTypeMemberResponse proto = libghidra.AddTypeMemberResponse.newBuilder()
 			.setUpdated(response != null && response.updated())
 			.build();
@@ -2575,6 +2615,7 @@ public final class RpcDispatcher {
 			new TypesContract.DeleteTypeMemberRequest(
 				protoRequest.getType(),
 				protoRequest.getOrdinal()));
+		requireEffect(response != null && response.deleted(), "DeleteTypeMember");
 		libghidra.DeleteTypeMemberResponse proto =
 			libghidra.DeleteTypeMemberResponse.newBuilder()
 				.setDeleted(response != null && response.deleted())
@@ -2592,6 +2633,7 @@ public final class RpcDispatcher {
 				protoRequest.getType(),
 				protoRequest.getOrdinal(),
 				protoRequest.getNewName()));
+		requireEffect(response != null && response.updated(), "RenameTypeMember");
 		libghidra.RenameTypeMemberResponse proto =
 			libghidra.RenameTypeMemberResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2609,6 +2651,7 @@ public final class RpcDispatcher {
 				protoRequest.getType(),
 				protoRequest.getOrdinal(),
 				protoRequest.getMemberType()));
+		requireEffect(response != null && response.updated(), "SetTypeMemberType");
 		libghidra.SetTypeMemberTypeResponse proto =
 			libghidra.SetTypeMemberTypeResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2626,6 +2669,7 @@ public final class RpcDispatcher {
 				protoRequest.getType(),
 				protoRequest.getOrdinal(),
 				protoRequest.getComment()));
+		requireEffect(response != null && response.updated(), "SetTypeMemberComment");
 		libghidra.SetTypeMemberCommentResponse proto =
 			libghidra.SetTypeMemberCommentResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2643,6 +2687,7 @@ public final class RpcDispatcher {
 				protoRequest.getType(),
 				protoRequest.getOrdinal(),
 				protoRequest.getComment()));
+		requireEffect(response != null && response.updated(), "SetTypeEnumMemberComment");
 		libghidra.SetTypeEnumMemberCommentResponse proto =
 			libghidra.SetTypeEnumMemberCommentResponse.newBuilder()
 				.setUpdated(response != null && response.updated())
@@ -2670,10 +2715,13 @@ public final class RpcDispatcher {
 		return ok(builder.build(), 0L);
 	}
 
+	// Record encoders. Each takes a record that exists: a single-record Get*
+	// handler sets its response field only when the runtime found the item, so
+	// "not found" reaches the client as an unset field (has_x() == false), and a
+	// list never carries a placeholder row. There is no null -> default-instance
+	// path: a blank record would decode as a real item at address 0.
+
 	private static libghidra.DecompileRecord toDecompileRecord(DecompilerContract.DecompileRecord row) {
-		if (row == null) {
-			return libghidra.DecompileRecord.getDefaultInstance();
-		}
 		libghidra.DecompileRecord.Builder builder = libghidra.DecompileRecord.newBuilder()
 			.setFunctionEntryAddress(row.functionEntryAddress())
 			.setFunctionName(nullable(row.functionName()))
@@ -2696,9 +2744,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.DecompileTokenRecord toDecompileTokenRecord(DecompilerContract.DecompileTokenRecord row) {
-		if (row == null) {
-			return libghidra.DecompileTokenRecord.getDefaultInstance();
-		}
 		libghidra.DecompileTokenRecord.Builder builder = libghidra.DecompileTokenRecord.newBuilder()
 			.setText(nullable(row.text()))
 			.setKind(toProtoDecompileTokenKind(row.kind()))
@@ -2732,9 +2777,6 @@ public final class RpcDispatcher {
 
 	private static libghidra.DecompileLocalRecord toDecompileLocalRecord(
 			DecompilerContract.DecompileLocalRecord row) {
-		if (row == null) {
-			return libghidra.DecompileLocalRecord.getDefaultInstance();
-		}
 		return libghidra.DecompileLocalRecord.newBuilder()
 			.setLocalId(nullable(row.localId()))
 			.setKind(toDecompileLocalKind(row.kind()))
@@ -2764,9 +2806,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.InstructionRecord toInstructionRecord(ListingContract.InstructionRecord row) {
-		if (row == null) {
-			return libghidra.InstructionRecord.getDefaultInstance();
-		}
 		return libghidra.InstructionRecord.newBuilder()
 			.setAddress(row.address())
 			.setMnemonic(nullable(row.mnemonic()))
@@ -2778,9 +2817,6 @@ public final class RpcDispatcher {
 
 	private static libghidra.InstructionOperandRecord toInstructionOperandRecord(
 			ListingContract.InstructionOperandRecord row) {
-		if (row == null) {
-			return libghidra.InstructionOperandRecord.getDefaultInstance();
-		}
 		return libghidra.InstructionOperandRecord.newBuilder()
 			.setAddress(row.address())
 			.setOperandIndex(row.operandIndex())
@@ -2791,9 +2827,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.CommentRecord toCommentRecord(ListingContract.CommentRecord row) {
-		if (row == null) {
-			return libghidra.CommentRecord.getDefaultInstance();
-		}
 		return libghidra.CommentRecord.newBuilder()
 			.setAddress(row.address())
 			.setKind(toProtoCommentKind(row.kind()))
@@ -2802,9 +2835,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.BookmarkRecord toBookmarkRecord(ListingContract.BookmarkRecord row) {
-		if (row == null) {
-			return libghidra.BookmarkRecord.getDefaultInstance();
-		}
 		return libghidra.BookmarkRecord.newBuilder()
 			.setAddress(row.address())
 			.setType(nullable(row.type()))
@@ -2814,9 +2844,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.DataItemRecord toDataItemRecord(ListingContract.DataItemRecord row) {
-		if (row == null) {
-			return libghidra.DataItemRecord.getDefaultInstance();
-		}
 		return libghidra.DataItemRecord.newBuilder()
 			.setAddress(row.address())
 			.setEndAddress(row.endAddress())
@@ -2828,9 +2855,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.BreakpointRecord toBreakpointRecord(ListingContract.BreakpointRecord row) {
-		if (row == null) {
-			return libghidra.BreakpointRecord.getDefaultInstance();
-		}
 		return libghidra.BreakpointRecord.newBuilder()
 			.setAddress(row.address())
 			.setEnabled(row.enabled())
@@ -2842,9 +2866,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.TypeRecord toTypeRecord(TypesContract.TypeRecord row) {
-		if (row == null) {
-			return libghidra.TypeRecord.getDefaultInstance();
-		}
 		return libghidra.TypeRecord.newBuilder()
 			.setTypeId(row.typeId())
 			.setName(nullable(row.name()))
@@ -2860,9 +2881,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.TypeAliasRecord toTypeAliasRecord(TypesContract.TypeAliasRecord row) {
-		if (row == null) {
-			return libghidra.TypeAliasRecord.getDefaultInstance();
-		}
 		return libghidra.TypeAliasRecord.newBuilder()
 			.setTypeId(row.typeId())
 			.setPathName(nullable(row.pathName()))
@@ -2873,9 +2891,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.TypeUnionRecord toTypeUnionRecord(TypesContract.TypeUnionRecord row) {
-		if (row == null) {
-			return libghidra.TypeUnionRecord.getDefaultInstance();
-		}
 		return libghidra.TypeUnionRecord.newBuilder()
 			.setTypeId(row.typeId())
 			.setPathName(nullable(row.pathName()))
@@ -2886,9 +2901,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.TypeEnumRecord toTypeEnumRecord(TypesContract.TypeEnumRecord row) {
-		if (row == null) {
-			return libghidra.TypeEnumRecord.getDefaultInstance();
-		}
 		return libghidra.TypeEnumRecord.newBuilder()
 			.setTypeId(row.typeId())
 			.setPathName(nullable(row.pathName()))
@@ -2901,9 +2913,6 @@ public final class RpcDispatcher {
 
 	private static libghidra.TypeEnumMemberRecord toTypeEnumMemberRecord(
 			TypesContract.TypeEnumMemberRecord row) {
-		if (row == null) {
-			return libghidra.TypeEnumMemberRecord.getDefaultInstance();
-		}
 		return libghidra.TypeEnumMemberRecord.newBuilder()
 			.setTypeId(row.typeId())
 			.setTypePathName(nullable(row.typePathName()))
@@ -2916,9 +2925,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.TypeMemberRecord toTypeMemberRecord(TypesContract.TypeMemberRecord row) {
-		if (row == null) {
-			return libghidra.TypeMemberRecord.getDefaultInstance();
-		}
 		return libghidra.TypeMemberRecord.newBuilder()
 			.setParentTypeId(row.parentTypeId())
 			.setParentTypePathName(nullable(row.parentTypePathName()))
@@ -2933,9 +2939,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.FunctionRecord toFunctionRecord(FunctionsContract.FunctionRecord row) {
-		if (row == null) {
-			return libghidra.FunctionRecord.getDefaultInstance();
-		}
 		return libghidra.FunctionRecord.newBuilder()
 			.setEntryAddress(row.entryAddress())
 			.setName(nullable(row.name()))
@@ -2950,9 +2953,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.SymbolRecord toSymbolRecord(SymbolsContract.SymbolRecord row) {
-		if (row == null) {
-			return libghidra.SymbolRecord.getDefaultInstance();
-		}
 		return libghidra.SymbolRecord.newBuilder()
 			.setSymbolId(row.symbolId())
 			.setAddress(row.address())
@@ -2969,9 +2969,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.XrefRecord toXrefRecord(XrefsContract.XrefRecord row) {
-		if (row == null) {
-			return libghidra.XrefRecord.getDefaultInstance();
-		}
 		return libghidra.XrefRecord.newBuilder()
 			.setFromAddress(row.fromAddress())
 			.setToAddress(row.toAddress())
@@ -2991,9 +2988,6 @@ public final class RpcDispatcher {
 	}
 
 	private static libghidra.ParameterRecord toParameterRecord(TypesContract.ParameterRecord row) {
-		if (row == null) {
-			return libghidra.ParameterRecord.getDefaultInstance();
-		}
 		return libghidra.ParameterRecord.newBuilder()
 			.setOrdinal(row.ordinal())
 			.setName(nullable(row.name()))
@@ -3006,9 +3000,6 @@ public final class RpcDispatcher {
 
 	private static libghidra.FunctionSignatureRecord toSignatureRecord(
 			TypesContract.FunctionSignatureRecord row) {
-		if (row == null) {
-			return libghidra.FunctionSignatureRecord.getDefaultInstance();
-		}
 		libghidra.FunctionSignatureRecord.Builder out =
 			libghidra.FunctionSignatureRecord.newBuilder()
 				.setFunctionEntryAddress(row.functionEntryAddress())
@@ -3124,6 +3115,28 @@ public final class RpcDispatcher {
 			out.setPayload(Any.pack(payload));
 		}
 		return out.build();
+	}
+
+	/**
+	 * The write contract's backstop. A write either succeeds with its effect, every
+	 * response flag true, or fails with a code from the vocabulary (rpc.proto,
+	 * RpcResponse.error_code). Runtimes report a failure by throwing
+	 * SessionRpcException; a false flag that still reaches here becomes an error
+	 * rather than an "ok + false" answer.
+	 */
+	private static void requireEffect(boolean effect, String method) {
+		requireEffect(effect, null, null, method);
+	}
+
+	private static void requireEffect(boolean effect, String code, String message, String method) {
+		if (effect) {
+			return;
+		}
+		throw new SessionRpcException(
+			code != null && !code.isBlank() ? code : SessionRpcException.INTERNAL_ERROR,
+			message != null && !message.isBlank()
+				? message
+				: method + " reported no effect and no reason");
 	}
 
 	private static libghidra.RpcResponse error(String code, String message) {

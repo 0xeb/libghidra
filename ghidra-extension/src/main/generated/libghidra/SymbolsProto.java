@@ -61,6 +61,16 @@ public final class SymbolsProto {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_RenameSymbolResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_CreateLabelRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_CreateLabelRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_CreateLabelResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_CreateLabelResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_DeleteSymbolRequest_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -92,22 +102,29 @@ public final class SymbolsProto {
       "tSymbolsRequest\022&\n\005range\030\002 \001(\0132\027.libghid" +
       "ra.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidr" +
       "a.Pagination\"?\n\023ListSymbolsResponse\022(\n\007s" +
-      "ymbols\030\001 \003(\0132\027.libghidra.SymbolRecord\"8\n" +
+      "ymbols\030\001 \003(\0132\027.libghidra.SymbolRecord\"\\\n" +
       "\023RenameSymbolRequest\022\017\n\007address\030\002 \001(\004\022\020\n" +
-      "\010new_name\030\003 \001(\t\"5\n\024RenameSymbolResponse\022" +
-      "\017\n\007renamed\030\001 \001(\010\022\014\n\004name\030\002 \001(\t\"4\n\023Delete" +
-      "SymbolRequest\022\017\n\007address\030\002 \001(\004\022\014\n\004name\030\003" +
-      " \001(\t\">\n\024DeleteSymbolResponse\022\017\n\007deleted\030" +
-      "\001 \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\310\002\n\016Symbols" +
-      "Service\022F\n\tGetSymbol\022\033.libghidra.GetSymb" +
-      "olRequest\032\034.libghidra.GetSymbolResponse\022" +
-      "L\n\013ListSymbols\022\035.libghidra.ListSymbolsRe" +
-      "quest\032\036.libghidra.ListSymbolsResponse\022O\n" +
-      "\014RenameSymbol\022\036.libghidra.RenameSymbolRe" +
-      "quest\032\037.libghidra.RenameSymbolResponse\022O" +
-      "\n\014DeleteSymbol\022\036.libghidra.DeleteSymbolR" +
-      "equest\032\037.libghidra.DeleteSymbolResponseB" +
-      "\033\n\tlibghidraB\014SymbolsProtoP\001b\006proto3"
+      "\010new_name\030\003 \001(\t\022\025\n\010old_name\030\004 \001(\tH\000\210\001\001B\013" +
+      "\n\t_old_name\"5\n\024RenameSymbolResponse\022\017\n\007r" +
+      "enamed\030\001 \001(\010\022\014\n\004name\030\002 \001(\t\"3\n\022CreateLabe" +
+      "lRequest\022\017\n\007address\030\002 \001(\004\022\014\n\004name\030\003 \001(\t\"" +
+      "O\n\023CreateLabelResponse\022\017\n\007created\030\001 \001(\010\022" +
+      "\'\n\006symbol\030\002 \001(\0132\027.libghidra.SymbolRecord" +
+      "\"4\n\023DeleteSymbolRequest\022\017\n\007address\030\002 \001(\004" +
+      "\022\014\n\004name\030\003 \001(\t\">\n\024DeleteSymbolResponse\022\017" +
+      "\n\007deleted\030\001 \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\226" +
+      "\003\n\016SymbolsService\022F\n\tGetSymbol\022\033.libghid" +
+      "ra.GetSymbolRequest\032\034.libghidra.GetSymbo" +
+      "lResponse\022L\n\013ListSymbols\022\035.libghidra.Lis" +
+      "tSymbolsRequest\032\036.libghidra.ListSymbolsR" +
+      "esponse\022L\n\013CreateLabel\022\035.libghidra.Creat" +
+      "eLabelRequest\032\036.libghidra.CreateLabelRes" +
+      "ponse\022O\n\014RenameSymbol\022\036.libghidra.Rename" +
+      "SymbolRequest\032\037.libghidra.RenameSymbolRe" +
+      "sponse\022O\n\014DeleteSymbol\022\036.libghidra.Delet" +
+      "eSymbolRequest\032\037.libghidra.DeleteSymbolR" +
+      "esponseB\033\n\tlibghidraB\014SymbolsProtoP\001b\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -149,21 +166,33 @@ public final class SymbolsProto {
     internal_static_libghidra_RenameSymbolRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_RenameSymbolRequest_descriptor,
-        new java.lang.String[] { "Address", "NewName", });
+        new java.lang.String[] { "Address", "NewName", "OldName", });
     internal_static_libghidra_RenameSymbolResponse_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_libghidra_RenameSymbolResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_RenameSymbolResponse_descriptor,
         new java.lang.String[] { "Renamed", "Name", });
-    internal_static_libghidra_DeleteSymbolRequest_descriptor =
+    internal_static_libghidra_CreateLabelRequest_descriptor =
       getDescriptor().getMessageTypes().get(7);
+    internal_static_libghidra_CreateLabelRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_CreateLabelRequest_descriptor,
+        new java.lang.String[] { "Address", "Name", });
+    internal_static_libghidra_CreateLabelResponse_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_libghidra_CreateLabelResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_CreateLabelResponse_descriptor,
+        new java.lang.String[] { "Created", "Symbol", });
+    internal_static_libghidra_DeleteSymbolRequest_descriptor =
+      getDescriptor().getMessageTypes().get(9);
     internal_static_libghidra_DeleteSymbolRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteSymbolRequest_descriptor,
         new java.lang.String[] { "Address", "Name", });
     internal_static_libghidra_DeleteSymbolResponse_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_libghidra_DeleteSymbolResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteSymbolResponse_descriptor,

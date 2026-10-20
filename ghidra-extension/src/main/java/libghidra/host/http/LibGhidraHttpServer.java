@@ -99,6 +99,8 @@ public final class LibGhidraHttpServer {
 			FunctionsContract.ListFunctionsRequest request);
 		FunctionsContract.ListFunctionsResponse listLeafFunctions(
 			FunctionsContract.ListFunctionsRequest request);
+		FunctionsContract.CreateFunctionResponse createFunction(
+			FunctionsContract.CreateFunctionRequest request);
 		FunctionsContract.RenameFunctionResponse renameFunction(
 			FunctionsContract.RenameFunctionRequest request);
 		FunctionsContract.ListBasicBlocksResponse listBasicBlocks(
@@ -131,6 +133,8 @@ public final class LibGhidraHttpServer {
 			SymbolsContract.GetSymbolRequest request);
 		SymbolsContract.ListSymbolsResponse listSymbols(
 			SymbolsContract.ListSymbolsRequest request);
+		SymbolsContract.CreateLabelResponse createLabel(
+			SymbolsContract.CreateLabelRequest request);
 		SymbolsContract.RenameSymbolResponse renameSymbol(
 			SymbolsContract.RenameSymbolRequest request);
 		SymbolsContract.DeleteSymbolResponse deleteSymbol(

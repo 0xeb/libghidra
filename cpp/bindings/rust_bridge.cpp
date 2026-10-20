@@ -12,6 +12,7 @@
 #include "libghidra/rust_bridge.hpp"
 
 #include <cstdint>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -454,6 +455,19 @@ rust::String LocalClientHandle::list_leaf_functions_json(uint64_t range_start,
   return encode_list(resp.functions);
 }
 
+rust::String LocalClientHandle::create_function_json(uint64_t address, bool has_name,
+                                                     rust::Str name) const {
+  std::optional<std::string> wanted;
+  if (has_name) wanted = str_of(name);
+  auto resp = unwrap(impl_->CreateFunction(address, wanted));
+  std::string out = "{\"created\":";
+  out += resp.created ? "true" : "false";
+  out += ",\"function\":";
+  out += std::string(encode_one(resp.function));
+  out += "}";
+  return rust::String(out);
+}
+
 rust::String LocalClientHandle::rename_function_json(uint64_t address,
                                                      rust::Str new_name) const {
   auto resp = unwrap(impl_->RenameFunction(address, str_of(new_name)));
@@ -515,9 +529,21 @@ rust::String LocalClientHandle::list_symbols_json(uint64_t range_start,
   return encode_list(resp.symbols);
 }
 
-rust::String LocalClientHandle::rename_symbol_json(uint64_t address,
-                                                   rust::Str new_name) const {
-  auto resp = unwrap(impl_->RenameSymbol(address, str_of(new_name)));
+rust::String LocalClientHandle::create_label_json(uint64_t address, rust::Str name) const {
+  auto resp = unwrap(impl_->CreateLabel(address, str_of(name)));
+  std::string out = "{\"created\":";
+  out += resp.created ? "true" : "false";
+  out += ",\"symbol\":";
+  out += std::string(encode_one(resp.symbol));
+  out += "}";
+  return rust::String(out);
+}
+
+rust::String LocalClientHandle::rename_symbol_json(uint64_t address, rust::Str new_name,
+                                                   bool has_old_name, rust::Str old_name) const {
+  std::optional<std::string> old;
+  if (has_old_name) old = str_of(old_name);
+  auto resp = unwrap(impl_->RenameSymbol(address, str_of(new_name), old));
   Json j;
   j.begin_obj()
     .field("renamed", resp.renamed)

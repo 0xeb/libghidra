@@ -6,6 +6,13 @@
 package libghidra;
 
 /**
+ * <pre>
+ * Not found: `function` is unset when no function starts at, or contains, the
+ * address (an interior address names the function that contains it).
+ * With no program open the call fails with the RpcResponse error code
+ * "not_loaded".
+ * </pre>
+ *
  * Protobuf type {@code libghidra.GetFunctionResponse}
  */
 public final class GetFunctionResponse extends
@@ -232,6 +239,13 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * Not found: `function` is unset when no function starts at, or contains, the
+   * address (an interior address names the function that contains it).
+   * With no program open the call fails with the RpcResponse error code
+   * "not_loaded".
+   * </pre>
+   *
    * Protobuf type {@code libghidra.GetFunctionResponse}
    */
   public static final class Builder extends

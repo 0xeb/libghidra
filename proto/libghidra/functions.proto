@@ -32,6 +32,10 @@ message GetFunctionRequest {
   uint64 address = 2;
 }
 
+// Not found: `function` is unset when no function starts at, or contains, the
+// address (an interior address names the function that contains it).
+// With no program open the call fails with the RpcResponse error code
+// "not_loaded".
 message GetFunctionResponse {
   FunctionRecord function = 1;
 }
@@ -55,6 +59,27 @@ message RenameFunctionRequest {
 message RenameFunctionResponse {
   bool renamed = 1;
   string name = 2;
+}
+
+// Define a new function whose entry is `address`, optionally naming it. An
+// absent `name` takes the backend's default (FUN_<address>).
+//
+// Errors (RpcResponse error_code):
+//   unmapped_address  no memory block contains the address
+//   duplicate_name    a function already starts at the address
+//   invalid_argument  the address is not code, or cannot start a function
+//   not_loaded        no program is open
+//
+// Field 1 reserved for future common request context.
+message CreateFunctionRequest {
+  uint64 address = 2;
+  optional string name = 3;
+}
+
+// On success `created` is true and `function` is the new function's record.
+message CreateFunctionResponse {
+  bool created = 1;
+  FunctionRecord function = 2;
 }
 
 message BasicBlockRecord {
@@ -283,6 +308,7 @@ service FunctionsService {
   // than by walking a call graph client-side. Reuses ListFunctionsRequest /
   // ListFunctionsResponse -- no new message shapes.
   rpc ListLeafFunctions(ListFunctionsRequest) returns (ListFunctionsResponse);
+  rpc CreateFunction(CreateFunctionRequest) returns (CreateFunctionResponse);
   rpc RenameFunction(RenameFunctionRequest) returns (RenameFunctionResponse);
   rpc ListBasicBlocks(ListBasicBlocksRequest) returns (ListBasicBlocksResponse);
   rpc ListCFGEdges(ListCFGEdgesRequest) returns (ListCFGEdgesResponse);

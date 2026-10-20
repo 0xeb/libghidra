@@ -6,6 +6,13 @@
 package libghidra;
 
 /**
+ * <pre>
+ * Not found: `instruction` is unset unless an instruction of the listing
+ * starts at the address (not inside one, not in data, not unmapped).
+ * With no program open the call fails with the RpcResponse error code
+ * "not_loaded".
+ * </pre>
+ *
  * Protobuf type {@code libghidra.GetInstructionResponse}
  */
 public final class GetInstructionResponse extends
@@ -232,6 +239,13 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * Not found: `instruction` is unset unless an instruction of the listing
+   * starts at the address (not inside one, not in data, not unmapped).
+   * With no program open the call fails with the RpcResponse error code
+   * "not_loaded".
+   * </pre>
+   *
    * Protobuf type {@code libghidra.GetInstructionResponse}
    */
   public static final class Builder extends

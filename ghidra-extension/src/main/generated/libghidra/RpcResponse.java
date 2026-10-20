@@ -6,6 +6,15 @@
 package libghidra;
 
 /**
+ * <pre>
+ * The answer to every RPC. success=true carries the payload; success=false carries
+ * error_code and a human-readable error_message.
+ *
+ * Write contract: a write either succeeds with its effect, every flag in its
+ * response true, or fails with an error_code below. It never answers success
+ * with a false flag.
+ * </pre>
+ *
  * Protobuf type {@code libghidra.RpcResponse}
  */
 public final class RpcResponse extends
@@ -60,6 +69,35 @@ private static final long serialVersionUID = 0L;
   @SuppressWarnings("serial")
   private volatile java.lang.Object errorCode_ = "";
   /**
+   * <pre>
+   * One lower-snake code from this vocabulary, the only codes an RPC answers:
+   * not_found             the target does not exist: no function, type, member
+   * ordinal, local, parameter, tag, breakpoint, bookmark,
+   * comment, data item, symbol, option, job or benchmark
+   * unmapped_address      no memory block contains the address
+   * not_loaded            no program is open (any program-scoped RPC)
+   * invalid_argument      the request is malformed or names the wrong kind of
+   * thing (a struct where an enum is required, an address
+   * inside an instruction, an overlapping block)
+   * duplicate_name        the name a create or rename asks for is taken
+   * not_supported         this backend or host mode cannot do it
+   * parse_error           a C declaration or prototype does not parse
+   * uninitialized_memory  the block exists but holds no bytes
+   * access_conflict       the host is busy with conflicting state: another
+   * program is open, a transaction is held, it is closing
+   * analysis_running      an analysis job owns the program
+   * cancelled             the request or job was cancelled
+   * internal_error        the engine failed; the message says how
+   * unknown_method        the method name is not an RPC
+   * invalid_payload       the payload does not decode as the method's request
+   * config_error          the host or client is misconfigured
+   * unknown_type          a type named as an argument (a member, parameter or
+   * local type, an alias target) does not resolve; a
+   * missing target type is not_found
+   * The HTTP transport can also refuse a request before any RPC runs
+   * (unauthorized, server_busy, invalid_method); those are not RPC results.
+   * </pre>
+   *
    * <code>string error_code = 2;</code>
    * @return The errorCode.
    */
@@ -77,6 +115,35 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
+   * <pre>
+   * One lower-snake code from this vocabulary, the only codes an RPC answers:
+   * not_found             the target does not exist: no function, type, member
+   * ordinal, local, parameter, tag, breakpoint, bookmark,
+   * comment, data item, symbol, option, job or benchmark
+   * unmapped_address      no memory block contains the address
+   * not_loaded            no program is open (any program-scoped RPC)
+   * invalid_argument      the request is malformed or names the wrong kind of
+   * thing (a struct where an enum is required, an address
+   * inside an instruction, an overlapping block)
+   * duplicate_name        the name a create or rename asks for is taken
+   * not_supported         this backend or host mode cannot do it
+   * parse_error           a C declaration or prototype does not parse
+   * uninitialized_memory  the block exists but holds no bytes
+   * access_conflict       the host is busy with conflicting state: another
+   * program is open, a transaction is held, it is closing
+   * analysis_running      an analysis job owns the program
+   * cancelled             the request or job was cancelled
+   * internal_error        the engine failed; the message says how
+   * unknown_method        the method name is not an RPC
+   * invalid_payload       the payload does not decode as the method's request
+   * config_error          the host or client is misconfigured
+   * unknown_type          a type named as an argument (a member, parameter or
+   * local type, an alias target) does not resolve; a
+   * missing target type is not_found
+   * The HTTP transport can also refuse a request before any RPC runs
+   * (unauthorized, server_busy, invalid_method); those are not RPC results.
+   * </pre>
+   *
    * <code>string error_code = 2;</code>
    * @return The bytes for errorCode.
    */
@@ -378,6 +445,15 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * The answer to every RPC. success=true carries the payload; success=false carries
+   * error_code and a human-readable error_message.
+   *
+   * Write contract: a write either succeeds with its effect, every flag in its
+   * response true, or fails with an error_code below. It never answers success
+   * with a false flag.
+   * </pre>
+   *
    * Protobuf type {@code libghidra.RpcResponse}
    */
   public static final class Builder extends
@@ -616,6 +692,35 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object errorCode_ = "";
     /**
+     * <pre>
+     * One lower-snake code from this vocabulary, the only codes an RPC answers:
+     * not_found             the target does not exist: no function, type, member
+     * ordinal, local, parameter, tag, breakpoint, bookmark,
+     * comment, data item, symbol, option, job or benchmark
+     * unmapped_address      no memory block contains the address
+     * not_loaded            no program is open (any program-scoped RPC)
+     * invalid_argument      the request is malformed or names the wrong kind of
+     * thing (a struct where an enum is required, an address
+     * inside an instruction, an overlapping block)
+     * duplicate_name        the name a create or rename asks for is taken
+     * not_supported         this backend or host mode cannot do it
+     * parse_error           a C declaration or prototype does not parse
+     * uninitialized_memory  the block exists but holds no bytes
+     * access_conflict       the host is busy with conflicting state: another
+     * program is open, a transaction is held, it is closing
+     * analysis_running      an analysis job owns the program
+     * cancelled             the request or job was cancelled
+     * internal_error        the engine failed; the message says how
+     * unknown_method        the method name is not an RPC
+     * invalid_payload       the payload does not decode as the method's request
+     * config_error          the host or client is misconfigured
+     * unknown_type          a type named as an argument (a member, parameter or
+     * local type, an alias target) does not resolve; a
+     * missing target type is not_found
+     * The HTTP transport can also refuse a request before any RPC runs
+     * (unauthorized, server_busy, invalid_method); those are not RPC results.
+     * </pre>
+     *
      * <code>string error_code = 2;</code>
      * @return The errorCode.
      */
@@ -632,6 +737,35 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * One lower-snake code from this vocabulary, the only codes an RPC answers:
+     * not_found             the target does not exist: no function, type, member
+     * ordinal, local, parameter, tag, breakpoint, bookmark,
+     * comment, data item, symbol, option, job or benchmark
+     * unmapped_address      no memory block contains the address
+     * not_loaded            no program is open (any program-scoped RPC)
+     * invalid_argument      the request is malformed or names the wrong kind of
+     * thing (a struct where an enum is required, an address
+     * inside an instruction, an overlapping block)
+     * duplicate_name        the name a create or rename asks for is taken
+     * not_supported         this backend or host mode cannot do it
+     * parse_error           a C declaration or prototype does not parse
+     * uninitialized_memory  the block exists but holds no bytes
+     * access_conflict       the host is busy with conflicting state: another
+     * program is open, a transaction is held, it is closing
+     * analysis_running      an analysis job owns the program
+     * cancelled             the request or job was cancelled
+     * internal_error        the engine failed; the message says how
+     * unknown_method        the method name is not an RPC
+     * invalid_payload       the payload does not decode as the method's request
+     * config_error          the host or client is misconfigured
+     * unknown_type          a type named as an argument (a member, parameter or
+     * local type, an alias target) does not resolve; a
+     * missing target type is not_found
+     * The HTTP transport can also refuse a request before any RPC runs
+     * (unauthorized, server_busy, invalid_method); those are not RPC results.
+     * </pre>
+     *
      * <code>string error_code = 2;</code>
      * @return The bytes for errorCode.
      */
@@ -649,6 +783,35 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * One lower-snake code from this vocabulary, the only codes an RPC answers:
+     * not_found             the target does not exist: no function, type, member
+     * ordinal, local, parameter, tag, breakpoint, bookmark,
+     * comment, data item, symbol, option, job or benchmark
+     * unmapped_address      no memory block contains the address
+     * not_loaded            no program is open (any program-scoped RPC)
+     * invalid_argument      the request is malformed or names the wrong kind of
+     * thing (a struct where an enum is required, an address
+     * inside an instruction, an overlapping block)
+     * duplicate_name        the name a create or rename asks for is taken
+     * not_supported         this backend or host mode cannot do it
+     * parse_error           a C declaration or prototype does not parse
+     * uninitialized_memory  the block exists but holds no bytes
+     * access_conflict       the host is busy with conflicting state: another
+     * program is open, a transaction is held, it is closing
+     * analysis_running      an analysis job owns the program
+     * cancelled             the request or job was cancelled
+     * internal_error        the engine failed; the message says how
+     * unknown_method        the method name is not an RPC
+     * invalid_payload       the payload does not decode as the method's request
+     * config_error          the host or client is misconfigured
+     * unknown_type          a type named as an argument (a member, parameter or
+     * local type, an alias target) does not resolve; a
+     * missing target type is not_found
+     * The HTTP transport can also refuse a request before any RPC runs
+     * (unauthorized, server_busy, invalid_method); those are not RPC results.
+     * </pre>
+     *
      * <code>string error_code = 2;</code>
      * @param value The errorCode to set.
      * @return This builder for chaining.
@@ -662,6 +825,35 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * One lower-snake code from this vocabulary, the only codes an RPC answers:
+     * not_found             the target does not exist: no function, type, member
+     * ordinal, local, parameter, tag, breakpoint, bookmark,
+     * comment, data item, symbol, option, job or benchmark
+     * unmapped_address      no memory block contains the address
+     * not_loaded            no program is open (any program-scoped RPC)
+     * invalid_argument      the request is malformed or names the wrong kind of
+     * thing (a struct where an enum is required, an address
+     * inside an instruction, an overlapping block)
+     * duplicate_name        the name a create or rename asks for is taken
+     * not_supported         this backend or host mode cannot do it
+     * parse_error           a C declaration or prototype does not parse
+     * uninitialized_memory  the block exists but holds no bytes
+     * access_conflict       the host is busy with conflicting state: another
+     * program is open, a transaction is held, it is closing
+     * analysis_running      an analysis job owns the program
+     * cancelled             the request or job was cancelled
+     * internal_error        the engine failed; the message says how
+     * unknown_method        the method name is not an RPC
+     * invalid_payload       the payload does not decode as the method's request
+     * config_error          the host or client is misconfigured
+     * unknown_type          a type named as an argument (a member, parameter or
+     * local type, an alias target) does not resolve; a
+     * missing target type is not_found
+     * The HTTP transport can also refuse a request before any RPC runs
+     * (unauthorized, server_busy, invalid_method); those are not RPC results.
+     * </pre>
+     *
      * <code>string error_code = 2;</code>
      * @return This builder for chaining.
      */
@@ -672,6 +864,35 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * One lower-snake code from this vocabulary, the only codes an RPC answers:
+     * not_found             the target does not exist: no function, type, member
+     * ordinal, local, parameter, tag, breakpoint, bookmark,
+     * comment, data item, symbol, option, job or benchmark
+     * unmapped_address      no memory block contains the address
+     * not_loaded            no program is open (any program-scoped RPC)
+     * invalid_argument      the request is malformed or names the wrong kind of
+     * thing (a struct where an enum is required, an address
+     * inside an instruction, an overlapping block)
+     * duplicate_name        the name a create or rename asks for is taken
+     * not_supported         this backend or host mode cannot do it
+     * parse_error           a C declaration or prototype does not parse
+     * uninitialized_memory  the block exists but holds no bytes
+     * access_conflict       the host is busy with conflicting state: another
+     * program is open, a transaction is held, it is closing
+     * analysis_running      an analysis job owns the program
+     * cancelled             the request or job was cancelled
+     * internal_error        the engine failed; the message says how
+     * unknown_method        the method name is not an RPC
+     * invalid_payload       the payload does not decode as the method's request
+     * config_error          the host or client is misconfigured
+     * unknown_type          a type named as an argument (a member, parameter or
+     * local type, an alias target) does not resolve; a
+     * missing target type is not_found
+     * The HTTP transport can also refuse a request before any RPC runs
+     * (unauthorized, server_busy, invalid_method); those are not RPC results.
+     * </pre>
+     *
      * <code>string error_code = 2;</code>
      * @param value The bytes for errorCode to set.
      * @return This builder for chaining.

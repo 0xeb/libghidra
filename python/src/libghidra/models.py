@@ -325,6 +325,12 @@ class ListFunctionsResponse:
 
 
 @dataclass
+class CreateFunctionResponse:
+    created: bool = False
+    function: FunctionRecord | None = None
+
+
+@dataclass
 class RenameFunctionResponse:
     renamed: bool = False
     name: str = ""
@@ -380,6 +386,12 @@ class GetSymbolResponse:
 @dataclass
 class ListSymbolsResponse:
     symbols: list[SymbolRecord] = field(default_factory=list)
+
+
+@dataclass
+class CreateLabelResponse:
+    created: bool = False
+    symbol: SymbolRecord | None = None
 
 
 @dataclass

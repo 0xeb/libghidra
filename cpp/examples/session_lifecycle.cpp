@@ -8,7 +8,7 @@
 //
 // Usage: session_lifecycle <binary_path> [ghidra_root] [arch]
 //
-// Demonstrates: GetStatus, GetCapabilities, GetRevision, RenameFunction,
+// Demonstrates: GetStatus, GetCapabilities, GetRevision, CreateFunction, RenameFunction,
 //   SaveProgram, DiscardProgram, CloseProgram, re-OpenProgram.
 //
 // If ghidra_root is omitted, uses embedded processor specs (no Ghidra needed).
@@ -82,7 +82,20 @@ int main(int argc, char* argv[]) {
   }
 
   // --- Make a mutation, check revision increments ---
-  auto rename = client->RenameFunction(open_result.value->image_base, "entry_renamed");
+  // Define a function at the start of the first executable block (a rename
+  // never creates one), then rename it.
+  std::uint64_t entry = open_result.value->image_base;
+  if (auto blocks = client->ListMemoryBlocks(0, 0); blocks.ok()) {
+    for (const auto& b : blocks.value->blocks) {
+      if (b.is_execute) {
+        entry = b.start_address;
+        break;
+      }
+    }
+  }
+  auto created = client->CreateFunction(entry, std::nullopt);
+  std::cout << "CreateFunction: " << (created.ok() ? "OK" : created.status.message) << "\n";
+  auto rename = client->RenameFunction(entry, "entry_renamed");
   std::cout << "RenameFunction: " << (rename.ok() ? "OK" : rename.status.message) << "\n";
 
   auto rev2 = client->GetRevision();

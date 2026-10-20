@@ -27,8 +27,9 @@ public final class DecompilerRuntime extends RuntimeSupport implements Decompile
 	public DecompilerContract.DecompileFunctionResponse decompileFunction(
 			DecompilerContract.DecompileFunctionRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
+			// No program open is an error (not_loaded), never "not found".
+			Program program = requireProgram();
+			if (request == null) {
 				return new DecompilerContract.DecompileFunctionResponse(null);
 			}
 			try {
@@ -54,8 +55,9 @@ public final class DecompilerRuntime extends RuntimeSupport implements Decompile
 	public DecompilerContract.GetPcodeResponse getPcode(
 			DecompilerContract.GetPcodeRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
+			// No program open is an error (not_loaded), never "not found".
+			Program program = requireProgram();
+			if (request == null) {
 				return new DecompilerContract.GetPcodeResponse(null);
 			}
 			try {

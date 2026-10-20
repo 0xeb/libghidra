@@ -305,6 +305,11 @@ struct RenameFunctionResponse {
   std::string name;
 };
 
+struct CreateFunctionResponse {
+  bool created = false;
+  FunctionRecord function;
+};
+
 struct BasicBlockRecord {
   std::uint64_t function_entry = 0;
   std::uint64_t start_address = 0;
@@ -465,6 +470,11 @@ struct GetSymbolResponse {
 
 struct ListSymbolsResponse {
   std::vector<SymbolRecord> symbols;
+};
+
+struct CreateLabelResponse {
+  bool created = false;
+  SymbolRecord symbol;
 };
 
 struct RenameSymbolResponse {

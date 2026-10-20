@@ -1,0 +1,191 @@
+diff --git a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/BaseLexer.g b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/BaseLexer.g
+index 076578bacf..a470426493 100644
+--- a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/BaseLexer.g
++++ b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/BaseLexer.g
+@@ -2,10 +2,35 @@ lexer grammar BaseLexer;
+ 
+ options {
+ 	superClass = AbstractSleighLexer;
+-	tokenVocab = SleighLexer;
+ }
+ 
+ tokens {
++	// ANTLR synthesizes this token for importing lexers. Include it for the
++	// non-importing BaseLexer as well, so its runtime constants stay aligned.
++	Tokens;
++	// Every lexer inherits the complete vocabulary, including the mode-specific
++	// tokens. Imported grammars cannot use tokenVocab; declaring the union here
++	// also gives standalone roots the same token numbers without circular imports.
++	DISPCHAR;
++	RES_IS;
++	FEQUAL;
++	FNOTEQUAL;
++	FLESS;
++	FGREAT;
++	FLESSEQUAL;
++	FGREATEQUAL;
++	FPLUS;
++	FMINUS;
++	FMULT;
++	FDIV;
++	SLESS;
++	SGREAT;
++	SLESSEQUAL;
++	SGREATEQUAL;
++	SRIGHT;
++	SDIV;
++	SREM;
++	RES_IF;
+ 	OP_ADD;
+ 	OP_ADDRESS_OF;
+ 	OP_ALIGNMENT;
+diff --git a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/DisplayLexer.g b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/DisplayLexer.g
+index a55a69d70e..3a157dd79d 100644
+--- a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/DisplayLexer.g
++++ b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/DisplayLexer.g
+@@ -2,7 +2,6 @@ lexer grammar DisplayLexer;
+ 
+ options {
+ 	superClass = AbstractSleighLexer;
+-	tokenVocab = SleighLexer;
+ }
+ 
+ import BaseLexer;
+diff --git a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/README.txt b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/README.txt
+index b954509ef8..45b5745ef0 100644
+--- a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/README.txt
++++ b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/README.txt
+@@ -130,12 +130,13 @@ extra location bookkeeping for the error reporting.
+ There's still a small issue with the build process, though. Because these lexers and grammars must
+ all cooperate during sleigh compilation, they must share a common token vocabulary. In other words,
+ the DisplayLexer must know about SemanticLexer's tokens even though it never refers to them itself,
+-simply so that they don't have overlapping numbers. To resolve this, a dummy lexer, called
+-SleighLexer.g is written to import the other lexers. Because of an ANTLR restriction, the dummy
+-lexer must specify at least one lexing rule. Building this lexer causes ANTLR to output a token
+-vocabulary containing all possible tokens from all the lexers. Those lexers then take this
+-vocabulary as their own. To avoid any confusion, the Gradle script deletes the Java source for the
+-dummy lexer, leaving just its .tokens file.
++simply so that they don't have overlapping numbers. BaseLexer declares the union of all mode
++tokens, including ANTLR's synthetic Tokens token. Every lexer inherits that complete vocabulary;
++tokenVocab is not needed in imported lexers (ANTLR ignores that option in delegates). A dummy
++SleighLexer.g imports BaseLexer once and exports the same vocabulary for the parsers. Because of
++an ANTLR restriction, the dummy lexer must specify at least one lexing rule. The Gradle script
++deletes its Java source, leaving just its .tokens file. Both the exported vocabulary and the
++constants generated in every lexer must agree with the parser's constants.
+ 
+ Additionally, there's a bit of a glitch with the way ANTLR handles "@header" actions with imported
+ grammars. A root grammar specifying its own "@header" action cannot import a grammar with another
+diff --git a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexer.g b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexer.g
+index e6da21098f..fc55e2b7ed 100644
+--- a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexer.g
++++ b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexer.g
+@@ -2,7 +2,6 @@ lexer grammar SemanticLexer;
+ 
+ options {
+ 	superClass = AbstractSleighLexer;
+-	tokenVocab = SleighLexer;
+ }
+ 
+ import BaseLexer;
+diff --git a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexerHex.g b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexerHex.g
+index 7426915983..aeb985d1bd 100644
+--- a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexerHex.g
++++ b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexerHex.g
+@@ -2,7 +2,6 @@ lexer grammar SemanticLexerHex;
+ 
+ options {
+ 	superClass = AbstractSleighLexer;
+-	tokenVocab = SleighLexer;
+ }
+ 
+ import SemanticLexer;
+diff --git a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexerIdHex.g b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexerIdHex.g
+index 02b2ab98cf..9db759a97d 100644
+--- a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexerIdHex.g
++++ b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SemanticLexerIdHex.g
+@@ -2,7 +2,6 @@ lexer grammar SemanticLexerIdHex;
+ 
+ options {
+ 	superClass = AbstractSleighLexer;
+-	tokenVocab = SleighLexer;
+ }
+ 
+ import SemanticLexer;
+diff --git a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SleighLexer.g b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SleighLexer.g
+index 485a0c8e31..d0a4509ca5 100644
+--- a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SleighLexer.g
++++ b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/SleighLexer.g
+@@ -4,14 +4,13 @@ options {
+ 	superClass = AbstractSleighLexer;
+ }
+ 
+-import BaseLexer, DisplayLexer, SemanticLexer;
++import BaseLexer;
+ 
+ /**
+  * See README.txt (near the bottom) for more information.
+  *
+- * This grammar exists solely to tease a combined token vocabulary from all of the lexers. The
+- * resulting vocabulary is used by all of the other grammars (parsers and lexers) except for
+- * BooleanExpression.
++ * This grammar exports the complete vocabulary declared by BaseLexer. The resulting vocabulary
++ * is used by all parsers except BooleanExpression; each lexer inherits it from BaseLexer.
+  *
+  * The output of this grammar (except for the .tokens file) is discarded by build.gradle.
+  */
+diff --git a/Ghidra/Framework/SoftwareModeling/src/test/java/ghidra/sleigh/grammar/SleighLexerVocabularyTest.java b/Ghidra/Framework/SoftwareModeling/src/test/java/ghidra/sleigh/grammar/SleighLexerVocabularyTest.java
+new file mode 100644
+--- /dev/null
++++ b/Ghidra/Framework/SoftwareModeling/src/test/java/ghidra/sleigh/grammar/SleighLexerVocabularyTest.java
+@@ -0,0 +1,51 @@
++/* ###
++ * IP: GHIDRA
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package ghidra.sleigh.grammar;
++
++import static org.junit.Assert.*;
++import java.lang.reflect.Field;
++import org.antlr.runtime.ANTLRStringStream;
++import org.junit.Test;
++
++public class SleighLexerVocabularyTest {
++    @Test
++    public void testEveryLexerUsesParserTokenNumbers() throws Exception {
++        for (Class<?> lexer : new Class<?>[] {BaseLexer.class, DisplayLexer.class,
++                SemanticLexer.class, SemanticLexerHex.class, SemanticLexerIdHex.class}) {
++            for (Field field : lexer.getFields()) {
++                if (field.getType() == int.class && java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
++                    Field parserToken;
++                    try {
++                        parserToken = SleighParser.class.getField(field.getName());
++                    } catch (NoSuchFieldException ignored) {
++                        continue; // ANTLR implementation constants are not grammar tokens.
++                    }
++                    assertEquals(lexer.getSimpleName() + "." + field.getName(),
++                        parserToken.getInt(null), field.getInt(null));
++                }
++            }
++        }
++    }
++
++    @Test
++    public void testBaseLexerUnderscoreAndWhitespace() {
++        BaseLexer lexer = new BaseLexer(new ANTLRStringStream("_ name"));
++        lexer.setEnv(new ParsingEnvironment(new LineArrayListWriter()));
++        assertEquals(SleighParser.UNDERSCORE, lexer.nextToken().getType());
++        assertEquals(SleighParser.WS, lexer.nextToken().getType());
++        assertEquals(SleighParser.IDENTIFIER, lexer.nextToken().getType());
++    }
++}

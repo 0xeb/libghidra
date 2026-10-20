@@ -1,0 +1,163 @@
+diff --git a/Ghidra/Features/Base/data/PEFunctionsThatDoNotReturn b/Ghidra/Features/Base/data/PEFunctionsThatDoNotReturn
+index 115bf6ff95..ba9c84719a 100644
+--- a/Ghidra/Features/Base/data/PEFunctionsThatDoNotReturn
++++ b/Ghidra/Features/Base/data/PEFunctionsThatDoNotReturn
+@@ -18,8 +18,8 @@ longjmp
+ quick_exit
+ RpcRaiseException
+ terminate
+-___raise_securityfailure
+-___report_rangecheckfailure
++raise_securityfailure
++report_rangecheckfailure
+ ?_Xregex_error@std@@YAXW4error_type@regex_constant@1@@Z
+ ?_Xbad_alloc@std@@YAXXZ
+ ?_Xlength_error@std@@YAXPBD@Z
+diff --git a/Ghidra/Features/Base/src/main/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzer.java b/Ghidra/Features/Base/src/main/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzer.java
+index f6988459bc..1f32ee0220 100644
+--- a/Ghidra/Features/Base/src/main/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzer.java
++++ b/Ghidra/Features/Base/src/main/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzer.java
+@@ -83,6 +83,15 @@ public class MingwRelocationAnalyzer extends AbstractAnalyzer {
+ 			boolean success = handler.processRelocations(log, monitor);
+ 			markAsProcessed(program, handler.listLabelsFound(), success);
+ 		}
++		catch (MinGWPseudoRelocListNotFoundException e) {
++			// Stripped MinGW programs with no auto-imports can have an empty list
++			// and no header or labels. Failure of the heuristic is not corrupt data.
++			// Keep the unavailable result explicit; do not claim relocations applied.
++			markAsNotFound(program);
++			log.appendMsg(NAME + ": " + e.getMessage());
++			Msg.info(this, e.getMessage());
++			return true;
++		}
+ 		catch (InvalidDataException e) {
+ 			markAsNotFound(program);
+ 			log.appendMsg(NAME + ": " + e.getMessage());
+@@ -113,6 +122,12 @@ public class MingwRelocationAnalyzer extends AbstractAnalyzer {
+ 	}
+ }
+ 
++class MinGWPseudoRelocListNotFoundException extends InvalidDataException {
++	MinGWPseudoRelocListNotFoundException() {
++		super("No MinGW pseudo-relocation list detected");
++	}
++}
++
+ class MinGWPseudoRelocList {
+ 
+ 	static final String PSEUDO_RELOC_LIST_START_NAME = "__RUNTIME_PSEUDO_RELOC_LIST__";
+@@ -170,7 +185,7 @@ class MinGWPseudoRelocList {
+ 
+ 		//TODO: find a way to recognize type0 ones
+ 		if (!findUnlabledType1PseudoRelocList(monitor)) {
+-			throw new InvalidDataException("MinGW pseudo-relocation list not found");
++			throw new MinGWPseudoRelocListNotFoundException();
+ 		}
+ 		createPrimaryLabel(pdwListStartAddr, PSEUDO_RELOC_LIST_START_NAME);
+ 		createPrimaryLabel(pdwListEndAddr, PSEUDO_RELOC_LIST_END_NAME);
+diff --git a/Ghidra/Features/Base/src/test/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzerTest.java b/Ghidra/Features/Base/src/test/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzerTest.java
+new file mode 100644
+--- /dev/null
++++ b/Ghidra/Features/Base/src/test/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzerTest.java
+@@ -0,0 +1,101 @@
++/* ###
++ * IP: GHIDRA
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package ghidra.app.plugin.core.analysis;
++
++import static org.junit.Assert.*;
++import org.junit.Test;
++import ghidra.app.util.bin.InvalidDataException;
++import ghidra.app.util.importer.MessageLog;
++import ghidra.program.database.ProgramBuilder;
++import ghidra.test.AbstractGhidraHeadlessIntegrationTest;
++import ghidra.util.task.TaskMonitor;
++
++public class MingwRelocationAnalyzerTest extends AbstractGhidraHeadlessIntegrationTest {
++    @Test
++    public void testUnlabeledEmptyImageIsNotAnAnalysisFailure() throws Exception {
++        ProgramBuilder builder = new ProgramBuilder("empty", ProgramBuilder._X64, "windows", null);
++        try {
++            builder.createMemory(".rdata", "1000", 0x100);
++            var program = builder.getProgram();
++            int tx = program.startTransaction("analyze");
++            try {
++                assertTrue(new MingwRelocationAnalyzer().added(program, program.getMemory(),
++                    TaskMonitor.DUMMY, new MessageLog()));
++                assertEquals("Unsupported", program.getOptions("Program Information")
++                    .getString("MinGW Relocations", null));
++            } finally {
++                program.endTransaction(tx, true);
++            }
++        } finally {
++            builder.dispose();
++        }
++    }
++
++    @Test
++    public void testLabeledEmptyListRemainsSupported() throws Exception {
++        ProgramBuilder builder = new ProgramBuilder("labeled", ProgramBuilder._X64, "windows", null);
++        try {
++            builder.createMemory(".rdata", "1000", 0x100);
++            builder.createLabel("1010", MinGWPseudoRelocList.PSEUDO_RELOC_LIST_START_NAME);
++            builder.createLabel("1010", MinGWPseudoRelocList.PSEUDO_RELOC_LIST_END_NAME);
++            assertTrue(new MinGWPseudoRelocationHandler(builder.getProgram(), TaskMonitor.DUMMY)
++                .processRelocations(new MessageLog(), TaskMonitor.DUMMY));
++        } finally {
++            builder.dispose();
++        }
++    }
++
++    @Test
++    public void testNonemptyLabeledListStillAppliesRelocations() throws Exception {
++        ProgramBuilder builder = new ProgramBuilder("relocated", ProgramBuilder._X64, "windows", null);
++        try {
++            builder.createMemory(".rdata", "1000", 0x100);
++            builder.setBytes("1010", "42 00 00 00 80 10 00 00");
++            builder.setBytes("1080", "01 00 00 00");
++            builder.createLabel("1010", MinGWPseudoRelocList.PSEUDO_RELOC_LIST_START_NAME);
++            builder.createLabel("1018", MinGWPseudoRelocList.PSEUDO_RELOC_LIST_END_NAME);
++            var program = builder.getProgram();
++            int tx = program.startTransaction("relocate");
++            try {
++                assertTrue(new MinGWPseudoRelocationHandler(program, TaskMonitor.DUMMY)
++                    .processRelocations(new MessageLog(), TaskMonitor.DUMMY));
++                assertEquals(0x43, program.getMemory().getInt(builder.addr("1080")));
++            } finally {
++                program.endTransaction(tx, true);
++            }
++        } finally {
++            builder.dispose();
++        }
++    }
++
++    @Test
++    public void testMissingEndLabelIsStillMalformed() throws Exception {
++        ProgramBuilder builder = new ProgramBuilder("malformed", ProgramBuilder._X64, "windows", null);
++        try {
++            builder.createMemory(".rdata", "1000", 0x100);
++            builder.createLabel("1010", MinGWPseudoRelocList.PSEUDO_RELOC_LIST_START_NAME);
++            try {
++                new MinGWPseudoRelocList(builder.getProgram(), TaskMonitor.DUMMY);
++                fail("Missing end label must fail");
++            } catch (InvalidDataException expected) {
++                assertFalse(expected instanceof MinGWPseudoRelocListNotFoundException);
++                assertTrue(expected.getMessage().contains("Missing MinGW"));
++            }
++        } finally {
++            builder.dispose();
++        }
++    }
++}

@@ -357,6 +357,12 @@ pub struct RenameFunctionResponse {
 }
 
 #[derive(Debug, Clone, Default)]
+pub struct CreateFunctionResponse {
+    pub created: bool,
+    pub function: Option<FunctionRecord>,
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct BasicBlockRecord {
     pub function_entry: u64,
     pub start_address: u64,
@@ -406,6 +412,12 @@ pub struct GetSymbolResponse {
 #[derive(Debug, Clone, Default)]
 pub struct ListSymbolsResponse {
     pub symbols: Vec<SymbolRecord>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CreateLabelResponse {
+    pub created: bool,
+    pub symbol: Option<SymbolRecord>,
 }
 
 #[derive(Debug, Clone, Default)]

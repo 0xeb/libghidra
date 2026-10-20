@@ -1,0 +1,59 @@
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.cc	2026-09-28 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.cc	2026-09-28 00:00:00.000000000 -0700
+@@ -33,7 +33,6 @@ ElementId ELEM_DESCRIPTION = ElementId("description",233);
+ ElementId ELEM_LANGUAGE = ElementId("language",234);
+ ElementId ELEM_LANGUAGE_DEFINITIONS = ElementId("language_definitions",235);
+ 
+-map<int4,Sleigh> SleighArchitecture::translators;
+ vector<LanguageDescription> SleighArchitecture::description;
+ 
+ FileManage SleighArchitecture::specpaths; // Global specfile manager
+@@ -152,7 +151,7 @@ void SleighArchitecture::loadLanguageDescription(const string &specfile,ostream
+ SleighArchitecture::~SleighArchitecture(void)
+ 
+ {
+-  translate = (const Translate *)0;
++  // translate is owned by this architecture; Architecture::~Architecture deletes it
+ }
+ 
+ string SleighArchitecture::getDescription(void) const
+@@ -168,22 +167,18 @@ string SleighArchitecture::getDescription(void) const
+ bool SleighArchitecture::isTranslateReused(void)
+ 
+ {
+-  return (translators.find(languageindex) != translators.end());
++  return false;		// Every architecture builds its own translator (see buildTranslator)
+ }
+ 
+ Translate *SleighArchitecture::buildTranslator(DocumentStorage &store)
+ 
+ {				// Build a sleigh translator
+-  map<int4,Sleigh>::iterator iter;
+-
+-  iter = translators.find(languageindex);
+-  if (iter != translators.end()) {
+-    iter->second.reset(loader, context);
+-    return &iter->second;
+-  }
+-  pair<map<int4,Sleigh>::iterator,bool> res;
+-  res = translators.emplace(piecewise_construct,forward_as_tuple(languageindex),forward_as_tuple(loader,context));
+-  return &(*res.first).second;
++  // A translator is bound to one architecture's LoadImage and ContextDatabase,
++  // so it cannot be shared: a process-wide cache keyed by language, reset() to
++  // the newest architecture, leaves every older live architecture of the same
++  // language translating through another architecture's loader and context --
++  // freed memory once that one is destroyed, and a data race while both decode.
++  return new Sleigh(loader,context);
+ }
+ 
+ PcodeInjectLibrary *SleighArchitecture::buildPcodeInjectLibrary(void)
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.hh	2026-09-28 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.hh	2026-09-28 00:00:00.000000000 -0700
+@@ -106,7 +106,6 @@ public:
+ /// Generally a \e language \e id (i.e. x86:LE:64:default) is provided, then this
+ /// object is able to automatically load in configuration and construct the Translate object.
+ class SleighArchitecture : public Architecture {
+-  static map<int4,Sleigh> translators;		///< Map from language index to instantiated translators
+   static vector<LanguageDescription> description;	///< List of languages we know about
+   int4 languageindex;					///< Index (within LanguageDescription array) of the active language
+   string filename;					///< Name of active load-image file

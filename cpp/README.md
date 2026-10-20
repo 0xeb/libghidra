@@ -4,7 +4,7 @@ Reference for the libghidra C++ LocalClient -- an offline binary analysis engine
 
 ## Overview
 
-LocalClient implements the shared `IClient` surface backed by Ghidra's C++ decompiler engine, with unsupported live-Ghidra concepts returning `NOT_SUPPORTED`. It supports decompilation, function/symbol/type queries, memory read/write, instruction disassembly, comments, data items, cross-references, and basic block/CFG extraction.
+LocalClient implements the shared `IClient` surface backed by Ghidra's C++ decompiler engine, with unsupported live-Ghidra concepts returning `not_supported`. It supports decompilation, function/symbol/type queries, memory read/write, instruction disassembly, comments, data items, cross-references, and basic block/CFG extraction.
 
 All methods return `StatusOr<T>` -- check `.ok()`, then access `.value`.
 
@@ -19,10 +19,10 @@ analysis pass of its own, so what it can enumerate depends on its input:
   them, and `ListLeafFunctions` reads the reference index Ghidra recorded during analysis —
   the same rule the live host applies, so both backends return the same set.
 - **From a bare binary** (`program_path`): only loader symbols (PE/ELF exports and imports)
-  are known, so enumeration is thin, and `ListLeafFunctions` returns `NOT_SUPPORTED` because
+  are known, so enumeration is thin, and `ListLeafFunctions` returns `not_supported` because
   there is no reference index to read. Drive it with **explicit addresses**
   (`GetDecompilation(addr)`, `ListInstructions(start, end)`, `ReadBytes(addr, n)`,
-  `RenameFunction(addr, name)`), or route enumeration through `HttpClient` against a host.
+  `CreateFunction(addr, name)`), or route enumeration through `HttpClient` against a host.
 
 `range_end` is an **inclusive** upper bound on every list method, exactly as on the live
 host: `(addr, addr)` is a point lookup, and `range_end = 0` or `UINT64_MAX` means "all".
@@ -94,7 +94,7 @@ Every method returns `StatusOr<T>`:
 ```cpp
 auto result = client->ListFunctions(0, UINT64_MAX, 0, 0);
 if (!result.ok()) {
-    // result.status.code    -- error code (e.g. "NOT_SUPPORTED", "INVALID_ARGUMENT")
+    // result.status.code    -- error code (e.g. "not_found", "unmapped_address")
     // result.status.message -- human-readable description
     return;
 }
@@ -102,16 +102,69 @@ if (!result.ok()) {
 for (auto& f : result.value->functions) { ... }
 ```
 
-Common error codes:
-- `"NOT_SUPPORTED"` -- method not implemented by this backend
-- `"INVALID_ARGUMENT"` -- bad parameters (e.g. unknown type name)
-- `"NOT_FOUND"` -- entity not found at the given address/name
+Both backends answer from one lower-snake vocabulary, defined once in
+`libghidra/error_codes.hpp` (`error_codes::kNotFound`, ...):
+
+| Code | Meaning |
+|------|---------|
+| `not_found` | the write names something that does not exist (function, type, member ordinal, local, parameter, symbol, comment, program) |
+| `unmapped_address` | the address is in no memory block |
+| `not_loaded` | no program is open |
+| `invalid_argument` | a malformed request, or a target of the wrong kind (a struct where an enum is needed, data over instructions, a comment inside an instruction) |
+| `duplicate_name` | a create or rename would collide with an existing name |
+| `not_supported` | this backend cannot do it |
+| `parse_error` | a prototype or declaration does not parse |
+| `uninitialized_memory` | the address is mapped but holds no bytes |
+| `access_conflict` | the target is busy or protected (another program open, a write running past mapped memory) |
+| `analysis_running`, `cancelled` | an analysis job owns the program / the request was cancelled |
+| `internal_error` | the backend failed for a reason the request cannot fix |
+| `unknown_method`, `invalid_payload` | the host does not know the RPC / cannot decode it |
+| `config_error` | the backend is not configured for the request (e.g. LocalClient `SaveProgram` without `state_path`) |
+| `unknown_type` | a type named as an argument (parameter, local, member or alias target type, `ApplyDataType`'s type) does not resolve |
+
+HttpClient adds transport codes (`connection_failed`, `timeout`, ...) for failures
+before the host answers.
+
+**Writes.** A write either succeeds with its effect, or fails with one of these codes
+and a message. It never answers ok with a false flag, never ok without its effect, and
+never creates something it was not asked for: a rename or signature change refuses an
+address with no function (`not_found`) instead of making one; an address in no memory
+block is `unmapped_address`; an address inside a function names that function, as reads
+do. The upserts are explicit: `SetComment` adds or replaces, `ApplyDataType` on undefined
+bytes creates a data item, `CreateType*` create, and `AddPerfBenchmark` replaces a
+benchmark with the same id.
+
+`LocalClient` follows the same contract. It reads the program's memory map from the
+project (or a bare PE's headers and sections; one block over a raw file), edits types in
+place by Ghidra path (`/category/Name`) -- a size change lays out again every struct,
+union, array and data item that holds the type by value, as Ghidra's data type manager
+does -- and refuses what its engine cannot do safely with `not_supported`: deleting or
+replacing a type that a prototype or another type uses, or growing a member of a struct
+without packing where no free bytes follow it (Ghidra would truncate the component).
+
+Not found is not an error for a read:
+
+```cpp
+auto r = client->GetInstruction(0xdeadbeef);
+if (r.ok() && !r.value->instruction) {
+    // nothing starts there
+}
+```
+
+A single-record read (`GetFunction`, `GetSymbol`, `GetInstruction`,
+`DecompileFunction`, `GetPcode`, `GetType`, `GetFunctionSignature`) that names
+nothing succeeds with the record absent: the response field is unset on the wire,
+so it reads as an empty optional / `None`, never as a placeholder record at
+address 0. An address inside a function names that function (the decompilation,
+signature or function that contains it); an instruction must start at the
+address. With no program open these reads fail with `not_loaded`, like every
+other read. The offline `LocalClient` answers the same way.
 
 ## Session
 
 Live `HttpClient`/headless sessions also expose project lifecycle helpers:
 `OpenProject`, `CloseProject`, `ListProjectFiles`, and `ImportProgram`.
-Those methods are intentionally `NOT_SUPPORTED` by `LocalClient`, because the
+Those methods are intentionally `not_supported` by `LocalClient`, because the
 offline backend loads one program database rather than a full Ghidra project.
 
 For live project workflows, list or import project programs first, then switch
@@ -143,11 +196,24 @@ auto r = client->OpenProgram(req);
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `program_path` | `string` | Path to binary file (required) |
-| `project_path` | `string` | Unused by LocalClient |
+| `program_path` | `string` | Path to a binary file (required unless `project_path` is set) |
+| `project_path` | `string` | Path to a Ghidra project `.gpr`: the program is read from its database (see below) |
 | `project_name` | `string` | Unused by LocalClient |
-| `analyze` | `bool` | Unused by LocalClient |
 | `read_only` | `bool` | Unused by LocalClient |
+| `language_id` | `string` | Sleigh language for a raw image (e.g. `x86:LE:64:default`) |
+| `compiler_spec_id` | `string` | Compiler spec for a raw image (e.g. `windows`) |
+| `format` | `string` | Loader format hint (`pe`, `elf`, `raw`, ...) |
+| `base_address` | `uint64_t` | Image base for a raw image |
+
+Opened from a project, the offline backend reads what the live host would hand its
+decompiler from the program database: functions with their namespaces and thunk flags,
+saved signatures (calling convention, no-return, inline, custom parameter storage), saved
+local variables, the program's data types (bitfields included), call fixups, instruction
+flow overrides and external function pointers. Decompilations use Ghidra's core type names
+(`int`, `uint`, `undefined4`, ...) and are printed the host's way (symbol names pass through
+Ghidra's C++ name sanitizer), so declarations, signatures and the locals Ghidra saved read
+the same on both backends. The standalone dialect names (`int4`, `uint1`, `xunknown8`, ...)
+are still accepted as input types.
 
 ### CloseProgram
 
@@ -237,7 +303,7 @@ Shuts down the client. Equivalent to `CloseProgram` for the local backend.
 StatusOr<GetDecompilationResponse> GetDecompilation(uint64_t address, int timeout_ms)
 ```
 
-Decompiles the function at `address`. This is a prerequisite for signature, xref, and basic block data.
+Decompiles the function at `address`. This is a prerequisite for xref and basic block data.
 
 For the live Ghidra host, `DecompilationRecord::pseudocode` is the unchanged
 `DecompiledFunction.getC()` string. Tokens and locals are returned in separate
@@ -289,7 +355,7 @@ StatusOr<GetPcodeResponse> GetPcode(
 
 Returns refined SSA or raw per-instruction P-code from the live Java host.
 `PcodeOpRecord::has_address` distinguishes a real source address zero from a
-synthetic op with no machine address. `LocalClient` returns `NOT_SUPPORTED`
+synthetic op with no machine address. `LocalClient` returns `not_supported`
 because the offline bridge does not yet expose this contract.
 
 ## Functions
@@ -328,13 +394,25 @@ for (auto& f : funcs.value->functions) {
 }
 ```
 
+### CreateFunction
+
+```cpp
+StatusOr<CreateFunctionResponse> CreateFunction(uint64_t address,
+                                                const std::optional<string>& name)
+```
+
+Defines a function whose entry is `address`, named `name` or, unset, `FUN_<address>`; the
+response carries its record. `unmapped_address` outside the memory map, `duplicate_name` when
+a function already starts there, `invalid_argument` when no instruction starts there. It is the
+only write that creates a function: a rename or a signature edit never does.
+
 ### RenameFunction
 
 ```cpp
 StatusOr<RenameFunctionResponse> RenameFunction(uint64_t address, const string& new_name)
 ```
 
-Renames the function at `address`. Increments revision.
+Renames the function at (or containing) `address`. Increments revision.
 
 ### ListLeafFunctions
 
@@ -346,7 +424,7 @@ StatusOr<ListFunctionsResponse> ListLeafFunctions(
 Functions that make no call: no reference from their body has a call type. The answer is
 read from the reference index Ghidra recorded during analysis, so it matches the live host
 exactly (import thunks, which Ghidra records as jumps, are leaves). Needs a program opened
-from a Ghidra project; a bare binary returns `NOT_SUPPORTED`.
+from a Ghidra project; a bare binary returns `not_supported`.
 
 ```cpp
 auto leaves = client->ListLeafFunctions(0, 0, 0, 0);
@@ -394,7 +472,11 @@ for (auto& e : edges.value->edges) {
 StatusOr<ReadBytesResponse> ReadBytes(uint64_t address, uint32_t length)
 ```
 
-Reads raw bytes from the program image. After `WriteBytes`, returns patched data from the CoW overlay.
+Reads raw bytes from the program image, as the host's `Memory.getBytes` does: from the
+address up to the end of the mapped, initialized memory it starts in (a read may come back
+shorter than asked). An address in no memory block is `unmapped_address`; one in a block
+that holds no bytes is `uninitialized_memory`. After `WriteBytes`, returns patched data
+from the CoW overlay.
 
 ```cpp
 auto r = client->ReadBytes(0x140001000, 32);
@@ -408,13 +490,15 @@ StatusOr<WriteBytesResponse> WriteBytes(uint64_t address, const vector<uint8_t>&
 ```
 
 Writes bytes via a Copy-on-Write overlay. The original binary is never modified; patches are layered on top. Installed lazily on first write.
+An address in no memory block is `unmapped_address`; a write that runs out of mapped,
+initialized memory is `access_conflict`; empty data is `invalid_argument`.
 
 ```cpp
 auto w = client->WriteBytes(0x140001000, {0x90, 0x90, 0x90, 0x90});
 printf("Wrote %u bytes\n", w.value->bytes_written);
 ```
 
-**Note:** Writes go through the primary decompiler slot only. Each pool slot would need its own overlay for thread safety.
+Writes land on every decompiler slot, so pooled reads see them.
 
 ### PatchBytesBatch
 
@@ -422,7 +506,8 @@ printf("Wrote %u bytes\n", w.value->bytes_written);
 StatusOr<PatchBytesBatchResponse> PatchBytesBatch(const vector<BytePatch>& patches)
 ```
 
-Applies multiple patches atomically.
+Applies multiple patches atomically: every patch is checked first, and one bad patch
+(unmapped, out of mapped memory, no data) fails the batch with nothing written.
 
 ```cpp
 libghidra::client::BytePatch p1{0x1000, {0x90, 0x90}};
@@ -437,7 +522,9 @@ printf("Applied %u patches, %u bytes\n", r.value->patch_count, r.value->bytes_wr
 StatusOr<ListMemoryBlocksResponse> ListMemoryBlocks(int limit, int offset)
 ```
 
-Lists memory blocks (segments) with permissions.
+Lists memory blocks (segments) with permissions. Offline this is the project's own memory
+map (the host's block list), a bare PE's headers and sections, or one block over a raw
+file. An address is mapped exactly when a block contains it.
 
 ```cpp
 auto blocks = client->ListMemoryBlocks(0, 0);
@@ -476,13 +563,28 @@ StatusOr<ListSymbolsResponse> ListSymbols(
 
 Lists symbols in an address range.
 
+### CreateLabel
+
+```cpp
+StatusOr<CreateLabelResponse> CreateLabel(uint64_t address, const string& name)
+```
+
+Adds the label `name` at `address` (Ghidra's `SymbolTable.createLabel`, `USER_DEFINED`). It never
+renames: the address keeps its symbols, and the label is primary only when it had none. As in
+Ghidra, a function that still has its default name (`FUN_...`) takes the name instead.
+Errors: `unmapped_address`, `duplicate_name` (a symbol of that name is already at the address),
+`invalid_argument` (blank or invalid name), `not_loaded`.
+
 ### RenameSymbol
 
 ```cpp
-StatusOr<RenameSymbolResponse> RenameSymbol(uint64_t address, const string& new_name)
+StatusOr<RenameSymbolResponse> RenameSymbol(uint64_t address, const string& new_name,
+                                            const std::optional<string>& old_name = std::nullopt)
 ```
 
-Renames the symbol at `address`. For function symbols, delegates to `RenameFunction`.
+With `old_name`, renames exactly the symbol of that name at `address` (a function's own symbol or
+any label, primary or not); `not_found` when the address has none. Without it, renames the
+primary symbol, or creates a label when the address has no symbol.
 
 ### DeleteSymbol
 
@@ -549,7 +651,9 @@ Lists union types. Each has `name`, `size`, `declaration`.
 StatusOr<CreateTypeResponse> CreateType(const string& name, const string& kind, uint64_t size)
 ```
 
-Creates a new type. `kind` is `"struct"` for structs.
+Creates a new type. `kind` is `"struct"`, `"enum"` or `"union"`; another kind is
+`invalid_argument`, and a name already taken is `duplicate_name`. A struct `size` gives it that
+many undefined bytes.
 
 ```cpp
 client->CreateType("packet_t", "struct", 16);
@@ -577,7 +681,11 @@ StatusOr<ListTypeMembersResponse> ListTypeMembers(
     const string& type_id_or_path, int limit, int offset)
 ```
 
-Lists struct fields with `ordinal`, `name`, `member_type`, `offset`, `size`, `comment`.
+Lists struct fields with `ordinal`, `name`, `member_type`, `offset`, `size`, `comment`, as
+the live host does: member types by path name (`/int`, `/rich.pdb/Node *`), and a bitfield
+as `<base>:<bits>` (`/uint:9`) with the offset and size of the bytes its bits span. The
+member edits below (`AddTypeMember`, `RenameTypeMember`, `SetTypeMemberType`,
+`DeleteTypeMember`) do not support a struct with bitfields offline.
 
 #### RenameTypeMember
 
@@ -739,7 +847,11 @@ Deletes a type. Throws on core/built-in types.
 StatusOr<GetFunctionSignatureResponse> GetFunctionSignature(uint64_t address)
 ```
 
-Gets the full signature for a function. Requires prior decompilation.
+Gets the full signature for a function: the saved prototype, with data types as
+Ghidra path names (e.g. `/int`, `/rich.pdb/Shape *`). A function with no saved
+signature reports `undefined name()`. The offline backend reads the signatures
+saved in a Ghidra project (and the program's data types) when it opens the
+project, so no decompilation is needed.
 
 ```cpp
 auto sig = client->GetFunctionSignature(addr);
@@ -759,7 +871,7 @@ StatusOr<ListFunctionSignaturesResponse> ListFunctionSignatures(
     uint64_t range_start, uint64_t range_end, int limit, int offset)
 ```
 
-Lists signatures for all functions in range. Requires prior decompilation.
+Lists signatures for all functions in range.
 
 ### SetFunctionSignature
 
@@ -848,7 +960,7 @@ StatusOr<ListInstructionOperandsResponse> ListInstructionOperands(
 
 Returns separate operand records (`address`, `operand_index`, `text`,
 `type_name`, `ref_type`) from the live Java host. `LocalClient` returns
-`NOT_SUPPORTED`; its offline listing bridge currently exposes only combined
+`not_supported`; its offline listing bridge currently exposes only combined
 instruction operand text.
 
 ### Comments
@@ -954,7 +1066,7 @@ Uses the decompiler pool for parallel extraction when `pool_size > 1`.
 
 ## Unsupported Methods
 
-These methods return `NOT_SUPPORTED` on the LocalClient:
+These methods return `not_supported` on the LocalClient:
 
 | Method | Reason |
 |--------|--------|
@@ -964,24 +1076,17 @@ These methods return `NOT_SUPPORTED` on the LocalClient:
 | `ListDominators` | Live/structural analysis surface not implemented locally |
 | `ListPostDominators` | Live/structural analysis surface not implemented locally |
 | `ListLoops` | Live/structural analysis surface not implemented locally |
-| `ListFunctionTags` | Ghidra database tag metadata is not modeled locally |
-| `CreateFunctionTag` | Ghidra database tag metadata is not modeled locally |
-| `DeleteFunctionTag` | Ghidra database tag metadata is not modeled locally |
-| `ListFunctionTagMappings` | Ghidra database tag metadata is not modeled locally |
-| `TagFunction` | Ghidra database tag metadata is not modeled locally |
-| `UntagFunction` | Ghidra database tag metadata is not modeled locally |
-| `ParseDeclarations` | Ghidra parser service is not embedded in the local backend |
-| `ListBookmarks` | GUI-only concept, no engine backing |
-| `AddBookmark` | GUI-only concept, no engine backing |
-| `DeleteBookmark` | GUI-only concept, no engine backing |
-| `ListBreakpoints` | Debugger concept, no engine backing |
-| `AddBreakpoint` | Debugger concept, no engine backing |
-| `SetBreakpointEnabled` | Debugger concept, no engine backing |
-| `SetBreakpointKind` | Debugger concept, no engine backing |
-| `SetBreakpointSize` | Debugger concept, no engine backing |
-| `SetBreakpointCondition` | Debugger concept, no engine backing |
-| `SetBreakpointGroup` | Debugger concept, no engine backing |
-| `DeleteBreakpoint` | Debugger concept, no engine backing |
+| `CreateMemoryBlock`, `RemoveMemoryBlock`, `MoveMemoryBlock`, `SetMemoryBlockAttributes` | The offline memory map is read-only |
+| `SetProgramOption`, `StartAnalysis`, `CancelAnalysis` | No options model or auto-analysis offline |
+| `ImportProgram`, `OpenProject`, `CloseProject` | No project writer offline |
+
+Labels, defined data, comments, bookmarks (breakpoints are bookmarks of type
+`GhidraAPI Breakpoint`, as the host stores them) and function tags are read from the project's own
+tables; offline edits stay in memory (`SaveProgram` writes the state file). Union members are
+edited as on the host. `ParseDeclarations` reads C as Ghidra's `CParser` does: `typedef struct S T;`
+is a typedef of `S`, anonymous types are named `_struct_<n>` / `_union_<n>` / `enum_<n>`, function
+pointers make function definitions in `/functions`, a redefinition replaces the type in place, and
+`const` / `volatile` / `__restrict` are dropped (as they are from `SetFunctionSignature`'s prototype).
 
 ## Appendix
 
@@ -1002,6 +1107,7 @@ These methods return `NOT_SUPPORTED` on the LocalClient:
 | | `GetPcode` | No |
 | **Functions** | `GetFunction` | Yes |
 | | `ListFunctions` | Yes |
+| | `CreateFunction` | Yes |
 | | `RenameFunction` | Yes |
 | | `ListBasicBlocks` | Yes |
 | | `ListCFGEdges` | Yes |
@@ -1009,23 +1115,24 @@ These methods return `NOT_SUPPORTED` on the LocalClient:
 | | `ListDominators` | No |
 | | `ListPostDominators` | No |
 | | `ListLoops` | No |
-| | `ListFunctionTags` | No |
-| | `CreateFunctionTag` | No |
-| | `DeleteFunctionTag` | No |
-| | `ListFunctionTagMappings` | No |
-| | `TagFunction` | No |
-| | `UntagFunction` | No |
+| | `ListFunctionTags` | Yes |
+| | `CreateFunctionTag` | Yes |
+| | `DeleteFunctionTag` | Yes |
+| | `ListFunctionTagMappings` | Yes |
+| | `TagFunction` | Yes |
+| | `UntagFunction` | Yes |
 | **Memory** | `ReadBytes` | Yes |
 | | `WriteBytes` | Yes (CoW overlay) |
 | | `PatchBytesBatch` | Yes (CoW overlay) |
 | | `ListMemoryBlocks` | Yes |
 | **Symbols** | `GetSymbol` | Yes |
 | | `ListSymbols` | Yes |
-| | `RenameSymbol` | Partial (function symbols only) |
+| | `CreateLabel` | Yes |
+| | `RenameSymbol` | Yes |
 | | `DeleteSymbol` | Yes |
 | **Types** | `GetType` | Yes |
 | | `ListTypes` | Yes |
-| | `CreateType` | Partial (struct creation) |
+| | `CreateType` | Yes (struct, union, enum) |
 | | `DeleteType` | Yes |
 | | `RenameType` | Yes |
 | | `ListTypeAliases` | Yes |
@@ -1040,7 +1147,7 @@ These methods return `NOT_SUPPORTED` on the LocalClient:
 | | `RenameTypeEnumMember` | Yes |
 | | `SetTypeEnumMemberValue` | Yes |
 | | `SetTypeEnumMemberComment` | Yes |
-| | `ParseDeclarations` | No |
+| | `ParseDeclarations` | Yes |
 | | `DeleteTypeEnumMember` | Yes |
 | | `ListTypeMembers` | Yes |
 | | `AddTypeMember` | Yes |
@@ -1068,17 +1175,17 @@ These methods return `NOT_SUPPORTED` on the LocalClient:
 | | `DeleteDataItem` | Yes |
 | | `ListDefinedStrings` | Yes |
 | **Xrefs** | `ListXrefs` | Yes (parallel) |
-| **Bookmarks** | `ListBookmarks` | No |
-| | `AddBookmark` | No |
-| | `DeleteBookmark` | No |
-| **Breakpoints** | `ListBreakpoints` | No |
-| | `AddBreakpoint` | No |
-| | `SetBreakpointEnabled` | No |
-| | `SetBreakpointKind` | No |
-| | `SetBreakpointSize` | No |
-| | `SetBreakpointCondition` | No |
-| | `SetBreakpointGroup` | No |
-| | `DeleteBreakpoint` | No |
+| **Bookmarks** | `ListBookmarks` | Yes |
+| | `AddBookmark` | Yes |
+| | `DeleteBookmark` | Yes |
+| **Breakpoints** | `ListBreakpoints` | Yes |
+| | `AddBreakpoint` | Yes |
+| | `SetBreakpointEnabled` | Yes |
+| | `SetBreakpointKind` | Yes |
+| | `SetBreakpointSize` | Yes |
+| | `SetBreakpointCondition` | Yes |
+| | `SetBreakpointGroup` | Yes |
+| | `DeleteBreakpoint` | Yes |
 
 ### Pagination Conventions
 

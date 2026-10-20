@@ -25,3 +25,9 @@ AGENTS.md export-ignore
 *.gradle text eol=lf
 *.properties text eol=lf
 CMakeLists.txt text eol=lf
+
+# Unified-diff context prefixes are syntax, including blank lines and tab indentation.
+cpp/patches/*.patch -whitespace
+
+# protoc 29.3's Java generator emits trailing spaces in generated source.
+ghidra-extension/src/main/generated/**/*.java whitespace=-trailing-space

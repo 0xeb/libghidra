@@ -6,6 +6,12 @@
 package libghidra;
 
 /**
+ * <pre>
+ * Not found: `pcode` is unset when no function contains the address.
+ * With no program open the call fails with the RpcResponse error code
+ * "not_loaded".
+ * </pre>
+ *
  * Protobuf type {@code libghidra.GetPcodeResponse}
  */
 public final class GetPcodeResponse extends
@@ -232,6 +238,12 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * Not found: `pcode` is unset when no function contains the address.
+   * With no program open the call fails with the RpcResponse error code
+   * "not_loaded".
+   * </pre>
+   *
    * Protobuf type {@code libghidra.GetPcodeResponse}
    */
   public static final class Builder extends

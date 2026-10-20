@@ -71,6 +71,12 @@ pub(crate) mod ffi {
             limit: i32,
             offset: i32,
         ) -> Result<String>;
+        fn create_function_json(
+            self: &LocalClientHandle,
+            address: u64,
+            has_name: bool,
+            name: &str,
+        ) -> Result<String>;
         fn rename_function_json(
             self: &LocalClientHandle,
             address: u64,
@@ -115,10 +121,13 @@ pub(crate) mod ffi {
             limit: i32,
             offset: i32,
         ) -> Result<String>;
+        fn create_label_json(self: &LocalClientHandle, address: u64, name: &str) -> Result<String>;
         fn rename_symbol_json(
             self: &LocalClientHandle,
             address: u64,
             new_name: &str,
+            has_old_name: bool,
+            old_name: &str,
         ) -> Result<String>;
 
         // -- Memory -------------------------------------------------------

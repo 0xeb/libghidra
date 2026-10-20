@@ -58,15 +58,18 @@ client = ghidra.GhidraClient(opts)
 
 ## Error Handling
 
-All methods raise `GhidraError` on failure.
+All methods raise `GhidraError` on failure. Not found is not a failure for a
+read: the record comes back as `None`.
 
 ```python
 from libghidra import GhidraError, ErrorCode
 
+assert client.get_function(0xdeadbeef).function is None  # nothing there
+
 try:
-    client.get_function(0xdeadbeef)
+    client.rename_function(0xdeadbeef, "x")
 except GhidraError as e:
-    print(e.code)     # ErrorCode.NOT_FOUND
+    print(e.code)     # ErrorCode.NOT_FOUND (a mutation's target is missing)
     print(e.message)  # human-readable message
     if e.code.is_retryable():
         # CONNECTION_FAILED, TIMEOUT, TOO_MANY_REQUESTS,
@@ -76,7 +79,18 @@ except GhidraError as e:
 
 ### ErrorCode values
 
-`CONNECTION_FAILED`, `TIMEOUT`, `TRANSPORT_ERROR`, `BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`, `BAD_GATEWAY`, `SERVICE_UNAVAILABLE`, `GATEWAY_TIMEOUT`, `HTTP_ERROR`, `ENCODE_ERROR`, `PARSE_ERROR`, `API_ERROR`, `NOT_SUPPORTED`, `CONFIG_ERROR`, `OTHER`.
+`CONNECTION_FAILED`, `TIMEOUT`, `TRANSPORT_ERROR`, `BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`, `BAD_GATEWAY`, `SERVICE_UNAVAILABLE`, `GATEWAY_TIMEOUT`, `HTTP_ERROR`, `ENCODE_ERROR`, `PARSE_ERROR`, `API_ERROR`, `NOT_SUPPORTED`, `NOT_LOADED`, `CONFIG_ERROR`, `OTHER`.
+
+### Not found
+
+A single-record read (`GetFunction`, `GetSymbol`, `GetInstruction`,
+`DecompileFunction`, `GetPcode`, `GetType`, `GetFunctionSignature`) that names
+nothing succeeds with the record absent: the response field is unset on the wire,
+so it reads as an empty optional / `None`, never as a placeholder record at
+address 0. An address inside a function names that function (the decompilation,
+signature or function that contains it); an instruction must start at the
+address. With no program open these reads fail with `not_loaded`, like every
+other read. The offline `LocalClient` answers the same way.
 
 ---
 
@@ -391,6 +405,22 @@ Ghidra project, so both return the same set. `LocalClient` on a bare binary rais
 leaves = client.list_leaf_functions()
 ```
 
+### `create_function(address, name=None) -> CreateFunctionResponse`
+
+Define a function whose entry is `address`. `name=None` takes the backend's default name
+(`FUN_<address>`).
+
+```python
+made = client.create_function(0x140001000, name="initialize_app")
+print(f"{made.function.name} @ 0x{made.function.entry_address:x}, {made.function.size} bytes")
+```
+
+**Returns:** `CreateFunctionResponse` with `created: bool` and `function: FunctionRecord`.
+
+**Errors:** `UNMAPPED_ADDRESS` outside every memory block; `DUPLICATE_NAME` when a function
+already starts there; `INVALID_ARGUMENT` when the address is not code (data, undefined
+bytes, the middle of an instruction) or cannot start a function.
+
 ### `rename_function(address, new_name) -> RenameFunctionResponse`
 
 Rename a function.
@@ -509,13 +539,33 @@ for s in syms.symbols:
     print(f"0x{s.address:x}  {s.name}  ({s.type})")
 ```
 
-### `rename_symbol(address, new_name) -> RenameSymbolResponse`
+### `create_label(address, name) -> CreateLabelResponse`
 
-Rename a symbol at the given address.
+Add the label `name` at `address`. It never renames: the address keeps its symbols, and the
+label is primary only when it had none (a function that still has its default name takes the
+name instead, as in Ghidra).
+
+```python
+made = client.create_label(0x140001000, "entry_alias")
+print(made.symbol.name, made.symbol.is_primary)
+```
+
+**Returns:** `CreateLabelResponse` with `created: bool` and `symbol: SymbolRecord`.
+
+**Errors:** `UNMAPPED_ADDRESS` outside every memory block; `DUPLICATE_NAME` when a symbol of
+that name is already at the address; `INVALID_ARGUMENT` for a blank or invalid name.
+
+### `rename_symbol(address, new_name, old_name=None) -> RenameSymbolResponse`
+
+Rename a symbol at the given address. With `old_name=None` the primary symbol is renamed
+(a label is created when the address has none). With `old_name` set, exactly the symbol of
+that name is renamed, primary or not; `NOT_FOUND` when the address has no such symbol.
+That is how a secondary label is renamed.
 
 ```python
 resp = client.rename_symbol(0x140001000, "my_func")
 print(f"Renamed to: {resp.name}")
+client.rename_symbol(0x140001000, "entry_alias", old_name="old_alias")
 ```
 
 ### `delete_symbol(address, name_filter="") -> DeleteSymbolResponse`

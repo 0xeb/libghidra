@@ -245,10 +245,14 @@ target_compile_features(libghidra_client PUBLIC cxx_std_20)
 target_include_directories(libghidra_client PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generated>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+# Keep diagnostics on our code; dependency headers use their own warning policy.
+target_include_directories(libghidra_client SYSTEM PUBLIC
     $<BUILD_INTERFACE:${protobuf_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${protobuf_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${protobuf_SOURCE_DIR}/third_party/abseil-cpp>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_include_directories(libghidra_client PRIVATE
     $<$<BOOL:${LIBGHIDRA_HTTPLIB_INCLUDE_DIR}>:${LIBGHIDRA_HTTPLIB_INCLUDE_DIR}>
@@ -302,12 +306,17 @@ if(LIBGHIDRA_WITH_LOCAL)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/force_capabilities.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidra_cpp_init.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidra_decompiler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/project_types.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/program_listing.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/host_print.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/core_types.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/buffer_file.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/db_record.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/btree.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/address_map.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/ghidra_project.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/memory_image.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ghidradb/program_types.cpp
         ${EMBEDDED_SPECS_SOURCES}
     )
 

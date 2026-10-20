@@ -71,12 +71,14 @@ let client = GhidraClient::new(ClientOptions {
 
 ## Error Handling
 
-All methods return `Result<T, ghidra::Error>`.
+All methods return `Result<T, ghidra::Error>`. Not found is not an error for a
+read: the record comes back as `None`.
 
 ```rust
 use libghidra::{Error, ErrorCode};
 
 match client.get_function(0xdeadbeef) {
+    Ok(resp) if resp.function.is_none() => { /* nothing there */ }
     Ok(resp) => { /* ... */ }
     Err(e) => {
         eprintln!("Code: {:?}, Message: {}", e.code, e);
@@ -89,7 +91,18 @@ match client.get_function(0xdeadbeef) {
 
 ### ErrorCode variants
 
-`ConnectionFailed`, `Timeout`, `TransportError`, `BadRequest`, `Unauthorized`, `Forbidden`, `NotFound`, `Conflict`, `TooManyRequests`, `InternalError`, `BadGateway`, `ServiceUnavailable`, `GatewayTimeout`, `HttpError`, `EncodeError`, `ParseError`, `ApiError`, `NotSupported`, `ConfigError`, `Other`.
+`ConnectionFailed`, `Timeout`, `TransportError`, `BadRequest`, `Unauthorized`, `Forbidden`, `NotFound`, `Conflict`, `TooManyRequests`, `InternalError`, `BadGateway`, `ServiceUnavailable`, `GatewayTimeout`, `HttpError`, `EncodeError`, `ParseError`, `ApiError`, `NotSupported`, `NotLoaded`, `ConfigError`, `Other`.
+
+### Not found
+
+A single-record read (`GetFunction`, `GetSymbol`, `GetInstruction`,
+`DecompileFunction`, `GetPcode`, `GetType`, `GetFunctionSignature`) that names
+nothing succeeds with the record absent: the response field is unset on the wire,
+so it reads as an empty optional / `None`, never as a placeholder record at
+address 0. An address inside a function names that function (the decompilation,
+signature or function that contains it); an instruction must start at the
+address. With no program open these reads fail with `not_loaded`, like every
+other read. The offline `LocalClient` answers the same way.
 
 ---
 
@@ -342,6 +355,20 @@ index out of a Ghidra project, so both backends agree; on a bare binary it retur
 let leaves = client.list_leaf_functions(0, u64::MAX, 0, 0)?;
 ```
 
+### `fn create_function(&self, address: u64, name: Option<&str>) -> Result<CreateFunctionResponse>`
+
+Define a function whose entry is `address`. `None` takes the backend's default name
+(`FUN_<address>`). Errors: `UnmappedAddress` outside every memory block, `DuplicateName`
+when a function already starts there, `InvalidArgument` when the address is not code
+(data, undefined bytes, the middle of an instruction) or cannot start a function.
+
+```rust
+let made = client.create_function(0x140001000, Some("init_app"))?;
+if let Some(f) = made.function {
+    println!("{} @ 0x{:x}, {} bytes", f.name, f.entry_address, f.size);
+}
+```
+
 ### `fn rename_function(&self, address: u64, new_name: &str) -> Result<RenameFunctionResponse>`
 
 ```rust
@@ -439,10 +466,26 @@ if let Some(s) = &resp.symbol {
 let syms = client.list_symbols(0, u64::MAX, 20, 0)?;
 ```
 
-### `fn rename_symbol(&self, address: u64, new_name: &str) -> Result<RenameSymbolResponse>`
+### `fn create_label(&self, address: u64, name: &str) -> Result<CreateLabelResponse>`
+
+Add the label `name` at `address`. It never renames: the address keeps its symbols, and the
+label is primary only when it had none (a function that still has its default name takes the
+name instead, as in Ghidra). Errors: `UnmappedAddress`, `DuplicateName` when a symbol of that
+name is already at the address, `InvalidArgument` for a blank or invalid name.
 
 ```rust
-client.rename_symbol(0x140001000, "my_func")?;
+let made = client.create_label(0x140001000, "entry_alias")?;
+```
+
+### `fn rename_symbol(&self, address: u64, new_name: &str, old_name: Option<&str>) -> Result<RenameSymbolResponse>`
+
+`old_name: None` renames the address's primary symbol (or creates a label when it has
+none). `Some(name)` renames exactly the symbol of that name, primary or not, and is
+`NotFound` when the address has no such symbol; that is how a secondary label is renamed.
+
+```rust
+client.rename_symbol(0x140001000, "my_func", None)?;
+client.rename_symbol(0x140001000, "entry_alias", Some("old_alias"))?;
 ```
 
 ### `fn delete_symbol(&self, address: u64, name_filter: &str) -> Result<DeleteSymbolResponse>`

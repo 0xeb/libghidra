@@ -343,8 +343,10 @@ jobs:
         run: |
           # These patches make Ghidra's native decompiler source behave with
           # libghidra's local/offline backend. They cover BFD target selection
-          # for explicit Sleigh language ids and local spec-load tolerance for
-          # callotherfixup entries that reference unavailable userops.
+          # for explicit Sleigh language ids, local spec-load tolerance for
+          # callotherfixup entries that reference unavailable userops, robust
+          # RawLoadImage reads, and one Sleigh translator per architecture.
+          # The series also carries Java parser, import-analyzer, and test fixes.
           set -euo pipefail
           for p in "${GITHUB_WORKSPACE}"/cpp/patches/*.patch; do
             echo "applying $(basename "$p")"

@@ -35,6 +35,7 @@ bool AddressDecoder::load(BufferFile& bf, const std::vector<MasterTableEntry>& t
     }
 
     base_addresses_.clear();
+    base_spaces_.clear();
     image_base_offset_ = 0;
 
     if (!map_table || map_table->root_buffer_id < 0) {
@@ -64,6 +65,7 @@ bool AddressDecoder::load(BufferFile& bf, const std::vector<MasterTableEntry>& t
             // Base address = segment shifted to form upper 32 bits
             // For most programs, segment=0 and base=0 (single RAM space)
             base_addresses_[index] = static_cast<uint64_t>(segment) << 32;
+            if (!rec.fields.empty()) base_spaces_[index] = rec.fields[0].asString();
             return true;
         });
 
@@ -102,6 +104,16 @@ uint64_t AddressDecoder::decodeAddress(int64_t key) const {
         default:
             return 0;
     }
+}
+
+std::string AddressDecoder::spaceName(int64_t key) const {
+    if (!isMemoryAddress(key)) return "";
+    const int type = static_cast<int>((static_cast<uint64_t>(key) >> ADDR_TYPE_SHIFT) & ADDR_TYPE_MASK);
+    if (type == OLD_ADDRESS_KEY_TYPE) return "";
+    const int32_t base_index = static_cast<int32_t>(
+        (static_cast<uint64_t>(key) >> ADDR_OFFSET_SIZE) & ID_MASK);
+    auto it = base_spaces_.find(base_index);
+    return it != base_spaces_.end() ? it->second : std::string();
 }
 
 bool AddressDecoder::isMemoryAddress(int64_t key) const {

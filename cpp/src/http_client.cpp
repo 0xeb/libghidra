@@ -1653,6 +1653,28 @@ StatusOr<ListFunctionsResponse> HttpClient::ListLeafFunctions(std::uint64_t rang
   return StatusOr<ListFunctionsResponse>::FromValue(std::move(out));
 }
 
+StatusOr<CreateFunctionResponse> HttpClient::CreateFunction(
+    std::uint64_t address, const std::optional<std::string>& name) {
+  libghidra::CreateFunctionRequest rpc_request;
+  rpc_request.set_address(address);
+  if (name) {
+    rpc_request.set_name(*name);
+  }
+  auto rpc = impl_->call_rpc<libghidra::CreateFunctionRequest,
+                             libghidra::CreateFunctionResponse>(
+      "libghidra.FunctionsService/CreateFunction",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<CreateFunctionResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  CreateFunctionResponse out;
+  out.created = rpc.value->created();
+  if (rpc.value->has_function()) {
+    out.function = from_proto_function_record(rpc.value->function());
+  }
+  return StatusOr<CreateFunctionResponse>::FromValue(std::move(out));
+}
+
 StatusOr<RenameFunctionResponse> HttpClient::RenameFunction(std::uint64_t address,
                                                             const std::string& new_name) {
   libghidra::RenameFunctionRequest rpc_request;
@@ -2047,11 +2069,34 @@ StatusOr<ListSymbolsResponse> HttpClient::ListSymbols(std::uint64_t range_start,
   return StatusOr<ListSymbolsResponse>::FromValue(std::move(out));
 }
 
-StatusOr<RenameSymbolResponse> HttpClient::RenameSymbol(std::uint64_t address,
-                                                        const std::string& new_name) {
+StatusOr<CreateLabelResponse> HttpClient::CreateLabel(std::uint64_t address,
+                                                      const std::string& name) {
+  libghidra::CreateLabelRequest rpc_request;
+  rpc_request.set_address(address);
+  rpc_request.set_name(name);
+  auto rpc = impl_->call_rpc<libghidra::CreateLabelRequest, libghidra::CreateLabelResponse>(
+      "libghidra.SymbolsService/CreateLabel",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<CreateLabelResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  CreateLabelResponse out;
+  out.created = rpc.value->created();
+  if (rpc.value->has_symbol()) {
+    out.symbol = from_proto_symbol_record(rpc.value->symbol());
+  }
+  return StatusOr<CreateLabelResponse>::FromValue(std::move(out));
+}
+
+StatusOr<RenameSymbolResponse> HttpClient::RenameSymbol(
+    std::uint64_t address, const std::string& new_name,
+    const std::optional<std::string>& old_name) {
   libghidra::RenameSymbolRequest rpc_request;
   rpc_request.set_address(address);
   rpc_request.set_new_name(new_name);
+  if (old_name) {
+    rpc_request.set_old_name(*old_name);
+  }
   auto rpc = impl_->call_rpc<libghidra::RenameSymbolRequest, libghidra::RenameSymbolResponse>(
       "libghidra.SymbolsService/RenameSymbol",
       rpc_request);

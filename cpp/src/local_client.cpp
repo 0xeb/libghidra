@@ -7,18 +7,23 @@
 #include "libghidra/local.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <cstdint>
 #include <cstdio>
+#include <filesystem>
+#include <functional>
 #include <future>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "decompiler_pool.hpp"
 #include "ghidra_decompiler.h"
+#include "libghidra/error_codes.hpp"
 #include "local_arch_adapter.hpp"
 
 namespace libghidra::client {
@@ -38,6 +43,151 @@ std::string to_hex_string(std::uint64_t v) {
   char buf[19];
   std::snprintf(buf, sizeof(buf), "%llx", static_cast<unsigned long long>(v));
   return buf;
+}
+
+std::string hex(std::uint64_t v) { return "0x" + to_hex_string(v); }
+
+namespace codes = libghidra::client::error_codes;
+using detail::RangeStatus;
+using detail::WriteStatus;
+using ghidra_standalone::EngineError;
+
+// The vocabulary code for why an engine call failed.
+const char* engine_code(EngineError kind) {
+  switch (kind) {
+    case EngineError::kNotFound: return codes::kNotFound;
+    case EngineError::kParse: return codes::kParseError;
+    case EngineError::kUnknownType: return codes::kUnknownType;
+    case EngineError::kInvalid: return codes::kInvalidArgument;
+    default: return codes::kInternalError;
+  }
+}
+
+std::string lower(std::string text) {
+  for (char& c : text) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+  return text;
+}
+
+std::string trim(const std::string& text) {
+  const auto first = text.find_first_not_of(" \t\r\n");
+  if (first == std::string::npos) return "";
+  const auto last = text.find_last_not_of(" \t\r\n");
+  return text.substr(first, last - first + 1);
+}
+
+// SymbolUtilities.validateName for the ASCII range: at most 2000 characters, no
+// space or control character (Ghidra rejects every whitespace/unprintable code point).
+bool validSymbolName(const std::string& name) {
+  if (name.empty() || name.size() > 2000) return false;
+  for (unsigned char c : name)
+    if (c <= 0x20 || c == 0x7f) return false;
+  return true;
+}
+
+// The inclusive end of a listing range: 0 means "to the end", as on the host.
+std::uint64_t range_end_of(std::uint64_t range_end) { return range_end == 0 ? UINT64_MAX : range_end; }
+
+// -- Breakpoints, stored as bookmarks (the host's BreakpointBookmarkStore) ----
+
+constexpr const char* kBreakpointType = "GhidraAPI Breakpoint";
+constexpr const char* kBreakpointCategory = "libghidra.breakpoint";
+
+std::string base64url(const std::string& in) {
+  static const char* kAlphabet =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  std::string out;
+  std::uint32_t buf = 0;
+  int bits = 0;
+  for (unsigned char c : in) {
+    buf = (buf << 8) | c;
+    bits += 8;
+    while (bits >= 6) {
+      bits -= 6;
+      out += kAlphabet[(buf >> bits) & 0x3f];
+    }
+  }
+  if (bits > 0) out += kAlphabet[(buf << (6 - bits)) & 0x3f];
+  return out;
+}
+
+std::optional<std::string> unbase64url(const std::string& in) {
+  std::string out;
+  std::uint32_t buf = 0;
+  int bits = 0;
+  for (char c : in) {
+    int v;
+    if (c >= 'A' && c <= 'Z') v = c - 'A';
+    else if (c >= 'a' && c <= 'z') v = c - 'a' + 26;
+    else if (c >= '0' && c <= '9') v = c - '0' + 52;
+    else if (c == '-' || c == '+') v = 62;
+    else if (c == '_' || c == '/') v = 63;
+    else if (c == '=') break;
+    else return std::nullopt;
+    buf = (buf << 6) | static_cast<std::uint32_t>(v);
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      out += static_cast<char>((buf >> bits) & 0xff);
+    }
+  }
+  return out;
+}
+
+BreakpointRecord breakpoint_from(const ghidra_standalone::BookmarkInfo& b) {
+  BreakpointRecord row;
+  row.address = b.address;
+  row.enabled = true;
+  row.kind = "software";
+  row.size = 1;
+  const std::string category = trim(b.category);
+  row.group = lower(category) == kBreakpointCategory ? "" : category;
+  std::map<std::string, std::string> fields;
+  std::size_t at = 0;
+  while (at <= b.comment.size()) {
+    std::size_t semi = b.comment.find(';', at);
+    if (semi == std::string::npos) semi = b.comment.size();
+    const std::string part = b.comment.substr(at, semi - at);
+    at = semi + 1;
+    const std::size_t eq = part.find('=');
+    if (eq == std::string::npos || eq == 0 || eq + 1 >= part.size()) continue;
+    fields[lower(trim(part.substr(0, eq)))] = trim(part.substr(eq + 1));
+  }
+  auto text = [&](const char* b64, const char* plain, const std::string& fallback) {
+    auto e = fields.find(b64);
+    if (e != fields.end() && !e->second.empty()) return unbase64url(e->second).value_or(fallback);
+    auto p = fields.find(plain);
+    return p != fields.end() && !p->second.empty() ? p->second : fallback;
+  };
+  auto number = [&](const char* key, long long fallback) {
+    auto it = fields.find(key);
+    if (it == fields.end()) return fallback;
+    try {
+      return std::stoll(it->second);
+    } catch (...) {
+      return fallback;
+    }
+  };
+  row.enabled = number("enabled", 1) != 0;
+  row.kind = text("kind_b64", "kind", "software");
+  row.size = static_cast<std::uint64_t>(std::max<long long>(1, number("size", 1)));
+  row.condition = text("condition_b64", "condition", "");
+  return row;
+}
+
+std::string breakpoint_comment(const BreakpointRecord& row) {
+  const std::string kind = trim(row.kind).empty() ? "software" : trim(row.kind);
+  return "enabled=" + std::string(row.enabled ? "1" : "0") + ";kind_b64=" + base64url(kind) +
+         ";size=" + std::to_string(std::max<std::uint64_t>(1, row.size)) +
+         ";condition_b64=" + base64url(row.condition);
+}
+
+std::string breakpoint_category(const std::string& group) {
+  return trim(group).empty() ? kBreakpointCategory : trim(group);
+}
+
+bool breakpoint_kind_ok(const std::string& kind) {
+  const std::string k = lower(kind);
+  return k == "software" || k == "hardware" || k == "read" || k == "write" || k == "access";
 }
 }  // namespace
 
@@ -78,11 +228,16 @@ class LocalClient final : public IClient {
         {"functions", "supported",
          "basic blocks and CFG edges via decompilation; leaf functions from a "
          "project's reference index"},
-        {"symbols", "supported", "rename (functions), delete (all)"},
-        {"types", "supported", "full CRUD including aliases, member comments"},
+        {"symbols", "supported",
+         "functions and labels from the project; rename (by old name too), create a label, "
+         "delete"},
+        {"types", "supported",
+         "structs, unions, enums and aliases; member edits in place; C declarations"},
         {"signatures", "supported", "full mutation via prototype rebuild"},
-        {"memory", "supported", "read + write (copy-on-write overlay)"},
-        {"listing", "supported", "instructions, comments, data items, strings (no bookmarks)"},
+        {"memory", "supported",
+         "the program's memory map; read + write (copy-on-write overlay); no block writes"},
+        {"listing", "supported",
+         "instructions, comments, data items, bookmarks and breakpoints from the project"},
         {"xrefs", "partial", "call and data xrefs via decompiler analysis"},
     };
     return StatusOr<std::vector<Capability>>::FromValue(std::move(caps));
@@ -93,57 +248,18 @@ class LocalClient final : public IClient {
   StatusOr<OpenProgramResponse> OpenProgram(
       const OpenProgramRequest& request) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
-    bool ok = false;
-
-    if (!request.project_path.empty()) {
-      ok = pool_->loadProject(request.project_path, request.program_path);
-    } else if (!request.program_path.empty()) {
-      // Dispatch by detected format: BFD/XML-recognised formats (elf/pe/mach-o)
-      // auto-identify their target from the file header, so we pass "default"
-      // to let ArchitectureCapability self-select. Passing a Ghidra language_id
-      // like "AARCH64:LE:64:v8A" straight through would be interpreted as a BFD
-      // target name (e.g. "elf64-littleaarch64"), which bfd_openr does not
-      // recognise — yielding "Unable to open image file: …" despite a perfectly
-      // valid ELF. For raw/unknown/empty formats, the explicit language_id is
-      // still required because raw_arch can't auto-detect.
-      // Always pass the full Sleigh spec id ("processor:endian:size:variant:
-      // compiler") to Ghidra so the language is unambiguous. The previous
-      // "let BFD auto-detect with target=default" branch produced wrong
-      // results for non-x86 ELF binaries because Ghidra's BfdArchitecture::
-      // resolveArchitecture has a hardcoded "elf64 -> x86:LE:64:default:gcc"
-      // mapping at bfd_arch.cc:102-103, so an aarch64 ELF on a Pi would load
-      // as x86 and disassembly was nonsense.
-      //
-      // Our patched bfd_arch.cc::buildLoader now sees a colon-bearing target
-      // and passes empty BFD target so bfd_check_format auto-detects the
-      // actual file format, while archid stays at the Sleigh id we sent.
-      // For raw_arch (no BFD on macOS/Windows) the same full Sleigh id is
-      // exactly what Ghidra needs.
-      std::string arch;
-      if (request.language_id.empty()) {
-        arch = opts_.default_arch;
-      } else if (!request.compiler_spec_id.empty()) {
-        arch = request.language_id + ":" + request.compiler_spec_id;
-      } else {
-        arch = request.language_id;
-      }
-      ok = pool_->loadBinary(request.program_path, arch, request.base_address,
-                             request.format);
-    } else {
+    // One program at a time, as on the host.
+    if (program_loaded_) {
       return StatusOr<OpenProgramResponse>::FromError(
-          "INVALID_ARGUMENT", "program_path or project_path required");
+          codes::kAccessConflict,
+          "a program is already open (" + open_request_.program_path + open_request_.project_path +
+              "); close it first");
     }
-
-    if (!ok) {
-      return StatusOr<OpenProgramResponse>::FromError("LOAD_FAILED",
-                                                      pool_->getError());
+    Status loaded = loadLocked(request);
+    if (!loaded.ok()) {
+      return StatusOr<OpenProgramResponse>::FromError(loaded.code, loaded.message);
     }
-
-    // Auto-load state if configured and file exists
-    if (!opts_.state_path.empty()) {
-      pool_->loadState(opts_.state_path);  // best-effort, primary only
-    }
-
+    open_request_ = request;
     program_loaded_ = true;
     revision_++;
 
@@ -164,26 +280,39 @@ class LocalClient final : public IClient {
   StatusOr<SaveProgramResponse> SaveProgram() override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!program_loaded_) {
-      return StatusOr<SaveProgramResponse>::FromError("NO_PROGRAM",
+      return StatusOr<SaveProgramResponse>::FromError(codes::kNotLoaded,
                                                       "no program loaded");
     }
+    // Offline saves only to a configured state file.
     if (opts_.state_path.empty()) {
       return StatusOr<SaveProgramResponse>::FromError(
-          "NO_STATE_PATH", "state_path not configured");
+          codes::kConfigError,
+          "the offline backend saves to LocalClientOptions::state_path, which is not set");
     }
-
-    bool ok = pool_->saveState(opts_.state_path);
-    SaveProgramResponse resp;
-    resp.saved = ok;
-    if (!ok) {
-      return StatusOr<SaveProgramResponse>::FromError("SAVE_FAILED",
+    if (!pool_->saveState(opts_.state_path)) {
+      return StatusOr<SaveProgramResponse>::FromError(codes::kInternalError,
                                                       pool_->getError());
     }
+    SaveProgramResponse resp;
+    resp.saved = true;
     return StatusOr<SaveProgramResponse>::FromValue(std::move(resp));
   }
 
   StatusOr<DiscardProgramResponse> DiscardProgram() override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!program_loaded_) {
+      return StatusOr<DiscardProgramResponse>::FromError(codes::kNotLoaded,
+                                                         "no program loaded");
+    }
+    // Drop every edit by loading the program again, as it was opened
+    // (the host undoes every transaction; the program stays open).
+    Status reloaded = loadLocked(open_request_);
+    if (!reloaded.ok()) {
+      program_loaded_ = false;
+      return StatusOr<DiscardProgramResponse>::FromError(
+          codes::kInternalError, "discard failed reloading the program: " + reloaded.message);
+    }
+    revision_++;
     DiscardProgramResponse resp;
     resp.discarded = true;
     return StatusOr<DiscardProgramResponse>::FromValue(std::move(resp));
@@ -217,11 +346,11 @@ class LocalClient final : public IClient {
       const PerfBenchmarkRecord& record) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!program_loaded_) {
-      return StatusOr<AddPerfBenchmarkResponse>::FromError("NO_PROGRAM",
+      return StatusOr<AddPerfBenchmarkResponse>::FromError(codes::kNotLoaded,
                                                            "no program loaded");
     }
     if (record.bench_id.empty()) {
-      return StatusOr<AddPerfBenchmarkResponse>::FromError("invalid_argument",
+      return StatusOr<AddPerfBenchmarkResponse>::FromError(codes::kInvalidArgument,
                                                            "bench_id is required");
     }
     // Upsert keyed on bench_id (matches the live Java host's PerfBenchmarkStore):
@@ -243,7 +372,7 @@ class LocalClient final : public IClient {
   StatusOr<ListPerfBenchmarksResponse> ListPerfBenchmarks() override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!program_loaded_) {
-      return StatusOr<ListPerfBenchmarksResponse>::FromError("NO_PROGRAM",
+      return StatusOr<ListPerfBenchmarksResponse>::FromError(codes::kNotLoaded,
                                                              "no program loaded");
     }
     ListPerfBenchmarksResponse resp;
@@ -254,7 +383,7 @@ class LocalClient final : public IClient {
   StatusOr<ClearPerfBenchmarksResponse> ClearPerfBenchmarks() override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!program_loaded_) {
-      return StatusOr<ClearPerfBenchmarksResponse>::FromError("NO_PROGRAM",
+      return StatusOr<ClearPerfBenchmarksResponse>::FromError(codes::kNotLoaded,
                                                               "no program loaded");
     }
     ClearPerfBenchmarksResponse resp;
@@ -269,11 +398,11 @@ class LocalClient final : public IClient {
       const std::string& bench_id) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!program_loaded_) {
-      return StatusOr<DeletePerfBenchmarkResponse>::FromError("NO_PROGRAM",
+      return StatusOr<DeletePerfBenchmarkResponse>::FromError(codes::kNotLoaded,
                                                               "no program loaded");
     }
     if (bench_id.empty()) {
-      return StatusOr<DeletePerfBenchmarkResponse>::FromError("invalid_argument",
+      return StatusOr<DeletePerfBenchmarkResponse>::FromError(codes::kInvalidArgument,
                                                               "bench_id is required");
     }
     const auto before = perf_benchmarks_.size();
@@ -283,10 +412,13 @@ class LocalClient final : public IClient {
                          return r.bench_id == bench_id;
                        }),
         perf_benchmarks_.end());
-    const bool deleted = perf_benchmarks_.size() != before;
-    if (deleted) revision_++;
+    if (perf_benchmarks_.size() == before) {
+      return StatusOr<DeletePerfBenchmarkResponse>::FromError(
+          codes::kNotFound, "no perf benchmark '" + bench_id + "'");
+    }
+    revision_++;
     DeletePerfBenchmarkResponse resp;
-    resp.deleted = deleted;
+    resp.deleted = true;
     return StatusOr<DeletePerfBenchmarkResponse>::FromValue(std::move(resp));
   }
 
@@ -297,21 +429,27 @@ class LocalClient final : public IClient {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<GetDecompilationResponse>();
 
+    // The function the address names, as the host resolves it (the one that
+    // contains it); none is "not found": the record stays unset.
+    GetDecompilationResponse resp;
+    const std::optional<std::uint64_t> entry =
+        pool_->primaryAdapter().decompileEntryFor(address);
+    if (!entry) return StatusOr<GetDecompilationResponse>::FromValue(std::move(resp));
+
     // Single decompilation — use primary instance. decompileWithLocals returns
     // both the pseudocode and the local-variable surface in one pass.
-    auto dl = pool_->primaryAdapter().decompileWithLocals(address);
+    auto dl = pool_->primaryAdapter().decompileWithLocals(*entry);
 
-    GetDecompilationResponse resp;
     if (!dl.ok) {
       resp.decompilation = DecompilationRecord{};
-      resp.decompilation->function_entry_address = address;
+      resp.decompilation->function_entry_address = *entry;
       resp.decompilation->completed = false;
       // Offline decompile bypasses Decompiler::decompileAt, so pool_->getError()
       // is stale/empty — carry the accurate reason from the result itself.
       resp.decompilation->error_message = dl.error;
     } else {
       DecompilationRecord rec;
-      rec.function_entry_address = address;
+      rec.function_entry_address = *entry;
       rec.pseudocode = std::move(dl.pseudocode);
       rec.locals = std::move(dl.locals);
       rec.completed = true;
@@ -346,7 +484,7 @@ class LocalClient final : public IClient {
     return StatusOr<ListDecompilationsResponse>::FromValue(std::move(resp));
   }
 
-  // GetPcode intentionally remains the IClient NOT_SUPPORTED default in the
+  // GetPcode intentionally remains the IClient not_supported default in the
   // offline backend. Raw p-code currently lives behind the Java host's listing
   // model, while refined p-code needs a separate offline adapter contract.
 
@@ -388,7 +526,7 @@ class LocalClient final : public IClient {
     std::vector<std::uint64_t> leaves;
     if (!pool_->primary().projectLeafEntries(leaves)) {
       return StatusOr<ListFunctionsResponse>::FromError(
-          "NOT_SUPPORTED",
+          codes::kNotSupported,
           "ListLeafFunctions needs a program opened from a Ghidra project "
           "(project_path): it reads the reference index Ghidra recorded during analysis");
     }
@@ -403,21 +541,61 @@ class LocalClient final : public IClient {
     return StatusOr<ListFunctionsResponse>::FromValue(std::move(resp));
   }
 
+  // The one write that makes a function: at the start of an instruction (of
+  // the project's listing, or any decodable address of a bare binary), named
+  // `name` or Ghidra's default FUN_<address>. Renames and prototype edits never
+  // create one.
+  StatusOr<CreateFunctionResponse> CreateFunction(
+      std::uint64_t address, const std::optional<std::string>& name) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<CreateFunctionResponse>();
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<CreateFunctionResponse>(mapped);
+    auto& adapter = pool_->primaryAdapter();
+    if (adapter.functionStartsAt(address)) {
+      return StatusOr<CreateFunctionResponse>::FromError(
+          codes::kDuplicateName, "a function already starts at " + hex(address));
+    }
+    if (!adapter.getInstruction(address)) {
+      return StatusOr<CreateFunctionResponse>::FromError(
+          codes::kInvalidArgument,
+          "no instruction starts at " + hex(address) + "; a function starts at code");
+    }
+    const std::string fname =
+        name && !name->empty() ? *name : detail::ArchAdapter::defaultFunctionName(address);
+    Status created = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      return d.defineFunction(address, fname);
+    });
+    if (!created.ok()) return error<CreateFunctionResponse>(created);
+    revision_++;
+
+    CreateFunctionResponse resp;
+    resp.created = true;
+    if (auto fn = adapter.getFunction(address)) resp.function = std::move(*fn);
+    return StatusOr<CreateFunctionResponse>::FromValue(std::move(resp));
+  }
+
   StatusOr<RenameFunctionResponse> RenameFunction(
       std::uint64_t address, const std::string& new_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<RenameFunctionResponse>();
+    if (new_name.empty()) {
+      return StatusOr<RenameFunctionResponse>::FromError(codes::kInvalidArgument,
+                                                         "function name is required");
+    }
+    std::uint64_t entry = 0;
+    Status found = requireFunction(address, entry);
+    if (!found.ok()) return error<RenameFunctionResponse>(found);
 
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.nameFunction(address, new_name); });
-    if (ok) revision_++;
+    Status renamed = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      return d.renameFunction(entry, new_name);
+    });
+    if (!renamed.ok()) return error<RenameFunctionResponse>(renamed);
+    revision_++;
 
     RenameFunctionResponse resp;
-    resp.renamed = ok;
+    resp.renamed = true;
     resp.name = new_name;
-    if (!ok) {
-      return StatusOr<RenameFunctionResponse>::FromError("RENAME_FAILED",
-                                                         pool_->getError());
-    }
     return StatusOr<RenameFunctionResponse>::FromValue(std::move(resp));
   }
 
@@ -527,51 +705,107 @@ class LocalClient final : public IClient {
     return StatusOr<ListSymbolsResponse>::FromValue(std::move(resp));
   }
 
+  // A label is added beside whatever the address has (the host's
+  // SymbolTable.createLabel); it never renames another symbol.
+  StatusOr<CreateLabelResponse> CreateLabel(std::uint64_t address,
+                                            const std::string& name) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<CreateLabelResponse>();
+    const std::string label = trim(name);
+    if (label.empty()) {
+      return StatusOr<CreateLabelResponse>::FromError(codes::kInvalidArgument,
+                                                      "label name is required");
+    }
+    if (!validSymbolName(label)) {
+      return StatusOr<CreateLabelResponse>::FromError(
+          codes::kInvalidArgument, "symbol name contains invalid characters: " + label);
+    }
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<CreateLabelResponse>(mapped);
+    auto& adapter = pool_->primaryAdapter();
+    for (const auto& sym : adapter.listSymbols(address, address)) {
+      if (sym.address == address && (sym.name == label || sym.full_name == label)) {
+        return StatusOr<CreateLabelResponse>::FromError(
+            codes::kDuplicateName,
+            "a symbol named '" + label + "' is already at " + hex(address));
+      }
+    }
+    Status created = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      return d.createLabel(address, label);
+    });
+    if (!created.ok()) return error<CreateLabelResponse>(created);
+    revision_++;
+
+    CreateLabelResponse resp;
+    resp.created = true;
+    for (auto& sym : adapter.listSymbols(address, address)) {
+      if (sym.address == address && sym.name == label) resp.symbol = std::move(sym);
+    }
+    return StatusOr<CreateLabelResponse>::FromValue(std::move(resp));
+  }
+
+  // The primary symbol at a mapped address (a function's own, else the
+  // primary label) is renamed, or a label is created when it has none (the
+  // host's upsert). With `old_name`, exactly the symbol of that name.
   StatusOr<RenameSymbolResponse> RenameSymbol(
-      std::uint64_t address, const std::string& new_name) override {
+      std::uint64_t address, const std::string& new_name,
+      const std::optional<std::string>& old_name = std::nullopt) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<RenameSymbolResponse>();
-
-    auto sym = pool_->primaryAdapter().getSymbol(address);
-    if (!sym) {
-      return StatusOr<RenameSymbolResponse>::FromError(
-          "NOT_FOUND", "no symbol found at address");
+    const std::string name = trim(new_name);
+    if (name.empty()) {
+      return StatusOr<RenameSymbolResponse>::FromError(codes::kInvalidArgument,
+                                                       "new symbol name is required");
     }
-
-    if (sym->type == "function") {
-      bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.nameFunction(address, new_name); });
-      if (ok) revision_++;
-
-      RenameSymbolResponse resp;
-      resp.renamed = ok;
-      resp.name = new_name;
-      if (!ok) {
-        return StatusOr<RenameSymbolResponse>::FromError("RENAME_FAILED",
-                                                          pool_->getError());
+    std::optional<std::string> old;
+    if (old_name) {
+      old = trim(*old_name);
+      if (old->empty()) {
+        return StatusOr<RenameSymbolResponse>::FromError(
+            codes::kInvalidArgument, "old_name, when given, names the symbol to rename");
       }
-      return StatusOr<RenameSymbolResponse>::FromValue(std::move(resp));
     }
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<RenameSymbolResponse>(mapped);
 
-    return StatusOr<RenameSymbolResponse>::FromError(
-        "NOT_SUPPORTED",
-        "RenameSymbol for non-function symbols not yet supported");
+    Status renamed = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      return d.renameSymbolAt(address, old, name);
+    });
+    if (!renamed.ok()) return error<RenameSymbolResponse>(renamed);
+    revision_++;
+
+    RenameSymbolResponse resp;
+    resp.renamed = true;
+    resp.name = name;
+    return StatusOr<RenameSymbolResponse>::FromValue(std::move(resp));
   }
 
   StatusOr<DeleteSymbolResponse> DeleteSymbol(
-      std::uint64_t address, const std::string& /*name*/) override {
+      std::uint64_t address, const std::string& name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<DeleteSymbolResponse>();
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<DeleteSymbolResponse>(mapped);
 
-    bool ok = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { return a.deleteSymbol(address); });
-
-    DeleteSymbolResponse resp;
-    resp.deleted = ok;
-    resp.deleted_count = ok ? 1 : 0;
-    if (!ok) {
+    // A function's own symbol goes back to its default name; the function
+    // stays. The name filter selects which symbols at the address go.
+    std::optional<std::uint32_t> count;
+    const std::string filter = trim(name);
+    pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) {
+      const std::uint32_t n = d.deleteSymbolsAt(address, filter);
+      if (!count) count = n;
+      return n > 0;
+    });
+    if (count.value_or(0) == 0) {
       return StatusOr<DeleteSymbolResponse>::FromError(
-          "NOT_FOUND", "no symbol found at address");
+          codes::kNotFound, name.empty() ? "no symbol at " + hex(address)
+                                         : "no symbol named '" + name + "' at " + hex(address));
     }
     revision_++;
+
+    DeleteSymbolResponse resp;
+    resp.deleted = true;
+    resp.deleted_count = *count;
     return StatusOr<DeleteSymbolResponse>::FromValue(std::move(resp));
   }
 
@@ -606,10 +840,7 @@ class LocalClient final : public IClient {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<ListTypeEnumMembersResponse>();
 
-    std::string name = type_id_or_path;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    auto all = pool_->primaryAdapter().listTypeEnumMembers(name);
+    auto all = pool_->primaryAdapter().listTypeEnumMembers(type_id_or_path);
 
     ListTypeEnumMembersResponse resp;
     resp.members = paginate(all, limit, offset);
@@ -621,10 +852,7 @@ class LocalClient final : public IClient {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<ListTypeMembersResponse>();
 
-    std::string name = type_id_or_path;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    auto all = pool_->primaryAdapter().listTypeMembers(name);
+    auto all = pool_->primaryAdapter().listTypeMembers(type_id_or_path);
 
     ListTypeMembersResponse resp;
     resp.members = paginate(all, limit, offset);
@@ -668,17 +896,23 @@ class LocalClient final : public IClient {
       std::uint64_t address, const std::string& prototype) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<SetFunctionSignatureResponse>();
+    if (prototype.empty()) {
+      return StatusOr<SetFunctionSignatureResponse>::FromError(codes::kInvalidArgument,
+                                                               "prototype is required");
+    }
+    std::uint64_t entry = 0;
+    Status found = requireFunction(address, entry);
+    if (!found.ok()) return error<SetFunctionSignatureResponse>(found);
 
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.setPrototype(address, prototype); });
-    if (ok) revision_++;
+    Status set = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      return d.setPrototype(entry, prototype);
+    });
+    if (!set.ok()) return error<SetFunctionSignatureResponse>(set);
+    revision_++;
 
     SetFunctionSignatureResponse resp;
-    resp.updated = ok;
+    resp.updated = true;
     resp.prototype = prototype;
-    if (!ok) {
-      return StatusOr<SetFunctionSignatureResponse>::FromError(
-          "SET_PROTOTYPE_FAILED", pool_->getError());
-    }
     return StatusOr<SetFunctionSignatureResponse>::FromValue(std::move(resp));
   }
 
@@ -687,73 +921,74 @@ class LocalClient final : public IClient {
                                           std::uint64_t size) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<CreateTypeResponse>();
-
-    if (kind == "struct") {
-      bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineStruct(name, {}); });
-      if (ok) revision_++;
-      CreateTypeResponse resp;
-      resp.updated = ok;
-      if (!ok) {
-        return StatusOr<CreateTypeResponse>::FromError("CREATE_TYPE_FAILED",
-                                                       pool_->getError());
-      }
-      return StatusOr<CreateTypeResponse>::FromValue(std::move(resp));
+    if (name.empty()) {
+      return StatusOr<CreateTypeResponse>::FromError(codes::kInvalidArgument,
+                                                     "type name is required");
     }
+    const std::string k = lower(kind);
+    if (k != "struct" && k != "enum" && k != "union") {
+      return StatusOr<CreateTypeResponse>::FromError(
+          codes::kInvalidArgument,
+          "unknown type kind '" + kind + "'; expected struct, enum or union");
+    }
+    Status fresh = requireNewTypeName(name);
+    if (!fresh.ok()) return error<CreateTypeResponse>(fresh);
 
-    return StatusOr<CreateTypeResponse>::FromError(
-        "NOT_SUPPORTED", "only struct kind is currently supported for creation");
+    Status created = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      if (k == "struct") return d.defineStruct(name, {}, static_cast<int>(std::min<std::uint64_t>(size, 1u << 20)));
+      if (k == "union") return d.defineUnion(name);
+      // The host's CreateType "enum": size clamped to 1..8, 4 when unset.
+      return d.defineEnum(name, std::vector<ghidra_standalone::EnumValue>{},
+                          size == 0 ? 4 : static_cast<int>(std::min<std::uint64_t>(size, 8)));
+    });
+    if (!created.ok()) return error<CreateTypeResponse>(created);
+    revision_++;
+    CreateTypeResponse resp;
+    resp.updated = true;
+    return StatusOr<CreateTypeResponse>::FromValue(std::move(resp));
   }
 
   StatusOr<AddTypeMemberResponse> AddTypeMember(
       const std::string& parent, const std::string& member_name,
-      const std::string& member_type, std::uint64_t size) override {
+      const std::string& member_type, std::uint64_t /*size*/) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<AddTypeMemberResponse>();
-
-    std::string name = parent;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    auto existing = pool_->primaryAdapter().listTypeMembers(name);
-
-    int off = 0;
-    for (const auto& m : existing) {
-      int end = static_cast<int>(m.offset) + static_cast<int>(m.size);
-      if (end > off) off = end;
+    if (member_name.empty()) {
+      return StatusOr<AddTypeMemberResponse>::FromError(codes::kInvalidArgument, "member name is required");
     }
-
-    std::vector<ghidra_standalone::FieldDef> fields;
-    for (const auto& m : existing) {
-      fields.push_back({m.name, m.member_type, static_cast<int>(m.offset)});
+    if (member_type.empty()) {
+      return StatusOr<AddTypeMemberResponse>::FromError(codes::kInvalidArgument, "member type is required");
     }
-    fields.push_back({member_name, member_type, off});
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineStruct(name, fields); });
-    if (ok) revision_++;
-
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.addTypeMember(parent, member_name, member_type); });
+    if (!written.ok()) return error<AddTypeMemberResponse>(written);
+    revision_++;
     AddTypeMemberResponse resp;
-    resp.updated = ok;
-    if (!ok) {
-      return StatusOr<AddTypeMemberResponse>::FromError("ADD_MEMBER_FAILED",
-                                                         pool_->getError());
-    }
+    resp.updated = true;
     return StatusOr<AddTypeMemberResponse>::FromValue(std::move(resp));
   }
 
   StatusOr<CreateTypeEnumResponse> CreateTypeEnum(const std::string& name,
                                                   std::uint64_t width,
-                                                  bool is_signed) override {
+                                                  bool /*is_signed*/) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<CreateTypeEnumResponse>();
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineEnum(name, std::vector<ghidra_standalone::EnumValue>{}); });
-    if (ok) revision_++;
-
-    CreateTypeEnumResponse resp;
-    resp.updated = ok;
-    if (!ok) {
-      return StatusOr<CreateTypeEnumResponse>::FromError(
-          "CREATE_ENUM_FAILED", pool_->getError());
+    if (name.empty()) {
+      return StatusOr<CreateTypeEnumResponse>::FromError(codes::kInvalidArgument,
+                                                         "enum name is required");
     }
+    Status fresh = requireNewTypeName(name);
+    if (!fresh.ok()) return error<CreateTypeEnumResponse>(fresh);
+
+    Status created = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      // EnumDataType(name, width): width clamped to 1..8, 4 when unset; the
+      // host records `signed` only as a description.
+      return d.defineEnum(name, std::vector<ghidra_standalone::EnumValue>{},
+                          width == 0 ? 4 : static_cast<int>(std::min<std::uint64_t>(width, 8)));
+    });
+    if (!created.ok()) return error<CreateTypeEnumResponse>(created);
+    revision_++;
+    CreateTypeEnumResponse resp;
+    resp.updated = true;
     return StatusOr<CreateTypeEnumResponse>::FromValue(std::move(resp));
   }
 
@@ -762,47 +997,63 @@ class LocalClient final : public IClient {
       std::int64_t value) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<AddTypeEnumMemberResponse>();
-
-    std::string type_name = type_id_or_path;
-    if (!type_name.empty() && type_name[0] == '/') type_name = type_name.substr(1);
-
-    auto existing = pool_->primaryAdapter().listTypeEnumMembers(type_name);
-
-    std::vector<ghidra_standalone::EnumValue> entries;
-    for (const auto& m : existing) {
-      entries.push_back({m.name, static_cast<uint64_t>(m.value)});
+    if (name.empty()) {
+      return StatusOr<AddTypeEnumMemberResponse>::FromError(codes::kInvalidArgument, "enum member name is required");
     }
-    entries.push_back({name, static_cast<uint64_t>(value)});
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineEnum(type_name, entries); });
-    if (ok) revision_++;
-
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.addTypeEnumMember(type_id_or_path, name, value); });
+    if (!written.ok()) return error<AddTypeEnumMemberResponse>(written);
+    revision_++;
     AddTypeEnumMemberResponse resp;
-    resp.updated = ok;
-    if (!ok) {
-      return StatusOr<AddTypeEnumMemberResponse>::FromError(
-          "ADD_ENUM_MEMBER_FAILED", pool_->getError());
-    }
+    resp.updated = true;
     return StatusOr<AddTypeEnumMemberResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<DeleteTypeEnumResponse> DeleteTypeEnum(const std::string& type_id_or_path) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<DeleteTypeEnumResponse>();
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.deleteTypeEnum(type_id_or_path); });
+    if (!written.ok()) return error<DeleteTypeEnumResponse>(written);
+    revision_++;
+    DeleteTypeEnumResponse resp;
+    resp.deleted = true;
+    return StatusOr<DeleteTypeEnumResponse>::FromValue(std::move(resp));
+  }
+
+  // C declarations through the engine's own C grammar, all or nothing: any
+  // error is parse_error and leaves no type behind (D10).
+  StatusOr<ParseDeclarationsResponse> ParseDeclarations(const std::string& source_text) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<ParseDeclarationsResponse>();
+    if (trim(source_text).empty()) {
+      return StatusOr<ParseDeclarationsResponse>::FromError(codes::kInvalidArgument,
+                                                            "source text is required");
+    }
+    std::vector<std::string> names;
+    bool first = true;
+    Status parsed = adapterWrite([&](detail::ArchAdapter& a) {
+      std::vector<std::string> created;
+      WriteStatus st = a.parseDeclarations(source_text, created);
+      if (first) names = std::move(created);
+      first = false;
+      return st;
+    });
+    if (!parsed.ok()) return error<ParseDeclarationsResponse>(parsed);
+    revision_++;
+    ParseDeclarationsResponse resp;
+    resp.types_created = static_cast<int>(names.size());
+    resp.type_names = std::move(names);
+    return StatusOr<ParseDeclarationsResponse>::FromValue(std::move(resp));
   }
 
   StatusOr<DeleteTypeResponse> DeleteType(
       const std::string& type_id_or_path) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<DeleteTypeResponse>();
-
-    std::string name = type_id_or_path;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    bool ok = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { return a.deleteType(name); });
-
-    DeleteTypeResponse resp;
-    resp.deleted = ok;
-    if (!ok) {
-      return StatusOr<DeleteTypeResponse>::FromError(
-          "DELETE_TYPE_FAILED", "type not found or is a core type");
-    }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.deleteType(type_id_or_path); });
+    if (!written.ok()) return error<DeleteTypeResponse>(written);
     revision_++;
+    DeleteTypeResponse resp;
+    resp.deleted = true;
     return StatusOr<DeleteTypeResponse>::FromValue(std::move(resp));
   }
 
@@ -811,20 +1062,15 @@ class LocalClient final : public IClient {
       const std::string& new_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<RenameTypeResponse>();
-
-    std::string name = type_id_or_path;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    bool ok = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { return a.renameType(name, new_name); });
-
-    RenameTypeResponse resp;
-    resp.updated = ok;
-    resp.name = new_name;
-    if (!ok) {
-      return StatusOr<RenameTypeResponse>::FromError(
-          "RENAME_TYPE_FAILED", "type not found");
+    if (new_name.empty()) {
+      return StatusOr<RenameTypeResponse>::FromError(codes::kInvalidArgument, "new type name is required");
     }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.renameType(type_id_or_path, new_name); });
+    if (!written.ok()) return error<RenameTypeResponse>(written);
     revision_++;
+    RenameTypeResponse resp;
+    resp.updated = true;
+    resp.name = new_name;
     return StatusOr<RenameTypeResponse>::FromValue(std::move(resp));
   }
 
@@ -833,32 +1079,11 @@ class LocalClient final : public IClient {
       std::uint64_t ordinal) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<DeleteTypeMemberResponse>();
-
-    std::string name = parent_type_id_or_path;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    auto existing = pool_->primaryAdapter().listTypeMembers(name);
-    if (ordinal >= existing.size()) {
-      return StatusOr<DeleteTypeMemberResponse>::FromError(
-          "NOT_FOUND", "ordinal out of range");
-    }
-
-    std::vector<ghidra_standalone::FieldDef> fields;
-    for (std::uint64_t i = 0; i < existing.size(); i++) {
-      if (i == ordinal) continue;
-      fields.push_back({existing[i].name, existing[i].member_type,
-                         static_cast<int>(existing[i].offset)});
-    }
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineStruct(name, fields); });
-
-    DeleteTypeMemberResponse resp;
-    resp.deleted = ok;
-    if (!ok) {
-      return StatusOr<DeleteTypeMemberResponse>::FromError(
-          "DELETE_MEMBER_FAILED", pool_->getError());
-    }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.deleteTypeMember(parent_type_id_or_path, ordinal); });
+    if (!written.ok()) return error<DeleteTypeMemberResponse>(written);
     revision_++;
+    DeleteTypeMemberResponse resp;
+    resp.deleted = true;
     return StatusOr<DeleteTypeMemberResponse>::FromValue(std::move(resp));
   }
 
@@ -868,32 +1093,14 @@ class LocalClient final : public IClient {
       const std::string& new_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<RenameTypeMemberResponse>();
-
-    std::string name = parent_type_id_or_path;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    auto existing = pool_->primaryAdapter().listTypeMembers(name);
-    if (ordinal >= existing.size()) {
-      return StatusOr<RenameTypeMemberResponse>::FromError(
-          "NOT_FOUND", "ordinal out of range");
+    if (new_name.empty()) {
+      return StatusOr<RenameTypeMemberResponse>::FromError(codes::kInvalidArgument, "member name is required");
     }
-
-    std::vector<ghidra_standalone::FieldDef> fields;
-    for (std::uint64_t i = 0; i < existing.size(); i++) {
-      std::string field_name = (i == ordinal) ? new_name : existing[i].name;
-      fields.push_back({field_name, existing[i].member_type,
-                         static_cast<int>(existing[i].offset)});
-    }
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineStruct(name, fields); });
-
-    RenameTypeMemberResponse resp;
-    resp.updated = ok;
-    if (!ok) {
-      return StatusOr<RenameTypeMemberResponse>::FromError(
-          "RENAME_MEMBER_FAILED", pool_->getError());
-    }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.renameTypeMember(parent_type_id_or_path, ordinal, new_name); });
+    if (!written.ok()) return error<RenameTypeMemberResponse>(written);
     revision_++;
+    RenameTypeMemberResponse resp;
+    resp.updated = true;
     return StatusOr<RenameTypeMemberResponse>::FromValue(std::move(resp));
   }
 
@@ -903,32 +1110,14 @@ class LocalClient final : public IClient {
       const std::string& member_type) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<SetTypeMemberTypeResponse>();
-
-    std::string name = parent_type_id_or_path;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    auto existing = pool_->primaryAdapter().listTypeMembers(name);
-    if (ordinal >= existing.size()) {
-      return StatusOr<SetTypeMemberTypeResponse>::FromError(
-          "NOT_FOUND", "ordinal out of range");
+    if (member_type.empty()) {
+      return StatusOr<SetTypeMemberTypeResponse>::FromError(codes::kInvalidArgument, "member type is required");
     }
-
-    std::vector<ghidra_standalone::FieldDef> fields;
-    for (std::uint64_t i = 0; i < existing.size(); i++) {
-      std::string type_str = (i == ordinal) ? member_type : existing[i].member_type;
-      fields.push_back({existing[i].name, type_str,
-                         static_cast<int>(existing[i].offset)});
-    }
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineStruct(name, fields); });
-
-    SetTypeMemberTypeResponse resp;
-    resp.updated = ok;
-    if (!ok) {
-      return StatusOr<SetTypeMemberTypeResponse>::FromError(
-          "SET_MEMBER_TYPE_FAILED", pool_->getError());
-    }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.setTypeMemberType(parent_type_id_or_path, ordinal, member_type); });
+    if (!written.ok()) return error<SetTypeMemberTypeResponse>(written);
     revision_++;
+    SetTypeMemberTypeResponse resp;
+    resp.updated = true;
     return StatusOr<SetTypeMemberTypeResponse>::FromValue(std::move(resp));
   }
 
@@ -937,31 +1126,11 @@ class LocalClient final : public IClient {
       std::uint64_t ordinal) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<DeleteTypeEnumMemberResponse>();
-
-    std::string type_name = type_id_or_path;
-    if (!type_name.empty() && type_name[0] == '/') type_name = type_name.substr(1);
-
-    auto existing = pool_->primaryAdapter().listTypeEnumMembers(type_name);
-    if (ordinal >= existing.size()) {
-      return StatusOr<DeleteTypeEnumMemberResponse>::FromError(
-          "NOT_FOUND", "ordinal out of range");
-    }
-
-    std::vector<ghidra_standalone::EnumValue> entries;
-    for (std::uint64_t i = 0; i < existing.size(); i++) {
-      if (i == ordinal) continue;
-      entries.push_back({existing[i].name, static_cast<uint64_t>(existing[i].value)});
-    }
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineEnum(type_name, entries); });
-
-    DeleteTypeEnumMemberResponse resp;
-    resp.deleted = ok;
-    if (!ok) {
-      return StatusOr<DeleteTypeEnumMemberResponse>::FromError(
-          "DELETE_ENUM_MEMBER_FAILED", pool_->getError());
-    }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.deleteTypeEnumMember(type_id_or_path, ordinal); });
+    if (!written.ok()) return error<DeleteTypeEnumMemberResponse>(written);
     revision_++;
+    DeleteTypeEnumMemberResponse resp;
+    resp.deleted = true;
     return StatusOr<DeleteTypeEnumMemberResponse>::FromValue(std::move(resp));
   }
 
@@ -971,31 +1140,14 @@ class LocalClient final : public IClient {
       const std::string& new_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<RenameTypeEnumMemberResponse>();
-
-    std::string type_name = type_id_or_path;
-    if (!type_name.empty() && type_name[0] == '/') type_name = type_name.substr(1);
-
-    auto existing = pool_->primaryAdapter().listTypeEnumMembers(type_name);
-    if (ordinal >= existing.size()) {
-      return StatusOr<RenameTypeEnumMemberResponse>::FromError(
-          "NOT_FOUND", "ordinal out of range");
+    if (new_name.empty()) {
+      return StatusOr<RenameTypeEnumMemberResponse>::FromError(codes::kInvalidArgument, "enum member name is required");
     }
-
-    std::vector<ghidra_standalone::EnumValue> entries;
-    for (std::uint64_t i = 0; i < existing.size(); i++) {
-      std::string entry_name = (i == ordinal) ? new_name : existing[i].name;
-      entries.push_back({entry_name, static_cast<uint64_t>(existing[i].value)});
-    }
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineEnum(type_name, entries); });
-
-    RenameTypeEnumMemberResponse resp;
-    resp.updated = ok;
-    if (!ok) {
-      return StatusOr<RenameTypeEnumMemberResponse>::FromError(
-          "RENAME_ENUM_MEMBER_FAILED", pool_->getError());
-    }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.renameTypeEnumMember(type_id_or_path, ordinal, new_name); });
+    if (!written.ok()) return error<RenameTypeEnumMemberResponse>(written);
     revision_++;
+    RenameTypeEnumMemberResponse resp;
+    resp.updated = true;
     return StatusOr<RenameTypeEnumMemberResponse>::FromValue(std::move(resp));
   }
 
@@ -1005,33 +1157,11 @@ class LocalClient final : public IClient {
       std::int64_t value) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<SetTypeEnumMemberValueResponse>();
-
-    std::string type_name = type_id_or_path;
-    if (!type_name.empty() && type_name[0] == '/') type_name = type_name.substr(1);
-
-    auto existing = pool_->primaryAdapter().listTypeEnumMembers(type_name);
-    if (ordinal >= existing.size()) {
-      return StatusOr<SetTypeEnumMemberValueResponse>::FromError(
-          "NOT_FOUND", "ordinal out of range");
-    }
-
-    std::vector<ghidra_standalone::EnumValue> entries;
-    for (std::uint64_t i = 0; i < existing.size(); i++) {
-      uint64_t entry_value = (i == ordinal)
-          ? static_cast<uint64_t>(value)
-          : static_cast<uint64_t>(existing[i].value);
-      entries.push_back({existing[i].name, entry_value});
-    }
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.defineEnum(type_name, entries); });
-
-    SetTypeEnumMemberValueResponse resp;
-    resp.updated = ok;
-    if (!ok) {
-      return StatusOr<SetTypeEnumMemberValueResponse>::FromError(
-          "SET_ENUM_VALUE_FAILED", pool_->getError());
-    }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.setTypeEnumMemberValue(type_id_or_path, ordinal, value); });
+    if (!written.ok()) return error<SetTypeEnumMemberValueResponse>(written);
     revision_++;
+    SetTypeEnumMemberValueResponse resp;
+    resp.updated = true;
     return StatusOr<SetTypeEnumMemberValueResponse>::FromValue(std::move(resp));
   }
 
@@ -1042,9 +1172,9 @@ class LocalClient final : public IClient {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<GetFunctionSignatureResponse>();
 
-    // Decompile first to populate FuncProto, then extract signature
-    pool_->primary().decompileAt(address);
-
+    // The prototype is read directly: a saved signature is installed locked at
+    // load, and anything a decompile infers is discarded by clearAnalysis, so
+    // decompiling first cannot change the answer.
     GetFunctionSignatureResponse resp;
     resp.signature = pool_->primaryAdapter().getFunctionSignature(address);
     return StatusOr<GetFunctionSignatureResponse>::FromValue(std::move(resp));
@@ -1061,43 +1191,10 @@ class LocalClient final : public IClient {
         limit, offset);
 
     std::vector<FunctionSignatureRecord> sigs;
-
-    if (pool_->size() <= 1) {
-      // Single-threaded path
-      for (const auto& f : funcs) {
-        pool_->primary().decompileAt(f.entry_address);
-        auto sig = pool_->primaryAdapter().getFunctionSignature(f.entry_address);
-        if (sig) sigs.push_back(std::move(*sig));
-      }
-    } else {
-      // Multi-threaded path: lease pool slots for parallel decompile+extract
-      sigs.resize(funcs.size());
-      std::vector<bool> valid(funcs.size(), false);
-      std::vector<std::future<void>> futures;
-      futures.reserve(funcs.size());
-
-      for (int i = 0; i < static_cast<int>(funcs.size()); i++) {
-        futures.push_back(std::async(std::launch::async,
-            [&, addr = funcs[i].entry_address, idx = i] {
-              auto lease = pool_->acquire();
-              lease.decomp().decompileAt(addr);
-              auto sig = lease.adapter().getFunctionSignature(addr);
-              if (sig) {
-                sigs[idx] = std::move(*sig);
-                valid[idx] = true;
-              }
-            }));
-      }
-      for (auto& f : futures) {
-        f.get();
-      }
-
-      // Remove invalid entries
-      std::vector<FunctionSignatureRecord> filtered;
-      for (int i = 0; i < static_cast<int>(sigs.size()); i++) {
-        if (valid[i]) filtered.push_back(std::move(sigs[i]));
-      }
-      sigs = std::move(filtered);
+    sigs.reserve(funcs.size());
+    for (const auto& f : funcs) {
+      auto sig = pool_->primaryAdapter().getFunctionSignature(f.entry_address);
+      if (sig) sigs.push_back(std::move(*sig));
     }
 
     ListFunctionSignaturesResponse resp;
@@ -1167,8 +1264,22 @@ class LocalClient final : public IClient {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<ReadBytesResponse>();
 
-    auto data = pool_->primaryAdapter().readBytes(address, length);
-
+    RangeStatus status = RangeStatus::kOk;
+    auto data = pool_->primaryAdapter().readBytes(address, length, status);
+    switch (status) {
+      case RangeStatus::kUnmapped:
+        return StatusOr<ReadBytesResponse>::FromError(
+            codes::kUnmappedAddress, "no memory block contains " + hex(address));
+      case RangeStatus::kUninitialized:
+        return StatusOr<ReadBytesResponse>::FromError(
+            codes::kUninitializedMemory, "the block at " + hex(address) + " holds no bytes");
+      case RangeStatus::kUnavailable:
+        return StatusOr<ReadBytesResponse>::FromError(
+            codes::kNotSupported,
+            "the offline image holds no bytes for the block at " + hex(address));
+      default:
+        break;
+    }
     ReadBytesResponse resp;
     resp.data = std::move(data);
     return StatusOr<ReadBytesResponse>::FromValue(std::move(resp));
@@ -1216,7 +1327,7 @@ class LocalClient final : public IClient {
   // operand text) but does not decompose into the per-operand representation the
   // RPC returns (Ghidra's getDefaultOperandRepresentation / getOperandType /
   // getOperandRefType are Java-host-only). The offline backend therefore inherits
-  // IClient's honest NOT_SUPPORTED for it — this is a capability boundary, not a TODO.
+  // IClient's honest not_supported for it — this is a capability boundary, not a TODO.
 
   StatusOr<GetCommentsResponse> GetComments(std::uint64_t range_start,
                                             std::uint64_t range_end,
@@ -1225,14 +1336,14 @@ class LocalClient final : public IClient {
     if (!ensure_loaded()) return not_loaded<GetCommentsResponse>();
 
     auto all = paginate(
-        pool_->primaryAdapter().getComments(range_start, range_end),
+        pool_->primary().comments(range_start, range_end_of(range_end)),
         limit, offset);
 
     GetCommentsResponse resp;
     for (const auto& c : all) {
       CommentRecord rec;
       rec.address = c.address;
-      rec.kind = static_cast<CommentKind>(c.kind);
+      rec.kind = static_cast<CommentKind>(c.type + 1);  // CommentType ordinal -> CommentKind
       rec.text = c.text;
       resp.comments.push_back(std::move(rec));
     }
@@ -1244,8 +1355,24 @@ class LocalClient final : public IClient {
                                           const std::string& text) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<SetCommentResponse>();
+    if (kind == CommentKind::kUnspecified) {
+      return StatusOr<SetCommentResponse>::FromError(codes::kInvalidArgument,
+                                                     "unsupported comment kind");
+    }
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<SetCommentResponse>(mapped);
+    // A comment attaches to the start of a code unit; one inside an
+    // instruction would be stored where no listing shows it.
+    if (auto start = pool_->primaryAdapter().insideInstruction(address)) {
+      return StatusOr<SetCommentResponse>::FromError(
+          codes::kInvalidArgument, hex(address) + " is inside the instruction at " + hex(*start) +
+                                       "; comments attach to the start of a code unit");
+    }
 
-    pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { a.setComment(address, static_cast<int>(kind), text); return true; });
+    pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) {
+      d.setComment(address, static_cast<int>(kind) - 1, text);
+      return true;
+    });
     revision_++;
 
     SetCommentResponse resp;
@@ -1257,16 +1384,23 @@ class LocalClient final : public IClient {
                                                 CommentKind kind) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<DeleteCommentResponse>();
+    if (kind == CommentKind::kUnspecified) {
+      return StatusOr<DeleteCommentResponse>::FromError(codes::kInvalidArgument,
+                                                        "unsupported comment kind");
+    }
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<DeleteCommentResponse>(mapped);
 
-    bool ok = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { return a.deleteComment(address, static_cast<int>(kind)); });
-
-    DeleteCommentResponse resp;
-    resp.deleted = ok;
+    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) {
+      return d.deleteComment(address, static_cast<int>(kind) - 1);
+    });
     if (!ok) {
       return StatusOr<DeleteCommentResponse>::FromError(
-          "NOT_FOUND", "no comment at address with given kind");
+          codes::kNotFound, "no comment of that kind at " + hex(address));
     }
     revision_++;
+    DeleteCommentResponse resp;
+    resp.deleted = true;
     return StatusOr<DeleteCommentResponse>::FromValue(std::move(resp));
   }
 
@@ -1314,16 +1448,17 @@ class LocalClient final : public IClient {
       const std::string& alias_name, const std::string& target_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<CreateTypeAliasResponse>();
-
-    bool ok = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { return a.createTypeAlias(alias_name, target_name); });
-
-    CreateTypeAliasResponse resp;
-    resp.updated = ok;
-    if (!ok) {
-      return StatusOr<CreateTypeAliasResponse>::FromError(
-          "CREATE_ALIAS_FAILED", "target type not found or alias creation failed");
+    if (alias_name.empty()) {
+      return StatusOr<CreateTypeAliasResponse>::FromError(codes::kInvalidArgument, "alias name is required");
     }
+    if (target_name.empty()) {
+      return StatusOr<CreateTypeAliasResponse>::FromError(codes::kInvalidArgument, "alias target type is required");
+    }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.createTypeAlias(alias_name, target_name); });
+    if (!written.ok()) return error<CreateTypeAliasResponse>(written);
     revision_++;
+    CreateTypeAliasResponse resp;
+    resp.updated = true;
     return StatusOr<CreateTypeAliasResponse>::FromValue(std::move(resp));
   }
 
@@ -1331,19 +1466,11 @@ class LocalClient final : public IClient {
       const std::string& alias_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<DeleteTypeAliasResponse>();
-
-    std::string name = alias_name;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    bool ok = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { return a.deleteTypeAlias(name); });
-
-    DeleteTypeAliasResponse resp;
-    resp.deleted = ok;
-    if (!ok) {
-      return StatusOr<DeleteTypeAliasResponse>::FromError(
-          "DELETE_ALIAS_FAILED", "alias not found or not a typedef");
-    }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.deleteTypeAlias(alias_name); });
+    if (!written.ok()) return error<DeleteTypeAliasResponse>(written);
     revision_++;
+    DeleteTypeAliasResponse resp;
+    resp.deleted = true;
     return StatusOr<DeleteTypeAliasResponse>::FromValue(std::move(resp));
   }
 
@@ -1352,20 +1479,14 @@ class LocalClient final : public IClient {
       const std::string& new_target_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<SetTypeAliasTargetResponse>();
-
-    std::string name = alias_name;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    bool ok = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { return a.setTypeAliasTarget(name, new_target_name); });
-
-    SetTypeAliasTargetResponse resp;
-    resp.updated = ok;
-    if (!ok) {
-      return StatusOr<SetTypeAliasTargetResponse>::FromError(
-          "SET_ALIAS_TARGET_FAILED",
-          "alias not found, not a typedef, or new target not found");
+    if (new_target_name.empty()) {
+      return StatusOr<SetTypeAliasTargetResponse>::FromError(codes::kInvalidArgument, "alias target type is required");
     }
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.setTypeAliasTarget(alias_name, new_target_name); });
+    if (!written.ok()) return error<SetTypeAliasTargetResponse>(written);
     revision_++;
+    SetTypeAliasTargetResponse resp;
+    resp.updated = true;
     return StatusOr<SetTypeAliasTargetResponse>::FromValue(std::move(resp));
   }
 
@@ -1377,13 +1498,9 @@ class LocalClient final : public IClient {
       const std::string& comment) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<SetTypeMemberCommentResponse>();
-
-    std::string name = parent_type_id_or_path;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { a.setTypeMemberComment(name, ordinal, comment); return true; });
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.setTypeMemberComment(parent_type_id_or_path, ordinal, comment); });
+    if (!written.ok()) return error<SetTypeMemberCommentResponse>(written);
     revision_++;
-
     SetTypeMemberCommentResponse resp;
     resp.updated = true;
     return StatusOr<SetTypeMemberCommentResponse>::FromValue(std::move(resp));
@@ -1395,13 +1512,9 @@ class LocalClient final : public IClient {
       const std::string& comment) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<SetTypeEnumMemberCommentResponse>();
-
-    std::string name = type_id_or_path;
-    if (!name.empty() && name[0] == '/') name = name.substr(1);
-
-    pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { a.setTypeEnumMemberComment(name, ordinal, comment); return true; });
+    Status written = adapterWrite([&](detail::ArchAdapter& a) { return a.setTypeEnumMemberComment(type_id_or_path, ordinal, comment); });
+    if (!written.ok()) return error<SetTypeEnumMemberCommentResponse>(written);
     revision_++;
-
     SetTypeEnumMemberCommentResponse resp;
     resp.updated = true;
     return StatusOr<SetTypeEnumMemberCommentResponse>::FromValue(std::move(resp));
@@ -1413,33 +1526,43 @@ class LocalClient final : public IClient {
       std::uint64_t address, const std::string& new_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<RenameDataItemResponse>();
-
-    bool ok = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { return a.renameDataItem(address, new_name); });
-
-    RenameDataItemResponse resp;
-    resp.updated = ok;
-    resp.name = new_name;
-    if (!ok) {
-      return StatusOr<RenameDataItemResponse>::FromError(
-          "RENAME_FAILED", "no data item at address or is a function symbol");
+    if (new_name.empty()) {
+      return StatusOr<RenameDataItemResponse>::FromError(codes::kInvalidArgument,
+                                                         "data item name is required");
     }
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<RenameDataItemResponse>(mapped);
+    if (!pool_->primary().hasDataAt(address)) {
+      return StatusOr<RenameDataItemResponse>::FromError(codes::kNotFound,
+                                                         "no data item at " + hex(address));
+    }
+    // The item's primary symbol is renamed, or a label created (the host's rule).
+    Status renamed = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      return d.renameSymbolAt(address, std::nullopt, new_name);
+    });
+    if (!renamed.ok()) return error<RenameDataItemResponse>(renamed);
     revision_++;
+    RenameDataItemResponse resp;
+    resp.updated = true;
+    resp.name = new_name;
     return StatusOr<RenameDataItemResponse>::FromValue(std::move(resp));
   }
 
   StatusOr<DeleteDataItemResponse> DeleteDataItem(std::uint64_t address) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<DeleteDataItemResponse>();
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<DeleteDataItemResponse>(mapped);
 
-    bool ok = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) { return a.deleteDataItem(address); });
-
-    DeleteDataItemResponse resp;
-    resp.deleted = ok;
+    bool ok = pool_->applyDecompilerMutationAllSlots(
+        [&](ghidra_standalone::Decompiler& d) { return d.clearData(address); });
     if (!ok) {
-      return StatusOr<DeleteDataItemResponse>::FromError(
-          "NOT_FOUND", "no data item at address or is a function symbol");
+      return StatusOr<DeleteDataItemResponse>::FromError(codes::kNotFound,
+                                                         "no data item at " + hex(address));
     }
     revision_++;
+    DeleteDataItemResponse resp;
+    resp.deleted = true;
     return StatusOr<DeleteDataItemResponse>::FromValue(std::move(resp));
   }
 
@@ -1450,34 +1573,23 @@ class LocalClient final : public IClient {
       const std::string& new_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<RenameFunctionParameterResponse>();
-
-    // Decompile to populate FuncProto, then extract current signature
-    pool_->primary().decompileAt(address);
-    auto sig = pool_->primaryAdapter().getFunctionSignature(address);
-    if (!sig) {
+    if (new_name.empty()) {
       return StatusOr<RenameFunctionParameterResponse>::FromError(
-          "NOT_FOUND", "no function at address");
+          codes::kInvalidArgument, "parameter name is required");
     }
+    std::uint64_t entry = 0;
+    Status found = requireParameter(address, ordinal, entry);
+    if (!found.ok()) return error<RenameFunctionParameterResponse>(found);
 
-    if (ordinal < 0 || ordinal >= static_cast<int>(sig->parameters.size())) {
-      return StatusOr<RenameFunctionParameterResponse>::FromError(
-          "OUT_OF_RANGE", "parameter ordinal out of range");
-    }
-
-    // Modify parameter name and rebuild prototype
-    sig->parameters[ordinal].name = new_name;
-    std::string proto = buildPrototypeString(*sig);
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.setPrototype(address, proto); });
-    if (ok) revision_++;
+    Status set = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      return d.setParameterName(entry, ordinal, new_name);
+    });
+    if (!set.ok()) return error<RenameFunctionParameterResponse>(set);
+    revision_++;
 
     RenameFunctionParameterResponse resp;
-    resp.updated = ok;
+    resp.updated = true;
     resp.name = new_name;
-    if (!ok) {
-      return StatusOr<RenameFunctionParameterResponse>::FromError(
-          "SET_PROTOTYPE_FAILED", pool_->getError());
-    }
     return StatusOr<RenameFunctionParameterResponse>::FromValue(std::move(resp));
   }
 
@@ -1486,32 +1598,23 @@ class LocalClient final : public IClient {
       const std::string& new_type) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<SetFunctionParameterTypeResponse>();
-
-    pool_->primary().decompileAt(address);
-    auto sig = pool_->primaryAdapter().getFunctionSignature(address);
-    if (!sig) {
+    if (new_type.empty()) {
       return StatusOr<SetFunctionParameterTypeResponse>::FromError(
-          "NOT_FOUND", "no function at address");
+          codes::kInvalidArgument, "parameter type is required");
     }
+    std::uint64_t entry = 0;
+    Status found = requireParameter(address, ordinal, entry);
+    if (!found.ok()) return error<SetFunctionParameterTypeResponse>(found);
 
-    if (ordinal < 0 || ordinal >= static_cast<int>(sig->parameters.size())) {
-      return StatusOr<SetFunctionParameterTypeResponse>::FromError(
-          "OUT_OF_RANGE", "parameter ordinal out of range");
-    }
-
-    sig->parameters[ordinal].data_type = new_type;
-    std::string proto = buildPrototypeString(*sig);
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.setPrototype(address, proto); });
-    if (ok) revision_++;
+    Status set = decompilerWrite([&](ghidra_standalone::Decompiler& d) {
+      return d.setParameterType(entry, ordinal, new_type);
+    });
+    if (!set.ok()) return error<SetFunctionParameterTypeResponse>(set);
+    revision_++;
 
     SetFunctionParameterTypeResponse resp;
-    resp.updated = ok;
+    resp.updated = true;
     resp.data_type = new_type;
-    if (!ok) {
-      return StatusOr<SetFunctionParameterTypeResponse>::FromError(
-          "SET_PROTOTYPE_FAILED", pool_->getError());
-    }
     return StatusOr<SetFunctionParameterTypeResponse>::FromValue(std::move(resp));
   }
 
@@ -1521,30 +1624,19 @@ class LocalClient final : public IClient {
       std::uint64_t address, const std::string& data_type) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<ApplyDataTypeResponse>();
-
-    // Check for existing symbol name or generate one
-    auto sym = pool_->primaryAdapter().getSymbol(address);
-    std::string name;
-    if (sym && !sym->name.empty()) {
-      name = sym->name;
-    } else {
-      // Generate DAT_<hex> name
-      char buf[32];
-      snprintf(buf, sizeof(buf), "DAT_%08llx",
-               static_cast<unsigned long long>(address));
-      name = buf;
+    if (data_type.empty()) {
+      return StatusOr<ApplyDataTypeResponse>::FromError(codes::kInvalidArgument,
+                                                        "data type is required");
     }
-
-    bool ok = pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { return d.nameGlobal(address, name, data_type); });
-    if (ok) revision_++;
+    Status applied = adapterWrite([&](detail::ArchAdapter& a) {
+      return a.applyDataType(address, data_type);
+    });
+    if (!applied.ok()) return error<ApplyDataTypeResponse>(applied);
+    revision_++;
 
     ApplyDataTypeResponse resp;
-    resp.updated = ok;
+    resp.updated = true;
     resp.data_type = data_type;
-    if (!ok) {
-      return StatusOr<ApplyDataTypeResponse>::FromError(
-          "APPLY_FAILED", pool_->getError());
-    }
     return StatusOr<ApplyDataTypeResponse>::FromValue(std::move(resp));
   }
 
@@ -1555,25 +1647,19 @@ class LocalClient final : public IClient {
       const std::string& new_name) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<RenameFunctionLocalResponse>();
+    if (local_id.empty() || new_name.empty()) {
+      return StatusOr<RenameFunctionLocalResponse>::FromError(
+          codes::kInvalidArgument, "local id and new local name are required");
+    }
+    std::uint64_t entry = 0;
+    Status found = requireFunction(address, entry);
+    if (!found.ok()) return error<RenameFunctionLocalResponse>(found);
 
     // Apply the rename to the decompiler scope on every slot (name-locked so it
-    // survives re-decompilation). Reports honest, specific failure so ghidrasql
-    // surfaces a real "UPDATE decomp_lvars failed" with a precise reason.
-    switch (pool_->applyLocalRenameAllSlots(address, local_id, new_name)) {
-      case detail::LocalMutationStatus::kOk:
-        break;
-      case detail::LocalMutationStatus::kNotFound:
-        return StatusOr<RenameFunctionLocalResponse>::FromError(
-            "NOT_FOUND",
-            "no local matching id '" + local_id + "' in function at 0x" +
-                to_hex_string(address));
-      case detail::LocalMutationStatus::kDecompileFailed:
-      case detail::LocalMutationStatus::kInvalidType:  // unreachable for rename
-        return StatusOr<RenameFunctionLocalResponse>::FromError(
-            "DECOMPILE_FAILED",
-            "could not decompile function at 0x" + to_hex_string(address) +
-                " to rename local '" + local_id + "'");
-    }
+    // survives re-decompilation).
+    Status renamed = localStatus(pool_->applyLocalRenameAllSlots(entry, local_id, new_name),
+                                 entry, local_id, "");
+    if (!renamed.ok()) return error<RenameFunctionLocalResponse>(renamed);
     revision_++;
 
     RenameFunctionLocalResponse resp;
@@ -1588,29 +1674,18 @@ class LocalClient final : public IClient {
       const std::string& new_type) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<SetFunctionLocalTypeResponse>();
+    if (local_id.empty() || new_type.empty()) {
+      return StatusOr<SetFunctionLocalTypeResponse>::FromError(
+          codes::kInvalidArgument, "local id and local type are required");
+    }
+    std::uint64_t entry = 0;
+    Status found = requireFunction(address, entry);
+    if (!found.ok()) return error<SetFunctionLocalTypeResponse>(found);
 
     // Apply the retype to the decompiler scope on every slot (type-locked).
-    // Distinguish a bad type string from a missing local from a decompile
-    // failure so the caller gets an actionable error code.
-    switch (pool_->applyLocalRetypeAllSlots(address, local_id, new_type)) {
-      case detail::LocalMutationStatus::kOk:
-        break;
-      case detail::LocalMutationStatus::kInvalidType:
-        return StatusOr<SetFunctionLocalTypeResponse>::FromError(
-            "INVALID_TYPE",
-            "could not parse type '" + new_type + "' for local '" + local_id +
-                "'");
-      case detail::LocalMutationStatus::kNotFound:
-        return StatusOr<SetFunctionLocalTypeResponse>::FromError(
-            "NOT_FOUND",
-            "no local matching id '" + local_id + "' in function at 0x" +
-                to_hex_string(address));
-      case detail::LocalMutationStatus::kDecompileFailed:
-        return StatusOr<SetFunctionLocalTypeResponse>::FromError(
-            "DECOMPILE_FAILED",
-            "could not decompile function at 0x" + to_hex_string(address) +
-                " to retype local '" + local_id + "'");
-    }
+    Status retyped = localStatus(pool_->applyLocalRetypeAllSlots(entry, local_id, new_type),
+                                 entry, local_id, new_type);
+    if (!retyped.ok()) return error<SetFunctionLocalTypeResponse>(retyped);
     revision_++;
 
     SetFunctionLocalTypeResponse resp;
@@ -1627,6 +1702,12 @@ class LocalClient final : public IClient {
       const std::vector<std::uint8_t>& data) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<WriteBytesResponse>();
+    if (data.empty()) {
+      return StatusOr<WriteBytesResponse>::FromError(codes::kInvalidArgument,
+                                                     "data is required");
+    }
+    Status writable = requireWritable(address, data.size(), "");
+    if (!writable.ok()) return error<WriteBytesResponse>(writable);
 
     pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) { d.writeBytes(address, data); return true; });
     revision_++;
@@ -1640,6 +1721,23 @@ class LocalClient final : public IClient {
       const std::vector<BytePatch>& patches) override {
     std::lock_guard<std::mutex> req_lock(req_mu_);
     if (!ensure_loaded()) return not_loaded<PatchBytesBatchResponse>();
+    if (patches.empty()) {
+      return StatusOr<PatchBytesBatchResponse>::FromError(codes::kInvalidArgument,
+                                                          "patches are required");
+    }
+    // Every patch or none: check them all before writing any.
+    for (std::size_t i = 0; i < patches.size(); ++i) {
+      if (patches[i].data.empty()) {
+        return StatusOr<PatchBytesBatchResponse>::FromError(
+            codes::kInvalidArgument, "patch " + std::to_string(i) + " has no data");
+      }
+      Status writable = requireWritable(patches[i].address, patches[i].data.size(),
+                                        "patch " + std::to_string(i) + ": ");
+      if (!writable.ok()) {
+        return StatusOr<PatchBytesBatchResponse>::FromError(
+            writable.code, writable.message + "; no patch was written");
+      }
+    }
 
     std::uint32_t total_bytes = 0;
     for (const auto& patch : patches) {
@@ -1654,14 +1752,532 @@ class LocalClient final : public IClient {
     return StatusOr<PatchBytesBatchResponse>::FromValue(std::move(resp));
   }
 
+  // -- IListingClient (bookmarks and breakpoints) -----------------------------
+  //
+  // The project's own bookmarks (and breakpoints, which the host keeps as
+  // bookmarks of type "GhidraAPI Breakpoint"), read from the program db and
+  // edited in memory.
+
+  StatusOr<ListBookmarksResponse> ListBookmarks(std::uint64_t range_start,
+                                                std::uint64_t range_end, int limit, int offset,
+                                                const std::string& type_filter,
+                                                const std::string& category_filter) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<ListBookmarksResponse>();
+    const std::uint64_t end = range_end_of(range_end);
+    const std::string type = trim(type_filter), category = trim(category_filter);
+    std::vector<BookmarkRecord> all;
+    for (const auto& b : pool_->primary().bookmarks()) {
+      if (b.address < range_start || b.address > end) continue;
+      if (!type.empty() && b.type != type) continue;
+      if (!category.empty() && b.category != category) continue;
+      all.push_back({b.address, b.type, b.category, b.comment});
+    }
+    ListBookmarksResponse resp;
+    resp.bookmarks = paginate(all, limit, offset);
+    return StatusOr<ListBookmarksResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<AddBookmarkResponse> AddBookmark(std::uint64_t address, const std::string& type,
+                                            const std::string& category,
+                                            const std::string& comment) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<AddBookmarkResponse>();
+    const std::string t = trim(type), c = trim(category);
+    if (t.empty()) {
+      return StatusOr<AddBookmarkResponse>::FromError(codes::kInvalidArgument,
+                                                      "bookmark type is required");
+    }
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<AddBookmarkResponse>(mapped);
+    pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) {
+      d.setBookmark(address, t, c, comment);
+      return true;
+    });
+    revision_++;
+    AddBookmarkResponse resp;
+    resp.updated = true;
+    return StatusOr<AddBookmarkResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<DeleteBookmarkResponse> DeleteBookmark(std::uint64_t address, const std::string& type,
+                                                  const std::string& category) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<DeleteBookmarkResponse>();
+    const std::string t = trim(type), c = trim(category);
+    if (t.empty()) {
+      return StatusOr<DeleteBookmarkResponse>::FromError(codes::kInvalidArgument,
+                                                         "bookmark type is required");
+    }
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<DeleteBookmarkResponse>(mapped);
+    const bool removed = pool_->applyDecompilerMutationAllSlots(
+        [&](ghidra_standalone::Decompiler& d) { return d.removeBookmark(address, t, c); });
+    if (!removed) {
+      return StatusOr<DeleteBookmarkResponse>::FromError(
+          codes::kNotFound, "no '" + t + "' bookmark in category '" + c + "' at " + hex(address));
+    }
+    revision_++;
+    DeleteBookmarkResponse resp;
+    resp.deleted = true;
+    return StatusOr<DeleteBookmarkResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<ListBreakpointsResponse> ListBreakpoints(std::uint64_t range_start,
+                                                    std::uint64_t range_end, int limit, int offset,
+                                                    const std::string& kind_filter,
+                                                    const std::string& group_filter) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<ListBreakpointsResponse>();
+    const std::uint64_t end = range_end_of(range_end);
+    const std::string kind = lower(trim(kind_filter)), group = lower(trim(group_filter));
+    std::vector<BreakpointRecord> all;
+    for (const auto& b : pool_->primary().bookmarks()) {
+      if (b.type != kBreakpointType) continue;
+      BreakpointRecord row = breakpoint_from(b);
+      if (row.address < range_start || row.address > end) continue;
+      if (!kind.empty() && lower(trim(row.kind)) != kind) continue;
+      if (!group.empty() && lower(trim(row.group)) != group) continue;
+      all.push_back(std::move(row));
+    }
+    ListBreakpointsResponse resp;
+    resp.breakpoints = paginate(all, limit, offset);
+    return StatusOr<ListBreakpointsResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<AddBreakpointResponse> AddBreakpoint(std::uint64_t address, const std::string& kind,
+                                                std::uint64_t size, bool enabled,
+                                                const std::string& condition,
+                                                const std::string& group) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<AddBreakpointResponse>();
+    BreakpointRecord row;
+    row.kind = trim(kind).empty() ? "software" : trim(kind);
+    if (!breakpoint_kind_ok(row.kind)) {
+      return StatusOr<AddBreakpointResponse>::FromError(
+          codes::kInvalidArgument, "unknown breakpoint kind '" + row.kind +
+                                       "'; expected one of software, hardware, read, write, access");
+    }
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<AddBreakpointResponse>(mapped);
+    row.address = address;
+    row.enabled = enabled;
+    row.size = std::max<std::uint64_t>(1, size);
+    row.condition = condition;
+    row.group = trim(group);
+    putBreakpoint(row);
+    revision_++;
+    AddBreakpointResponse resp;
+    resp.updated = true;
+    return StatusOr<AddBreakpointResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<SetBreakpointEnabledResponse> SetBreakpointEnabled(std::uint64_t address,
+                                                              bool enabled) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<SetBreakpointEnabledResponse>();
+    Status edited = editBreakpoint(address, [&](BreakpointRecord& r) { r.enabled = enabled; });
+    if (!edited.ok()) return error<SetBreakpointEnabledResponse>(edited);
+    SetBreakpointEnabledResponse resp;
+    resp.updated = true;
+    return StatusOr<SetBreakpointEnabledResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<SetBreakpointKindResponse> SetBreakpointKind(std::uint64_t address,
+                                                        const std::string& kind) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<SetBreakpointKindResponse>();
+    const std::string k = trim(kind);
+    if (k.empty()) {
+      return StatusOr<SetBreakpointKindResponse>::FromError(codes::kInvalidArgument,
+                                                            "breakpoint kind is required");
+    }
+    if (!breakpoint_kind_ok(k)) {
+      return StatusOr<SetBreakpointKindResponse>::FromError(
+          codes::kInvalidArgument, "unknown breakpoint kind '" + k +
+                                       "'; expected one of software, hardware, read, write, access");
+    }
+    Status edited = editBreakpoint(address, [&](BreakpointRecord& r) { r.kind = k; });
+    if (!edited.ok()) return error<SetBreakpointKindResponse>(edited);
+    SetBreakpointKindResponse resp;
+    resp.updated = true;
+    return StatusOr<SetBreakpointKindResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<SetBreakpointSizeResponse> SetBreakpointSize(std::uint64_t address,
+                                                        std::uint64_t size) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<SetBreakpointSizeResponse>();
+    if (size == 0) {
+      return StatusOr<SetBreakpointSizeResponse>::FromError(codes::kInvalidArgument,
+                                                            "breakpoint size must be > 0");
+    }
+    Status edited = editBreakpoint(address, [&](BreakpointRecord& r) { r.size = size; });
+    if (!edited.ok()) return error<SetBreakpointSizeResponse>(edited);
+    SetBreakpointSizeResponse resp;
+    resp.updated = true;
+    return StatusOr<SetBreakpointSizeResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<SetBreakpointConditionResponse> SetBreakpointCondition(
+      std::uint64_t address, const std::string& condition) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<SetBreakpointConditionResponse>();
+    Status edited = editBreakpoint(address, [&](BreakpointRecord& r) { r.condition = condition; });
+    if (!edited.ok()) return error<SetBreakpointConditionResponse>(edited);
+    SetBreakpointConditionResponse resp;
+    resp.updated = true;
+    return StatusOr<SetBreakpointConditionResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<SetBreakpointGroupResponse> SetBreakpointGroup(std::uint64_t address,
+                                                          const std::string& group) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<SetBreakpointGroupResponse>();
+    Status edited = editBreakpoint(address, [&](BreakpointRecord& r) { r.group = trim(group); });
+    if (!edited.ok()) return error<SetBreakpointGroupResponse>(edited);
+    SetBreakpointGroupResponse resp;
+    resp.updated = true;
+    return StatusOr<SetBreakpointGroupResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<DeleteBreakpointResponse> DeleteBreakpoint(std::uint64_t address) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<DeleteBreakpointResponse>();
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return error<DeleteBreakpointResponse>(mapped);
+    const bool removed = pool_->applyDecompilerMutationAllSlots(
+        [&](ghidra_standalone::Decompiler& d) { return d.removeBookmarks(address, kBreakpointType); });
+    if (!removed) {
+      return StatusOr<DeleteBreakpointResponse>::FromError(codes::kNotFound,
+                                                           "no breakpoint at " + hex(address));
+    }
+    revision_++;
+    DeleteBreakpointResponse resp;
+    resp.deleted = true;
+    return StatusOr<DeleteBreakpointResponse>::FromValue(std::move(resp));
+  }
+
+  // -- IFunctionsClient (function tags) ------------------------------------------
+
+  StatusOr<ListFunctionTagsResponse> ListFunctionTags() override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<ListFunctionTagsResponse>();
+    ListFunctionTagsResponse resp;
+    for (const auto& t : pool_->primary().functionTags()) resp.tags.push_back({t.name, t.comment});
+    return StatusOr<ListFunctionTagsResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<CreateFunctionTagResponse> CreateFunctionTag(const std::string& name,
+                                                        const std::string& comment) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<CreateFunctionTagResponse>();
+    const std::string n = trim(name);
+    if (n.empty()) {
+      return StatusOr<CreateFunctionTagResponse>::FromError(codes::kInvalidArgument,
+                                                            "tag name is required");
+    }
+    if (pool_->primary().hasFunctionTag(n)) {
+      return StatusOr<CreateFunctionTagResponse>::FromError(
+          codes::kDuplicateName, "function tag '" + n + "' already exists");
+    }
+    pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) {
+      d.createFunctionTag(n, comment);
+      return true;
+    });
+    revision_++;
+    CreateFunctionTagResponse resp;
+    resp.created = true;
+    return StatusOr<CreateFunctionTagResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<DeleteFunctionTagResponse> DeleteFunctionTag(const std::string& name) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<DeleteFunctionTagResponse>();
+    const std::string n = trim(name);
+    if (n.empty()) {
+      return StatusOr<DeleteFunctionTagResponse>::FromError(codes::kInvalidArgument,
+                                                            "tag name is required");
+    }
+    const bool removed = pool_->applyDecompilerMutationAllSlots(
+        [&](ghidra_standalone::Decompiler& d) { return d.deleteFunctionTag(n); });
+    if (!removed) {
+      return StatusOr<DeleteFunctionTagResponse>::FromError(codes::kNotFound,
+                                                            "no function tag named '" + n + "'");
+    }
+    revision_++;
+    DeleteFunctionTagResponse resp;
+    resp.deleted = true;
+    return StatusOr<DeleteFunctionTagResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<ListFunctionTagMappingsResponse> ListFunctionTagMappings(
+      std::uint64_t function_entry) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<ListFunctionTagMappingsResponse>();
+    ListFunctionTagMappingsResponse resp;
+    for (const auto& [entry, tag] : pool_->primary().functionTagMappings(function_entry))
+      resp.mappings.push_back({entry, tag});
+    return StatusOr<ListFunctionTagMappingsResponse>::FromValue(std::move(resp));
+  }
+
+  // Tags the function at, or containing, the address; a missing tag is created.
+  StatusOr<TagFunctionResponse> TagFunction(std::uint64_t function_entry,
+                                            const std::string& tag_name) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<TagFunctionResponse>();
+    const std::string n = trim(tag_name);
+    if (n.empty()) {
+      return StatusOr<TagFunctionResponse>::FromError(codes::kInvalidArgument,
+                                                      "tag name is required");
+    }
+    std::uint64_t entry = 0;
+    Status found = requireFunction(function_entry, entry);
+    if (!found.ok()) return error<TagFunctionResponse>(found);
+    pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) {
+      d.tagFunction(entry, n);
+      return true;
+    });
+    revision_++;
+    TagFunctionResponse resp;
+    resp.updated = true;
+    return StatusOr<TagFunctionResponse>::FromValue(std::move(resp));
+  }
+
+  StatusOr<UntagFunctionResponse> UntagFunction(std::uint64_t function_entry,
+                                                const std::string& tag_name) override {
+    std::lock_guard<std::mutex> req_lock(req_mu_);
+    if (!ensure_loaded()) return not_loaded<UntagFunctionResponse>();
+    const std::string n = trim(tag_name);
+    if (n.empty()) {
+      return StatusOr<UntagFunctionResponse>::FromError(codes::kInvalidArgument,
+                                                        "tag name is required");
+    }
+    std::uint64_t entry = 0;
+    Status found = requireFunction(function_entry, entry);
+    if (!found.ok()) return error<UntagFunctionResponse>(found);
+    if (!pool_->primary().hasFunctionTag(n)) {
+      return StatusOr<UntagFunctionResponse>::FromError(codes::kNotFound,
+                                                        "no function tag named '" + n + "'");
+    }
+    if (!pool_->primary().functionHasTag(entry, n)) {
+      return StatusOr<UntagFunctionResponse>::FromError(
+          codes::kNotFound, "tag '" + n + "' is not applied to the function at " + hex(entry));
+    }
+    pool_->applyDecompilerMutationAllSlots(
+        [&](ghidra_standalone::Decompiler& d) { return d.untagFunction(entry, n); });
+    revision_++;
+    UntagFunctionResponse resp;
+    resp.updated = true;
+    return StatusOr<UntagFunctionResponse>::FromValue(std::move(resp));
+  }
+
  private:
+  /// Replace the breakpoint at row.address (BreakpointBookmarkStore.upsert).
+  void putBreakpoint(const BreakpointRecord& row) {
+    pool_->applyDecompilerMutationAllSlots([&](ghidra_standalone::Decompiler& d) {
+      d.removeBookmarks(row.address, kBreakpointType);
+      d.setBookmark(row.address, kBreakpointType, breakpoint_category(row.group),
+                    breakpoint_comment(row));
+      return true;
+    });
+  }
+
+  /// Edit the breakpoint at a mapped address; not_found when there is none.
+  Status editBreakpoint(std::uint64_t address, const std::function<void(BreakpointRecord&)>& edit) {
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return mapped;
+    for (const auto& b : pool_->primary().bookmarks()) {
+      if (b.type != kBreakpointType || b.address != address) continue;
+      BreakpointRecord row = breakpoint_from(b);
+      row.address = address;
+      edit(row);
+      putBreakpoint(row);
+      revision_++;
+      return Status::Ok();
+    }
+    return Status::Error(codes::kNotFound, "no breakpoint at " + hex(address));
+  }
+
   bool ensure_loaded() const {
     return program_loaded_ && pool_ && pool_->primaryAdapter().valid();
   }
 
   template <typename T>
   StatusOr<T> not_loaded() const {
-    return StatusOr<T>::FromError("NO_PROGRAM", "no program loaded; call OpenProgram first");
+    return StatusOr<T>::FromError(codes::kNotLoaded, "no program loaded; call OpenProgram first");
+  }
+
+  template <typename T>
+  static StatusOr<T> error(const Status& status) {
+    return StatusOr<T>::FromError(status.code, status.message);
+  }
+
+  /// Load `request`'s program into every pool slot (OpenProgram and
+  /// DiscardProgram), then the configured state file.
+  Status loadLocked(const OpenProgramRequest& request) {
+    namespace fs = std::filesystem;
+    if (!request.project_path.empty()) {
+      std::error_code ec;
+      if (!fs::exists(request.project_path, ec)) {
+        return Status::Error(codes::kNotFound, "no project at " + request.project_path);
+      }
+      // The project's program the request names (program_path), or its only one.
+      if (!pool_->loadProject(request.project_path, request.program_path)) {
+        return Status::Error(engine_code(pool_->getErrorKind()), pool_->getError());
+      }
+    } else if (!request.program_path.empty()) {
+      std::error_code ec;
+      if (!fs::exists(request.program_path, ec)) {
+        return Status::Error(codes::kNotFound, "no file at " + request.program_path);
+      }
+      // Always pass the full Sleigh spec id ("processor:endian:size:variant:
+      // compiler") so the language is unambiguous: Ghidra's
+      // BfdArchitecture::resolveArchitecture maps every elf64 to
+      // x86:LE:64:default:gcc, so letting BFD auto-detect loaded an aarch64 ELF
+      // as x86. The patched bfd_arch.cc::buildLoader sees a colon-bearing target
+      // and lets bfd_check_format detect the file format while archid keeps
+      // the Sleigh id; raw_arch (no BFD on macOS/Windows) needs exactly that id.
+      std::string arch;
+      if (request.language_id.empty()) {
+        arch = opts_.default_arch;
+      } else if (!request.compiler_spec_id.empty()) {
+        arch = request.language_id + ":" + request.compiler_spec_id;
+      } else {
+        arch = request.language_id;
+      }
+      if (!pool_->loadBinary(request.program_path, arch, request.base_address,
+                             request.format)) {
+        return Status::Error(codes::kInvalidArgument,
+                             "cannot load " + request.program_path + ": " + pool_->getError());
+      }
+    } else {
+      return Status::Error(codes::kInvalidArgument, "program_path or project_path required");
+    }
+    // Auto-load state if configured and file exists (best-effort, primary only)
+    if (!opts_.state_path.empty()) {
+      pool_->loadState(opts_.state_path);
+    }
+    return Status::Ok();
+  }
+
+  /// `address` lies in the program's memory (unmapped_address otherwise).
+  Status requireMapped(std::uint64_t address) {
+    if (!pool_->primaryAdapter().isMapped(address)) {
+      return Status::Error(codes::kUnmappedAddress, "no memory block contains " + hex(address));
+    }
+    return Status::Ok();
+  }
+
+  /// The function a function-scoped write acts on: the one that starts at, or
+  /// contains, `address` -- the rule the reads use. unmapped_address when
+  /// no block contains it, not_found when no function does. Never creates one.
+  Status requireFunction(std::uint64_t address, std::uint64_t& entry) {
+    Status mapped = requireMapped(address);
+    if (!mapped.ok()) return mapped;
+    const std::optional<std::uint64_t> found =
+        pool_->primaryAdapter().functionEntryFor(address);
+    if (!found) return Status::Error(codes::kNotFound, "no function at " + hex(address));
+    entry = *found;
+    return Status::Ok();
+  }
+
+  /// requireFunction, then a parameter `ordinal` of its signature.
+  Status requireParameter(std::uint64_t address, int ordinal, std::uint64_t& entry) {
+    Status found = requireFunction(address, entry);
+    if (!found.ok()) return found;
+    if (ordinal < 0) {
+      return Status::Error(codes::kInvalidArgument, "parameter ordinal must be >= 0");
+    }
+    auto sig = pool_->primaryAdapter().getFunctionSignature(entry);
+    const std::size_t count = sig ? sig->parameters.size() : 0;
+    if (static_cast<std::size_t>(ordinal) >= count) {
+      return Status::Error(codes::kNotFound,
+                           "function " + (sig ? sig->function_name : hex(entry)) +
+                               " has no parameter " + std::to_string(ordinal) + " (it has " +
+                               std::to_string(count) + ")");
+    }
+    return Status::Ok();
+  }
+
+  /// `length` bytes from `address` can be written.
+  Status requireWritable(std::uint64_t address, std::uint64_t length, const std::string& what) {
+    switch (pool_->primaryAdapter().checkWritable(address, length)) {
+      case RangeStatus::kOk:
+        return Status::Ok();
+      case RangeStatus::kUnmapped:
+        return Status::Error(codes::kUnmappedAddress,
+                             what + "no memory block contains " + hex(address));
+      case RangeStatus::kPastMapped:
+        return Status::Error(codes::kAccessConflict,
+                             what + "the write at " + hex(address) + " runs past mapped memory");
+      case RangeStatus::kUninitialized:
+        return Status::Error(codes::kAccessConflict,
+                             what + "the write at " + hex(address) +
+                                 " reaches a block that holds no bytes");
+      case RangeStatus::kUnavailable:
+        return Status::Error(codes::kNotSupported,
+                             what + "the offline image holds no bytes at " + hex(address));
+    }
+    return Status::Error(codes::kInternalError, what + "unknown range status");
+  }
+
+  /// A name a new type may take (duplicate_name otherwise).
+  Status requireNewTypeName(const std::string& name) {
+    if (pool_->primaryAdapter().typeNameTaken(name)) {
+      return Status::Error(codes::kDuplicateName, "a type named '" + name + "' already exists");
+    }
+    return Status::Ok();
+  }
+
+  /// Run an engine write on every slot; the primary slot's failure decides the code.
+  Status decompilerWrite(const std::function<bool(ghidra_standalone::Decompiler&)>& apply) {
+    if (pool_->applyDecompilerMutationAllSlots(apply)) return Status::Ok();
+    if (pool_->getErrorKind() == EngineError::kNone) {
+      return Status::Error(codes::kInternalError, "the write did not apply on every decompiler slot");
+    }
+    return Status::Error(engine_code(pool_->getErrorKind()), pool_->getError());
+  }
+
+  /// Run an adapter write on every slot. Slot 0 runs first and validates; a
+  /// refusal there leaves every slot untouched (they hold the same state).
+  Status adapterWrite(const std::function<WriteStatus(detail::ArchAdapter&)>& apply) {
+    std::optional<WriteStatus> first;
+    const bool all = pool_->applyMutationAllSlots([&](detail::ArchAdapter& a) {
+      WriteStatus st = apply(a);
+      if (!first) first = st;
+      return st.ok();
+    });
+    if (!first) return Status::Error(codes::kInternalError, "no decompiler slot");
+    if (!first->ok()) return Status::Error(first->code, first->message);
+    if (!all) {
+      return Status::Error(codes::kInternalError, "the write did not apply on every decompiler slot");
+    }
+    return Status::Ok();
+  }
+
+  /// The vocabulary answer for a local rename/retype.
+  static Status localStatus(detail::LocalMutationStatus status, std::uint64_t entry,
+                            const std::string& local_id, const std::string& new_type) {
+    switch (status) {
+      case detail::LocalMutationStatus::kOk:
+        return Status::Ok();
+      case detail::LocalMutationStatus::kNotFound:
+        return Status::Error(codes::kNotFound, "no local matching id '" + local_id +
+                                                   "' in function at " + hex(entry));
+      case detail::LocalMutationStatus::kInvalidType:
+        return Status::Error(codes::kUnknownType, "unknown data type '" + new_type + "'");
+      case detail::LocalMutationStatus::kRetypeRejected:
+        return Status::Error(
+            codes::kInvalidArgument,
+            "the decompiler cannot retype local '" + local_id + "' to '" + new_type +
+                "': its size can only change when it is a single fixed storage "
+                "location (a stack slot), not a register temporary");
+      case detail::LocalMutationStatus::kDecompileFailed:
+        return Status::Error(codes::kInternalError,
+                             "could not decompile the function at " + hex(entry));
+    }
+    return Status::Error(codes::kInternalError, "unknown local mutation status");
   }
 
   /// Non-locking body of CloseProgram(). The caller MUST already hold req_mu_.
@@ -1669,15 +2285,15 @@ class LocalClient final : public IClient {
   /// without re-entering the non-recursive req_mu_ (which would self-deadlock).
   StatusOr<CloseProgramResponse> closeProgramLocked(ShutdownPolicy policy) {
     if (!program_loaded_) {
-      return StatusOr<CloseProgramResponse>::FromError("NO_PROGRAM",
+      return StatusOr<CloseProgramResponse>::FromError(codes::kNotLoaded,
                                                        "no program loaded");
     }
 
     const bool should_save = policy == ShutdownPolicy::kSave;
     if (should_save && !opts_.state_path.empty() &&
         !pool_->saveState(opts_.state_path)) {
-      return StatusOr<CloseProgramResponse>::FromError(
-          "SAVE_FAILED", pool_->getError());
+      return StatusOr<CloseProgramResponse>::FromError(codes::kInternalError,
+                                                       pool_->getError());
     }
 
     pool_->resetAdapters();
@@ -1689,24 +2305,11 @@ class LocalClient final : public IClient {
     return StatusOr<CloseProgramResponse>::FromValue(std::move(resp));
   }
 
-  /// Build a C prototype string from a FunctionSignatureRecord.
-  static std::string buildPrototypeString(const FunctionSignatureRecord& sig) {
-    std::string proto = sig.return_type + " " + sig.function_name + "(";
-    for (std::size_t i = 0; i < sig.parameters.size(); i++) {
-      if (i > 0) proto += ", ";
-      proto += sig.parameters[i].data_type + " " + sig.parameters[i].name;
-    }
-    if (sig.has_var_args) {
-      if (!sig.parameters.empty()) proto += ", ";
-      proto += "...";
-    }
-    proto += ")";
-    return proto;
-  }
-
   LocalClientOptions opts_;
   std::unique_ptr<detail::DecompilerPool> pool_;
   bool program_loaded_ = false;
+  // What OpenProgram loaded, for DiscardProgram to load again.
+  OpenProgramRequest open_request_;
   std::uint64_t revision_ = 0;
 
   // In-memory perf_benchmarks store. The offline backend has no persistent

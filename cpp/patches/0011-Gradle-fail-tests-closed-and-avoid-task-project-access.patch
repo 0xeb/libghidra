@@ -1,0 +1,62 @@
+diff --git a/gradle/javaTestProject.gradle b/gradle/javaTestProject.gradle
+index 4f7f75db33..d995b7a036 100644
+--- a/gradle/javaTestProject.gradle
++++ b/gradle/javaTestProject.gradle
+@@ -141,6 +141,7 @@ rootProject.combinedTestReport {
+  * Initialize test task
+  *********************************************************************************/
+ def initTestJVM(Task task, String rootDirName) {
++	def ownerProject = project
+ 
+ 	def testTempDir = file(rootTestDir).getAbsolutePath()
+ 	def testReportDir = file(reportDir).getAbsolutePath()
+@@ -157,12 +158,12 @@ def initTestJVM(Task task, String rootDirName) {
+ 		mkdir testOutputDir
+ 	}
+ 	// If false, testing will halt when an error is found.
+-	task.ignoreFailures = true
++	task.ignoreFailures = false
+ 	
+ 	// Whether or failure should occur if tests sources are present, but no tests are discovered
+ 	// during test execution. New for Gradle 9 (behavior is equivalent to false on Gradle 8).
+ 	if (task.hasProperty('failOnNoDiscoveredTests')) { // remove check when we require Gradle 9
+-		task.failOnNoDiscoveredTests = false
++		task.failOnNoDiscoveredTests = true
+ 	}
+ 	
+ 	// If false, then tests are re-run every time, even if no code has changed.
+@@ -228,7 +229,7 @@ def initTestJVM(Task task, String rootDirName) {
+ 			// 
+ 		]
+ 		
+-		if (hasApiProjectDependency(project, ":FileSystem")) {
++		if (hasApiProjectDependency(ownerProject, ":FileSystem")) {
+ 			// If project has a FileSystem dependency we must assume there may be a
+ 			// Ghidra ApplicationConfiguration that will attempt to configure a
+ 			// serial filter factory which must be done in a lazy fashion when gradle
+@@ -244,7 +245,7 @@ def initTestJVM(Task task, String rootDirName) {
+  *********************************************************************************/
+ def startTestTimer(Task task) {
+ 	project.ext.testStartTime = new Date()
+-	println ":" + task.project.name + ":" + task.name + " started: " + testStartTime;
++	println task.path + " started: " + testStartTime;
+ }
+ 
+ /*********************************************************************************
+@@ -252,7 +253,7 @@ def startTestTimer(Task task) {
+  *********************************************************************************/
+ def endTestTimer(Task task) {
+ 	Date endTime = new Date();
+-	println ":" + task.project.name + ":" + task.name + " ended: " + endTime;
++	println task.path + " ended: " + endTime;
+ 	
+ 	long elapsedMS = endTime.getTime() - testStartTime.getTime();
+ 	long msPerMin = 60 * 1000;
+@@ -260,6 +261,6 @@ def endTestTimer(Task task) {
+ 	long hrs = elapsedMS / msPerHour;
+ 	long mins = (elapsedMS - (hrs * msPerHour)) / msPerMin;
+ 	long secs = (elapsedMS - (hrs * msPerHour) - (mins * msPerMin)) / 1000;
+-	println ":" + task.project.name + ":" + task.name + " elapsed time: " +
++	println task.path + " elapsed time: " +
+ 		String.format("%d:%02d:%02d", hrs, mins, secs);
+ }

@@ -9,6 +9,8 @@
 #include <optional>
 #include <string>
 
+#include "libghidra/error_codes.hpp"
+
 namespace libghidra::client {
 
 struct Status {

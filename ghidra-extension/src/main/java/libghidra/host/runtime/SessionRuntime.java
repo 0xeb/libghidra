@@ -150,14 +150,14 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 					: new SessionContract.OpenProjectRequest("", "", false, false);
 			if (safeRequest.readOnly()) {
 				throw new SessionRpcException(
-					"NOT_SUPPORTED",
+					SessionRpcException.NOT_SUPPORTED,
 					"read-only project open is not supported by this host");
 			}
 			String projectPath = safeRequest.projectPath() != null ? safeRequest.projectPath().trim() : "";
 			String projectName = safeRequest.projectName() != null ? safeRequest.projectName().trim() : "";
 			if (projectPath.isBlank() || projectName.isBlank()) {
 				throw new SessionRpcException(
-					"invalid_argument",
+					SessionRpcException.INVALID_ARGUMENT,
 					"project_path and project_name are required");
 			}
 			String normalizedPath = ManagedProgramSupport.normalizeProjectPath(projectPath);
@@ -170,12 +170,24 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			}
 			if (currentProgram() != null) {
 				throw new SessionRpcException(
-					"conflict",
+					SessionRpcException.ACCESS_CONFLICT,
 					"close the current program before opening another project on this host");
+			}
+			ProjectLocator locator;
+			try {
+				locator = new ProjectLocator(projectPath, projectName);
+			}
+			catch (IllegalArgumentException e) {
+				throw SessionRpcException.from("open_project", e);
+			}
+			if (!safeRequest.create() && !locator.exists()) {
+				// Checked before the current project is closed: a failed open must not
+				// leave the host with no project at all.
+				throw SessionRpcException.notFound(
+					"no project '" + projectName + "' at " + projectPath);
 			}
 			closeProjectOnlyLocked();
 			try {
-				ProjectLocator locator = new ProjectLocator(projectPath, projectName);
 				Project opened = safeRequest.create()
 						? projectManager.createProject(locator, null, false)
 						: projectManager.openProject(locator, false, false);
@@ -201,11 +213,12 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			SessionContract.ShutdownPolicy policy = request != null
 					? request.shutdownPolicy()
 					: SessionContract.ShutdownPolicy.UNSPECIFIED;
-			if (currentProgram() != null && !closeManagedProgramLocked(policy)) {
-				return new SessionContract.CloseProjectResponse(false);
+			requireProjectLocked();
+			if (currentProgram() != null) {
+				closeManagedProgramLocked(policy);
 			}
-			boolean closed = closeProjectOnlyLocked();
-			return new SessionContract.CloseProjectResponse(closed);
+			closeProjectOnlyLocked();
+			return new SessionContract.CloseProjectResponse(true);
 		}
 	}
 
@@ -245,11 +258,11 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 						"", "", "", false, false, "", "", "", List.of(), List.of(), List.of());
 			String sourcePath = safeRequest.sourcePath() != null ? safeRequest.sourcePath().trim() : "";
 			if (sourcePath.isBlank()) {
-				throw new SessionRpcException("invalid_argument", "source_path is required");
+				throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT, "source_path is required");
 			}
 			File source = new File(sourcePath);
 			if (!source.isFile()) {
-				throw new SessionRpcException("not_found", "source binary not found: " + sourcePath);
+				throw new SessionRpcException(SessionRpcException.NOT_FOUND, "source binary not found: " + sourcePath);
 			}
 			String folderPath = normalizeProjectFolderPath(safeRequest.projectFolderPath());
 			try {
@@ -303,32 +316,28 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 	@Override
 	public SessionContract.CloseProgramResponse closeProgram(SessionContract.CloseProgramRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null) {
-				return new SessionContract.CloseProgramResponse(false);
-			}
+			requireProgram();
 			SessionContract.ShutdownPolicy policy = request != null
 					? request.shutdownPolicy()
 					: SessionContract.ShutdownPolicy.UNSPECIFIED;
-			return switch (controlMode) {
+			switch (controlMode) {
 				case ATTACHED_GUI ->
 					throw new SessionRpcException(
-						"NOT_SUPPORTED",
+						SessionRpcException.NOT_SUPPORTED,
 						"close_program() is not supported for an attached GUI host");
-				case FIXED_HEADLESS -> {
-					boolean ok = applyShutdownPolicyLocked(policy);
-					yield new SessionContract.CloseProgramResponse(ok);
-				}
-				case MANAGED_HEADLESS -> new SessionContract.CloseProgramResponse(
-					closeManagedProgramLocked(policy));
-			};
+				case FIXED_HEADLESS -> applyShutdownPolicyLocked(policy);
+				case MANAGED_HEADLESS -> closeManagedProgramLocked(policy);
+			}
+			return new SessionContract.CloseProgramResponse(true);
 		}
 	}
 
 	@Override
 	public SessionContract.SaveProgramResponse saveProgram(SessionContract.SaveProgramRequest request) {
 		try (LockScope ignored = writeLock()) {
-			return new SessionContract.SaveProgramResponse(saveProgramLocked(false));
+			requireProgram();
+			saveProgramLocked(false);
+			return new SessionContract.SaveProgramResponse(true);
 		}
 	}
 
@@ -336,7 +345,9 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 	public SessionContract.DiscardProgramResponse discardProgram(
 			SessionContract.DiscardProgramRequest request) {
 		try (LockScope ignored = writeLock()) {
-			return new SessionContract.DiscardProgramResponse(discardProgramLocked());
+			requireProgram();
+			discardProgramLocked();
+			return new SessionContract.DiscardProgramResponse(true);
 		}
 	}
 
@@ -359,8 +370,8 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			SessionContract.ShutdownPolicy policy = request != null
 					? request.shutdownPolicy()
 					: SessionContract.ShutdownPolicy.UNSPECIFIED;
-			boolean ok = applyShutdownPolicyLocked(policy);
-			return new SessionContract.ShutdownResponse(ok);
+			applyShutdownPolicyLocked(policy);
+			return new SessionContract.ShutdownResponse(true);
 		}
 	}
 
@@ -371,10 +382,10 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			Program program = requireProgram();
 			SessionContract.PerfBenchmarkRecord record = request != null ? request.record() : null;
 			if (record == null) {
-				throw new SessionRpcException("invalid_argument", "record is required");
+				throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT, "record is required");
 			}
 			if (record.benchId() == null || record.benchId().isBlank()) {
-				throw new SessionRpcException("invalid_argument", "bench_id is required");
+				throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT, "bench_id is required");
 			}
 			int tx = program.startTransaction("libghidra add perf benchmark");
 			boolean commit = false;
@@ -430,14 +441,16 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			Program program = requireProgram();
 			String benchId = request != null ? request.benchId() : null;
 			if (benchId == null || benchId.isBlank()) {
-				throw new SessionRpcException("invalid_argument", "bench_id is required");
+				throw SessionRpcException.invalidArgument("bench_id is required");
 			}
 			int tx = program.startTransaction("libghidra delete perf benchmark");
 			boolean commit = false;
 			try {
-				int removed = PerfBenchmarkStore.delete(program, benchId);
+				if (PerfBenchmarkStore.delete(program, benchId) <= 0) {
+					throw SessionRpcException.notFound("no perf benchmark '" + benchId + "'");
+				}
 				commit = true;
-				return new SessionContract.DeletePerfBenchmarkResponse(removed > 0);
+				return new SessionContract.DeletePerfBenchmarkResponse(true);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -514,7 +527,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			return describeCurrentProgram(program);
 		}
 		throw new SessionRpcException(
-			"NOT_SUPPORTED",
+			SessionRpcException.NOT_SUPPORTED,
 			"open_program() cannot switch the active program for an attached GUI host");
 	}
 
@@ -530,11 +543,11 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			SessionContract.OpenProgramRequest request) {
 		if (!matchesManagedProject(request)) {
 			throw new SessionRpcException(
-				"NOT_SUPPORTED",
+				SessionRpcException.NOT_SUPPORTED,
 				"managed headless hosts only operate on their configured project");
 		}
 		if (projectData == null) {
-			throw new SessionRpcException("not_found", "no project is open on this host");
+			throw new SessionRpcException(SessionRpcException.NOT_FOUND, "no project is open on this host");
 		}
 		String requestedProgramPath = request != null
 				? ManagedProgramSupport.normalizeProgramPath(request.programPath())
@@ -548,7 +561,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 				return describeCurrentProgram(current);
 			}
 			throw new SessionRpcException(
-				"conflict",
+				SessionRpcException.ACCESS_CONFLICT,
 				"close the current program before opening another one on this host");
 		}
 		try {
@@ -568,27 +581,20 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			return describeCurrentProgram(opened);
 		}
 		catch (IllegalArgumentException e) {
-			throw new SessionRpcException("not_found", e.getMessage());
+			throw new SessionRpcException(SessionRpcException.NOT_FOUND, e.getMessage());
 		}
 		catch (Exception e) {
 			String message = e.getMessage();
 			throw new SessionRpcException(
-				"internal_error",
+				SessionRpcException.INTERNAL_ERROR,
 				message != null && !message.isBlank() ? message : e.toString());
 		}
 	}
 
-	private boolean closeManagedProgramLocked(SessionContract.ShutdownPolicy policy) {
-		Program program = currentProgram();
-		if (program == null) {
-			return false;
-		}
-		boolean ok = applyShutdownPolicyLocked(policy);
-		if (!ok) {
-			return false;
-		}
+	/** Applies the close policy to the current program, then releases it. */
+	private void closeManagedProgramLocked(SessionContract.ShutdownPolicy policy) {
+		applyShutdownPolicyLocked(policy);
 		releaseOwnedProgramLocked();
-		return true;
 	}
 
 	private void releaseOwnedProgramLocked() {
@@ -611,14 +617,14 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 	private void requireManagedProjectLifecycle(String operation) {
 		if (controlMode != ControlMode.MANAGED_HEADLESS) {
 			throw new SessionRpcException(
-				"NOT_SUPPORTED",
+				SessionRpcException.NOT_SUPPORTED,
 				operation + " is only supported for managed headless hosts");
 		}
 	}
 
 	private Project requireProjectLocked() {
 		if (project == null || projectData == null) {
-			throw new SessionRpcException("not_found", "no project is open on this host");
+			throw new SessionRpcException(SessionRpcException.NOT_FOUND, "no project is open on this host");
 		}
 		return project;
 	}
@@ -638,6 +644,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		knownProgramFiles.clear();
 	}
 
+	/** Closes the open project, if any; true when one was closed. */
 	private boolean closeProjectOnlyLocked() {
 		if (project == null) {
 			projectData = null;
@@ -656,7 +663,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			return true;
 		}
 		catch (RuntimeException e) {
-			throw new SessionRpcException("internal_error", e.getMessage());
+			throw SessionRpcException.internalError(e.getMessage());
 		}
 	}
 
@@ -783,7 +790,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		String targetPath = ManagedProgramSupport.normalizeProgramPath(folderPath + "/" + name);
 		if (targetPath.equals(currentProgramPath())) {
 			throw new SessionRpcException(
-				"conflict",
+				SessionRpcException.ACCESS_CONFLICT,
 				"close the current program before overwriting it: " + targetPath);
 		}
 		DomainFile existing = projectData != null ? projectData.getFile(targetPath) : null;
@@ -805,13 +812,7 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 	}
 
 	private SessionRpcException toSessionException(String operation, Exception e) {
-		if (e instanceof SessionRpcException session) {
-			return session;
-		}
-		String message = e.getMessage();
-		return new SessionRpcException(
-			"internal_error",
-			operation + " failed: " + (message != null && !message.isBlank() ? message : e.toString()));
+		return SessionRpcException.from(operation + " failed", e);
 	}
 
 	private boolean matchesManagedProject(SessionContract.OpenProgramRequest request) {
@@ -881,20 +882,23 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 			sha256, executableFormat, entryPoint, hasEntryPoint);
 	}
 
-	private boolean applyShutdownPolicyLocked(SessionContract.ShutdownPolicy policy) {
+	/** Saves or discards the current program as {@code policy} says; a failure throws. */
+	private void applyShutdownPolicyLocked(SessionContract.ShutdownPolicy policy) {
 		if (currentProgram() == null) {
-			return true;
+			return;
 		}
 		SessionContract.ShutdownPolicy resolved = resolveShutdownPolicy(policy);
 		switch (resolved) {
 			case SAVE:
-				return saveProgramLocked(true);
+				saveProgramLocked(true);
+				break;
 			case DISCARD:
-				return discardProgramLocked();
+				discardProgramLocked();
+				break;
 			case NONE:
 			case UNSPECIFIED:
 			default:
-				return true;
+				break;
 		}
 	}
 
@@ -909,10 +913,11 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		return policy;
 	}
 
-	private boolean saveProgramLocked(boolean allowDeferredHeadless) {
+	/** Saves the current program; a save that cannot happen throws. */
+	private void saveProgramLocked(boolean allowDeferredHeadless) {
 		Program program = currentProgram();
 		if (program == null) {
-			return false;
+			throw new SessionRpcException(SessionRpcException.NOT_LOADED, "no current program");
 		}
 		final boolean isHeadless = "headless".equals(hostMode());
 		TransactionInfo txInfo = null;
@@ -952,10 +957,11 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 						this,
 						"deferring save until headless shutdown after active transaction '" +
 							txInfo.getDescription() + "'");
-					return true;
+					return;
 				}
 				Msg.warn(this, "save timed out waiting for active transaction: " + txInfo.getDescription());
-				return false;
+				throw new SessionRpcException(SessionRpcException.ACCESS_CONFLICT,
+					"save blocked: transaction '" + txInfo.getDescription() + "' is still open");
 			}
 			Msg.info(this, "transaction cleared, proceeding with save");
 		}
@@ -968,24 +974,24 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 		}
 		try {
 			program.save("libghidra save", TaskMonitor.DUMMY);
-			return true;
 		}
 		catch (IOException | CancelledException e) {
 			Msg.warn(this, "save failed (host_mode=" + hostMode() + ", canSave=" + canSave + "): " +
 				e.getMessage());
-			return false;
+			throw SessionRpcException.internalError("save failed: " + e.getMessage());
 		}
 		catch (RuntimeException e) {
 			Msg.warn(this, "runtime save failure (host_mode=" + hostMode() + ", canSave=" + canSave + "): " +
 				e.getMessage());
-			return false;
+			throw SessionRpcException.internalError("save failed: " + e.getMessage());
 		}
 	}
 
-	private boolean discardProgramLocked() {
+	/** Undoes every edit to the current program; a failure throws. */
+	private void discardProgramLocked() {
 		Program program = currentProgram();
 		if (program == null) {
-			return false;
+			throw new SessionRpcException(SessionRpcException.NOT_LOADED, "no current program");
 		}
 		try {
 			int count = 0;
@@ -996,10 +1002,9 @@ public final class SessionRuntime extends RuntimeSupport implements SessionOpera
 					break;
 				}
 			}
-			return true;
 		}
 		catch (IOException e) {
-			return false;
+			throw SessionRpcException.internalError("discard failed: " + e.getMessage());
 		}
 	}
 

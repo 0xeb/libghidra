@@ -424,6 +424,12 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						}
 
 						@Override
+						public FunctionsContract.CreateFunctionResponse createFunction(
+								FunctionsContract.CreateFunctionRequest request) {
+							return functionsHandler.createFunction(request);
+						}
+
+						@Override
 						public FunctionsContract.RenameFunctionResponse renameFunction(
 								FunctionsContract.RenameFunctionRequest request) {
 							return functionsHandler.renameFunction(request);
@@ -517,6 +523,12 @@ public class LibGhidraHostPlugin extends ProgramPlugin {
 						public SymbolsContract.ListSymbolsResponse listSymbols(
 								SymbolsContract.ListSymbolsRequest request) {
 							return symbolsHandler.listSymbols(request);
+						}
+
+						@Override
+						public SymbolsContract.CreateLabelResponse createLabel(
+								SymbolsContract.CreateLabelRequest request) {
+							return symbolsHandler.createLabel(request);
 						}
 
 						@Override

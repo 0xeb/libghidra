@@ -50,7 +50,9 @@ from .models import (
     CommentRecord,
     CreateTypeAliasResponse,
     CreateTypeEnumResponse,
+    CreateFunctionResponse,
     CreateFunctionTagResponse,
+    CreateLabelResponse,
     CreateTypeResponse,
     DataItemRecord,
     DecompileLocalKind,
@@ -827,6 +829,26 @@ class GhidraClient:
         )
         return ListFunctionsResponse(functions=[_to_function(f) for f in resp.functions])
 
+    def create_function(self, address: int, name: str | None = None) -> CreateFunctionResponse:
+        """Define a function whose entry is ``address``.
+
+        ``name=None`` takes the backend's default name (``FUN_<address>``). Errors:
+        ``UNMAPPED_ADDRESS``; ``DUPLICATE_NAME`` when a function already starts there;
+        ``INVALID_ARGUMENT`` when the address is not code or cannot start a function.
+        """
+        req = functions_pb2.CreateFunctionRequest(address=address)
+        if name is not None:
+            req.name = name
+        resp = self._call_rpc(
+            "libghidra.FunctionsService/CreateFunction",
+            req,
+            functions_pb2.CreateFunctionResponse,
+        )
+        return CreateFunctionResponse(
+            created=resp.created,
+            function=_to_function(resp.function) if resp.HasField("function") else None,
+        )
+
     def rename_function(self, address: int, new_name: str) -> RenameFunctionResponse:
         req = functions_pb2.RenameFunctionRequest(
             address=address, new_name=new_name,
@@ -1023,10 +1045,38 @@ class GhidraClient:
         )
         return ListSymbolsResponse(symbols=[_to_symbol(s) for s in resp.symbols])
 
-    def rename_symbol(self, address: int, new_name: str) -> RenameSymbolResponse:
+    def create_label(self, address: int, name: str) -> CreateLabelResponse:
+        """Add the label ``name`` at ``address``; it never renames another symbol.
+
+        The address keeps its symbols; the label is primary only when it had none.
+        Errors: ``UNMAPPED_ADDRESS``; ``DUPLICATE_NAME`` when a symbol of that name is
+        already at the address; ``INVALID_ARGUMENT`` for a blank or invalid name.
+        """
+        req = symbols_pb2.CreateLabelRequest(address=address, name=name)
+        resp = self._call_rpc(
+            "libghidra.SymbolsService/CreateLabel",
+            req,
+            symbols_pb2.CreateLabelResponse,
+        )
+        return CreateLabelResponse(
+            created=resp.created,
+            symbol=_to_symbol(resp.symbol) if resp.HasField("symbol") else None,
+        )
+
+    def rename_symbol(
+        self, address: int, new_name: str, old_name: str | None = None,
+    ) -> RenameSymbolResponse:
+        """Rename a symbol at ``address``.
+
+        With ``old_name`` set, exactly the symbol of that name is renamed, primary or
+        not (``NOT_FOUND`` when the address has none). Unset, the primary symbol is
+        renamed, or a label is created when the address has none.
+        """
         req = symbols_pb2.RenameSymbolRequest(
             address=address, new_name=new_name,
         )
+        if old_name is not None:
+            req.old_name = old_name
         resp = self._call_rpc(
             "libghidra.SymbolsService/RenameSymbol",
             req,

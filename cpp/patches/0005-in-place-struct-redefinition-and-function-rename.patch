@@ -1,0 +1,70 @@
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/funcdata.hh	2026-10-01 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/funcdata.hh	2026-10-01 00:00:00.000000000 -0700
+@@ -139,6 +139,7 @@ public:
+   ~Funcdata(void);							///< Destructor
+   const string &getName(void) const { return name; }			///< Get the function's local symbol name
+   const string &getDisplayName(void) const { return displayName; }	///< Get the name to display in output
++  void setName(const string &nm) { name = nm; displayName = nm; }	///< Rename (the caller renames the function's symbol)
+   const Address &getAddress(void) const { return baseaddr; }		///< Get the entry point address
+   int4 getSize(void) const { return size; }				///< Get the function body size in bytes
+   Architecture *getArch(void) const { return glb; }			///< Get the program/architecture owning \b this function
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc	2026-10-01 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc	2026-10-01 00:00:00.000000000 -0700
+@@ -4803,6 +4803,46 @@ void TypeFactory::assignRawFields(TypeUnion *ct,vector<TypeField> &fd)
+   glb->types->setFields(fd,ct,newSize,newAlign,flags);
+ }
+ 
++/// \brief Replace the fields of an existing structure in place
++///
++/// Unlike setFields(), the structure may already be complete. It keeps its identity -- name, id,
++/// and every pointer, array or prototype that refers to it -- so an edit reaches every user of the
++/// data-type, where destroying and recreating it would leave those users pointing at freed memory.
++/// Typedefs of the structure (which are copies of it) receive the same fields.
++/// Field offsets are taken as given; the caller supplies the new size and alignment.
++/// \param ct is the structure to redefine
++/// \param fd is the new list of fields
++/// \param bit is the new list of bitfields
++/// \param newSize is the new size of the structure in bytes
++/// \param newAlign is the new alignment of the structure
++void TypeFactory::redefineStruct(TypeStruct *ct,const vector<TypeField> &fd,const vector<TypeBitField> &bit,
++				 int4 newSize,int4 newAlign)
++{
++  uint4 newFlags = bit.empty() ? 0 : (uint4)Datatype::has_bitfields;
++  for(int4 i=0;i<fd.size();++i) {
++    if (fd[i].type->getMetatype() == TYPE_VOID)
++      throw LowlevelError("Illegal field void in structure: "+ct->getName());
++    if (fd[i].type->hasBitfields())
++      newFlags |= Datatype::has_bitfields;
++  }
++  vector<TypeStruct *> targets(1,ct);
++  for(DatatypeSet::const_iterator iter=tree.begin();iter!=tree.end();++iter) {
++    Datatype *dt = *iter;
++    if (dt != ct && dt->getTypedef() == ct && dt->getMetatype() == TYPE_STRUCT)
++      targets.push_back((TypeStruct *)dt);
++  }
++  for(int4 i=0;i<targets.size();++i) {
++    TypeStruct *st = targets[i];
++    tree.erase(st);		// The tree is ordered by the fields
++    st->flags &= ~(uint4)(Datatype::has_bitfields | Datatype::needs_resolution);
++    st->setFields(fd,bit,newSize,newAlign);
++    st->flags |= newFlags;
++    tree.insert(st);
++    recalcPointerSubmeta(st, SUB_PTR);
++    recalcPointerSubmeta(st, SUB_PTR_STRUCT);
++  }
++}
++
+ /// The indicated Datatype object is removed from this container.
+ /// Indirect references (via TypeArray TypeStruct etc.) are not affected
+ /// \param ct is the data-type to destroy
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh	2026-10-01 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh	2026-10-01 00:00:00.000000000 -0700
+@@ -938,6 +938,8 @@ public:
+   Datatype *getExactPiece(Datatype *ct,int4 offset,int4 size);	///< Get the data-type associated with piece of a structured data-type
+   void assignRawFields(TypeStruct *ct,vector<TypeField> &fd,vector<TypeBitField> &bit);
+   void assignRawFields(TypeUnion *ct,vector<TypeField> &fd);
++  void redefineStruct(TypeStruct *ct,const vector<TypeField> &fd,const vector<TypeBitField> &bit,
++		      int4 newSize,int4 newAlign);	///< Replace the fields of an existing structure in place
+   void destroyType(Datatype *ct);				///< Remove a data-type from \b this
+   Datatype *concretize(Datatype *ct);				///< Convert given data-type to concrete form
+   void dependentOrder(vector<Datatype *> &deporder) const;	///< Place all data-types in dependency order

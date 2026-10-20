@@ -38,12 +38,21 @@ public final class SymbolsServiceHandler {
 		return runtime.listSymbols(request);
 	}
 
+	public SymbolsContract.CreateLabelResponse createLabel(
+			SymbolsContract.CreateLabelRequest request) {
+		if (request == null) {
+			request = new SymbolsContract.CreateLabelRequest(0L, "");
+		}
+		return runtime.createLabel(request);
+	}
+
 	public SymbolsContract.RenameSymbolResponse renameSymbol(
 			SymbolsContract.RenameSymbolRequest request) {
 		if (request == null) {
 			request = new SymbolsContract.RenameSymbolRequest(
 				0L,
-				"");
+				"",
+				null);
 		}
 		return runtime.renameSymbol(request);
 	}

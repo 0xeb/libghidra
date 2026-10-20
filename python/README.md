@@ -220,8 +220,8 @@ core host operations, including the exact xref helpers.
 | Health | `get_status`, `get_capabilities` |
 | Session | `open_project`, `close_project`, `list_project_files`, `import_program`, `open_program`, `close_program`, `save_program`, `discard_program`, `get_revision`, `shutdown` |
 | Memory | `read_bytes`, `write_bytes`, `patch_bytes_batch`, `list_memory_blocks` |
-| Functions | `get_function`, `list_functions`, `rename_function`, `list_basic_blocks`, `list_cfg_edges`, `list_switch_tables`, `list_dominators`, `list_post_dominators`, `list_loops`, `list_function_tags`, `create_function_tag`, `delete_function_tag`, `list_function_tag_mappings`, `tag_function`, `untag_function` |
-| Symbols | `get_symbol`, `list_symbols`, `rename_symbol`, `delete_symbol` |
+| Functions | `get_function`, `list_functions`, `create_function`, `rename_function`, `list_basic_blocks`, `list_cfg_edges`, `list_switch_tables`, `list_dominators`, `list_post_dominators`, `list_loops`, `list_function_tags`, `create_function_tag`, `delete_function_tag`, `list_function_tag_mappings`, `tag_function`, `untag_function` |
+| Symbols | `get_symbol`, `list_symbols`, `create_label`, `rename_symbol`, `delete_symbol` |
 | Xrefs | `list_xrefs`, `list_xrefs_to`, `list_xrefs_from_function`, `list_xrefs_to_function` |
 | Types | `get_type`, `list_types`, `list_type_aliases`, `list_type_unions`, `list_type_enums`, `list_type_enum_members`, `list_type_members`, `get_function_signature`, `list_function_signatures`, `set_function_signature`, `rename_function_parameter`, `set_function_parameter_type`, `rename_function_local`, `set_function_local_type`, `apply_data_type`, `create_type`, `delete_type`, `rename_type`, `create_type_alias`, `delete_type_alias`, `set_type_alias_target`, `create_type_enum`, `delete_type_enum`, `add_type_enum_member`, `delete_type_enum_member`, `rename_type_enum_member`, `set_type_enum_member_value`, `add_type_member`, `delete_type_member`, `rename_type_member`, `set_type_member_type`, `parse_declarations` |
 | Decompiler | `get_decompilation`, `list_decompilations` |

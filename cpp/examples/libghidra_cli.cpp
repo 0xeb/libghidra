@@ -127,9 +127,9 @@ static std::unique_ptr<ghidra::Client> smart_open(const std::string& binary,
   // If no state file, auto-name PE exports/entry
   if (state_file.empty() && is_pe) {
     if (pe_out.entryPointFileOffset != 0)
-      client->RenameFunction(pe_out.entryPointFileOffset, "entry");
+      client->CreateFunction(pe_out.entryPointFileOffset, "entry");
     for (const auto& exp : pe_out.exports) {
-      if (exp.fileOffset != 0) client->RenameFunction(exp.fileOffset, exp.name);
+      if (exp.fileOffset != 0) client->CreateFunction(exp.fileOffset, exp.name);
     }
   }
 
@@ -353,8 +353,16 @@ static int cmd_name(int argc, char* argv[]) {
   auto client = smart_open(binary, ghidra_root, arch, state_file, pe);
   if (!client) return 1;
 
+  // Rename the function there, or define one with that name (a rename never
+  // creates a function).
   auto r = client->RenameFunction(addr, name);
-  if (!r.ok()) {
+  if (!r.ok() && r.status.code == libghidra::client::error_codes::kNotFound) {
+    auto c = client->CreateFunction(addr, name);
+    if (!c.ok()) {
+      std::cerr << "Error naming function: " << c.status.message << "\n";
+      return 1;
+    }
+  } else if (!r.ok()) {
     std::cerr << "Error naming function: " << r.status.message << "\n";
     return 1;
   }

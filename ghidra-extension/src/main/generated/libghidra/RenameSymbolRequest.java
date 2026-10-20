@@ -32,6 +32,7 @@ private static final long serialVersionUID = 0L;
   }
   private RenameSymbolRequest() {
     newName_ = "";
+    oldName_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -47,6 +48,7 @@ private static final long serialVersionUID = 0L;
             libghidra.RenameSymbolRequest.class, libghidra.RenameSymbolRequest.Builder.class);
   }
 
+  private int bitField0_;
   public static final int ADDRESS_FIELD_NUMBER = 2;
   private long address_ = 0L;
   /**
@@ -97,6 +99,68 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int OLD_NAME_FIELD_NUMBER = 4;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object oldName_ = "";
+  /**
+   * <pre>
+   * Which symbol at the address to rename. Set: exactly the symbol of that name
+   * (not_found if the address has none). Unset: the address's primary symbol.
+   * </pre>
+   *
+   * <code>optional string old_name = 4;</code>
+   * @return Whether the oldName field is set.
+   */
+  @java.lang.Override
+  public boolean hasOldName() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <pre>
+   * Which symbol at the address to rename. Set: exactly the symbol of that name
+   * (not_found if the address has none). Unset: the address's primary symbol.
+   * </pre>
+   *
+   * <code>optional string old_name = 4;</code>
+   * @return The oldName.
+   */
+  @java.lang.Override
+  public java.lang.String getOldName() {
+    java.lang.Object ref = oldName_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      oldName_ = s;
+      return s;
+    }
+  }
+  /**
+   * <pre>
+   * Which symbol at the address to rename. Set: exactly the symbol of that name
+   * (not_found if the address has none). Unset: the address's primary symbol.
+   * </pre>
+   *
+   * <code>optional string old_name = 4;</code>
+   * @return The bytes for oldName.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getOldNameBytes() {
+    java.lang.Object ref = oldName_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      oldName_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -117,6 +181,9 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(newName_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 3, newName_);
     }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 4, oldName_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -132,6 +199,9 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(newName_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(3, newName_);
+    }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(4, oldName_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -152,6 +222,11 @@ private static final long serialVersionUID = 0L;
         != other.getAddress()) return false;
     if (!getNewName()
         .equals(other.getNewName())) return false;
+    if (hasOldName() != other.hasOldName()) return false;
+    if (hasOldName()) {
+      if (!getOldName()
+          .equals(other.getOldName())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -168,6 +243,10 @@ private static final long serialVersionUID = 0L;
         getAddress());
     hash = (37 * hash) + NEW_NAME_FIELD_NUMBER;
     hash = (53 * hash) + getNewName().hashCode();
+    if (hasOldName()) {
+      hash = (37 * hash) + OLD_NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getOldName().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -305,6 +384,7 @@ private static final long serialVersionUID = 0L;
       bitField0_ = 0;
       address_ = 0L;
       newName_ = "";
+      oldName_ = "";
       return this;
     }
 
@@ -344,6 +424,12 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.newName_ = newName_;
       }
+      int to_bitField0_ = 0;
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.oldName_ = oldName_;
+        to_bitField0_ |= 0x00000001;
+      }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -364,6 +450,11 @@ private static final long serialVersionUID = 0L;
       if (!other.getNewName().isEmpty()) {
         newName_ = other.newName_;
         bitField0_ |= 0x00000002;
+        onChanged();
+      }
+      if (other.hasOldName()) {
+        oldName_ = other.oldName_;
+        bitField0_ |= 0x00000004;
         onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
@@ -402,6 +493,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000002;
               break;
             } // case 26
+            case 34: {
+              oldName_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 34
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -519,6 +615,115 @@ private static final long serialVersionUID = 0L;
       checkByteStringIsUtf8(value);
       newName_ = value;
       bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object oldName_ = "";
+    /**
+     * <pre>
+     * Which symbol at the address to rename. Set: exactly the symbol of that name
+     * (not_found if the address has none). Unset: the address's primary symbol.
+     * </pre>
+     *
+     * <code>optional string old_name = 4;</code>
+     * @return Whether the oldName field is set.
+     */
+    public boolean hasOldName() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <pre>
+     * Which symbol at the address to rename. Set: exactly the symbol of that name
+     * (not_found if the address has none). Unset: the address's primary symbol.
+     * </pre>
+     *
+     * <code>optional string old_name = 4;</code>
+     * @return The oldName.
+     */
+    public java.lang.String getOldName() {
+      java.lang.Object ref = oldName_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        oldName_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <pre>
+     * Which symbol at the address to rename. Set: exactly the symbol of that name
+     * (not_found if the address has none). Unset: the address's primary symbol.
+     * </pre>
+     *
+     * <code>optional string old_name = 4;</code>
+     * @return The bytes for oldName.
+     */
+    public com.google.protobuf.ByteString
+        getOldNameBytes() {
+      java.lang.Object ref = oldName_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        oldName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <pre>
+     * Which symbol at the address to rename. Set: exactly the symbol of that name
+     * (not_found if the address has none). Unset: the address's primary symbol.
+     * </pre>
+     *
+     * <code>optional string old_name = 4;</code>
+     * @param value The oldName to set.
+     * @return This builder for chaining.
+     */
+    public Builder setOldName(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      oldName_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Which symbol at the address to rename. Set: exactly the symbol of that name
+     * (not_found if the address has none). Unset: the address's primary symbol.
+     * </pre>
+     *
+     * <code>optional string old_name = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearOldName() {
+      oldName_ = getDefaultInstance().getOldName();
+      bitField0_ = (bitField0_ & ~0x00000004);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Which symbol at the address to rename. Set: exactly the symbol of that name
+     * (not_found if the address has none). Unset: the address's primary symbol.
+     * </pre>
+     *
+     * <code>optional string old_name = 4;</code>
+     * @param value The bytes for oldName to set.
+     * @return This builder for chaining.
+     */
+    public Builder setOldNameBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      oldName_ = value;
+      bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }

@@ -143,16 +143,16 @@ install and no Java at runtime.
 
 ```bash
 # Linux x86_64 (RHEL 8+, Ubuntu 20.04+, Debian 11+, Fedora 29+)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.9/libghidra-0.0.9-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 
 # Linux aarch64 (Raspberry Pi 4/5 on 64-bit OS, Ubuntu/Debian arm64)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.9/libghidra-0.0.9-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
 
 # macOS Apple Silicon (M1/M2/M3/M4)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.9/libghidra-0.0.9-cp312-abi3-macosx_26_0_arm64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-macosx_26_0_arm64.whl
 
 # Windows x64
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.9/libghidra-0.0.9-cp312-abi3-win_amd64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-win_amd64.whl
 ```
 
 Inspecting an executable **file** offline (rather than a live program) also
@@ -162,11 +162,11 @@ matching Ghidra `language_id`; you can still pass one explicitly on
 `OpenProgramRequest`.
 
 ```bash
-pip install "libghidra[local] @ https://github.com/0xeb/libghidra/releases/download/v0.0.9/libghidra-0.0.9-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+pip install "libghidra[local] @ https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
 ```
 
 No wheel for your platform (Intel Mac, Windows on Arm)? The pure-Python
-fallback `libghidra-0.0.9-py3-none-any.whl` inside `libghidra-python-v0.0.9.zip`
+fallback `libghidra-0.0.10-py3-none-any.whl` inside `libghidra-python-v0.0.10.zip`
 on the release page gives you the HTTP/RPC client only -- no local backend.
 
 From a clone, for contributors:
@@ -283,6 +283,16 @@ escalating to a bounded force-kill. `detach()` is the explicit exception: it
 disarms ownership and leaves the host running after the client exits, and the
 caller then owns shutdown, project locks, and cleanup.
 
+## Editing implicit parameters
+
+The Java host supports direct name and type edits of implicit parameters such
+as C++ `this`. Before editing an auto-parameter, it converts the function to
+custom variable storage, preserves the current parameter locations, and refetches
+the editable parameter. Conversion and mutation share one transaction, so a
+failed edit rolls back both. Direct edits of explicit parameters retain the
+function's existing storage policy. Review the complete signature after an
+implicit-parameter edit, since subsequent signature changes use custom storage.
+
 ## Building the C++ SDK
 
 ```bash
@@ -306,11 +316,17 @@ needs a Ghidra **source** checkout.
 To also build the offline backend:
 
 ```bash
-# 1) Apply libghidra's patches to Ghidra's C++ decompiler source. CI does this
+# 1) Apply libghidra's patches to the full Ghidra source tree. CI does this
 #    before every release build. Skipping it leaves some local loads failing or
-#    mis-detecting architecture metadata -- and one patch (rawloadimage) is what
+#    mis-detecting architecture metadata -- one patch (rawloadimage) is what
 #    stops a single short read from silently turning every later image read
-#    into zeros.
+#    into zeros, one (per-architecture sleigh translator) is what lets two
+#    local clients of the same language live in one process, and one (in-place
+#    struct redefinition and function rename) lets the offline backend edit a
+#    type or rename a function without leaving the engine pointing at freed
+#    memory.
+#    The series also carries Java parser, import-analyzer, and test-runner fixes
+#    for builds of the Ghidra runtime from source.
 cd /path/to/ghidra-source
 for p in /path/to/libghidra/cpp/patches/*.patch; do patch -p1 < "$p"; done
 cd -
@@ -429,6 +445,15 @@ Typed RPCs across 10 domain service areas, defined in
 [`proto/libghidra/`](proto/libghidra/): 110 domain RPCs plus one transport RPC.
 Transport is binary protobuf over `POST /rpc` (not gRPC). See
 [proto/README.md](proto/README.md).
+
+**Not found.** A single-record read (`GetFunction`, `GetSymbol`, `GetInstruction`,
+`DecompileFunction`, `GetPcode`, `GetType`, `GetFunctionSignature`) that names
+nothing succeeds with the record absent: the response field is unset on the wire,
+so it reads as an empty optional / `None`, never as a placeholder record at
+address 0. An address inside a function names that function (the decompilation,
+signature or function that contains it); an instruction must start at the
+address. With no program open these reads fail with `not_loaded`, like every
+other read. The offline `LocalClient` answers the same way.
 
 Exact-from-function xref responses carry source and destination function
 identity, so call-graph views stay bounded without an RPC per edge. The live

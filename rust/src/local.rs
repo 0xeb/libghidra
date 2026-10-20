@@ -18,15 +18,16 @@ use serde_json::Value;
 use crate::error::{Error, ErrorCode, Result};
 use crate::local_ffi::ffi;
 use crate::models::{
-    BasicBlockRecord, CFGEdgeRecord, Capability, DecompilationRecord, DecompileLocalKind,
-    DecompileLocalRecord, DecompileTokenKind, DecompileTokenRecord, DefinedStringRecord,
-    FunctionRecord, GetDecompilationResponse, GetFunctionResponse, GetInstructionResponse,
-    GetSymbolResponse, GetTypeResponse, HealthStatus, InstructionRecord, ListBasicBlocksResponse,
-    ListCFGEdgesResponse, ListDecompilationsResponse, ListDefinedStringsResponse,
-    ListFunctionsResponse, ListInstructionsResponse, ListMemoryBlocksResponse, ListSymbolsResponse,
-    ListTypeMembersResponse, ListTypesResponse, ListXrefsResponse, MemoryBlockRecord,
-    OpenProgramRequest, OpenProgramResponse, ReadBytesResponse, RenameFunctionResponse,
-    RenameSymbolResponse, RevisionResponse, SymbolRecord, TypeMemberRecord, TypeRecord, XrefRecord,
+    BasicBlockRecord, CFGEdgeRecord, Capability, CreateFunctionResponse, CreateLabelResponse,
+    DecompilationRecord, DecompileLocalKind, DecompileLocalRecord, DecompileTokenKind,
+    DecompileTokenRecord, DefinedStringRecord, FunctionRecord, GetDecompilationResponse,
+    GetFunctionResponse, GetInstructionResponse, GetSymbolResponse, GetTypeResponse, HealthStatus,
+    InstructionRecord, ListBasicBlocksResponse, ListCFGEdgesResponse, ListDecompilationsResponse,
+    ListDefinedStringsResponse, ListFunctionsResponse, ListInstructionsResponse,
+    ListMemoryBlocksResponse, ListSymbolsResponse, ListTypeMembersResponse, ListTypesResponse,
+    ListXrefsResponse, MemoryBlockRecord, OpenProgramRequest, OpenProgramResponse,
+    ReadBytesResponse, RenameFunctionResponse, RenameSymbolResponse, RevisionResponse,
+    SymbolRecord, TypeMemberRecord, TypeRecord, XrefRecord,
 };
 
 // ===========================================================================
@@ -204,7 +205,7 @@ impl LocalClient {
 
     /// Functions that make no call, from the reference index Ghidra recorded
     /// during analysis. Needs a program opened from a Ghidra project
-    /// (`project_path`); a bare binary returns `NOT_SUPPORTED`.
+    /// (`project_path`); a bare binary returns `not_supported`.
     pub fn list_leaf_functions(
         &self,
         range_start: u64,
@@ -222,6 +223,27 @@ impl LocalClient {
                 .as_array()
                 .map(|arr| arr.iter().map(decode_function).collect())
                 .unwrap_or_default(),
+        })
+    }
+
+    /// Same signature as [`crate::GhidraClient::create_function`]: define a function
+    /// whose entry is `address`; `None` takes the default name (`FUN_<address>`).
+    pub fn create_function(
+        &self,
+        address: u64,
+        name: Option<&str>,
+    ) -> Result<CreateFunctionResponse> {
+        let v = call_json(self.handle.create_function_json(
+            address,
+            name.is_some(),
+            name.unwrap_or(""),
+        ))?;
+        Ok(CreateFunctionResponse {
+            created: v["created"].as_bool().unwrap_or(false),
+            function: v
+                .get("function")
+                .filter(|f| f.is_object())
+                .map(decode_function),
         })
     }
 
@@ -345,8 +367,31 @@ impl LocalClient {
         })
     }
 
-    pub fn rename_symbol(&self, address: u64, new_name: &str) -> Result<RenameSymbolResponse> {
-        let v = call_json(self.handle.rename_symbol_json(address, new_name))?;
+    /// Same signature as [`crate::GhidraClient::create_label`]: add the label `name` at
+    /// `address`; it never renames another symbol.
+    pub fn create_label(&self, address: u64, name: &str) -> Result<CreateLabelResponse> {
+        let v = call_json(self.handle.create_label_json(address, name))?;
+        Ok(CreateLabelResponse {
+            created: v["created"].as_bool().unwrap_or(false),
+            symbol: v.get("symbol").filter(|s| s.is_object()).map(decode_symbol),
+        })
+    }
+
+    /// Same signature as [`crate::GhidraClient::rename_symbol`]: with `old_name`,
+    /// exactly the symbol of that name is renamed (`NotFound` when the address has
+    /// none); without it, the primary symbol, or a label is created.
+    pub fn rename_symbol(
+        &self,
+        address: u64,
+        new_name: &str,
+        old_name: Option<&str>,
+    ) -> Result<RenameSymbolResponse> {
+        let v = call_json(self.handle.rename_symbol_json(
+            address,
+            new_name,
+            old_name.is_some(),
+            old_name.unwrap_or(""),
+        ))?;
         Ok(RenameSymbolResponse {
             renamed: v["renamed"].as_bool().unwrap_or(false),
             name: take_str(&v, "name"),

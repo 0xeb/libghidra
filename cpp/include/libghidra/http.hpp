@@ -101,6 +101,8 @@ class HttpClient final : public IClient {
                                                     std::uint64_t range_end,
                                                     int limit,
                                                     int offset) override;
+  StatusOr<CreateFunctionResponse> CreateFunction(
+      std::uint64_t address, const std::optional<std::string>& name) override;
   StatusOr<RenameFunctionResponse> RenameFunction(std::uint64_t address,
                                                   const std::string& new_name) override;
   StatusOr<ListBasicBlocksResponse> ListBasicBlocks(std::uint64_t range_start,
@@ -146,8 +148,11 @@ class HttpClient final : public IClient {
                                             std::uint64_t range_end,
                                             int limit,
                                             int offset) override;
-  StatusOr<RenameSymbolResponse> RenameSymbol(std::uint64_t address,
-                                              const std::string& new_name) override;
+  StatusOr<CreateLabelResponse> CreateLabel(std::uint64_t address,
+                                            const std::string& name) override;
+  StatusOr<RenameSymbolResponse> RenameSymbol(
+      std::uint64_t address, const std::string& new_name,
+      const std::optional<std::string>& old_name = std::nullopt) override;
   StatusOr<DeleteSymbolResponse> DeleteSymbol(std::uint64_t address,
                                               const std::string& name_filter) override;
   StatusOr<ListXrefsResponse> ListXrefs(std::uint64_t range_start,

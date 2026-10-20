@@ -134,16 +134,15 @@ public final class XrefsRuntime extends RuntimeSupport implements XrefsOperation
 					Address functionAddress = toAddress(program, request.functionAddress());
 					Function function = program.getFunctionManager().getFunctionAt(functionAddress);
 					if (function == null) {
-						// Distinguish "there is no function starting here" from "this
-						// function makes no references". Returning an empty list for
-						// both is indistinguishable to the caller, and the asymmetry
-						// is easy to hit because getFunctionAt() requires an EXACT
-						// entry point while GetFunction accepts any interior address
-						// and resolves it to the containing function -- so the same
-						// address can work for one call and silently yield nothing here.
-						throw new SessionRpcException("not_found",
-							"no function starts at address 0x" +
-								Long.toHexString(request.functionAddress()));
+						// A function filter, not a single-record read: the rows are the
+						// references whose source function STARTS at the address, so an
+						// address that is no function's entry (inside a body, or no function
+						// at all) selects nothing. Empty, like ListXrefsToFunction and
+						// ListFunctionTagMappings, and row-equivalent to filtering a full
+						// scan on from_function_address. ("An address inside a function
+						// names that function" governs single-record reads and
+						// function-scoped writes; it does not widen a list filter.)
+						return new XrefsContract.ListXrefsResponse(List.of());
 					}
 					List<XrefsContract.XrefRecord> rows = new ArrayList<>();
 					int seen = 0;

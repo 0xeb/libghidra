@@ -6,6 +6,12 @@
 package libghidra;
 
 /**
+ * <pre>
+ * Not found: `type` is unset when no data type has that path or name.
+ * With no program open the call fails with the RpcResponse error code
+ * "not_loaded".
+ * </pre>
+ *
  * Protobuf type {@code libghidra.GetTypeResponse}
  */
 public final class GetTypeResponse extends
@@ -232,6 +238,12 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * Not found: `type` is unset when no data type has that path or name.
+   * With no program open the call fails with the RpcResponse error code
+   * "not_loaded".
+   * </pre>
+   *
    * Protobuf type {@code libghidra.GetTypeResponse}
    */
   public static final class Builder extends

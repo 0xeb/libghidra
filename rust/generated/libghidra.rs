@@ -169,6 +169,11 @@ pub struct DecompileFunctionRequest {
     #[prost(uint32, tag = "3")]
     pub timeout_ms: u32,
 }
+/// Not found: `decompilation` is unset when no function contains the address.
+/// A function the decompiler cannot finish is a record with completed = false
+/// and error_message set.
+/// With no program open the call fails with the RpcResponse error code
+/// "not_loaded".
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DecompileFunctionResponse {
     #[prost(message, optional, tag = "1")]
@@ -248,6 +253,9 @@ pub struct GetPcodeRequest {
     #[prost(enumeration = "PcodeMaturity", tag = "4")]
     pub maturity: i32,
 }
+/// Not found: `pcode` is unset when no function contains the address.
+/// With no program open the call fails with the RpcResponse error code
+/// "not_loaded".
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetPcodeResponse {
     #[prost(message, optional, tag = "1")]
@@ -400,6 +408,10 @@ pub struct GetFunctionRequest {
     #[prost(uint64, tag = "2")]
     pub address: u64,
 }
+/// Not found: `function` is unset when no function starts at, or contains, the
+/// address (an interior address names the function that contains it).
+/// With no program open the call fails with the RpcResponse error code
+/// "not_loaded".
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetFunctionResponse {
     #[prost(message, optional, tag = "1")]
@@ -432,6 +444,31 @@ pub struct RenameFunctionResponse {
     pub renamed: bool,
     #[prost(string, tag = "2")]
     pub name: ::prost::alloc::string::String,
+}
+/// Define a new function whose entry is `address`, optionally naming it. An
+/// absent `name` takes the backend's default (FUN_<address>).
+///
+/// Errors (RpcResponse error_code):
+///    unmapped_address  no memory block contains the address
+///    duplicate_name    a function already starts at the address
+///    invalid_argument  the address is not code, or cannot start a function
+///    not_loaded        no program is open
+///
+/// Field 1 reserved for future common request context.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateFunctionRequest {
+    #[prost(uint64, tag = "2")]
+    pub address: u64,
+    #[prost(string, optional, tag = "3")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
+}
+/// On success `created` is true and `function` is the new function's record.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateFunctionResponse {
+    #[prost(bool, tag = "1")]
+    pub created: bool,
+    #[prost(message, optional, tag = "2")]
+    pub function: ::core::option::Option<FunctionRecord>,
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct BasicBlockRecord {
@@ -791,6 +828,10 @@ pub struct GetInstructionRequest {
     #[prost(uint64, tag = "2")]
     pub address: u64,
 }
+/// Not found: `instruction` is unset unless an instruction of the listing
+/// starts at the address (not inside one, not in data, not unmapped).
+/// With no program open the call fails with the RpcResponse error code
+/// "not_loaded".
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetInstructionResponse {
     #[prost(message, optional, tag = "1")]
@@ -1389,10 +1430,42 @@ pub struct RpcRequest {
     #[prost(message, optional, tag = "2")]
     pub payload: ::core::option::Option<::prost_types::Any>,
 }
+/// The answer to every RPC. success=true carries the payload; success=false carries
+/// error_code and a human-readable error_message.
+///
+/// Write contract: a write either succeeds with its effect, every flag in its
+/// response true, or fails with an error_code below. It never answers success
+/// with a false flag.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RpcResponse {
     #[prost(bool, tag = "1")]
     pub success: bool,
+    /// One lower-snake code from this vocabulary, the only codes an RPC answers:
+    ///    not_found             the target does not exist: no function, type, member
+    ///                          ordinal, local, parameter, tag, breakpoint, bookmark,
+    ///                          comment, data item, symbol, option, job or benchmark
+    ///    unmapped_address      no memory block contains the address
+    ///    not_loaded            no program is open (any program-scoped RPC)
+    ///    invalid_argument      the request is malformed or names the wrong kind of
+    ///                          thing (a struct where an enum is required, an address
+    ///                          inside an instruction, an overlapping block)
+    ///    duplicate_name        the name a create or rename asks for is taken
+    ///    not_supported         this backend or host mode cannot do it
+    ///    parse_error           a C declaration or prototype does not parse
+    ///    uninitialized_memory  the block exists but holds no bytes
+    ///    access_conflict       the host is busy with conflicting state: another
+    ///                          program is open, a transaction is held, it is closing
+    ///    analysis_running      an analysis job owns the program
+    ///    cancelled             the request or job was cancelled
+    ///    internal_error        the engine failed; the message says how
+    ///    unknown_method        the method name is not an RPC
+    ///    invalid_payload       the payload does not decode as the method's request
+    ///    config_error          the host or client is misconfigured
+    ///    unknown_type          a type named as an argument (a member, parameter or
+    ///                          local type, an alias target) does not resolve; a
+    ///                          missing target type is not_found
+    /// The HTTP transport can also refuse a request before any RPC runs
+    /// (unauthorized, server_busy, invalid_method); those are not RPC results.
     #[prost(string, tag = "2")]
     pub error_code: ::prost::alloc::string::String,
     #[prost(string, tag = "3")]
@@ -1782,6 +1855,10 @@ pub struct GetSymbolRequest {
     #[prost(uint64, tag = "2")]
     pub address: u64,
 }
+/// Not found: `symbol` is unset when no memory block backs the address or no
+/// symbol is there.
+/// With no program open the call fails with the RpcResponse error code
+/// "not_loaded".
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetSymbolResponse {
     #[prost(message, optional, tag = "1")]
@@ -1807,6 +1884,10 @@ pub struct RenameSymbolRequest {
     pub address: u64,
     #[prost(string, tag = "3")]
     pub new_name: ::prost::alloc::string::String,
+    /// Which symbol at the address to rename. Set: exactly the symbol of that name
+    /// (not_found if the address has none). Unset: the address's primary symbol.
+    #[prost(string, optional, tag = "4")]
+    pub old_name: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RenameSymbolResponse {
@@ -1814,6 +1895,32 @@ pub struct RenameSymbolResponse {
     pub renamed: bool,
     #[prost(string, tag = "2")]
     pub name: ::prost::alloc::string::String,
+}
+/// Add a label `name` at `address`. It never renames: an address that already
+/// has symbols keeps them and gains this one (primary only when the address had no
+/// symbol). The label is USER_DEFINED in the global namespace.
+///
+/// Errors (RpcResponse error_code):
+///    unmapped_address  no memory block contains the address
+///    duplicate_name    a symbol of that name is already at the address
+///    invalid_argument  the name is blank or not a valid symbol name
+///    not_loaded        no program is open
+///
+/// Field 1 reserved for future common request context.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateLabelRequest {
+    #[prost(uint64, tag = "2")]
+    pub address: u64,
+    #[prost(string, tag = "3")]
+    pub name: ::prost::alloc::string::String,
+}
+/// On success `created` is true and `symbol` is the new label's record.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateLabelResponse {
+    #[prost(bool, tag = "1")]
+    pub created: bool,
+    #[prost(message, optional, tag = "2")]
+    pub symbol: ::core::option::Option<SymbolRecord>,
 }
 /// Field 1 reserved for future common request context.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1970,6 +2077,9 @@ pub struct GetTypeRequest {
     #[prost(string, tag = "2")]
     pub path: ::prost::alloc::string::String,
 }
+/// Not found: `type` is unset when no data type has that path or name.
+/// With no program open the call fails with the RpcResponse error code
+/// "not_loaded".
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetTypeResponse {
     #[prost(message, optional, tag = "1")]
@@ -2059,6 +2169,9 @@ pub struct GetFunctionSignatureRequest {
     #[prost(uint64, tag = "2")]
     pub address: u64,
 }
+/// Not found: `signature` is unset when no function contains the address.
+/// With no program open the call fails with the RpcResponse error code
+/// "not_loaded".
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetFunctionSignatureResponse {
     #[prost(message, optional, tag = "1")]
@@ -2441,6 +2554,10 @@ pub struct ParseDeclarationsRequest {
     #[prost(string, tag = "2")]
     pub source_text: ::prost::alloc::string::String,
 }
+/// `types_created` counts the named types the text created (structures, unions,
+/// enums, typedefs, function definitions) and `type_names` lists their paths; a
+/// pointer or array type the text needed is not counted. All or nothing: text
+/// that does not parse is the error parse_error and creates no type.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ParseDeclarationsResponse {
     #[prost(int32, tag = "1")]

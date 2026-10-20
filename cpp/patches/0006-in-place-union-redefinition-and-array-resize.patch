@@ -1,0 +1,76 @@
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc	2026-10-02 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc	2026-10-02 00:00:00.000000000 -0700
+@@ -4858,6 +4858,62 @@ void TypeFactory::destroyType(Datatype *ct)
+   delete ct;
+ }
+ 
++/// \brief Replace the fields of an existing union in place
++///
++/// The union counterpart of redefineStruct(): the union may already be complete, and it keeps its
++/// name, id and every reference to it. Typedefs of the union (which are copies of it) receive the
++/// same fields. The caller supplies the new size and alignment.
++/// \param ct is the union to redefine
++/// \param fd is the new list of fields (each at offset 0, ident its ordinal)
++/// \param newSize is the new size of the union in bytes
++/// \param newAlign is the new alignment of the union
++void TypeFactory::redefineUnion(TypeUnion *ct,const vector<TypeField> &fd,int4 newSize,int4 newAlign)
++
++{
++  for(int4 i=0;i<fd.size();++i) {
++    if (fd[i].type->getMetatype() == TYPE_VOID)
++      throw LowlevelError("Illegal field void in union: "+ct->getName());
++  }
++  vector<TypeUnion *> targets(1,ct);
++  for(DatatypeSet::const_iterator iter=tree.begin();iter!=tree.end();++iter) {
++    Datatype *dt = *iter;
++    if (dt != ct && dt->getTypedef() == ct && dt->getMetatype() == TYPE_UNION)
++      targets.push_back((TypeUnion *)dt);
++  }
++  for(int4 i=0;i<targets.size();++i) {
++    TypeUnion *un = targets[i];
++    tree.erase(un);		// The tree is ordered by the fields
++    un->setFields(fd,newSize,newAlign);
++    un->flags &= ~(uint4)Datatype::type_incomplete;
++    tree.insert(un);
++  }
++}
++
++/// \brief Recompute the size of an existing array from its element
++///
++/// An array's size is fixed when it is created (number of elements times the element's aligned
++/// size). After the element data-type is redefined in place with a different size, the array and
++/// its typedef copies are given the new size and alignment, keeping their identity.
++/// \param ct is the array to resize
++void TypeFactory::resizeArray(TypeArray *ct)
++
++{
++  vector<TypeArray *> targets(1,ct);
++  for(DatatypeSet::const_iterator iter=tree.begin();iter!=tree.end();++iter) {
++    Datatype *dt = *iter;
++    if (dt != ct && dt->getTypedef() == ct && dt->getMetatype() == TYPE_ARRAY)
++      targets.push_back((TypeArray *)dt);
++  }
++  for(int4 i=0;i<targets.size();++i) {
++    TypeArray *ar = targets[i];
++    tree.erase(ar);		// The tree is ordered by size
++    ar->size = ar->arraysize * ar->arrayof->getAlignSize();
++    ar->alignment = ar->arrayof->getAlignment();
++    ar->alignSize = Datatype::calcAlignSize(ar->size,ar->alignment);
++    tree.insert(ar);
++  }
++}
++
+ /// The data-type propagation system can push around data-types that are \e partial or are
+ /// otherwise unrepresentable in the source language.  This method substitutes those data-types
+ /// with a concrete data-type that is representable, or returns the same data-type if is already concrete.
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh	2026-10-02 00:00:00.000000000 -0700
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh	2026-10-02 00:00:00.000000000 -0700
+@@ -943,6 +943,8 @@ public:
+   void destroyType(Datatype *ct);				///< Remove a data-type from \b this
+   Datatype *concretize(Datatype *ct);				///< Convert given data-type to concrete form
+   void dependentOrder(vector<Datatype *> &deporder) const;	///< Place all data-types in dependency order
++  void redefineUnion(TypeUnion *ct,const vector<TypeField> &fd,int4 newSize,int4 newAlign);	///< Replace the fields of an existing union in place
++  void resizeArray(TypeArray *ct);				///< Recompute an array's size after its element changed size
+   void encode(Encoder &encoder) const;			///< Encode \b this container to stream
+   void encodeCoreTypes(Encoder &encoder) const;		///< Encode core types to stream
+   void decode(Decoder &decoder);			///< Decode \b this from a \<typegrp> element

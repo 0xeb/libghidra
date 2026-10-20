@@ -17,6 +17,9 @@ public interface FunctionsOperations {
 	FunctionsContract.ListFunctionsResponse listLeafFunctions(
 		FunctionsContract.ListFunctionsRequest request);
 
+	FunctionsContract.CreateFunctionResponse createFunction(
+		FunctionsContract.CreateFunctionRequest request);
+
 	FunctionsContract.RenameFunctionResponse renameFunction(
 		FunctionsContract.RenameFunctionRequest request);
 

@@ -70,7 +70,7 @@ public final class HostState {
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			throw new SessionRpcException("cancelled", "interrupted while waiting for the host lock");
+			throw new SessionRpcException(SessionRpcException.CANCELLED, "interrupted while waiting for the host lock");
 		}
 		LockScope scope = LockScope.adopt(lock);
 		if (closing) {
@@ -317,14 +317,14 @@ public final class HostState {
 
 	private SessionRpcException analysisRunningException() {
 		return new SessionRpcException(
-			"analysis_running",
+			SessionRpcException.ANALYSIS_RUNNING,
 			"analysis job " + analysisJobId +
 				" owns the program; poll ListAnalysisJobs until it finishes, or CancelAnalysis");
 	}
 
 	private static SessionRpcException hostClosingException() {
 		return new SessionRpcException(
-			"host_closing",
+			SessionRpcException.ACCESS_CONFLICT,
 			"libghidra host is closing or switching programs; retry after the UI settles");
 	}
 

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
 
 #include "libghidra/status.hpp"
@@ -27,6 +28,12 @@ class IFunctionsClient {
                                                             std::uint64_t range_end,
                                                             int limit,
                                                             int offset) = 0;
+  // Define a function whose entry is `address`; an unset `name` takes the
+  // backend's default (FUN_<address>). Errors: unmapped_address, duplicate_name
+  // (a function already starts there), invalid_argument (not code / cannot start
+  // a function), not_loaded.
+  virtual StatusOr<CreateFunctionResponse> CreateFunction(
+      std::uint64_t address, const std::optional<std::string>& name) = 0;
   virtual StatusOr<RenameFunctionResponse> RenameFunction(std::uint64_t address,
                                                           const std::string& new_name) = 0;
   virtual StatusOr<ListBasicBlocksResponse> ListBasicBlocks(std::uint64_t range_start,

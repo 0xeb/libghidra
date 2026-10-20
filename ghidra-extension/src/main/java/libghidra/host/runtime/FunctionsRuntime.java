@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import ghidra.app.cmd.function.CreateFunctionCmd;
 import ghidra.app.decompiler.DecompInterface;
 import ghidra.app.decompiler.DecompileResults;
 import ghidra.graph.DefaultGEdge;
@@ -45,9 +46,9 @@ import ghidra.program.model.pcode.HighFunction;
 import ghidra.program.model.pcode.JumpTable;
 import ghidra.program.model.pcode.PcodeBlock;
 import ghidra.program.model.symbol.SourceType;
+import ghidra.program.model.symbol.SymbolUtilities;
 import ghidra.program.model.symbol.Reference;
 import ghidra.program.model.symbol.ReferenceManager;
-import ghidra.util.Msg;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.exception.DuplicateNameException;
 import ghidra.util.exception.InvalidInputException;
@@ -64,8 +65,9 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 	public FunctionsContract.GetFunctionResponse getFunction(
 			FunctionsContract.GetFunctionRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
+			// No program open is an error (not_loaded), never "not found".
+			Program program = requireProgram();
+			if (request == null) {
 				return new FunctionsContract.GetFunctionResponse(null);
 			}
 			try {
@@ -225,37 +227,84 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 		return false;
 	}
 
+	/**
+	 * Defines a function whose entry is the address, through Ghidra's
+	 * {@link CreateFunctionCmd}: the body follows flow from the entry, and any of it an
+	 * existing function already holds is carved out of that function (Ghidra's own
+	 * "Create Function" behaviour). An unset name takes Ghidra's default name: a
+	 * non-default label already at the entry, else {@code FUN_<address>}.
+	 *
+	 * Errors: {@code unmapped_address} outside every memory block; {@code duplicate_name}
+	 * when a function already starts there; {@code invalid_argument} when no instruction
+	 * starts there (data, undefined bytes or the middle of an instruction -- a function
+	 * is never laid over anything but code), for a blank or invalid name, or when
+	 * Ghidra cannot create it.
+	 */
+	@Override
+	public FunctionsContract.CreateFunctionResponse createFunction(
+			FunctionsContract.CreateFunctionRequest request) {
+		try (LockScope ignored = writeLock()) {
+			Program program = requireProgram();
+			requireRequest(request);
+			String name = null;
+			if (request.name() != null) {
+				name = requireText(request.name(), "function name");
+				try {
+					SymbolUtilities.validateName(name);
+				}
+				catch (InvalidInputException e) {
+					throw SessionRpcException.from("create function", e);
+				}
+			}
+			Address entry = requireMappedAddress(program, request.address());
+			String where = "0x" + Long.toHexString(request.address());
+			FunctionManager functions = program.getFunctionManager();
+			Function existing = functions.getFunctionAt(entry);
+			if (existing != null) {
+				throw SessionRpcException.duplicateName(
+					"function '" + existing.getName() + "' already starts at " + where);
+			}
+			if (program.getListing().getInstructionAt(entry) == null) {
+				throw SessionRpcException.invalidArgument(
+					"no instruction starts at " + where + "; a function entry must be code");
+			}
+			int tx = program.startTransaction("libghidra create function");
+			boolean commit = false;
+			try {
+				CreateFunctionCmd cmd = new CreateFunctionCmd(name, entry, null,
+					name != null ? SourceType.USER_DEFINED : SourceType.DEFAULT);
+				boolean applied = cmd.applyTo(program, TaskMonitor.DUMMY);
+				Function created = functions.getFunctionAt(entry);
+				if (!applied || created == null) {
+					String why = cmd.getStatusMsg();
+					throw SessionRpcException.invalidArgument("cannot create a function at " + where +
+						(why != null && !why.isBlank() ? ": " + why : ""));
+				}
+				commit = true;
+				return new FunctionsContract.CreateFunctionResponse(
+					true, RuntimeMappers.toFunctionRecord(created));
+			}
+			finally {
+				program.endTransaction(tx, commit);
+				if (commit) {
+					flushProgramEvents(program);
+				}
+			}
+		}
+	}
+
+	/** Renames the function at, or containing, the address. It never creates a function. */
 	@Override
 	public FunctionsContract.RenameFunctionResponse renameFunction(
 			FunctionsContract.RenameFunctionRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new FunctionsContract.RenameFunctionResponse(
-					false,
-					"",
-					"not_loaded",
-					"no current program");
-			}
-			String newName = request.newName() != null ? request.newName().trim() : "";
-			if (newName.isEmpty()) {
-				return new FunctionsContract.RenameFunctionResponse(
-					false,
-					"",
-					"invalid_argument",
-					"new function name is empty");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			String newName = requireText(request.newName(), "new function name");
+			Function function = requireFunction(program, request.address());
 			int tx = program.startTransaction("libghidra rename function");
 			boolean commit = false;
 			try {
-				Function function = FunctionSupport.resolveFunction(program, request.address());
-				if (function == null) {
-					return new FunctionsContract.RenameFunctionResponse(
-						false,
-						"",
-						"not_found",
-						"function not found at 0x" + Long.toHexString(request.address()));
-				}
 				function.setName(newName, SourceType.USER_DEFINED);
 				commit = true;
 				return new FunctionsContract.RenameFunctionResponse(
@@ -265,13 +314,7 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 					"");
 			}
 			catch (IllegalArgumentException | DuplicateNameException | InvalidInputException e) {
-				Msg.error(this, "renameFunction failed: " + e.getMessage(), e);
-				String code = e instanceof DuplicateNameException ? "duplicate_name" : "invalid_argument";
-				return new FunctionsContract.RenameFunctionResponse(
-					false,
-					"",
-					code,
-					nullableString(e.getMessage()));
+				throw SessionRpcException.from("rename function", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -411,22 +454,24 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 	public FunctionsContract.CreateFunctionTagResponse createFunctionTag(
 			FunctionsContract.CreateFunctionTagRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new FunctionsContract.CreateFunctionTagResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			String name = requireText(request.name(), "tag name");
+			FunctionTagManager mgr = program.getFunctionManager().getFunctionTagManager();
+			if (mgr.getFunctionTag(name) != null) {
+				throw SessionRpcException.duplicateName("function tag '" + name + "' already exists");
 			}
 			int txId = program.startTransaction("createFunctionTag");
+			boolean commit = false;
 			try {
-				FunctionTagManager mgr = program.getFunctionManager().getFunctionTagManager();
-				FunctionTag existing = mgr.getFunctionTag(request.name());
-				if (existing != null) {
-					return new FunctionsContract.CreateFunctionTagResponse(false);
+				if (mgr.createFunctionTag(name, request.comment() != null ? request.comment() : "") == null) {
+					throw SessionRpcException.internalError("Ghidra created no function tag '" + name + "'");
 				}
-				mgr.createFunctionTag(request.name(), request.comment() != null ? request.comment() : "");
+				commit = true;
 				return new FunctionsContract.CreateFunctionTagResponse(true);
 			}
 			finally {
-				program.endTransaction(txId, true);
+				program.endTransaction(txId, commit);
 			}
 		}
 	}
@@ -435,22 +480,22 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 	public FunctionsContract.DeleteFunctionTagResponse deleteFunctionTag(
 			FunctionsContract.DeleteFunctionTagRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new FunctionsContract.DeleteFunctionTagResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			String name = requireText(request.name(), "tag name");
+			FunctionTag tag = program.getFunctionManager().getFunctionTagManager().getFunctionTag(name);
+			if (tag == null) {
+				throw SessionRpcException.notFound("no function tag named '" + name + "'");
 			}
 			int txId = program.startTransaction("deleteFunctionTag");
+			boolean commit = false;
 			try {
-				FunctionTagManager mgr = program.getFunctionManager().getFunctionTagManager();
-				FunctionTag tag = mgr.getFunctionTag(request.name());
-				if (tag == null) {
-					return new FunctionsContract.DeleteFunctionTagResponse(false);
-				}
 				tag.delete();
+				commit = true;
 				return new FunctionsContract.DeleteFunctionTagResponse(true);
 			}
 			finally {
-				program.endTransaction(txId, true);
+				program.endTransaction(txId, commit);
 			}
 		}
 	}
@@ -478,55 +523,65 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 		}
 	}
 
+	/** Tags the function at, or containing, the address; a missing tag is created (an upsert). */
 	@Override
 	public FunctionsContract.TagFunctionResponse tagFunction(
 			FunctionsContract.TagFunctionRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new FunctionsContract.TagFunctionResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			String tagName = requireText(request.tagName(), "tag name");
+			Function func = requireFunction(program, request.functionEntry());
 			int txId = program.startTransaction("tagFunction");
+			boolean commit = false;
 			try {
-				Function func = program.getFunctionManager().getFunctionAt(
-					toAddress(program, request.functionEntry()));
-				if (func == null) {
-					return new FunctionsContract.TagFunctionResponse(false);
-				}
 				FunctionTagManager mgr = program.getFunctionManager().getFunctionTagManager();
-				FunctionTag tag = mgr.getFunctionTag(request.tagName());
+				FunctionTag tag = mgr.getFunctionTag(tagName);
 				if (tag == null) {
-					tag = mgr.createFunctionTag(request.tagName(), "");
+					tag = mgr.createFunctionTag(tagName, "");
 				}
-				func.addTag(tag.getName());
+				if (tag == null || !func.addTag(tag.getName())) {
+					throw SessionRpcException.internalError("tag '" + tagName +
+						"' was not applied to " + func.getName());
+				}
+				commit = true;
 				return new FunctionsContract.TagFunctionResponse(true);
 			}
 			finally {
-				program.endTransaction(txId, true);
+				program.endTransaction(txId, commit);
 			}
 		}
 	}
 
+	/**
+	 * Removes a tag from the function at, or containing, the address. A tag that does
+	 * not exist, or is not applied to that function, is {@code not_found}.
+	 */
 	@Override
 	public FunctionsContract.UntagFunctionResponse untagFunction(
 			FunctionsContract.UntagFunctionRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new FunctionsContract.UntagFunctionResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			String tagName = requireText(request.tagName(), "tag name");
+			Function func = requireFunction(program, request.functionEntry());
+			if (program.getFunctionManager().getFunctionTagManager().getFunctionTag(tagName) == null) {
+				throw SessionRpcException.notFound("no function tag named '" + tagName + "'");
+			}
+			boolean applied = func.getTags().stream().anyMatch(t -> tagName.equals(t.getName()));
+			if (!applied) {
+				throw SessionRpcException.notFound("tag '" + tagName + "' is not applied to " +
+					func.getName() + " at " + func.getEntryPoint());
 			}
 			int txId = program.startTransaction("untagFunction");
+			boolean commit = false;
 			try {
-				Function func = program.getFunctionManager().getFunctionAt(
-					toAddress(program, request.functionEntry()));
-				if (func == null) {
-					return new FunctionsContract.UntagFunctionResponse(false);
-				}
-				func.removeTag(request.tagName());
+				func.removeTag(tagName);
+				commit = true;
 				return new FunctionsContract.UntagFunctionResponse(true);
 			}
 			finally {
-				program.endTransaction(txId, true);
+				program.endTransaction(txId, commit);
 			}
 		}
 	}
@@ -883,7 +938,7 @@ public final class FunctionsRuntime extends RuntimeSupport implements FunctionsO
 				if (message == null || message.isBlank()) {
 					message = e.toString();
 				}
-				throw new SessionRpcException("internal_error",
+				throw new SessionRpcException(SessionRpcException.INTERNAL_ERROR,
 					"listFunctionFrames failed: " + message);
 			}
 		}

@@ -44,9 +44,24 @@ public final class SymbolsContract {
 	public record ListSymbolsResponse(List<SymbolRecord> symbols) {
 	}
 
+	public record CreateLabelRequest(
+		long address,
+		String name) {
+	}
+
+	public record CreateLabelResponse(
+		boolean created,
+		SymbolRecord symbol) {
+	}
+
+	/**
+	 * {@code oldName} is null when the caller left it unset (rename the primary symbol);
+	 * set, it names exactly the symbol at the address to rename.
+	 */
 	public record RenameSymbolRequest(
 		long address,
-		String newName) {
+		String newName,
+		String oldName) {
 	}
 
 	public record RenameSymbolResponse(

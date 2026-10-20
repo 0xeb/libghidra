@@ -243,10 +243,15 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 				if (!shutdownPolicyApplied.get()) {
 					applyShutdownPolicy();
 				}
-				runtimes.session().releaseOwnedProgram();
 			}
 			catch (Exception e) {
 				ghidra.util.Msg.error(this, "shutdown policy failed: " + e.getMessage(), e);
+			}
+			try {
+				runtimes.session().releaseOwnedProgram();
+			}
+			catch (Exception e) {
+				ghidra.util.Msg.error(this, "program release failed: " + e.getMessage(), e);
 			}
 			closed = true;
 		}
@@ -469,6 +474,12 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			}
 
 			@Override
+			public FunctionsContract.CreateFunctionResponse createFunction(
+					FunctionsContract.CreateFunctionRequest request) {
+				return functionsHandler.createFunction(request);
+			}
+
+			@Override
 			public FunctionsContract.RenameFunctionResponse renameFunction(
 					FunctionsContract.RenameFunctionRequest request) {
 				return functionsHandler.renameFunction(request);
@@ -562,6 +573,12 @@ public final class LibGhidraHeadlessHost implements AutoCloseable {
 			public SymbolsContract.ListSymbolsResponse listSymbols(
 					SymbolsContract.ListSymbolsRequest request) {
 				return symbolsHandler.listSymbols(request);
+			}
+
+			@Override
+			public SymbolsContract.CreateLabelResponse createLabel(
+					SymbolsContract.CreateLabelRequest request) {
+				return symbolsHandler.createLabel(request);
 			}
 
 			@Override

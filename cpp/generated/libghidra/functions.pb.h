@@ -60,6 +60,12 @@ extern BasicBlockRecordDefaultTypeInternal _BasicBlockRecord_default_instance_;
 class CFGEdgeRecord;
 struct CFGEdgeRecordDefaultTypeInternal;
 extern CFGEdgeRecordDefaultTypeInternal _CFGEdgeRecord_default_instance_;
+class CreateFunctionRequest;
+struct CreateFunctionRequestDefaultTypeInternal;
+extern CreateFunctionRequestDefaultTypeInternal _CreateFunctionRequest_default_instance_;
+class CreateFunctionResponse;
+struct CreateFunctionResponseDefaultTypeInternal;
+extern CreateFunctionResponseDefaultTypeInternal _CreateFunctionResponse_default_instance_;
 class CreateFunctionTagRequest;
 struct CreateFunctionTagRequestDefaultTypeInternal;
 extern CreateFunctionTagRequestDefaultTypeInternal _CreateFunctionTagRequest_default_instance_;
@@ -258,7 +264,7 @@ class UntagFunctionResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const UntagFunctionResponse*>(
         &_UntagFunctionResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 26;
+  static constexpr int kIndexInFileMessages = 28;
   friend void swap(UntagFunctionResponse& a, UntagFunctionResponse& b) { a.Swap(&b); }
   inline void Swap(UntagFunctionResponse* other) {
     if (other == this) return;
@@ -448,7 +454,7 @@ class UntagFunctionRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const UntagFunctionRequest*>(
         &_UntagFunctionRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 25;
+  static constexpr int kIndexInFileMessages = 27;
   friend void swap(UntagFunctionRequest& a, UntagFunctionRequest& b) { a.Swap(&b); }
   inline void Swap(UntagFunctionRequest* other) {
     if (other == this) return;
@@ -656,7 +662,7 @@ class TagFunctionResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const TagFunctionResponse*>(
         &_TagFunctionResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 24;
+  static constexpr int kIndexInFileMessages = 26;
   friend void swap(TagFunctionResponse& a, TagFunctionResponse& b) { a.Swap(&b); }
   inline void Swap(TagFunctionResponse* other) {
     if (other == this) return;
@@ -846,7 +852,7 @@ class TagFunctionRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const TagFunctionRequest*>(
         &_TagFunctionRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 23;
+  static constexpr int kIndexInFileMessages = 25;
   friend void swap(TagFunctionRequest& a, TagFunctionRequest& b) { a.Swap(&b); }
   inline void Swap(TagFunctionRequest* other) {
     if (other == this) return;
@@ -1054,7 +1060,7 @@ class SwitchCaseRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const SwitchCaseRecord*>(
         &_SwitchCaseRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 27;
+  static constexpr int kIndexInFileMessages = 29;
   friend void swap(SwitchCaseRecord& a, SwitchCaseRecord& b) { a.Swap(&b); }
   inline void Swap(SwitchCaseRecord* other) {
     if (other == this) return;
@@ -1256,7 +1262,7 @@ class StackVariableRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const StackVariableRecord*>(
         &_StackVariableRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 40;
+  static constexpr int kIndexInFileMessages = 42;
   friend void swap(StackVariableRecord& a, StackVariableRecord& b) { a.Swap(&b); }
   inline void Swap(StackVariableRecord* other) {
     if (other == this) return;
@@ -1970,7 +1976,7 @@ class PostDominatorRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const PostDominatorRecord*>(
         &_PostDominatorRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 34;
+  static constexpr int kIndexInFileMessages = 36;
   friend void swap(PostDominatorRecord& a, PostDominatorRecord& b) { a.Swap(&b); }
   inline void Swap(PostDominatorRecord* other) {
     if (other == this) return;
@@ -2208,7 +2214,7 @@ class LoopRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const LoopRecord*>(
         &_LoopRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 37;
+  static constexpr int kIndexInFileMessages = 39;
   friend void swap(LoopRecord& a, LoopRecord& b) { a.Swap(&b); }
   inline void Swap(LoopRecord* other) {
     if (other == this) return;
@@ -2463,7 +2469,7 @@ class ListFunctionTagsRequest final : public ::google::protobuf::internal::ZeroF
     return reinterpret_cast<const ListFunctionTagsRequest*>(
         &_ListFunctionTagsRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 14;
+  static constexpr int kIndexInFileMessages = 16;
   friend void swap(ListFunctionTagsRequest& a, ListFunctionTagsRequest& b) { a.Swap(&b); }
   inline void Swap(ListFunctionTagsRequest* other) {
     if (other == this) return;
@@ -2609,7 +2615,7 @@ class ListFunctionTagMappingsRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const ListFunctionTagMappingsRequest*>(
         &_ListFunctionTagMappingsRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 21;
+  static constexpr int kIndexInFileMessages = 23;
   friend void swap(ListFunctionTagMappingsRequest& a, ListFunctionTagMappingsRequest& b) { a.Swap(&b); }
   inline void Swap(ListFunctionTagMappingsRequest* other) {
     if (other == this) return;
@@ -2989,7 +2995,7 @@ class FunctionTagRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const FunctionTagRecord*>(
         &_FunctionTagRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 13;
+  static constexpr int kIndexInFileMessages = 15;
   friend void swap(FunctionTagRecord& a, FunctionTagRecord& b) { a.Swap(&b); }
   inline void Swap(FunctionTagRecord* other) {
     if (other == this) return;
@@ -3203,7 +3209,7 @@ class FunctionTagMappingRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const FunctionTagMappingRecord*>(
         &_FunctionTagMappingRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 20;
+  static constexpr int kIndexInFileMessages = 22;
   friend void swap(FunctionTagMappingRecord& a, FunctionTagMappingRecord& b) { a.Swap(&b); }
   inline void Swap(FunctionTagMappingRecord* other) {
     if (other == this) return;
@@ -3715,7 +3721,7 @@ class DominatorRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const DominatorRecord*>(
         &_DominatorRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 31;
+  static constexpr int kIndexInFileMessages = 33;
   friend void swap(DominatorRecord& a, DominatorRecord& b) { a.Swap(&b); }
   inline void Swap(DominatorRecord* other) {
     if (other == this) return;
@@ -3953,7 +3959,7 @@ class DeleteFunctionTagResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const DeleteFunctionTagResponse*>(
         &_DeleteFunctionTagResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 19;
+  static constexpr int kIndexInFileMessages = 21;
   friend void swap(DeleteFunctionTagResponse& a, DeleteFunctionTagResponse& b) { a.Swap(&b); }
   inline void Swap(DeleteFunctionTagResponse* other) {
     if (other == this) return;
@@ -4143,7 +4149,7 @@ class DeleteFunctionTagRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const DeleteFunctionTagRequest*>(
         &_DeleteFunctionTagRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 18;
+  static constexpr int kIndexInFileMessages = 20;
   friend void swap(DeleteFunctionTagRequest& a, DeleteFunctionTagRequest& b) { a.Swap(&b); }
   inline void Swap(DeleteFunctionTagRequest* other) {
     if (other == this) return;
@@ -4339,7 +4345,7 @@ class CreateFunctionTagResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const CreateFunctionTagResponse*>(
         &_CreateFunctionTagResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 17;
+  static constexpr int kIndexInFileMessages = 19;
   friend void swap(CreateFunctionTagResponse& a, CreateFunctionTagResponse& b) { a.Swap(&b); }
   inline void Swap(CreateFunctionTagResponse* other) {
     if (other == this) return;
@@ -4529,7 +4535,7 @@ class CreateFunctionTagRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const CreateFunctionTagRequest*>(
         &_CreateFunctionTagRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 16;
+  static constexpr int kIndexInFileMessages = 18;
   friend void swap(CreateFunctionTagRequest& a, CreateFunctionTagRequest& b) { a.Swap(&b); }
   inline void Swap(CreateFunctionTagRequest* other) {
     if (other == this) return;
@@ -4684,6 +4690,216 @@ class CreateFunctionTagRequest final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
+class CreateFunctionRequest final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.CreateFunctionRequest) */ {
+ public:
+  inline CreateFunctionRequest() : CreateFunctionRequest(nullptr) {}
+  ~CreateFunctionRequest() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(CreateFunctionRequest* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(CreateFunctionRequest));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR CreateFunctionRequest(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline CreateFunctionRequest(const CreateFunctionRequest& from) : CreateFunctionRequest(nullptr, from) {}
+  inline CreateFunctionRequest(CreateFunctionRequest&& from) noexcept
+      : CreateFunctionRequest(nullptr, std::move(from)) {}
+  inline CreateFunctionRequest& operator=(const CreateFunctionRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline CreateFunctionRequest& operator=(CreateFunctionRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const CreateFunctionRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const CreateFunctionRequest* internal_default_instance() {
+    return reinterpret_cast<const CreateFunctionRequest*>(
+        &_CreateFunctionRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 7;
+  friend void swap(CreateFunctionRequest& a, CreateFunctionRequest& b) { a.Swap(&b); }
+  inline void Swap(CreateFunctionRequest* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(CreateFunctionRequest* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  CreateFunctionRequest* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<CreateFunctionRequest>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const CreateFunctionRequest& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const CreateFunctionRequest& from) { CreateFunctionRequest::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(CreateFunctionRequest* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.CreateFunctionRequest"; }
+
+ protected:
+  explicit CreateFunctionRequest(::google::protobuf::Arena* arena);
+  CreateFunctionRequest(::google::protobuf::Arena* arena, const CreateFunctionRequest& from);
+  CreateFunctionRequest(::google::protobuf::Arena* arena, CreateFunctionRequest&& from) noexcept
+      : CreateFunctionRequest(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kNameFieldNumber = 3,
+    kAddressFieldNumber = 2,
+  };
+  // optional string name = 3;
+  bool has_name() const;
+  void clear_name() ;
+  const std::string& name() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_name(Arg_&& arg, Args_... args);
+  std::string* mutable_name();
+  PROTOBUF_NODISCARD std::string* release_name();
+  void set_allocated_name(std::string* value);
+
+  private:
+  const std::string& _internal_name() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_name(
+      const std::string& value);
+  std::string* _internal_mutable_name();
+
+  public:
+  // uint64 address = 2;
+  void clear_address() ;
+  ::uint64_t address() const;
+  void set_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_address() const;
+  void _internal_set_address(::uint64_t value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.CreateFunctionRequest)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      1, 2, 0,
+      44, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const CreateFunctionRequest& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::google::protobuf::internal::ArenaStringPtr name_;
+    ::uint64_t address_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2ffunctions_2eproto;
+};
+// -------------------------------------------------------------------
+
 class CFGEdgeRecord final : public ::google::protobuf::Message
 /* @@protoc_insertion_point(class_definition:libghidra.CFGEdgeRecord) */ {
  public:
@@ -4743,7 +4959,7 @@ class CFGEdgeRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const CFGEdgeRecord*>(
         &_CFGEdgeRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 10;
+  static constexpr int kIndexInFileMessages = 12;
   friend void swap(CFGEdgeRecord& a, CFGEdgeRecord& b) { a.Swap(&b); }
   inline void Swap(CFGEdgeRecord* other) {
     if (other == this) return;
@@ -4975,7 +5191,7 @@ class BasicBlockRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const BasicBlockRecord*>(
         &_BasicBlockRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 7;
+  static constexpr int kIndexInFileMessages = 9;
   friend void swap(BasicBlockRecord& a, BasicBlockRecord& b) { a.Swap(&b); }
   inline void Swap(BasicBlockRecord* other) {
     if (other == this) return;
@@ -5213,7 +5429,7 @@ class SwitchTableRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const SwitchTableRecord*>(
         &_SwitchTableRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 28;
+  static constexpr int kIndexInFileMessages = 30;
   friend void swap(SwitchTableRecord& a, SwitchTableRecord& b) { a.Swap(&b); }
   inline void Swap(SwitchTableRecord* other) {
     if (other == this) return;
@@ -5458,7 +5674,7 @@ class ListSwitchTablesRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const ListSwitchTablesRequest*>(
         &_ListSwitchTablesRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 29;
+  static constexpr int kIndexInFileMessages = 31;
   friend void swap(ListSwitchTablesRequest& a, ListSwitchTablesRequest& b) { a.Swap(&b); }
   inline void Swap(ListSwitchTablesRequest* other) {
     if (other == this) return;
@@ -5671,7 +5887,7 @@ class ListPostDominatorsResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const ListPostDominatorsResponse*>(
         &_ListPostDominatorsResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 36;
+  static constexpr int kIndexInFileMessages = 38;
   friend void swap(ListPostDominatorsResponse& a, ListPostDominatorsResponse& b) { a.Swap(&b); }
   inline void Swap(ListPostDominatorsResponse* other) {
     if (other == this) return;
@@ -5868,7 +6084,7 @@ class ListPostDominatorsRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const ListPostDominatorsRequest*>(
         &_ListPostDominatorsRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 35;
+  static constexpr int kIndexInFileMessages = 37;
   friend void swap(ListPostDominatorsRequest& a, ListPostDominatorsRequest& b) { a.Swap(&b); }
   inline void Swap(ListPostDominatorsRequest* other) {
     if (other == this) return;
@@ -6081,7 +6297,7 @@ class ListLoopsResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const ListLoopsResponse*>(
         &_ListLoopsResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 39;
+  static constexpr int kIndexInFileMessages = 41;
   friend void swap(ListLoopsResponse& a, ListLoopsResponse& b) { a.Swap(&b); }
   inline void Swap(ListLoopsResponse* other) {
     if (other == this) return;
@@ -6278,7 +6494,7 @@ class ListLoopsRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const ListLoopsRequest*>(
         &_ListLoopsRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 38;
+  static constexpr int kIndexInFileMessages = 40;
   friend void swap(ListLoopsRequest& a, ListLoopsRequest& b) { a.Swap(&b); }
   inline void Swap(ListLoopsRequest* other) {
     if (other == this) return;
@@ -6901,7 +7117,7 @@ class ListFunctionTagsResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const ListFunctionTagsResponse*>(
         &_ListFunctionTagsResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 15;
+  static constexpr int kIndexInFileMessages = 17;
   friend void swap(ListFunctionTagsResponse& a, ListFunctionTagsResponse& b) { a.Swap(&b); }
   inline void Swap(ListFunctionTagsResponse* other) {
     if (other == this) return;
@@ -7098,7 +7314,7 @@ class ListFunctionTagMappingsResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const ListFunctionTagMappingsResponse*>(
         &_ListFunctionTagMappingsResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 22;
+  static constexpr int kIndexInFileMessages = 24;
   friend void swap(ListFunctionTagMappingsResponse& a, ListFunctionTagMappingsResponse& b) { a.Swap(&b); }
   inline void Swap(ListFunctionTagMappingsResponse* other) {
     if (other == this) return;
@@ -7295,7 +7511,7 @@ class ListFunctionFramesRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const ListFunctionFramesRequest*>(
         &_ListFunctionFramesRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 42;
+  static constexpr int kIndexInFileMessages = 44;
   friend void swap(ListFunctionFramesRequest& a, ListFunctionFramesRequest& b) { a.Swap(&b); }
   inline void Swap(ListFunctionFramesRequest* other) {
     if (other == this) return;
@@ -7508,7 +7724,7 @@ class ListDominatorsResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const ListDominatorsResponse*>(
         &_ListDominatorsResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 33;
+  static constexpr int kIndexInFileMessages = 35;
   friend void swap(ListDominatorsResponse& a, ListDominatorsResponse& b) { a.Swap(&b); }
   inline void Swap(ListDominatorsResponse* other) {
     if (other == this) return;
@@ -7705,7 +7921,7 @@ class ListDominatorsRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const ListDominatorsRequest*>(
         &_ListDominatorsRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 32;
+  static constexpr int kIndexInFileMessages = 34;
   friend void swap(ListDominatorsRequest& a, ListDominatorsRequest& b) { a.Swap(&b); }
   inline void Swap(ListDominatorsRequest* other) {
     if (other == this) return;
@@ -7918,7 +8134,7 @@ class ListCFGEdgesResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const ListCFGEdgesResponse*>(
         &_ListCFGEdgesResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 12;
+  static constexpr int kIndexInFileMessages = 14;
   friend void swap(ListCFGEdgesResponse& a, ListCFGEdgesResponse& b) { a.Swap(&b); }
   inline void Swap(ListCFGEdgesResponse* other) {
     if (other == this) return;
@@ -8115,7 +8331,7 @@ class ListCFGEdgesRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const ListCFGEdgesRequest*>(
         &_ListCFGEdgesRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 11;
+  static constexpr int kIndexInFileMessages = 13;
   friend void swap(ListCFGEdgesRequest& a, ListCFGEdgesRequest& b) { a.Swap(&b); }
   inline void Swap(ListCFGEdgesRequest* other) {
     if (other == this) return;
@@ -8328,7 +8544,7 @@ class ListBasicBlocksResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const ListBasicBlocksResponse*>(
         &_ListBasicBlocksResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 9;
+  static constexpr int kIndexInFileMessages = 11;
   friend void swap(ListBasicBlocksResponse& a, ListBasicBlocksResponse& b) { a.Swap(&b); }
   inline void Swap(ListBasicBlocksResponse* other) {
     if (other == this) return;
@@ -8525,7 +8741,7 @@ class ListBasicBlocksRequest final : public ::google::protobuf::Message
     return reinterpret_cast<const ListBasicBlocksRequest*>(
         &_ListBasicBlocksRequest_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 8;
+  static constexpr int kIndexInFileMessages = 10;
   friend void swap(ListBasicBlocksRequest& a, ListBasicBlocksRequest& b) { a.Swap(&b); }
   inline void Swap(ListBasicBlocksRequest* other) {
     if (other == this) return;
@@ -8934,7 +9150,7 @@ class FunctionFrameRecord final : public ::google::protobuf::Message
     return reinterpret_cast<const FunctionFrameRecord*>(
         &_FunctionFrameRecord_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 41;
+  static constexpr int kIndexInFileMessages = 43;
   friend void swap(FunctionFrameRecord& a, FunctionFrameRecord& b) { a.Swap(&b); }
   inline void Swap(FunctionFrameRecord* other) {
     if (other == this) return;
@@ -9174,6 +9390,214 @@ class FunctionFrameRecord final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
+class CreateFunctionResponse final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:libghidra.CreateFunctionResponse) */ {
+ public:
+  inline CreateFunctionResponse() : CreateFunctionResponse(nullptr) {}
+  ~CreateFunctionResponse() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(CreateFunctionResponse* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(CreateFunctionResponse));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR CreateFunctionResponse(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline CreateFunctionResponse(const CreateFunctionResponse& from) : CreateFunctionResponse(nullptr, from) {}
+  inline CreateFunctionResponse(CreateFunctionResponse&& from) noexcept
+      : CreateFunctionResponse(nullptr, std::move(from)) {}
+  inline CreateFunctionResponse& operator=(const CreateFunctionResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline CreateFunctionResponse& operator=(CreateFunctionResponse&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const CreateFunctionResponse& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const CreateFunctionResponse* internal_default_instance() {
+    return reinterpret_cast<const CreateFunctionResponse*>(
+        &_CreateFunctionResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 8;
+  friend void swap(CreateFunctionResponse& a, CreateFunctionResponse& b) { a.Swap(&b); }
+  inline void Swap(CreateFunctionResponse* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(CreateFunctionResponse* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  CreateFunctionResponse* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<CreateFunctionResponse>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const CreateFunctionResponse& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const CreateFunctionResponse& from) { CreateFunctionResponse::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(CreateFunctionResponse* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "libghidra.CreateFunctionResponse"; }
+
+ protected:
+  explicit CreateFunctionResponse(::google::protobuf::Arena* arena);
+  CreateFunctionResponse(::google::protobuf::Arena* arena, const CreateFunctionResponse& from);
+  CreateFunctionResponse(::google::protobuf::Arena* arena, CreateFunctionResponse&& from) noexcept
+      : CreateFunctionResponse(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kFunctionFieldNumber = 2,
+    kCreatedFieldNumber = 1,
+  };
+  // .libghidra.FunctionRecord function = 2;
+  bool has_function() const;
+  void clear_function() ;
+  const ::libghidra::FunctionRecord& function() const;
+  PROTOBUF_NODISCARD ::libghidra::FunctionRecord* release_function();
+  ::libghidra::FunctionRecord* mutable_function();
+  void set_allocated_function(::libghidra::FunctionRecord* value);
+  void unsafe_arena_set_allocated_function(::libghidra::FunctionRecord* value);
+  ::libghidra::FunctionRecord* unsafe_arena_release_function();
+
+  private:
+  const ::libghidra::FunctionRecord& _internal_function() const;
+  ::libghidra::FunctionRecord* _internal_mutable_function();
+
+  public:
+  // bool created = 1;
+  void clear_created() ;
+  bool created() const;
+  void set_created(bool value);
+
+  private:
+  bool _internal_created() const;
+  void _internal_set_created(bool value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:libghidra.CreateFunctionResponse)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      1, 2, 1,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const CreateFunctionResponse& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::libghidra::FunctionRecord* function_;
+    bool created_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_libghidra_2ffunctions_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ListSwitchTablesResponse final : public ::google::protobuf::Message
 /* @@protoc_insertion_point(class_definition:libghidra.ListSwitchTablesResponse) */ {
  public:
@@ -9233,7 +9657,7 @@ class ListSwitchTablesResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const ListSwitchTablesResponse*>(
         &_ListSwitchTablesResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 30;
+  static constexpr int kIndexInFileMessages = 32;
   friend void swap(ListSwitchTablesResponse& a, ListSwitchTablesResponse& b) { a.Swap(&b); }
   inline void Swap(ListSwitchTablesResponse* other) {
     if (other == this) return;
@@ -9430,7 +9854,7 @@ class ListFunctionFramesResponse final : public ::google::protobuf::Message
     return reinterpret_cast<const ListFunctionFramesResponse*>(
         &_ListFunctionFramesResponse_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 43;
+  static constexpr int kIndexInFileMessages = 45;
   friend void swap(ListFunctionFramesResponse& a, ListFunctionFramesResponse& b) { a.Swap(&b); }
   inline void Swap(ListFunctionFramesResponse* other) {
     if (other == this) return;
@@ -10370,6 +10794,223 @@ inline void RenameFunctionResponse::set_allocated_name(std::string* value) {
     _impl_.name_.Set("", GetArena());
   }
   // @@protoc_insertion_point(field_set_allocated:libghidra.RenameFunctionResponse.name)
+}
+
+// -------------------------------------------------------------------
+
+// CreateFunctionRequest
+
+// uint64 address = 2;
+inline void CreateFunctionRequest::clear_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.address_ = ::uint64_t{0u};
+}
+inline ::uint64_t CreateFunctionRequest::address() const {
+  // @@protoc_insertion_point(field_get:libghidra.CreateFunctionRequest.address)
+  return _internal_address();
+}
+inline void CreateFunctionRequest::set_address(::uint64_t value) {
+  _internal_set_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.CreateFunctionRequest.address)
+}
+inline ::uint64_t CreateFunctionRequest::_internal_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.address_;
+}
+inline void CreateFunctionRequest::_internal_set_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.address_ = value;
+}
+
+// optional string name = 3;
+inline bool CreateFunctionRequest::has_name() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline void CreateFunctionRequest::clear_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.name_.ClearToEmpty();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+inline const std::string& CreateFunctionRequest::name() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.CreateFunctionRequest.name)
+  return _internal_name();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void CreateFunctionRequest::set_name(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_._has_bits_[0] |= 0x00000001u;
+  _impl_.name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:libghidra.CreateFunctionRequest.name)
+}
+inline std::string* CreateFunctionRequest::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_name();
+  // @@protoc_insertion_point(field_mutable:libghidra.CreateFunctionRequest.name)
+  return _s;
+}
+inline const std::string& CreateFunctionRequest::_internal_name() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.name_.Get();
+}
+inline void CreateFunctionRequest::_internal_set_name(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_._has_bits_[0] |= 0x00000001u;
+  _impl_.name_.Set(value, GetArena());
+}
+inline std::string* CreateFunctionRequest::_internal_mutable_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_._has_bits_[0] |= 0x00000001u;
+  return _impl_.name_.Mutable( GetArena());
+}
+inline std::string* CreateFunctionRequest::release_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.CreateFunctionRequest.name)
+  if ((_impl_._has_bits_[0] & 0x00000001u) == 0) {
+    return nullptr;
+  }
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  auto* released = _impl_.name_.Release();
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
+    _impl_.name_.Set("", GetArena());
+  }
+  return released;
+}
+inline void CreateFunctionRequest::set_allocated_name(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  _impl_.name_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.name_.IsDefault()) {
+    _impl_.name_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libghidra.CreateFunctionRequest.name)
+}
+
+// -------------------------------------------------------------------
+
+// CreateFunctionResponse
+
+// bool created = 1;
+inline void CreateFunctionResponse::clear_created() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.created_ = false;
+}
+inline bool CreateFunctionResponse::created() const {
+  // @@protoc_insertion_point(field_get:libghidra.CreateFunctionResponse.created)
+  return _internal_created();
+}
+inline void CreateFunctionResponse::set_created(bool value) {
+  _internal_set_created(value);
+  // @@protoc_insertion_point(field_set:libghidra.CreateFunctionResponse.created)
+}
+inline bool CreateFunctionResponse::_internal_created() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.created_;
+}
+inline void CreateFunctionResponse::_internal_set_created(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.created_ = value;
+}
+
+// .libghidra.FunctionRecord function = 2;
+inline bool CreateFunctionResponse::has_function() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.function_ != nullptr);
+  return value;
+}
+inline void CreateFunctionResponse::clear_function() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.function_ != nullptr) _impl_.function_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+inline const ::libghidra::FunctionRecord& CreateFunctionResponse::_internal_function() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  const ::libghidra::FunctionRecord* p = _impl_.function_;
+  return p != nullptr ? *p : reinterpret_cast<const ::libghidra::FunctionRecord&>(::libghidra::_FunctionRecord_default_instance_);
+}
+inline const ::libghidra::FunctionRecord& CreateFunctionResponse::function() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:libghidra.CreateFunctionResponse.function)
+  return _internal_function();
+}
+inline void CreateFunctionResponse::unsafe_arena_set_allocated_function(::libghidra::FunctionRecord* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.function_);
+  }
+  _impl_.function_ = reinterpret_cast<::libghidra::FunctionRecord*>(value);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:libghidra.CreateFunctionResponse.function)
+}
+inline ::libghidra::FunctionRecord* CreateFunctionResponse::release_function() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::FunctionRecord* released = _impl_.function_;
+  _impl_.function_ = nullptr;
+  if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
+    auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
+    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    if (GetArena() == nullptr) {
+      delete old;
+    }
+  } else {
+    if (GetArena() != nullptr) {
+      released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    }
+  }
+  return released;
+}
+inline ::libghidra::FunctionRecord* CreateFunctionResponse::unsafe_arena_release_function() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:libghidra.CreateFunctionResponse.function)
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::libghidra::FunctionRecord* temp = _impl_.function_;
+  _impl_.function_ = nullptr;
+  return temp;
+}
+inline ::libghidra::FunctionRecord* CreateFunctionResponse::_internal_mutable_function() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.function_ == nullptr) {
+    auto* p = ::google::protobuf::Message::DefaultConstruct<::libghidra::FunctionRecord>(GetArena());
+    _impl_.function_ = reinterpret_cast<::libghidra::FunctionRecord*>(p);
+  }
+  return _impl_.function_;
+}
+inline ::libghidra::FunctionRecord* CreateFunctionResponse::mutable_function() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  _impl_._has_bits_[0] |= 0x00000001u;
+  ::libghidra::FunctionRecord* _msg = _internal_mutable_function();
+  // @@protoc_insertion_point(field_mutable:libghidra.CreateFunctionResponse.function)
+  return _msg;
+}
+inline void CreateFunctionResponse::set_allocated_function(::libghidra::FunctionRecord* value) {
+  ::google::protobuf::Arena* message_arena = GetArena();
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (message_arena == nullptr) {
+    delete (_impl_.function_);
+  }
+
+  if (value != nullptr) {
+    ::google::protobuf::Arena* submessage_arena = (value)->GetArena();
+    if (message_arena != submessage_arena) {
+      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
+    }
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+
+  _impl_.function_ = reinterpret_cast<::libghidra::FunctionRecord*>(value);
+  // @@protoc_insertion_point(field_set_allocated:libghidra.CreateFunctionResponse.function)
 }
 
 // -------------------------------------------------------------------

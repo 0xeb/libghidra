@@ -9,6 +9,7 @@ package libghidra.host.runtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import ghidra.program.model.address.Address;
 import ghidra.program.model.address.AddressIterator;
@@ -27,7 +28,6 @@ import ghidra.program.model.symbol.SourceType;
 import ghidra.program.model.symbol.Symbol;
 import ghidra.program.model.symbol.SymbolTable;
 import ghidra.program.util.DefinedDataIterator;
-import ghidra.util.Msg;
 import ghidra.util.exception.DuplicateNameException;
 import ghidra.util.exception.InvalidInputException;
 import libghidra.host.contract.ListingContract;
@@ -35,7 +35,7 @@ import libghidra.host.contract.ListingContract;
 public final class ListingRuntime extends RuntimeSupport implements ListingOperations {
 
 	private interface BreakpointMutation {
-		boolean apply(BreakpointBookmarkStore.BreakpointRecord row);
+		void apply(BreakpointBookmarkStore.BreakpointRecord row);
 	}
 
 	public ListingRuntime(HostState state) {
@@ -46,8 +46,9 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.GetInstructionResponse getInstruction(
 			ListingContract.GetInstructionRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
+			// No program open is an error (not_loaded), never "not found".
+			Program program = requireProgram();
+			if (request == null) {
 				return new ListingContract.GetInstructionResponse(null);
 			}
 			try {
@@ -275,33 +276,33 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 		}
 	}
 
+	/**
+	 * Adds or replaces a comment (an upsert). The address must be mapped
+	 * ({@code unmapped_address}) and must not fall inside an instruction
+	 * ({@code invalid_argument}): a comment there is stored but no listing shows it.
+	 */
 	@Override
 	public ListingContract.SetCommentResponse setComment(ListingContract.SetCommentRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.SetCommentResponse(false, "not_loaded", "no current program");
-			}
-			CommentType type = toCommentType(request.kind());
-			if (type == null) {
-				return new ListingContract.SetCommentResponse(
-					false,
-					"invalid_argument",
-					"unsupported comment kind");
+			Program program = requireProgram();
+			requireRequest(request);
+			CommentType type = requireCommentType(request.kind());
+			Address address = requireMappedAddress(program, request.address());
+			Instruction containing = program.getListing().getInstructionContaining(address);
+			if (containing != null && !containing.getMinAddress().equals(address)) {
+				throw SessionRpcException.invalidArgument("0x" + Long.toHexString(request.address()) +
+					" is inside the instruction at " + containing.getMinAddress() +
+					"; a comment must start a code unit");
 			}
 			int tx = program.startTransaction("libghidra set comment");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
 				program.getListing().setComment(address, type, request.text());
 				commit = true;
 				return new ListingContract.SetCommentResponse(true, "", "");
 			}
 			catch (IllegalArgumentException e) {
-				return new ListingContract.SetCommentResponse(
-					false,
-					"invalid_argument",
-					nullableString(e.getMessage()));
+				throw SessionRpcException.from("set comment", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -316,26 +317,16 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.DeleteCommentResponse deleteComment(
 			ListingContract.DeleteCommentRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.DeleteCommentResponse(false, "not_loaded", "no current program");
-			}
-			CommentType type = toCommentType(request.kind());
-			if (type == null) {
-				return new ListingContract.DeleteCommentResponse(
-					false,
-					"invalid_argument",
-					"unsupported comment kind");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			CommentType type = requireCommentType(request.kind());
+			Address address = requireMappedAddress(program, request.address());
 			int tx = program.startTransaction("libghidra delete comment");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
 				String current = program.getListing().getComment(type, address);
 				if (current == null || current.isBlank()) {
-					return new ListingContract.DeleteCommentResponse(
-						false,
-						"not_found",
+					throw SessionRpcException.notFound(
 						"no comment of the requested kind exists at 0x" +
 							Long.toHexString(request.address()));
 				}
@@ -344,10 +335,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				return new ListingContract.DeleteCommentResponse(true, "", "");
 			}
 			catch (IllegalArgumentException e) {
-				return new ListingContract.DeleteCommentResponse(
-					false,
-					"invalid_argument",
-					nullableString(e.getMessage()));
+				throw SessionRpcException.from("delete comment", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -362,23 +350,14 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.RenameDataItemResponse renameDataItem(
 			ListingContract.RenameDataItemRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.RenameDataItemResponse(false, "");
-			}
-			String newName = request.newName() != null ? request.newName().trim() : "";
-			if (newName.isEmpty()) {
-				return new ListingContract.RenameDataItemResponse(false, "");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			String newName = requireText(request.newName(), "new data item name");
+			Address address = requireMappedAddress(program, request.address());
+			requireDataItem(program, address, request.address());
 			int tx = program.startTransaction("libghidra rename data item");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
-				Listing listing = program.getListing();
-				Data data = listing.getDataAt(address);
-				if (data == null) {
-					return new ListingContract.RenameDataItemResponse(false, "");
-				}
 				SymbolTable symbolTable = program.getSymbolTable();
 				Symbol symbol = symbolTable.getPrimarySymbol(address);
 				if (symbol != null && !symbol.isDeleted()) {
@@ -391,8 +370,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				return new ListingContract.RenameDataItemResponse(true, newName);
 			}
 			catch (InvalidInputException | DuplicateNameException | IllegalArgumentException e) {
-				Msg.error(this, "renameDataItem failed: " + e.getMessage(), e);
-				return new ListingContract.RenameDataItemResponse(false, "");
+				throw SessionRpcException.from("rename data item", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -404,31 +382,44 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.DeleteDataItemResponse deleteDataItem(
 			ListingContract.DeleteDataItemRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.DeleteDataItemResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			Address address = requireMappedAddress(program, request.address());
+			Data data = requireDataItem(program, address, request.address());
 			int tx = program.startTransaction("libghidra delete data item");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
-				Listing listing = program.getListing();
-				Data data = listing.getDataAt(address);
-				if (data == null) {
-					return new ListingContract.DeleteDataItemResponse(false);
-				}
-				listing.clearCodeUnits(address, data.getMaxAddress(), false);
+				program.getListing().clearCodeUnits(address, data.getMaxAddress(), false);
 				commit = true;
 				return new ListingContract.DeleteDataItemResponse(true);
 			}
 			catch (IllegalArgumentException e) {
-				Msg.error(this, "deleteDataItem failed: " + e.getMessage(), e);
-				return new ListingContract.DeleteDataItemResponse(false);
+				throw SessionRpcException.from("delete data item", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
 			}
 		}
+	}
+
+	/**
+	 * The defined data item that starts at {@code address}; {@code not_found} for
+	 * undefined bytes, an instruction, or the middle of an item.
+	 */
+	private static Data requireDataItem(Program program, Address address, long offset) {
+		Data data = program.getListing().getDefinedDataAt(address);
+		if (data == null) {
+			throw SessionRpcException.notFound("no data item at 0x" + Long.toHexString(offset));
+		}
+		return data;
+	}
+
+	private static CommentType requireCommentType(ListingContract.CommentKind kind) {
+		CommentType type = toCommentType(kind);
+		if (type == null) {
+			throw SessionRpcException.invalidArgument("unsupported comment kind");
+		}
+		return type;
 	}
 
 	@Override
@@ -573,30 +564,22 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 		}
 	}
 
+	/** Adds or replaces the bookmark of a type and category at a mapped address (an upsert). */
 	@Override
 	public ListingContract.AddBookmarkResponse addBookmark(ListingContract.AddBookmarkRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.AddBookmarkResponse(false);
-			}
-			String type = request.type() != null ? request.type().trim() : "";
-			String category = request.category() != null ? request.category().trim() : "";
+			Program program = requireProgram();
+			requireRequest(request);
 			// Only `type` is required. An empty `category` is valid in native Ghidra
 			// (BookmarkManager.setBookmark accepts an empty category sub-label), so do
 			// not reject it here.
-			if (type.isEmpty()) {
-				return new ListingContract.AddBookmarkResponse(false);
-			}
+			String type = requireText(request.type(), "bookmark type");
+			String category = request.category() != null ? request.category().trim() : "";
+			Address address = requireMappedAddress(program, request.address());
 			int tx = program.startTransaction("libghidra add bookmark");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
-				BookmarkManager manager = program.getBookmarkManager();
-				if (manager == null) {
-					return new ListingContract.AddBookmarkResponse(false);
-				}
-				manager.setBookmark(
+				program.getBookmarkManager().setBookmark(
 					address,
 					type,
 					category,
@@ -605,8 +588,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				return new ListingContract.AddBookmarkResponse(true);
 			}
 			catch (IllegalArgumentException e) {
-				Msg.error(this, "addBookmark failed: " + e.getMessage(), e);
-				return new ListingContract.AddBookmarkResponse(false);
+				throw SessionRpcException.from("add bookmark", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -618,36 +600,28 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.DeleteBookmarkResponse deleteBookmark(
 			ListingContract.DeleteBookmarkRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.DeleteBookmarkResponse(false);
-			}
-			String type = request.type() != null ? request.type().trim() : "";
-			String category = request.category() != null ? request.category().trim() : "";
+			Program program = requireProgram();
+			requireRequest(request);
 			// Only `type` is required; an empty `category` is valid (mirrors addBookmark
 			// and native Ghidra's getBookmark, which matches an empty category sub-label).
-			if (type.isEmpty()) {
-				return new ListingContract.DeleteBookmarkResponse(false);
+			String type = requireText(request.type(), "bookmark type");
+			String category = request.category() != null ? request.category().trim() : "";
+			Address address = requireMappedAddress(program, request.address());
+			BookmarkManager manager = program.getBookmarkManager();
+			Bookmark bookmark = manager.getBookmark(address, type, category);
+			if (bookmark == null) {
+				throw SessionRpcException.notFound("no '" + type + "' bookmark in category '" +
+					category + "' at 0x" + Long.toHexString(request.address()));
 			}
 			int tx = program.startTransaction("libghidra delete bookmark");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
-				BookmarkManager manager = program.getBookmarkManager();
-				if (manager == null) {
-					return new ListingContract.DeleteBookmarkResponse(false);
-				}
-				Bookmark bookmark = manager.getBookmark(address, type, category);
-				if (bookmark == null) {
-					return new ListingContract.DeleteBookmarkResponse(false);
-				}
 				manager.removeBookmark(bookmark);
 				commit = true;
 				return new ListingContract.DeleteBookmarkResponse(true);
 			}
 			catch (IllegalArgumentException e) {
-				Msg.error(this, "deleteBookmark failed: " + e.getMessage(), e);
-				return new ListingContract.DeleteBookmarkResponse(false);
+				throw SessionRpcException.from("delete bookmark", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -723,27 +697,27 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 		}
 	}
 
+	/**
+	 * Adds or replaces the breakpoint at a mapped address (an upsert). {@code kind} is
+	 * one of {@link #BREAKPOINT_KINDS} (any case; empty means software).
+	 */
 	@Override
 	public ListingContract.AddBreakpointResponse addBreakpoint(
 			ListingContract.AddBreakpointRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.AddBreakpointResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
 			String kind = nullableString(request.kind()).trim();
 			if (kind.isEmpty()) {
 				kind = "software";
 			}
+			requireBreakpointKind(kind);
 			long size = Math.max(1L, request.size());
+			Address address = requireMappedAddress(program, request.address());
 			int tx = program.startTransaction("libghidra add breakpoint");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
 				BookmarkManager manager = program.getBookmarkManager();
-				if (manager == null) {
-					return new ListingContract.AddBreakpointResponse(false);
-				}
 				BreakpointBookmarkStore.BreakpointRecord row;
 				Bookmark bookmark = BreakpointBookmarkStore.findAt(manager, address);
 				if (bookmark != null) {
@@ -763,8 +737,7 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 				return new ListingContract.AddBreakpointResponse(true);
 			}
 			catch (IllegalArgumentException e) {
-				Msg.error(this, "addBreakpoint failed: " + e.getMessage(), e);
-				return new ListingContract.AddBreakpointResponse(false);
+				throw SessionRpcException.from("add breakpoint", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -776,18 +749,14 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.SetBreakpointEnabledResponse setBreakpointEnabled(
 			ListingContract.SetBreakpointEnabledRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.SetBreakpointEnabledResponse(false);
-			}
-			boolean updated = updateBreakpointInProgram(
+			Program program = requireProgram();
+			requireRequest(request);
+			updateBreakpointInProgram(
+				program,
 				request.address(),
 				"libghidra set breakpoint enabled",
-				row -> {
-					row.enabled = request.enabled();
-					return true;
-				});
-			return new ListingContract.SetBreakpointEnabledResponse(updated);
+				row -> row.enabled = request.enabled());
+			return new ListingContract.SetBreakpointEnabledResponse(true);
 		}
 	}
 
@@ -795,22 +764,16 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.SetBreakpointKindResponse setBreakpointKind(
 			ListingContract.SetBreakpointKindRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.SetBreakpointKindResponse(false);
-			}
-			String kind = nullableString(request.kind()).trim();
-			if (kind.isEmpty()) {
-				return new ListingContract.SetBreakpointKindResponse(false);
-			}
-			boolean updated = updateBreakpointInProgram(
+			Program program = requireProgram();
+			requireRequest(request);
+			String kind = requireText(request.kind(), "breakpoint kind");
+			requireBreakpointKind(kind);
+			updateBreakpointInProgram(
+				program,
 				request.address(),
 				"libghidra set breakpoint kind",
-				row -> {
-					row.kind = kind;
-					return true;
-				});
-			return new ListingContract.SetBreakpointKindResponse(updated);
+				row -> row.kind = kind);
+			return new ListingContract.SetBreakpointKindResponse(true);
 		}
 	}
 
@@ -818,19 +781,18 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.SetBreakpointSizeResponse setBreakpointSize(
 			ListingContract.SetBreakpointSizeRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null || request.size() <= 0) {
-				return new ListingContract.SetBreakpointSizeResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			if (request.size() <= 0) {
+				throw SessionRpcException.invalidArgument("breakpoint size must be > 0");
 			}
 			long size = request.size();
-			boolean updated = updateBreakpointInProgram(
+			updateBreakpointInProgram(
+				program,
 				request.address(),
 				"libghidra set breakpoint size",
-				row -> {
-					row.size = size;
-					return true;
-				});
-			return new ListingContract.SetBreakpointSizeResponse(updated);
+				row -> row.size = size);
+			return new ListingContract.SetBreakpointSizeResponse(true);
 		}
 	}
 
@@ -838,18 +800,14 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.SetBreakpointConditionResponse setBreakpointCondition(
 			ListingContract.SetBreakpointConditionRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.SetBreakpointConditionResponse(false);
-			}
-			boolean updated = updateBreakpointInProgram(
+			Program program = requireProgram();
+			requireRequest(request);
+			updateBreakpointInProgram(
+				program,
 				request.address(),
 				"libghidra set breakpoint condition",
-				row -> {
-					row.condition = nullableString(request.condition());
-					return true;
-				});
-			return new ListingContract.SetBreakpointConditionResponse(updated);
+				row -> row.condition = nullableString(request.condition()));
+			return new ListingContract.SetBreakpointConditionResponse(true);
 		}
 	}
 
@@ -857,18 +815,14 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.SetBreakpointGroupResponse setBreakpointGroup(
 			ListingContract.SetBreakpointGroupRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.SetBreakpointGroupResponse(false);
-			}
-			boolean updated = updateBreakpointInProgram(
+			Program program = requireProgram();
+			requireRequest(request);
+			updateBreakpointInProgram(
+				program,
 				request.address(),
 				"libghidra set breakpoint group",
-				row -> {
-					row.group = nullableString(request.group()).trim();
-					return true;
-				});
-			return new ListingContract.SetBreakpointGroupResponse(updated);
+				row -> row.group = nullableString(request.group()).trim());
+			return new ListingContract.SetBreakpointGroupResponse(true);
 		}
 	}
 
@@ -876,27 +830,26 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 	public ListingContract.DeleteBreakpointResponse deleteBreakpoint(
 			ListingContract.DeleteBreakpointRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new ListingContract.DeleteBreakpointResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			Address address = requireMappedAddress(program, request.address());
+			BookmarkManager manager = program.getBookmarkManager();
+			if (BreakpointBookmarkStore.findAt(manager, address) == null) {
+				throw SessionRpcException.notFound(
+					"no breakpoint at 0x" + Long.toHexString(request.address()));
 			}
 			int tx = program.startTransaction("libghidra delete breakpoint");
 			boolean commit = false;
 			try {
-				Address address = toAddress(program, request.address());
-				BookmarkManager manager = program.getBookmarkManager();
-				if (manager == null) {
-					return new ListingContract.DeleteBreakpointResponse(false);
+				if (!BreakpointBookmarkStore.removeAt(manager, address)) {
+					throw SessionRpcException.internalError(
+						"the breakpoint at 0x" + Long.toHexString(request.address()) + " was not removed");
 				}
-				boolean removed = BreakpointBookmarkStore.removeAt(manager, address);
-				if (removed) {
-					commit = true;
-				}
-				return new ListingContract.DeleteBreakpointResponse(removed);
+				commit = true;
+				return new ListingContract.DeleteBreakpointResponse(true);
 			}
 			catch (IllegalArgumentException e) {
-				Msg.error(this, "deleteBreakpoint failed: " + e.getMessage(), e);
-				return new ListingContract.DeleteBreakpointResponse(false);
+				throw SessionRpcException.from("delete breakpoint", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -970,42 +923,47 @@ public final class ListingRuntime extends RuntimeSupport implements ListingOpera
 		}
 	}
 
-	private boolean updateBreakpointInProgram(
+	/** Edits the breakpoint at a mapped address; {@code not_found} when there is none. */
+	private void updateBreakpointInProgram(
+			Program program,
 			long addressOffset,
 			String txName,
 			BreakpointMutation mutation) {
-		Program program = currentProgram();
-		if (program == null || mutation == null) {
-			return false;
+		Address address = requireMappedAddress(program, addressOffset);
+		BookmarkManager manager = program.getBookmarkManager();
+		Bookmark bookmark = BreakpointBookmarkStore.findAt(manager, address);
+		if (bookmark == null) {
+			throw SessionRpcException.notFound("no breakpoint at 0x" + Long.toHexString(addressOffset));
 		}
 		int tx = program.startTransaction(txName);
 		boolean commit = false;
 		try {
-			Address address = toAddress(program, addressOffset);
-			BookmarkManager manager = program.getBookmarkManager();
-			if (manager == null) {
-				return false;
-			}
-			Bookmark bookmark = BreakpointBookmarkStore.findAt(manager, address);
-			if (bookmark == null) {
-				return false;
-			}
 			BreakpointBookmarkStore.BreakpointRecord row =
 				BreakpointBookmarkStore.fromBookmark(bookmark);
 			row.address = address.getOffset();
-			if (!mutation.apply(row)) {
-				return false;
-			}
+			mutation.apply(row);
 			BreakpointBookmarkStore.upsert(manager, address, row);
 			commit = true;
-			return true;
 		}
 		catch (IllegalArgumentException e) {
-			Msg.error(this, "updateBreakpointInProgram failed: " + e.getMessage(), e);
-			return false;
+			throw SessionRpcException.from(txName, e);
 		}
 		finally {
 			program.endTransaction(tx, commit);
+		}
+	}
+
+	/**
+	 * The breakpoint kinds the host stores. Clients read them back case-insensitively
+	 * (ghidrasql writes SOFTWARE / HARDWARE and treats read/write/access as hardware).
+	 */
+	static final Set<String> BREAKPOINT_KINDS =
+		Set.of("software", "hardware", "read", "write", "access");
+
+	private static void requireBreakpointKind(String kind) {
+		if (!BREAKPOINT_KINDS.contains(kind.toLowerCase(Locale.ROOT))) {
+			throw SessionRpcException.invalidArgument("unknown breakpoint kind '" + kind +
+				"'; expected one of software, hardware, read, write, access");
 		}
 	}
 }

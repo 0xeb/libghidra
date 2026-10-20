@@ -73,6 +73,12 @@ final class DataTypeSupport {
 			return null;
 		}
 		String trimmed = name.trim();
+		// A path ("/category/Name") was already looked up as one: it names its
+		// category, so it does not fall back to a search by name ("//category"
+		// is also not a path Ghidra accepts).
+		if (trimmed.startsWith("/")) {
+			return null;
+		}
 		DataType byPath = dtm.getDataType("/" + trimmed);
 		if (byPath != null) {
 			return byPath;

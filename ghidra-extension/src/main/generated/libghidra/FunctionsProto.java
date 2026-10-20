@@ -61,6 +61,16 @@ public final class FunctionsProto {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_libghidra_RenameFunctionResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_CreateFunctionRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_CreateFunctionRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_libghidra_CreateFunctionResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_libghidra_CreateFunctionResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_libghidra_BasicBlockRecord_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -270,129 +280,135 @@ public final class FunctionsProto {
       "ghidra.FunctionRecord\":\n\025RenameFunctionR" +
       "equest\022\017\n\007address\030\002 \001(\004\022\020\n\010new_name\030\003 \001(" +
       "\t\"7\n\026RenameFunctionResponse\022\017\n\007renamed\030\001" +
-      " \001(\010\022\014\n\004name\030\002 \001(\t\"}\n\020BasicBlockRecord\022\026" +
-      "\n\016function_entry\030\001 \001(\004\022\025\n\rstart_address\030" +
-      "\002 \001(\004\022\023\n\013end_address\030\003 \001(\004\022\021\n\tin_degree\030" +
-      "\004 \001(\r\022\022\n\nout_degree\030\005 \001(\r\"e\n\026ListBasicBl" +
-      "ocksRequest\022&\n\005range\030\002 \001(\0132\027.libghidra.A" +
+      " \001(\010\022\014\n\004name\030\002 \001(\t\"D\n\025CreateFunctionRequ" +
+      "est\022\017\n\007address\030\002 \001(\004\022\021\n\004name\030\003 \001(\tH\000\210\001\001B" +
+      "\007\n\005_name\"V\n\026CreateFunctionResponse\022\017\n\007cr" +
+      "eated\030\001 \001(\010\022+\n\010function\030\002 \001(\0132\031.libghidr" +
+      "a.FunctionRecord\"}\n\020BasicBlockRecord\022\026\n\016" +
+      "function_entry\030\001 \001(\004\022\025\n\rstart_address\030\002 " +
+      "\001(\004\022\023\n\013end_address\030\003 \001(\004\022\021\n\tin_degree\030\004 " +
+      "\001(\r\022\022\n\nout_degree\030\005 \001(\r\"e\n\026ListBasicBloc" +
+      "ksRequest\022&\n\005range\030\002 \001(\0132\027.libghidra.Add" +
+      "ressRange\022#\n\004page\030\003 \001(\0132\025.libghidra.Pagi" +
+      "nation\"F\n\027ListBasicBlocksResponse\022+\n\006blo" +
+      "cks\030\001 \003(\0132\033.libghidra.BasicBlockRecord\"l" +
+      "\n\rCFGEdgeRecord\022\026\n\016function_entry\030\001 \001(\004\022" +
+      "\027\n\017src_block_start\030\002 \001(\004\022\027\n\017dst_block_st" +
+      "art\030\003 \001(\004\022\021\n\tedge_kind\030\004 \001(\t\"b\n\023ListCFGE" +
+      "dgesRequest\022&\n\005range\030\002 \001(\0132\027.libghidra.A" +
       "ddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra.Pa" +
-      "gination\"F\n\027ListBasicBlocksResponse\022+\n\006b" +
-      "locks\030\001 \003(\0132\033.libghidra.BasicBlockRecord" +
-      "\"l\n\rCFGEdgeRecord\022\026\n\016function_entry\030\001 \001(" +
-      "\004\022\027\n\017src_block_start\030\002 \001(\004\022\027\n\017dst_block_" +
-      "start\030\003 \001(\004\022\021\n\tedge_kind\030\004 \001(\t\"b\n\023ListCF" +
-      "GEdgesRequest\022&\n\005range\030\002 \001(\0132\027.libghidra" +
-      ".AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra." +
-      "Pagination\"?\n\024ListCFGEdgesResponse\022\'\n\005ed" +
-      "ges\030\001 \003(\0132\030.libghidra.CFGEdgeRecord\"2\n\021F" +
-      "unctionTagRecord\022\014\n\004name\030\001 \001(\t\022\017\n\007commen" +
-      "t\030\002 \001(\t\"\031\n\027ListFunctionTagsRequest\"F\n\030Li" +
-      "stFunctionTagsResponse\022*\n\004tags\030\001 \003(\0132\034.l" +
-      "ibghidra.FunctionTagRecord\"9\n\030CreateFunc" +
-      "tionTagRequest\022\014\n\004name\030\002 \001(\t\022\017\n\007comment\030" +
-      "\003 \001(\t\",\n\031CreateFunctionTagResponse\022\017\n\007cr" +
-      "eated\030\001 \001(\010\"(\n\030DeleteFunctionTagRequest\022" +
-      "\014\n\004name\030\002 \001(\t\",\n\031DeleteFunctionTagRespon" +
-      "se\022\017\n\007deleted\030\001 \001(\010\"D\n\030FunctionTagMappin" +
-      "gRecord\022\026\n\016function_entry\030\001 \001(\004\022\020\n\010tag_n" +
-      "ame\030\002 \001(\t\"8\n\036ListFunctionTagMappingsRequ" +
-      "est\022\026\n\016function_entry\030\002 \001(\004\"X\n\037ListFunct" +
-      "ionTagMappingsResponse\0225\n\010mappings\030\001 \003(\013" +
-      "2#.libghidra.FunctionTagMappingRecord\">\n" +
-      "\022TagFunctionRequest\022\026\n\016function_entry\030\002 " +
-      "\001(\004\022\020\n\010tag_name\030\003 \001(\t\"&\n\023TagFunctionResp" +
-      "onse\022\017\n\007updated\030\001 \001(\010\"@\n\024UntagFunctionRe" +
-      "quest\022\026\n\016function_entry\030\002 \001(\004\022\020\n\010tag_nam" +
-      "e\030\003 \001(\t\"(\n\025UntagFunctionResponse\022\017\n\007upda" +
-      "ted\030\001 \001(\010\"9\n\020SwitchCaseRecord\022\r\n\005value\030\001" +
-      " \001(\003\022\026\n\016target_address\030\002 \001(\004\"\234\001\n\021SwitchT" +
-      "ableRecord\022\026\n\016function_entry\030\001 \001(\004\022\026\n\016sw" +
-      "itch_address\030\002 \001(\004\022\022\n\ncase_count\030\003 \001(\r\022*" +
-      "\n\005cases\030\004 \003(\0132\033.libghidra.SwitchCaseReco" +
-      "rd\022\027\n\017default_address\030\005 \001(\004\"f\n\027ListSwitc" +
-      "hTablesRequest\022&\n\005range\030\002 \001(\0132\027.libghidr" +
+      "gination\"?\n\024ListCFGEdgesResponse\022\'\n\005edge" +
+      "s\030\001 \003(\0132\030.libghidra.CFGEdgeRecord\"2\n\021Fun" +
+      "ctionTagRecord\022\014\n\004name\030\001 \001(\t\022\017\n\007comment\030" +
+      "\002 \001(\t\"\031\n\027ListFunctionTagsRequest\"F\n\030List" +
+      "FunctionTagsResponse\022*\n\004tags\030\001 \003(\0132\034.lib" +
+      "ghidra.FunctionTagRecord\"9\n\030CreateFuncti" +
+      "onTagRequest\022\014\n\004name\030\002 \001(\t\022\017\n\007comment\030\003 " +
+      "\001(\t\",\n\031CreateFunctionTagResponse\022\017\n\007crea" +
+      "ted\030\001 \001(\010\"(\n\030DeleteFunctionTagRequest\022\014\n" +
+      "\004name\030\002 \001(\t\",\n\031DeleteFunctionTagResponse" +
+      "\022\017\n\007deleted\030\001 \001(\010\"D\n\030FunctionTagMappingR" +
+      "ecord\022\026\n\016function_entry\030\001 \001(\004\022\020\n\010tag_nam" +
+      "e\030\002 \001(\t\"8\n\036ListFunctionTagMappingsReques" +
+      "t\022\026\n\016function_entry\030\002 \001(\004\"X\n\037ListFunctio" +
+      "nTagMappingsResponse\0225\n\010mappings\030\001 \003(\0132#" +
+      ".libghidra.FunctionTagMappingRecord\">\n\022T" +
+      "agFunctionRequest\022\026\n\016function_entry\030\002 \001(" +
+      "\004\022\020\n\010tag_name\030\003 \001(\t\"&\n\023TagFunctionRespon" +
+      "se\022\017\n\007updated\030\001 \001(\010\"@\n\024UntagFunctionRequ" +
+      "est\022\026\n\016function_entry\030\002 \001(\004\022\020\n\010tag_name\030" +
+      "\003 \001(\t\"(\n\025UntagFunctionResponse\022\017\n\007update" +
+      "d\030\001 \001(\010\"9\n\020SwitchCaseRecord\022\r\n\005value\030\001 \001" +
+      "(\003\022\026\n\016target_address\030\002 \001(\004\"\234\001\n\021SwitchTab" +
+      "leRecord\022\026\n\016function_entry\030\001 \001(\004\022\026\n\016swit" +
+      "ch_address\030\002 \001(\004\022\022\n\ncase_count\030\003 \001(\r\022*\n\005" +
+      "cases\030\004 \003(\0132\033.libghidra.SwitchCaseRecord" +
+      "\022\027\n\017default_address\030\005 \001(\004\"f\n\027ListSwitchT" +
+      "ablesRequest\022&\n\005range\030\002 \001(\0132\027.libghidra." +
+      "AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra.P" +
+      "agination\"O\n\030ListSwitchTablesResponse\0223\n" +
+      "\rswitch_tables\030\001 \003(\0132\034.libghidra.SwitchT" +
+      "ableRecord\"w\n\017DominatorRecord\022\026\n\016functio" +
+      "n_entry\030\001 \001(\004\022\025\n\rblock_address\030\002 \001(\004\022\024\n\014" +
+      "idom_address\030\003 \001(\004\022\r\n\005depth\030\004 \001(\r\022\020\n\010is_" +
+      "entry\030\005 \001(\010\"d\n\025ListDominatorsRequest\022&\n\005" +
+      "range\030\002 \001(\0132\027.libghidra.AddressRange\022#\n\004" +
+      "page\030\003 \001(\0132\025.libghidra.Pagination\"H\n\026Lis" +
+      "tDominatorsResponse\022.\n\ndominators\030\001 \003(\0132" +
+      "\032.libghidra.DominatorRecord\"{\n\023PostDomin" +
+      "atorRecord\022\026\n\016function_entry\030\001 \001(\004\022\025\n\rbl" +
+      "ock_address\030\002 \001(\004\022\025\n\ripdom_address\030\003 \001(\004" +
+      "\022\r\n\005depth\030\004 \001(\r\022\017\n\007is_exit\030\005 \001(\010\"h\n\031List" +
+      "PostDominatorsRequest\022&\n\005range\030\002 \001(\0132\027.l" +
+      "ibghidra.AddressRange\022#\n\004page\030\003 \001(\0132\025.li" +
+      "bghidra.Pagination\"U\n\032ListPostDominators" +
+      "Response\0227\n\017post_dominators\030\001 \003(\0132\036.libg" +
+      "hidra.PostDominatorRecord\"\215\001\n\nLoopRecord" +
+      "\022\026\n\016function_entry\030\001 \001(\004\022\026\n\016header_addre" +
+      "ss\030\002 \001(\004\022\030\n\020back_edge_source\030\003 \001(\004\022\021\n\tlo" +
+      "op_kind\030\004 \001(\t\022\023\n\013block_count\030\005 \001(\r\022\r\n\005de" +
+      "pth\030\006 \001(\r\"_\n\020ListLoopsRequest\022&\n\005range\030\002" +
+      " \001(\0132\027.libghidra.AddressRange\022#\n\004page\030\003 " +
+      "\001(\0132\025.libghidra.Pagination\"9\n\021ListLoopsR" +
+      "esponse\022$\n\005loops\030\001 \003(\0132\025.libghidra.LoopR" +
+      "ecord\"\257\001\n\023StackVariableRecord\022\016\n\006var_id\030" +
+      "\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\021\n\tdata_type\030\003 \001(\t\022\024" +
+      "\n\014stack_offset\030\004 \001(\003\022\014\n\004size\030\005 \001(\r\022\024\n\014is" +
+      "_parameter\030\006 \001(\010\022\030\n\020first_use_offset\030\007 \001" +
+      "(\005\022\023\n\013source_type\030\010 \001(\t\"\227\002\n\023FunctionFram" +
+      "eRecord\022\026\n\016function_entry\030\001 \001(\004\022\022\n\nframe" +
+      "_size\030\002 \001(\003\022\022\n\nlocal_size\030\003 \001(\003\022\026\n\016param" +
+      "eter_size\030\004 \001(\003\022\030\n\020parameter_offset\030\005 \001(" +
+      "\003\022\035\n\025return_address_offset\030\006 \001(\003\022\026\n\016grow" +
+      "s_negative\030\007 \001(\010\022\036\n\026stack_pointer_regist" +
+      "er\030\010 \001(\t\0227\n\017stack_variables\030\t \003(\0132\036.libg" +
+      "hidra.StackVariableRecord\"h\n\031ListFunctio" +
+      "nFramesRequest\022&\n\005range\030\002 \001(\0132\027.libghidr" +
       "a.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidra" +
-      ".Pagination\"O\n\030ListSwitchTablesResponse\022" +
-      "3\n\rswitch_tables\030\001 \003(\0132\034.libghidra.Switc" +
-      "hTableRecord\"w\n\017DominatorRecord\022\026\n\016funct" +
-      "ion_entry\030\001 \001(\004\022\025\n\rblock_address\030\002 \001(\004\022\024" +
-      "\n\014idom_address\030\003 \001(\004\022\r\n\005depth\030\004 \001(\r\022\020\n\010i" +
-      "s_entry\030\005 \001(\010\"d\n\025ListDominatorsRequest\022&" +
-      "\n\005range\030\002 \001(\0132\027.libghidra.AddressRange\022#" +
-      "\n\004page\030\003 \001(\0132\025.libghidra.Pagination\"H\n\026L" +
-      "istDominatorsResponse\022.\n\ndominators\030\001 \003(" +
-      "\0132\032.libghidra.DominatorRecord\"{\n\023PostDom" +
-      "inatorRecord\022\026\n\016function_entry\030\001 \001(\004\022\025\n\r" +
-      "block_address\030\002 \001(\004\022\025\n\ripdom_address\030\003 \001" +
-      "(\004\022\r\n\005depth\030\004 \001(\r\022\017\n\007is_exit\030\005 \001(\010\"h\n\031Li" +
-      "stPostDominatorsRequest\022&\n\005range\030\002 \001(\0132\027" +
-      ".libghidra.AddressRange\022#\n\004page\030\003 \001(\0132\025." +
-      "libghidra.Pagination\"U\n\032ListPostDominato" +
-      "rsResponse\0227\n\017post_dominators\030\001 \003(\0132\036.li" +
-      "bghidra.PostDominatorRecord\"\215\001\n\nLoopReco" +
-      "rd\022\026\n\016function_entry\030\001 \001(\004\022\026\n\016header_add" +
-      "ress\030\002 \001(\004\022\030\n\020back_edge_source\030\003 \001(\004\022\021\n\t" +
-      "loop_kind\030\004 \001(\t\022\023\n\013block_count\030\005 \001(\r\022\r\n\005" +
-      "depth\030\006 \001(\r\"_\n\020ListLoopsRequest\022&\n\005range" +
-      "\030\002 \001(\0132\027.libghidra.AddressRange\022#\n\004page\030" +
-      "\003 \001(\0132\025.libghidra.Pagination\"9\n\021ListLoop" +
-      "sResponse\022$\n\005loops\030\001 \003(\0132\025.libghidra.Loo" +
-      "pRecord\"\257\001\n\023StackVariableRecord\022\016\n\006var_i" +
-      "d\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\021\n\tdata_type\030\003 \001(\t" +
-      "\022\024\n\014stack_offset\030\004 \001(\003\022\014\n\004size\030\005 \001(\r\022\024\n\014" +
-      "is_parameter\030\006 \001(\010\022\030\n\020first_use_offset\030\007" +
-      " \001(\005\022\023\n\013source_type\030\010 \001(\t\"\227\002\n\023FunctionFr" +
-      "ameRecord\022\026\n\016function_entry\030\001 \001(\004\022\022\n\nfra" +
-      "me_size\030\002 \001(\003\022\022\n\nlocal_size\030\003 \001(\003\022\026\n\016par" +
-      "ameter_size\030\004 \001(\003\022\030\n\020parameter_offset\030\005 " +
-      "\001(\003\022\035\n\025return_address_offset\030\006 \001(\003\022\026\n\016gr" +
-      "ows_negative\030\007 \001(\010\022\036\n\026stack_pointer_regi" +
-      "ster\030\010 \001(\t\0227\n\017stack_variables\030\t \003(\0132\036.li" +
-      "bghidra.StackVariableRecord\"h\n\031ListFunct" +
-      "ionFramesRequest\022&\n\005range\030\002 \001(\0132\027.libghi" +
-      "dra.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghid" +
-      "ra.Pagination\"L\n\032ListFunctionFramesRespo" +
-      "nse\022.\n\006frames\030\001 \003(\0132\036.libghidra.Function" +
-      "FrameRecord2\201\014\n\020FunctionsService\022L\n\013GetF" +
-      "unction\022\035.libghidra.GetFunctionRequest\032\036" +
-      ".libghidra.GetFunctionResponse\022R\n\rListFu" +
-      "nctions\022\037.libghidra.ListFunctionsRequest" +
-      "\032 .libghidra.ListFunctionsResponse\022V\n\021Li" +
-      "stLeafFunctions\022\037.libghidra.ListFunction" +
-      "sRequest\032 .libghidra.ListFunctionsRespon" +
-      "se\022U\n\016RenameFunction\022 .libghidra.RenameF" +
-      "unctionRequest\032!.libghidra.RenameFunctio" +
-      "nResponse\022X\n\017ListBasicBlocks\022!.libghidra" +
-      ".ListBasicBlocksRequest\032\".libghidra.List" +
-      "BasicBlocksResponse\022O\n\014ListCFGEdges\022\036.li" +
-      "bghidra.ListCFGEdgesRequest\032\037.libghidra." +
-      "ListCFGEdgesResponse\022[\n\020ListFunctionTags" +
-      "\022\".libghidra.ListFunctionTagsRequest\032#.l" +
-      "ibghidra.ListFunctionTagsResponse\022^\n\021Cre" +
-      "ateFunctionTag\022#.libghidra.CreateFunctio" +
-      "nTagRequest\032$.libghidra.CreateFunctionTa" +
-      "gResponse\022^\n\021DeleteFunctionTag\022#.libghid" +
-      "ra.DeleteFunctionTagRequest\032$.libghidra." +
-      "DeleteFunctionTagResponse\022p\n\027ListFunctio" +
-      "nTagMappings\022).libghidra.ListFunctionTag" +
-      "MappingsRequest\032*.libghidra.ListFunction" +
-      "TagMappingsResponse\022L\n\013TagFunction\022\035.lib" +
-      "ghidra.TagFunctionRequest\032\036.libghidra.Ta" +
-      "gFunctionResponse\022R\n\rUntagFunction\022\037.lib" +
-      "ghidra.UntagFunctionRequest\032 .libghidra." +
-      "UntagFunctionResponse\022[\n\020ListSwitchTable" +
-      "s\022\".libghidra.ListSwitchTablesRequest\032#." +
-      "libghidra.ListSwitchTablesResponse\022U\n\016Li" +
-      "stDominators\022 .libghidra.ListDominatorsR" +
-      "equest\032!.libghidra.ListDominatorsRespons" +
-      "e\022a\n\022ListPostDominators\022$.libghidra.List" +
-      "PostDominatorsRequest\032%.libghidra.ListPo" +
-      "stDominatorsResponse\022F\n\tListLoops\022\033.libg" +
-      "hidra.ListLoopsRequest\032\034.libghidra.ListL" +
-      "oopsResponse\022a\n\022ListFunctionFrames\022$.lib" +
-      "ghidra.ListFunctionFramesRequest\032%.libgh" +
-      "idra.ListFunctionFramesResponseB\035\n\tlibgh" +
-      "idraB\016FunctionsProtoP\001b\006proto3"
+      ".Pagination\"L\n\032ListFunctionFramesRespons" +
+      "e\022.\n\006frames\030\001 \003(\0132\036.libghidra.FunctionFr" +
+      "ameRecord2\330\014\n\020FunctionsService\022L\n\013GetFun" +
+      "ction\022\035.libghidra.GetFunctionRequest\032\036.l" +
+      "ibghidra.GetFunctionResponse\022R\n\rListFunc" +
+      "tions\022\037.libghidra.ListFunctionsRequest\032 " +
+      ".libghidra.ListFunctionsResponse\022V\n\021List" +
+      "LeafFunctions\022\037.libghidra.ListFunctionsR" +
+      "equest\032 .libghidra.ListFunctionsResponse" +
+      "\022U\n\016CreateFunction\022 .libghidra.CreateFun" +
+      "ctionRequest\032!.libghidra.CreateFunctionR" +
+      "esponse\022U\n\016RenameFunction\022 .libghidra.Re" +
+      "nameFunctionRequest\032!.libghidra.RenameFu" +
+      "nctionResponse\022X\n\017ListBasicBlocks\022!.libg" +
+      "hidra.ListBasicBlocksRequest\032\".libghidra" +
+      ".ListBasicBlocksResponse\022O\n\014ListCFGEdges" +
+      "\022\036.libghidra.ListCFGEdgesRequest\032\037.libgh" +
+      "idra.ListCFGEdgesResponse\022[\n\020ListFunctio" +
+      "nTags\022\".libghidra.ListFunctionTagsReques" +
+      "t\032#.libghidra.ListFunctionTagsResponse\022^" +
+      "\n\021CreateFunctionTag\022#.libghidra.CreateFu" +
+      "nctionTagRequest\032$.libghidra.CreateFunct" +
+      "ionTagResponse\022^\n\021DeleteFunctionTag\022#.li" +
+      "bghidra.DeleteFunctionTagRequest\032$.libgh" +
+      "idra.DeleteFunctionTagResponse\022p\n\027ListFu" +
+      "nctionTagMappings\022).libghidra.ListFuncti" +
+      "onTagMappingsRequest\032*.libghidra.ListFun" +
+      "ctionTagMappingsResponse\022L\n\013TagFunction\022" +
+      "\035.libghidra.TagFunctionRequest\032\036.libghid" +
+      "ra.TagFunctionResponse\022R\n\rUntagFunction\022" +
+      "\037.libghidra.UntagFunctionRequest\032 .libgh" +
+      "idra.UntagFunctionResponse\022[\n\020ListSwitch" +
+      "Tables\022\".libghidra.ListSwitchTablesReque" +
+      "st\032#.libghidra.ListSwitchTablesResponse\022" +
+      "U\n\016ListDominators\022 .libghidra.ListDomina" +
+      "torsRequest\032!.libghidra.ListDominatorsRe" +
+      "sponse\022a\n\022ListPostDominators\022$.libghidra" +
+      ".ListPostDominatorsRequest\032%.libghidra.L" +
+      "istPostDominatorsResponse\022F\n\tListLoops\022\033" +
+      ".libghidra.ListLoopsRequest\032\034.libghidra." +
+      "ListLoopsResponse\022a\n\022ListFunctionFrames\022" +
+      "$.libghidra.ListFunctionFramesRequest\032%." +
+      "libghidra.ListFunctionFramesResponseB\035\n\t" +
+      "libghidraB\016FunctionsProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -441,224 +457,236 @@ public final class FunctionsProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_RenameFunctionResponse_descriptor,
         new java.lang.String[] { "Renamed", "Name", });
-    internal_static_libghidra_BasicBlockRecord_descriptor =
+    internal_static_libghidra_CreateFunctionRequest_descriptor =
       getDescriptor().getMessageTypes().get(7);
+    internal_static_libghidra_CreateFunctionRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_CreateFunctionRequest_descriptor,
+        new java.lang.String[] { "Address", "Name", });
+    internal_static_libghidra_CreateFunctionResponse_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_libghidra_CreateFunctionResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_libghidra_CreateFunctionResponse_descriptor,
+        new java.lang.String[] { "Created", "Function", });
+    internal_static_libghidra_BasicBlockRecord_descriptor =
+      getDescriptor().getMessageTypes().get(9);
     internal_static_libghidra_BasicBlockRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_BasicBlockRecord_descriptor,
         new java.lang.String[] { "FunctionEntry", "StartAddress", "EndAddress", "InDegree", "OutDegree", });
     internal_static_libghidra_ListBasicBlocksRequest_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_libghidra_ListBasicBlocksRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListBasicBlocksRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_ListBasicBlocksResponse_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_libghidra_ListBasicBlocksResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListBasicBlocksResponse_descriptor,
         new java.lang.String[] { "Blocks", });
     internal_static_libghidra_CFGEdgeRecord_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_libghidra_CFGEdgeRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_CFGEdgeRecord_descriptor,
         new java.lang.String[] { "FunctionEntry", "SrcBlockStart", "DstBlockStart", "EdgeKind", });
     internal_static_libghidra_ListCFGEdgesRequest_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_libghidra_ListCFGEdgesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListCFGEdgesRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_ListCFGEdgesResponse_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_libghidra_ListCFGEdgesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListCFGEdgesResponse_descriptor,
         new java.lang.String[] { "Edges", });
     internal_static_libghidra_FunctionTagRecord_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_libghidra_FunctionTagRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_FunctionTagRecord_descriptor,
         new java.lang.String[] { "Name", "Comment", });
     internal_static_libghidra_ListFunctionTagsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_libghidra_ListFunctionTagsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListFunctionTagsRequest_descriptor,
         new java.lang.String[] { });
     internal_static_libghidra_ListFunctionTagsResponse_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_libghidra_ListFunctionTagsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListFunctionTagsResponse_descriptor,
         new java.lang.String[] { "Tags", });
     internal_static_libghidra_CreateFunctionTagRequest_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_libghidra_CreateFunctionTagRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_CreateFunctionTagRequest_descriptor,
         new java.lang.String[] { "Name", "Comment", });
     internal_static_libghidra_CreateFunctionTagResponse_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_libghidra_CreateFunctionTagResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_CreateFunctionTagResponse_descriptor,
         new java.lang.String[] { "Created", });
     internal_static_libghidra_DeleteFunctionTagRequest_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_libghidra_DeleteFunctionTagRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteFunctionTagRequest_descriptor,
         new java.lang.String[] { "Name", });
     internal_static_libghidra_DeleteFunctionTagResponse_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_libghidra_DeleteFunctionTagResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DeleteFunctionTagResponse_descriptor,
         new java.lang.String[] { "Deleted", });
     internal_static_libghidra_FunctionTagMappingRecord_descriptor =
-      getDescriptor().getMessageTypes().get(20);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_libghidra_FunctionTagMappingRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_FunctionTagMappingRecord_descriptor,
         new java.lang.String[] { "FunctionEntry", "TagName", });
     internal_static_libghidra_ListFunctionTagMappingsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_libghidra_ListFunctionTagMappingsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListFunctionTagMappingsRequest_descriptor,
         new java.lang.String[] { "FunctionEntry", });
     internal_static_libghidra_ListFunctionTagMappingsResponse_descriptor =
-      getDescriptor().getMessageTypes().get(22);
+      getDescriptor().getMessageTypes().get(24);
     internal_static_libghidra_ListFunctionTagMappingsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListFunctionTagMappingsResponse_descriptor,
         new java.lang.String[] { "Mappings", });
     internal_static_libghidra_TagFunctionRequest_descriptor =
-      getDescriptor().getMessageTypes().get(23);
+      getDescriptor().getMessageTypes().get(25);
     internal_static_libghidra_TagFunctionRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_TagFunctionRequest_descriptor,
         new java.lang.String[] { "FunctionEntry", "TagName", });
     internal_static_libghidra_TagFunctionResponse_descriptor =
-      getDescriptor().getMessageTypes().get(24);
+      getDescriptor().getMessageTypes().get(26);
     internal_static_libghidra_TagFunctionResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_TagFunctionResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_UntagFunctionRequest_descriptor =
-      getDescriptor().getMessageTypes().get(25);
+      getDescriptor().getMessageTypes().get(27);
     internal_static_libghidra_UntagFunctionRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_UntagFunctionRequest_descriptor,
         new java.lang.String[] { "FunctionEntry", "TagName", });
     internal_static_libghidra_UntagFunctionResponse_descriptor =
-      getDescriptor().getMessageTypes().get(26);
+      getDescriptor().getMessageTypes().get(28);
     internal_static_libghidra_UntagFunctionResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_UntagFunctionResponse_descriptor,
         new java.lang.String[] { "Updated", });
     internal_static_libghidra_SwitchCaseRecord_descriptor =
-      getDescriptor().getMessageTypes().get(27);
+      getDescriptor().getMessageTypes().get(29);
     internal_static_libghidra_SwitchCaseRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SwitchCaseRecord_descriptor,
         new java.lang.String[] { "Value", "TargetAddress", });
     internal_static_libghidra_SwitchTableRecord_descriptor =
-      getDescriptor().getMessageTypes().get(28);
+      getDescriptor().getMessageTypes().get(30);
     internal_static_libghidra_SwitchTableRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SwitchTableRecord_descriptor,
         new java.lang.String[] { "FunctionEntry", "SwitchAddress", "CaseCount", "Cases", "DefaultAddress", });
     internal_static_libghidra_ListSwitchTablesRequest_descriptor =
-      getDescriptor().getMessageTypes().get(29);
+      getDescriptor().getMessageTypes().get(31);
     internal_static_libghidra_ListSwitchTablesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListSwitchTablesRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_ListSwitchTablesResponse_descriptor =
-      getDescriptor().getMessageTypes().get(30);
+      getDescriptor().getMessageTypes().get(32);
     internal_static_libghidra_ListSwitchTablesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListSwitchTablesResponse_descriptor,
         new java.lang.String[] { "SwitchTables", });
     internal_static_libghidra_DominatorRecord_descriptor =
-      getDescriptor().getMessageTypes().get(31);
+      getDescriptor().getMessageTypes().get(33);
     internal_static_libghidra_DominatorRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_DominatorRecord_descriptor,
         new java.lang.String[] { "FunctionEntry", "BlockAddress", "IdomAddress", "Depth", "IsEntry", });
     internal_static_libghidra_ListDominatorsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(32);
+      getDescriptor().getMessageTypes().get(34);
     internal_static_libghidra_ListDominatorsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListDominatorsRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_ListDominatorsResponse_descriptor =
-      getDescriptor().getMessageTypes().get(33);
+      getDescriptor().getMessageTypes().get(35);
     internal_static_libghidra_ListDominatorsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListDominatorsResponse_descriptor,
         new java.lang.String[] { "Dominators", });
     internal_static_libghidra_PostDominatorRecord_descriptor =
-      getDescriptor().getMessageTypes().get(34);
+      getDescriptor().getMessageTypes().get(36);
     internal_static_libghidra_PostDominatorRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_PostDominatorRecord_descriptor,
         new java.lang.String[] { "FunctionEntry", "BlockAddress", "IpdomAddress", "Depth", "IsExit", });
     internal_static_libghidra_ListPostDominatorsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(35);
+      getDescriptor().getMessageTypes().get(37);
     internal_static_libghidra_ListPostDominatorsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListPostDominatorsRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_ListPostDominatorsResponse_descriptor =
-      getDescriptor().getMessageTypes().get(36);
+      getDescriptor().getMessageTypes().get(38);
     internal_static_libghidra_ListPostDominatorsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListPostDominatorsResponse_descriptor,
         new java.lang.String[] { "PostDominators", });
     internal_static_libghidra_LoopRecord_descriptor =
-      getDescriptor().getMessageTypes().get(37);
+      getDescriptor().getMessageTypes().get(39);
     internal_static_libghidra_LoopRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_LoopRecord_descriptor,
         new java.lang.String[] { "FunctionEntry", "HeaderAddress", "BackEdgeSource", "LoopKind", "BlockCount", "Depth", });
     internal_static_libghidra_ListLoopsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(38);
+      getDescriptor().getMessageTypes().get(40);
     internal_static_libghidra_ListLoopsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListLoopsRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_ListLoopsResponse_descriptor =
-      getDescriptor().getMessageTypes().get(39);
+      getDescriptor().getMessageTypes().get(41);
     internal_static_libghidra_ListLoopsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListLoopsResponse_descriptor,
         new java.lang.String[] { "Loops", });
     internal_static_libghidra_StackVariableRecord_descriptor =
-      getDescriptor().getMessageTypes().get(40);
+      getDescriptor().getMessageTypes().get(42);
     internal_static_libghidra_StackVariableRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_StackVariableRecord_descriptor,
         new java.lang.String[] { "VarId", "Name", "DataType", "StackOffset", "Size", "IsParameter", "FirstUseOffset", "SourceType", });
     internal_static_libghidra_FunctionFrameRecord_descriptor =
-      getDescriptor().getMessageTypes().get(41);
+      getDescriptor().getMessageTypes().get(43);
     internal_static_libghidra_FunctionFrameRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_FunctionFrameRecord_descriptor,
         new java.lang.String[] { "FunctionEntry", "FrameSize", "LocalSize", "ParameterSize", "ParameterOffset", "ReturnAddressOffset", "GrowsNegative", "StackPointerRegister", "StackVariables", });
     internal_static_libghidra_ListFunctionFramesRequest_descriptor =
-      getDescriptor().getMessageTypes().get(42);
+      getDescriptor().getMessageTypes().get(44);
     internal_static_libghidra_ListFunctionFramesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListFunctionFramesRequest_descriptor,
         new java.lang.String[] { "Range", "Page", });
     internal_static_libghidra_ListFunctionFramesResponse_descriptor =
-      getDescriptor().getMessageTypes().get(43);
+      getDescriptor().getMessageTypes().get(45);
     internal_static_libghidra_ListFunctionFramesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_ListFunctionFramesResponse_descriptor,

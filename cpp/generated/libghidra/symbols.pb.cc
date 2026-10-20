@@ -101,11 +101,14 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
 
 inline constexpr RenameSymbolRequest::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
-      : new_name_(
+      : _cached_size_{0},
+        new_name_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
-        address_{::uint64_t{0u}},
-        _cached_size_{0} {}
+        old_name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        address_{::uint64_t{0u}} {}
 
 template <typename>
 PROTOBUF_CONSTEXPR RenameSymbolRequest::RenameSymbolRequest(::_pbi::ConstantInitialized)
@@ -206,6 +209,34 @@ struct DeleteSymbolRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DeleteSymbolRequestDefaultTypeInternal _DeleteSymbolRequest_default_instance_;
 
+inline constexpr CreateLabelRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        address_{::uint64_t{0u}},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR CreateLabelRequest::CreateLabelRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct CreateLabelRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR CreateLabelRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~CreateLabelRequestDefaultTypeInternal() {}
+  union {
+    CreateLabelRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CreateLabelRequestDefaultTypeInternal _CreateLabelRequest_default_instance_;
+
 inline constexpr ListSymbolsResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : symbols_{},
@@ -281,6 +312,32 @@ struct GetSymbolResponseDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 GetSymbolResponseDefaultTypeInternal _GetSymbolResponse_default_instance_;
+
+inline constexpr CreateLabelResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        symbol_{nullptr},
+        created_{false} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR CreateLabelResponse::CreateLabelResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct CreateLabelResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR CreateLabelResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~CreateLabelResponseDefaultTypeInternal() {}
+  union {
+    CreateLabelResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CreateLabelResponseDefaultTypeInternal _CreateLabelResponse_default_instance_;
 }  // namespace libghidra
 static constexpr const ::_pb::EnumDescriptor**
     file_level_enum_descriptors_libghidra_2fsymbols_2eproto = nullptr;
@@ -348,7 +405,7 @@ const ::uint32_t
         ~0u,  // no _split_
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::ListSymbolsResponse, _impl_.symbols_),
-        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::RenameSymbolRequest, _impl_._has_bits_),
         PROTOBUF_FIELD_OFFSET(::libghidra::RenameSymbolRequest, _internal_metadata_),
         ~0u,  // no _extensions_
         ~0u,  // no _oneof_case_
@@ -358,6 +415,10 @@ const ::uint32_t
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::RenameSymbolRequest, _impl_.address_),
         PROTOBUF_FIELD_OFFSET(::libghidra::RenameSymbolRequest, _impl_.new_name_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::RenameSymbolRequest, _impl_.old_name_),
+        ~0u,
+        ~0u,
+        0,
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::RenameSymbolResponse, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -368,6 +429,28 @@ const ::uint32_t
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::libghidra::RenameSymbolResponse, _impl_.renamed_),
         PROTOBUF_FIELD_OFFSET(::libghidra::RenameSymbolResponse, _impl_.name_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateLabelRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateLabelRequest, _impl_.address_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateLabelRequest, _impl_.name_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateLabelResponse, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateLabelResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateLabelResponse, _impl_.created_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::CreateLabelResponse, _impl_.symbol_),
+        ~0u,
+        0,
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::DeleteSymbolRequest, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -397,10 +480,12 @@ static const ::_pbi::MigrationSchema
         {28, 37, -1, sizeof(::libghidra::GetSymbolResponse)},
         {38, 48, -1, sizeof(::libghidra::ListSymbolsRequest)},
         {50, -1, -1, sizeof(::libghidra::ListSymbolsResponse)},
-        {59, -1, -1, sizeof(::libghidra::RenameSymbolRequest)},
-        {69, -1, -1, sizeof(::libghidra::RenameSymbolResponse)},
-        {79, -1, -1, sizeof(::libghidra::DeleteSymbolRequest)},
-        {89, -1, -1, sizeof(::libghidra::DeleteSymbolResponse)},
+        {59, 70, -1, sizeof(::libghidra::RenameSymbolRequest)},
+        {73, -1, -1, sizeof(::libghidra::RenameSymbolResponse)},
+        {83, -1, -1, sizeof(::libghidra::CreateLabelRequest)},
+        {93, 103, -1, sizeof(::libghidra::CreateLabelResponse)},
+        {105, -1, -1, sizeof(::libghidra::DeleteSymbolRequest)},
+        {115, -1, -1, sizeof(::libghidra::DeleteSymbolResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_SymbolRecord_default_instance_._instance,
@@ -410,6 +495,8 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_ListSymbolsResponse_default_instance_._instance,
     &::libghidra::_RenameSymbolRequest_default_instance_._instance,
     &::libghidra::_RenameSymbolResponse_default_instance_._instance,
+    &::libghidra::_CreateLabelRequest_default_instance_._instance,
+    &::libghidra::_CreateLabelResponse_default_instance_._instance,
     &::libghidra::_DeleteSymbolRequest_default_instance_._instance,
     &::libghidra::_DeleteSymbolResponse_default_instance_._instance,
 };
@@ -428,22 +515,29 @@ const char descriptor_table_protodef_libghidra_2fsymbols_2eproto[] ABSL_ATTRIBUT
     "tSymbolsRequest\022&\n\005range\030\002 \001(\0132\027.libghid"
     "ra.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidr"
     "a.Pagination\"\?\n\023ListSymbolsResponse\022(\n\007s"
-    "ymbols\030\001 \003(\0132\027.libghidra.SymbolRecord\"8\n"
+    "ymbols\030\001 \003(\0132\027.libghidra.SymbolRecord\"\\\n"
     "\023RenameSymbolRequest\022\017\n\007address\030\002 \001(\004\022\020\n"
-    "\010new_name\030\003 \001(\t\"5\n\024RenameSymbolResponse\022"
-    "\017\n\007renamed\030\001 \001(\010\022\014\n\004name\030\002 \001(\t\"4\n\023Delete"
-    "SymbolRequest\022\017\n\007address\030\002 \001(\004\022\014\n\004name\030\003"
-    " \001(\t\">\n\024DeleteSymbolResponse\022\017\n\007deleted\030"
-    "\001 \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\310\002\n\016Symbols"
-    "Service\022F\n\tGetSymbol\022\033.libghidra.GetSymb"
-    "olRequest\032\034.libghidra.GetSymbolResponse\022"
-    "L\n\013ListSymbols\022\035.libghidra.ListSymbolsRe"
-    "quest\032\036.libghidra.ListSymbolsResponse\022O\n"
-    "\014RenameSymbol\022\036.libghidra.RenameSymbolRe"
-    "quest\032\037.libghidra.RenameSymbolResponse\022O"
-    "\n\014DeleteSymbol\022\036.libghidra.DeleteSymbolR"
-    "equest\032\037.libghidra.DeleteSymbolResponseB"
-    "\033\n\tlibghidraB\014SymbolsProtoP\001b\006proto3"
+    "\010new_name\030\003 \001(\t\022\025\n\010old_name\030\004 \001(\tH\000\210\001\001B\013"
+    "\n\t_old_name\"5\n\024RenameSymbolResponse\022\017\n\007r"
+    "enamed\030\001 \001(\010\022\014\n\004name\030\002 \001(\t\"3\n\022CreateLabe"
+    "lRequest\022\017\n\007address\030\002 \001(\004\022\014\n\004name\030\003 \001(\t\""
+    "O\n\023CreateLabelResponse\022\017\n\007created\030\001 \001(\010\022"
+    "\'\n\006symbol\030\002 \001(\0132\027.libghidra.SymbolRecord"
+    "\"4\n\023DeleteSymbolRequest\022\017\n\007address\030\002 \001(\004"
+    "\022\014\n\004name\030\003 \001(\t\">\n\024DeleteSymbolResponse\022\017"
+    "\n\007deleted\030\001 \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\226"
+    "\003\n\016SymbolsService\022F\n\tGetSymbol\022\033.libghid"
+    "ra.GetSymbolRequest\032\034.libghidra.GetSymbo"
+    "lResponse\022L\n\013ListSymbols\022\035.libghidra.Lis"
+    "tSymbolsRequest\032\036.libghidra.ListSymbolsR"
+    "esponse\022L\n\013CreateLabel\022\035.libghidra.Creat"
+    "eLabelRequest\032\036.libghidra.CreateLabelRes"
+    "ponse\022O\n\014RenameSymbol\022\036.libghidra.Rename"
+    "SymbolRequest\032\037.libghidra.RenameSymbolRe"
+    "sponse\022O\n\014DeleteSymbol\022\036.libghidra.Delet"
+    "eSymbolRequest\032\037.libghidra.DeleteSymbolR"
+    "esponseB\033\n\tlibghidraB\014SymbolsProtoP\001b\006pr"
+    "oto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2fsymbols_2eproto_deps[1] =
     {
@@ -453,13 +547,13 @@ static ::absl::once_flag descriptor_table_libghidra_2fsymbols_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fsymbols_2eproto = {
     false,
     false,
-    1156,
+    1404,
     descriptor_table_protodef_libghidra_2fsymbols_2eproto,
     "libghidra/symbols.proto",
     &descriptor_table_libghidra_2fsymbols_2eproto_once,
     descriptor_table_libghidra_2fsymbols_2eproto_deps,
     1,
-    9,
+    11,
     schemas,
     file_default_instances,
     TableStruct_libghidra_2fsymbols_2eproto::offsets,
@@ -1974,6 +2068,10 @@ void ListSymbolsResponse::InternalSwap(ListSymbolsResponse* PROTOBUF_RESTRICT ot
 
 class RenameSymbolRequest::_Internal {
  public:
+  using HasBits =
+      decltype(std::declval<RenameSymbolRequest>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(RenameSymbolRequest, _impl_._has_bits_);
 };
 
 RenameSymbolRequest::RenameSymbolRequest(::google::protobuf::Arena* arena)
@@ -1988,8 +2086,10 @@ RenameSymbolRequest::RenameSymbolRequest(::google::protobuf::Arena* arena)
 inline PROTOBUF_NDEBUG_INLINE RenameSymbolRequest::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
     const Impl_& from, const ::libghidra::RenameSymbolRequest& from_msg)
-      : new_name_(arena, from.new_name_),
-        _cached_size_{0} {}
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        new_name_(arena, from.new_name_),
+        old_name_(arena, from.old_name_) {}
 
 RenameSymbolRequest::RenameSymbolRequest(
     ::google::protobuf::Arena* arena,
@@ -2011,8 +2111,9 @@ RenameSymbolRequest::RenameSymbolRequest(
 inline PROTOBUF_NDEBUG_INLINE RenameSymbolRequest::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility,
     ::google::protobuf::Arena* arena)
-      : new_name_(arena),
-        _cached_size_{0} {}
+      : _cached_size_{0},
+        new_name_(arena),
+        old_name_(arena) {}
 
 inline void RenameSymbolRequest::SharedCtor(::_pb::Arena* arena) {
   new (&_impl_) Impl_(internal_visibility(), arena);
@@ -2027,6 +2128,7 @@ inline void RenameSymbolRequest::SharedDtor(MessageLite& self) {
   this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   ABSL_DCHECK(this_.GetArena() == nullptr);
   this_._impl_.new_name_.Destroy();
+  this_._impl_.old_name_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -2066,15 +2168,15 @@ const ::google::protobuf::internal::ClassData* RenameSymbolRequest::GetClassData
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<1, 2, 0, 46, 2> RenameSymbolRequest::_table_ = {
+const ::_pbi::TcParseTable<2, 3, 0, 54, 2> RenameSymbolRequest::_table_ = {
   {
-    0,  // no _has_bits_
+    PROTOBUF_FIELD_OFFSET(RenameSymbolRequest, _impl_._has_bits_),
     0, // no _extensions_
-    3, 8,  // max_field_number, fast_idx_mask
+    4, 24,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967289,  // skipmap
+    4294967281,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    2,  // num_field_entries
+    3,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     _class_data_.base(),
@@ -2084,6 +2186,10 @@ const ::_pbi::TcParseTable<1, 2, 0, 46, 2> RenameSymbolRequest::_table_ = {
     ::_pbi::TcParser::GetTable<::libghidra::RenameSymbolRequest>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
+    // optional string old_name = 4;
+    {::_pbi::TcParser::FastUS1,
+     {34, 0, 0, PROTOBUF_FIELD_OFFSET(RenameSymbolRequest, _impl_.old_name_)}},
+    {::_pbi::TcParser::MiniParse, {}},
     // uint64 address = 2;
     {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(RenameSymbolRequest, _impl_.address_), 63>(),
      {16, 63, 0, PROTOBUF_FIELD_OFFSET(RenameSymbolRequest, _impl_.address_)}},
@@ -2094,17 +2200,21 @@ const ::_pbi::TcParseTable<1, 2, 0, 46, 2> RenameSymbolRequest::_table_ = {
     65535, 65535
   }}, {{
     // uint64 address = 2;
-    {PROTOBUF_FIELD_OFFSET(RenameSymbolRequest, _impl_.address_), 0, 0,
+    {PROTOBUF_FIELD_OFFSET(RenameSymbolRequest, _impl_.address_), -1, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
     // string new_name = 3;
-    {PROTOBUF_FIELD_OFFSET(RenameSymbolRequest, _impl_.new_name_), 0, 0,
+    {PROTOBUF_FIELD_OFFSET(RenameSymbolRequest, _impl_.new_name_), -1, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // optional string old_name = 4;
+    {PROTOBUF_FIELD_OFFSET(RenameSymbolRequest, _impl_.old_name_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
   }},
   // no aux_entries
   {{
-    "\35\0\10\0\0\0\0\0"
+    "\35\0\10\10\0\0\0\0"
     "libghidra.RenameSymbolRequest"
     "new_name"
+    "old_name"
   }},
 };
 
@@ -2116,7 +2226,12 @@ PROTOBUF_NOINLINE void RenameSymbolRequest::Clear() {
   (void) cached_has_bits;
 
   _impl_.new_name_.ClearToEmpty();
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    _impl_.old_name_.ClearNonDefaultToEmpty();
+  }
   _impl_.address_ = ::uint64_t{0u};
+  _impl_._has_bits_.Clear();
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
@@ -2150,6 +2265,15 @@ PROTOBUF_NOINLINE void RenameSymbolRequest::Clear() {
             target = stream->WriteStringMaybeAliased(3, _s, target);
           }
 
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // optional string old_name = 4;
+          if (cached_has_bits & 0x00000001u) {
+            const std::string& _s = this_._internal_old_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.RenameSymbolRequest.old_name");
+            target = stream->WriteStringMaybeAliased(4, _s, target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -2180,6 +2304,16 @@ PROTOBUF_NOINLINE void RenameSymbolRequest::Clear() {
               total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
                                               this_._internal_new_name());
             }
+          }
+           {
+            // optional string old_name = 4;
+            cached_has_bits = this_._impl_._has_bits_[0];
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_old_name());
+            }
+          }
+           {
             // uint64 address = 2;
             if (this_._internal_address() != 0) {
               total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
@@ -2201,9 +2335,14 @@ void RenameSymbolRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, con
   if (!from._internal_new_name().empty()) {
     _this->_internal_set_new_name(from._internal_new_name());
   }
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    _this->_internal_set_old_name(from._internal_old_name());
+  }
   if (from._internal_address() != 0) {
     _this->_impl_.address_ = from._impl_.address_;
   }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -2220,7 +2359,9 @@ void RenameSymbolRequest::InternalSwap(RenameSymbolRequest* PROTOBUF_RESTRICT ot
   auto* arena = GetArena();
   ABSL_DCHECK_EQ(arena, other->GetArena());
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.new_name_, &other->_impl_.new_name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.old_name_, &other->_impl_.old_name_, arena);
         swap(_impl_.address_, other->_impl_.address_);
 }
 
@@ -2481,6 +2622,548 @@ void RenameSymbolResponse::InternalSwap(RenameSymbolResponse* PROTOBUF_RESTRICT 
 }
 
 ::google::protobuf::Metadata RenameSymbolResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class CreateLabelRequest::_Internal {
+ public:
+};
+
+CreateLabelRequest::CreateLabelRequest(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.CreateLabelRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE CreateLabelRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::CreateLabelRequest& from_msg)
+      : name_(arena, from.name_),
+        _cached_size_{0} {}
+
+CreateLabelRequest::CreateLabelRequest(
+    ::google::protobuf::Arena* arena,
+    const CreateLabelRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  CreateLabelRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  _impl_.address_ = from._impl_.address_;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.CreateLabelRequest)
+}
+inline PROTOBUF_NDEBUG_INLINE CreateLabelRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : name_(arena),
+        _cached_size_{0} {}
+
+inline void CreateLabelRequest::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.address_ = {};
+}
+CreateLabelRequest::~CreateLabelRequest() {
+  // @@protoc_insertion_point(destructor:libghidra.CreateLabelRequest)
+  SharedDtor(*this);
+}
+inline void CreateLabelRequest::SharedDtor(MessageLite& self) {
+  CreateLabelRequest& this_ = static_cast<CreateLabelRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.name_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* CreateLabelRequest::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) CreateLabelRequest(arena);
+}
+constexpr auto CreateLabelRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(CreateLabelRequest),
+                                            alignof(CreateLabelRequest));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull CreateLabelRequest::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_CreateLabelRequest_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &CreateLabelRequest::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<CreateLabelRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &CreateLabelRequest::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<CreateLabelRequest>(), &CreateLabelRequest::ByteSizeLong,
+            &CreateLabelRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(CreateLabelRequest, _impl_._cached_size_),
+        false,
+    },
+    &CreateLabelRequest::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsymbols_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* CreateLabelRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 0, 41, 2> CreateLabelRequest::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    3, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967289,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::CreateLabelRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // uint64 address = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(CreateLabelRequest, _impl_.address_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(CreateLabelRequest, _impl_.address_)}},
+    // string name = 3;
+    {::_pbi::TcParser::FastUS1,
+     {26, 63, 0, PROTOBUF_FIELD_OFFSET(CreateLabelRequest, _impl_.name_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint64 address = 2;
+    {PROTOBUF_FIELD_OFFSET(CreateLabelRequest, _impl_.address_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // string name = 3;
+    {PROTOBUF_FIELD_OFFSET(CreateLabelRequest, _impl_.name_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\34\0\4\0\0\0\0\0"
+    "libghidra.CreateLabelRequest"
+    "name"
+  }},
+};
+
+PROTOBUF_NOINLINE void CreateLabelRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.CreateLabelRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.name_.ClearToEmpty();
+  _impl_.address_ = ::uint64_t{0u};
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* CreateLabelRequest::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const CreateLabelRequest& this_ = static_cast<const CreateLabelRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* CreateLabelRequest::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const CreateLabelRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.CreateLabelRequest)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint64 address = 2;
+          if (this_._internal_address() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                2, this_._internal_address(), target);
+          }
+
+          // string name = 3;
+          if (!this_._internal_name().empty()) {
+            const std::string& _s = this_._internal_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "libghidra.CreateLabelRequest.name");
+            target = stream->WriteStringMaybeAliased(3, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.CreateLabelRequest)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t CreateLabelRequest::ByteSizeLong(const MessageLite& base) {
+          const CreateLabelRequest& this_ = static_cast<const CreateLabelRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t CreateLabelRequest::ByteSizeLong() const {
+          const CreateLabelRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.CreateLabelRequest)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string name = 3;
+            if (!this_._internal_name().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_name());
+            }
+            // uint64 address = 2;
+            if (this_._internal_address() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_address());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void CreateLabelRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<CreateLabelRequest*>(&to_msg);
+  auto& from = static_cast<const CreateLabelRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.CreateLabelRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_name().empty()) {
+    _this->_internal_set_name(from._internal_name());
+  }
+  if (from._internal_address() != 0) {
+    _this->_impl_.address_ = from._impl_.address_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void CreateLabelRequest::CopyFrom(const CreateLabelRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.CreateLabelRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void CreateLabelRequest::InternalSwap(CreateLabelRequest* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+        swap(_impl_.address_, other->_impl_.address_);
+}
+
+::google::protobuf::Metadata CreateLabelRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class CreateLabelResponse::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<CreateLabelResponse>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(CreateLabelResponse, _impl_._has_bits_);
+};
+
+CreateLabelResponse::CreateLabelResponse(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:libghidra.CreateLabelResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE CreateLabelResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::libghidra::CreateLabelResponse& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0} {}
+
+CreateLabelResponse::CreateLabelResponse(
+    ::google::protobuf::Arena* arena,
+    const CreateLabelResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  CreateLabelResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.symbol_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::libghidra::SymbolRecord>(
+                              arena, *from._impl_.symbol_)
+                        : nullptr;
+  _impl_.created_ = from._impl_.created_;
+
+  // @@protoc_insertion_point(copy_constructor:libghidra.CreateLabelResponse)
+}
+inline PROTOBUF_NDEBUG_INLINE CreateLabelResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void CreateLabelResponse::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, symbol_),
+           0,
+           offsetof(Impl_, created_) -
+               offsetof(Impl_, symbol_) +
+               sizeof(Impl_::created_));
+}
+CreateLabelResponse::~CreateLabelResponse() {
+  // @@protoc_insertion_point(destructor:libghidra.CreateLabelResponse)
+  SharedDtor(*this);
+}
+inline void CreateLabelResponse::SharedDtor(MessageLite& self) {
+  CreateLabelResponse& this_ = static_cast<CreateLabelResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  delete this_._impl_.symbol_;
+  this_._impl_.~Impl_();
+}
+
+inline void* CreateLabelResponse::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) CreateLabelResponse(arena);
+}
+constexpr auto CreateLabelResponse::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(CreateLabelResponse),
+                                            alignof(CreateLabelResponse));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull CreateLabelResponse::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_CreateLabelResponse_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &CreateLabelResponse::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<CreateLabelResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &CreateLabelResponse::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<CreateLabelResponse>(), &CreateLabelResponse::ByteSizeLong,
+            &CreateLabelResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(CreateLabelResponse, _impl_._cached_size_),
+        false,
+    },
+    &CreateLabelResponse::kDescriptorMethods,
+    &descriptor_table_libghidra_2fsymbols_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* CreateLabelResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 1, 0, 2> CreateLabelResponse::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(CreateLabelResponse, _impl_._has_bits_),
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::libghidra::CreateLabelResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // .libghidra.SymbolRecord symbol = 2;
+    {::_pbi::TcParser::FastMtS1,
+     {18, 0, 0, PROTOBUF_FIELD_OFFSET(CreateLabelResponse, _impl_.symbol_)}},
+    // bool created = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(CreateLabelResponse, _impl_.created_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(CreateLabelResponse, _impl_.created_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // bool created = 1;
+    {PROTOBUF_FIELD_OFFSET(CreateLabelResponse, _impl_.created_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // .libghidra.SymbolRecord symbol = 2;
+    {PROTOBUF_FIELD_OFFSET(CreateLabelResponse, _impl_.symbol_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::libghidra::SymbolRecord>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void CreateLabelResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:libghidra.CreateLabelResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(_impl_.symbol_ != nullptr);
+    _impl_.symbol_->Clear();
+  }
+  _impl_.created_ = false;
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* CreateLabelResponse::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const CreateLabelResponse& this_ = static_cast<const CreateLabelResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* CreateLabelResponse::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const CreateLabelResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:libghidra.CreateLabelResponse)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // bool created = 1;
+          if (this_._internal_created() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                1, this_._internal_created(), target);
+          }
+
+          cached_has_bits = this_._impl_._has_bits_[0];
+          // .libghidra.SymbolRecord symbol = 2;
+          if (cached_has_bits & 0x00000001u) {
+            target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                2, *this_._impl_.symbol_, this_._impl_.symbol_->GetCachedSize(), target,
+                stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:libghidra.CreateLabelResponse)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t CreateLabelResponse::ByteSizeLong(const MessageLite& base) {
+          const CreateLabelResponse& this_ = static_cast<const CreateLabelResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t CreateLabelResponse::ByteSizeLong() const {
+          const CreateLabelResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:libghidra.CreateLabelResponse)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // .libghidra.SymbolRecord symbol = 2;
+            cached_has_bits = this_._impl_._has_bits_[0];
+            if (cached_has_bits & 0x00000001u) {
+              total_size += 1 +
+                            ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.symbol_);
+            }
+          }
+           {
+            // bool created = 1;
+            if (this_._internal_created() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void CreateLabelResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<CreateLabelResponse*>(&to_msg);
+  auto& from = static_cast<const CreateLabelResponse&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
+  // @@protoc_insertion_point(class_specific_merge_from_start:libghidra.CreateLabelResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(from._impl_.symbol_ != nullptr);
+    if (_this->_impl_.symbol_ == nullptr) {
+      _this->_impl_.symbol_ =
+          ::google::protobuf::Message::CopyConstruct<::libghidra::SymbolRecord>(arena, *from._impl_.symbol_);
+    } else {
+      _this->_impl_.symbol_->MergeFrom(*from._impl_.symbol_);
+    }
+  }
+  if (from._internal_created() != 0) {
+    _this->_impl_.created_ = from._impl_.created_;
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void CreateLabelResponse::CopyFrom(const CreateLabelResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:libghidra.CreateLabelResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void CreateLabelResponse::InternalSwap(CreateLabelResponse* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(CreateLabelResponse, _impl_.created_)
+      + sizeof(CreateLabelResponse::_impl_.created_)
+      - PROTOBUF_FIELD_OFFSET(CreateLabelResponse, _impl_.symbol_)>(
+          reinterpret_cast<char*>(&_impl_.symbol_),
+          reinterpret_cast<char*>(&other->_impl_.symbol_));
+}
+
+::google::protobuf::Metadata CreateLabelResponse::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // ===================================================================

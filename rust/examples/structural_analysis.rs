@@ -176,7 +176,7 @@ fn main() {
     }
     println!("\n  Token kind breakdown:");
     let mut sorted_kinds: Vec<_> = kind_counts.into_iter().collect();
-    sorted_kinds.sort_by(|a, b| b.1.cmp(&a.1));
+    sorted_kinds.sort_by_key(|k| std::cmp::Reverse(k.1));
     for (kind, count) in &sorted_kinds {
         println!("    {kind:<16} {count}");
     }

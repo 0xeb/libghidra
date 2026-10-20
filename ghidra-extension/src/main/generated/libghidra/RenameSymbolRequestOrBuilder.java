@@ -26,4 +26,36 @@ public interface RenameSymbolRequestOrBuilder extends
    */
   com.google.protobuf.ByteString
       getNewNameBytes();
+
+  /**
+   * <pre>
+   * Which symbol at the address to rename. Set: exactly the symbol of that name
+   * (not_found if the address has none). Unset: the address's primary symbol.
+   * </pre>
+   *
+   * <code>optional string old_name = 4;</code>
+   * @return Whether the oldName field is set.
+   */
+  boolean hasOldName();
+  /**
+   * <pre>
+   * Which symbol at the address to rename. Set: exactly the symbol of that name
+   * (not_found if the address has none). Unset: the address's primary symbol.
+   * </pre>
+   *
+   * <code>optional string old_name = 4;</code>
+   * @return The oldName.
+   */
+  java.lang.String getOldName();
+  /**
+   * <pre>
+   * Which symbol at the address to rename. Set: exactly the symbol of that name
+   * (not_found if the address has none). Unset: the address's primary symbol.
+   * </pre>
+   *
+   * <code>optional string old_name = 4;</code>
+   * @return The bytes for oldName.
+   */
+  com.google.protobuf.ByteString
+      getOldNameBytes();
 }

@@ -66,21 +66,21 @@ final class ProgramOptionsSupport {
 	/** Apply one typed write; returns the previous value. Caller holds the write lock. */
 	static String set(Program program, String category, String name, String value) {
 		if (name == null || name.isBlank()) {
-			throw new SessionRpcException("invalid_argument", "option name is required");
+			throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT, "option name is required");
 		}
 		String categoryName = category != null ? category.trim() : "";
 		if (!ANALYZERS_CATEGORY.equals(categoryName)) {
-			throw new SessionRpcException("invalid_argument",
+			throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT,
 				"only \"" + ANALYZERS_CATEGORY + "\" options are settable, not \"" + categoryName + "\"");
 		}
 		AutoAnalysisManager.getAnalysisManager(program);
 		Options options = program.getOptions(categoryName);
 		if (!options.contains(name)) {
-			throw new SessionRpcException("invalid_argument", "no such option: " + name);
+			throw SessionRpcException.notFound("no such option: " + name);
 		}
 		OptionType type = options.getType(name);
 		if (!isSettableType(type)) {
-			throw new SessionRpcException("invalid_argument",
+			throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT,
 				"option " + name + " has type " + typeName(type) + ", which is not settable");
 		}
 		String previous = valueText(options, name);
@@ -190,7 +190,7 @@ final class ProgramOptionsSupport {
 		}
 		manager.startAnalysis(monitor);
 		if (monitor.isCancelled()) {
-			throw new SessionRpcException("cancelled", "analysis was cancelled");
+			throw new SessionRpcException(SessionRpcException.CANCELLED, "analysis was cancelled");
 		}
 		if (all) {
 			GhidraProgramUtilities.markProgramAnalyzed(program);
@@ -238,7 +238,7 @@ final class ProgramOptionsSupport {
 			case INT_TYPE -> {
 				long parsed = parseLong(name, value);
 				if (parsed < Integer.MIN_VALUE || parsed > Integer.MAX_VALUE) {
-					throw new SessionRpcException("invalid_argument",
+					throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT,
 						"value out of int range for " + name + ": " + value);
 				}
 				options.setInt(name, (int) parsed);
@@ -248,7 +248,7 @@ final class ProgramOptionsSupport {
 			case FLOAT_TYPE -> options.setFloat(name, (float) parseDouble(name, value));
 			case STRING_TYPE -> options.setString(name, value);
 			case ENUM_TYPE -> setEnum(options, name, value);
-			default -> throw new SessionRpcException("invalid_argument",
+			default -> throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT,
 				"option " + name + " has type " + typeName(type) + ", which is not settable");
 		}
 	}
@@ -257,7 +257,7 @@ final class ProgramOptionsSupport {
 	private static void setEnum(Options options, String name, String value) {
 		Object current = safeObject(options, name);
 		if (!(current instanceof Enum<?> constant)) {
-			throw new SessionRpcException("invalid_argument",
+			throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT,
 				"option " + name + " has no enum value to resolve against");
 		}
 		Enum<?>[] constants = constant.getDeclaringClass().getEnumConstants();
@@ -279,7 +279,7 @@ final class ProgramOptionsSupport {
 			}
 		}
 		if (match == null) {
-			throw new SessionRpcException("invalid_argument",
+			throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT,
 				"not one of " + Arrays.stream(constants).map(Enum::name).toList() + " for " + name +
 					": " + value);
 		}
@@ -335,7 +335,7 @@ final class ProgramOptionsSupport {
 			case "false", "0", "no", "off":
 				return false;
 			default:
-				throw new SessionRpcException("invalid_argument",
+				throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT,
 					"not a boolean for " + name + ": " + value);
 		}
 	}
@@ -345,7 +345,7 @@ final class ProgramOptionsSupport {
 			return Long.parseLong(value.trim());
 		}
 		catch (NumberFormatException e) {
-			throw new SessionRpcException("invalid_argument",
+			throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT,
 				"not an integer for " + name + ": " + value);
 		}
 	}
@@ -355,7 +355,7 @@ final class ProgramOptionsSupport {
 			return Double.parseDouble(value.trim());
 		}
 		catch (NumberFormatException e) {
-			throw new SessionRpcException("invalid_argument",
+			throw new SessionRpcException(SessionRpcException.INVALID_ARGUMENT,
 				"not a number for " + name + ": " + value);
 		}
 	}

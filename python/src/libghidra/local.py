@@ -19,6 +19,8 @@ from .models import (
     BasicBlockRecord,
     Capability,
     CFGEdgeRecord,
+    CreateFunctionResponse,
+    CreateLabelResponse,
     DecompilationRecord,
     DecompileLocalKind,
     DecompileLocalRecord,
@@ -32,6 +34,7 @@ from .models import (
     HealthStatus,
     InstructionRecord,
     GetInstructionResponse,
+    GetTypeResponse,
     ListBasicBlocksResponse,
     ListCFGEdgesResponse,
     ListDecompilationsResponse,
@@ -252,10 +255,20 @@ class LocalClient:
         """Functions that make no call, from the reference index Ghidra recorded.
 
         Needs a program opened from a Ghidra project (``project_path``); a bare
-        binary raises NOT_SUPPORTED.
+        binary raises not_supported.
         """
         items = self._call(self._client.list_leaf_functions, range_start, range_end, limit, offset)
         return ListFunctionsResponse(functions=[_to_function(d) for d in items])
+
+    def create_function(self, address: int, name: str | None = None) -> CreateFunctionResponse:
+        """Define a function whose entry is ``address``.
+
+        ``name=None`` takes the default name (``FUN_<address>``). Errors:
+        ``UNMAPPED_ADDRESS``; ``DUPLICATE_NAME`` when a function already starts there;
+        ``INVALID_ARGUMENT`` when no instruction starts there.
+        """
+        d = self._call(self._client.create_function, address, name)
+        return CreateFunctionResponse(created=d["created"], function=_to_function(d["function"]))
 
     def rename_function(self, address: int, new_name: str) -> RenameFunctionResponse:
         d = self._call(self._client.rename_function, address, new_name)
@@ -297,8 +310,25 @@ class LocalClient:
         items = self._call(self._client.list_symbols, range_start, range_end, limit, offset)
         return ListSymbolsResponse(symbols=[_to_symbol(d) for d in items])
 
-    def rename_symbol(self, address: int, new_name: str) -> RenameSymbolResponse:
-        d = self._call(self._client.rename_symbol, address, new_name)
+    def create_label(self, address: int, name: str) -> CreateLabelResponse:
+        """Add the label ``name`` at ``address``; it never renames another symbol.
+
+        Errors: ``UNMAPPED_ADDRESS``; ``DUPLICATE_NAME`` when a symbol of that name is
+        already at the address; ``INVALID_ARGUMENT`` for a blank or invalid name.
+        """
+        d = self._call(self._client.create_label, address, name)
+        return CreateLabelResponse(created=d["created"], symbol=_to_symbol(d["symbol"]))
+
+    def rename_symbol(
+        self, address: int, new_name: str, old_name: str | None = None,
+    ) -> RenameSymbolResponse:
+        """Rename a symbol at ``address``.
+
+        With ``old_name`` set, exactly the symbol of that name is renamed, primary or
+        not (``NOT_FOUND`` when the address has none). Unset, the primary symbol is
+        renamed, or a label is created when the address has none.
+        """
+        d = self._call(self._client.rename_symbol, address, new_name, old_name)
         return RenameSymbolResponse(**d)
 
     # --- Memory ---
@@ -337,9 +367,9 @@ class LocalClient:
 
     # --- Types ---
 
-    def get_type(self, path: str):
+    def get_type(self, path: str) -> GetTypeResponse:
         d = self._call(self._client.get_type, path)
-        return _to_type(d) if d is not None else None
+        return GetTypeResponse(type=_to_type(d) if d is not None else None)
 
     def list_types(self, query: str = "", limit: int = 0, offset: int = 0) -> ListTypesResponse:
         items = self._call(self._client.list_types, query, limit, offset)

@@ -34,4 +34,37 @@ inline const ghidra::DynamicEntry* as_dynamic_entry(
   return entry ? dynamic_cast<const ghidra::DynamicEntry*>(entry) : nullptr;
 }
 
+// Visit the global scope and every namespace scope below it, parents first.
+// Function-local scopes (ScopeLocal) are skipped: their symbols are variables.
+// Functions loaded from a Ghidra project live in their namespace's scope, so a
+// walk of the global scope alone misses them.
+template <class Fn>
+void for_each_namespace_scope(ghidra::Scope* scope, Fn&& fn) {
+  if (scope == nullptr || !scope->isGlobal()) return;
+  fn(scope);
+  for (auto it = scope->childrenBegin(); it != scope->childrenEnd(); ++it)
+    for_each_namespace_scope(it->second, fn);
+}
+
+// The symbol entry starting exactly at `addr`, in whichever namespace owns the
+// address (Database::mapScope), then that scope's parents up to the global one.
+inline ghidra::SymbolEntry* find_addr_any_scope(ghidra::Architecture* arch,
+                                                const ghidra::Address& addr) {
+  ghidra::Scope* global = arch->symboltab->getGlobalScope();
+  for (ghidra::Scope* s = arch->symboltab->mapScope(global, addr, ghidra::Address());
+       s != nullptr; s = s->getParent()) {
+    if (ghidra::SymbolEntry* e = s->findAddr(addr, ghidra::Address())) return e;
+  }
+  return nullptr;
+}
+
+// Ghidra Namespace.getName(true) for a decompiler scope: the scope names from
+// the outermost namespace down, joined by "::"; the global scope is "Global".
+inline std::string namespace_path(const ghidra::Scope* scope) {
+  std::string path;
+  for (; scope != nullptr && scope->getParent() != nullptr; scope = scope->getParent())
+    path = path.empty() ? scope->getDisplayName() : scope->getDisplayName() + "::" + path;
+  return path.empty() ? "Global" : path;
+}
+
 }  // namespace libghidra::detail

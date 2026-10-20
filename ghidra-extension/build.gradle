@@ -174,18 +174,20 @@ if (regenRequested) {
 def extensionName = 'LibGhidraHost'
 
 // ---------------------------------------------------------------------------
-// Keep the repo-tree staging lib/ from accumulating stale dependency jars.
+// Keep the staging lib/ from accumulating stale dependency jars.
 //
-// Ghidra's buildExtension `copyDependencies` copies runtime deps into the
-// repo-tree lib/ directory and explicitly skips jars already present there, so
-// an upgraded dependency (e.g. a new protobuf-java version) is ADDED alongside
-// the old one rather than replacing it. Wiping lib/ before each build forces a
-// clean copy of exactly the current dependency set.
+// Ghidra's buildExtension `copyDependencies` copies runtime deps into a staging
+// lib/ directory (<projectDir>/lib unless a Gradle init script relocates the
+// task) and explicitly skips jars already present there, so an upgraded
+// dependency (e.g. a new protobuf-java version) is ADDED alongside the old one
+// rather than replacing it. Wiping the staging dir before each build forces a
+// clean copy of exactly the current dependency set. The directory is read from
+// the task at execution time, so a relocated destination is honoured.
 // ---------------------------------------------------------------------------
-def stagingLibDir = file("${projectDir}/lib")
 if (tasks.findByName('copyDependencies')) {
-    tasks.named('copyDependencies').configure {
+    tasks.named('copyDependencies').configure { t ->
         doFirst {
+            def stagingLibDir = t.destinationDir
             if (stagingLibDir.exists()) {
                 logger.lifecycle("libghidra: clearing staging lib/ (${stagingLibDir}) before dependency copy.")
                 delete stagingLibDir
@@ -206,13 +208,15 @@ task installExtension {
     description = 'Build and install the extension into the Ghidra distribution'
     group = 'ghidra'
 
+    // The exact archive buildExtension produces (wherever its
+    // destinationDirectory points), not a scan of a dist/ directory.
+    def extensionArchive = tasks.named('buildExtension').flatMap { it.archiveFile }
+
     doLast {
-        def distDir = file("${projectDir}/dist")
-        def zips = distDir.listFiles()?.findAll { it.name.endsWith('.zip') }
-        if (!zips) {
-            throw new GradleException("No ZIP found in ${distDir}")
+        def zipFile = extensionArchive.get().asFile
+        if (!zipFile.exists()) {
+            throw new GradleException("buildExtension archive not found at ${zipFile}")
         }
-        def zipFile = zips.max { it.lastModified() }
 
         def installDir = file("${GHIDRA_INSTALL_DIR}/Ghidra/Extensions/${extensionName}")
 

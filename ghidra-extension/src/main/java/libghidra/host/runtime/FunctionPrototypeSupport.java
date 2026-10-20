@@ -76,6 +76,16 @@ final class FunctionPrototypeSupport {
 	// matches these (otherwise "return *x" or similar fragments would be
 	// rewritten). FunctionSignatureParser accepts a small subset of C; these
 	// are the only tokens we need to guard against in prototype context.
+	// Type qualifiers as Ghidra's CParser reads them (its C.jj tokens): CONST is
+	// `_*const`, VOLATILE `_*volatile_*`, RESTRICT `_+restrict`. CParser parses
+	// and discards them -- Ghidra data types carry no qualifiers -- while
+	// FunctionSignatureParser, which applyFunctionPrototype uses, resolves each
+	// parameter through DataTypeParser and rejects them ("Can't resolve
+	// datatype: const char *"). A bare `restrict` is no qualifier to CParser
+	// either, so it is left for the parser to reject.
+	private static final Pattern TYPE_QUALIFIER = Pattern.compile(
+			"(?<![A-Za-z0-9_])(?:_*const|_*volatile_*|_+restrict)(?![A-Za-z0-9_])");
+
 	private static final java.util.Set<String> NON_TYPE_LHS = java.util.Set.of(
 			"return", "if", "else", "while", "for", "do", "switch", "case",
 			"break", "continue", "goto", "sizeof", "typedef");
@@ -231,6 +241,22 @@ final class FunctionPrototypeSupport {
 	}
 
 	/**
+	 * Drops the type qualifiers Ghidra's CParser discards (const, volatile and
+	 * their underscore spellings, {@code __restrict}), so a prototype written with
+	 * them parses to the types CParser gives it: {@code int f(const char *s)} is
+	 * {@code int f(char *s)}. Idempotent.
+	 *
+	 * Package-private for unit testing.
+	 */
+	static String stripTypeQualifiers(String prototype) {
+		if (prototype == null || prototype.isEmpty()) {
+			return prototype;
+		}
+		String out = TYPE_QUALIFIER.matcher(prototype).replaceAll(" ");
+		return out.replaceAll("[ \\t]{2,}", " ").replaceAll("\\( ", "(").trim();
+	}
+
+	/**
 	 * Normalises pointer placement in a C function prototype string so Ghidra's
 	 * {@link FunctionSignatureParser} accepts both common spellings
 	 * ({@code char *fn(...)} and {@code char* fn(...)}). Idempotent — running
@@ -274,6 +300,7 @@ final class FunctionPrototypeSupport {
 		// pathological inputs (overlong, too-deep nesting, too-many-stars)
 		// before they reach CParser, which is not cancellation-aware.
 		validatePrototypeShape(prototype);
+		prototype = stripTypeQualifiers(prototype);
 
 		FunctionSignatureParser parser = new FunctionSignatureParser(program.getDataTypeManager(), null);
 

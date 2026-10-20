@@ -32,7 +32,7 @@ public final class RequestCancellation {
 
 	public static void throwIfCancelled() {
 		if (isCancelled()) {
-			throw new SessionRpcException("cancelled", "request cancelled");
+			throw new SessionRpcException(SessionRpcException.CANCELLED, "request cancelled");
 		}
 	}
 

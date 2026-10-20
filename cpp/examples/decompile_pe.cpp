@@ -112,11 +112,11 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  // --- Name functions ---
+  // --- Define the functions (a rename never creates one) ---
   for (const auto& fn : funcs) {
     uint64_t rva = fn.rvaBase - pe.imageBase;
     uint64_t fileOff = pe::rvaToFileOffset(pe, rva);
-    auto r = client->RenameFunction(fileOff, fn.name);
+    auto r = client->CreateFunction(fileOff, fn.name);
     if (!r.ok()) {
       std::cerr << "Warning: could not name " << fn.name << " at 0x" << std::hex
                 << fileOff << std::dec << ": " << r.status.message << "\n";

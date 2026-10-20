@@ -9,16 +9,23 @@ package libghidra.host.runtime;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import ghidra.app.util.cparser.C.CParser;
 import ghidra.app.util.cparser.C.ParseException;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.address.AddressOverflowException;
+import ghidra.program.model.address.AddressSet;
+import ghidra.program.model.data.Array;
 import ghidra.program.model.data.Composite;
 import ghidra.program.model.data.DataType;
+import ghidra.program.model.data.DataTypeConflictHandler;
 import ghidra.program.model.data.DataTypeManager;
+import ghidra.program.model.data.Pointer;
 import ghidra.program.model.data.Structure;
 import ghidra.program.model.data.TypeDef;
 import ghidra.program.model.data.Union;
@@ -30,9 +37,7 @@ import ghidra.program.model.listing.Listing;
 import ghidra.program.model.listing.Parameter;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.listing.Variable;
-import ghidra.program.model.mem.Memory;
 import ghidra.program.model.symbol.SourceType;
-import ghidra.util.Msg;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.exception.DuplicateNameException;
 import ghidra.util.exception.InvalidInputException;
@@ -47,8 +52,9 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	@Override
 	public TypesContract.GetTypeResponse getType(TypesContract.GetTypeRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
+			// No program open is an error (not_loaded), never "not found".
+			Program program = requireProgram();
+			if (request == null) {
 				return new TypesContract.GetTypeResponse(null);
 			}
 			DataTypeManager manager = program.getDataTypeManager();
@@ -220,10 +226,10 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 			List<TypesContract.TypeEnumMemberRecord> rows = new ArrayList<>();
 			int seen = 0;
 
-			DataType specificType = typeFilter.isEmpty()
-					? null
-					: DataTypeSupport.resolveTypeByIdPathOrName(manager, typeFilter);
-			if (specificType != null) {
+			// A named type that does not exist (or is no enum) has no members --
+			// never every enum's members, which is what the unfiltered walk is.
+			if (!typeFilter.isEmpty()) {
+				DataType specificType = DataTypeSupport.resolveTypeByIdPathOrName(manager, typeFilter);
 				if (specificType instanceof ghidra.program.model.data.Enum) {
 					RuntimeMappers.appendTypeEnumMembers(
 						rows,
@@ -271,10 +277,10 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 			List<TypesContract.TypeMemberRecord> rows = new ArrayList<>();
 			int seen = 0;
 
-			DataType specificType = typeFilter.isEmpty()
-					? null
-					: DataTypeSupport.resolveTypeByIdPathOrName(manager, typeFilter);
-			if (specificType != null) {
+			// A named type that does not exist (or is no composite) has no members
+			// -- never every composite's members, which is what the unfiltered walk is.
+			if (!typeFilter.isEmpty()) {
+				DataType specificType = DataTypeSupport.resolveTypeByIdPathOrName(manager, typeFilter);
 				if (specificType instanceof Composite) {
 					RuntimeMappers.appendTypeMembers(
 						rows,
@@ -312,8 +318,9 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.GetFunctionSignatureResponse getFunctionSignature(
 			TypesContract.GetFunctionSignatureRequest request) {
 		try (LockScope ignored = readLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
+			// No program open is an error (not_loaded), never "not found".
+			Program program = requireProgram();
+			if (request == null) {
 				return new TypesContract.GetFunctionSignatureResponse(null);
 			}
 			try {
@@ -384,28 +391,13 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.SetFunctionSignatureResponse setFunctionSignature(
 			TypesContract.SetFunctionSignatureRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new TypesContract.SetFunctionSignatureResponse(
-					false, "", "", "not_loaded", "no current program");
-			}
-			String prototype = request.prototype() != null ? request.prototype().trim() : "";
-			if (prototype.isEmpty()) {
-				return new TypesContract.SetFunctionSignatureResponse(
-					false, "", "", "invalid_argument", "prototype is empty");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			String prototype = requireText(request.prototype(), "prototype");
+			Function function = requireFunction(program, request.address());
 			int tx = program.startTransaction("libghidra set function signature");
 			boolean commit = false;
 			try {
-				Function function = FunctionSupport.resolveFunction(program, request.address());
-				if (function == null) {
-					return new TypesContract.SetFunctionSignatureResponse(
-						false,
-						"",
-						"",
-						"not_found",
-						"function not found at 0x" + Long.toHexString(request.address()));
-				}
 				String convention = request.callingConvention();
 				if (convention != null && !convention.isBlank()) {
 					convention = convention.trim();
@@ -414,12 +406,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				}
 				if (!FunctionPrototypeSupport.applyFunctionPrototype(
 						program, function, prototype, convention)) {
-					return new TypesContract.SetFunctionSignatureResponse(
-						false,
-						"",
-						"",
-						"apply_error",
-						"function prototype was not applied");
+					throw SessionRpcException.internalError("function prototype was not applied");
 				}
 				commit = true;
 				return new TypesContract.SetFunctionSignatureResponse(
@@ -431,17 +418,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 			}
 			catch (ParseException | CancelledException | InvalidInputException |
 				DuplicateNameException | IllegalArgumentException e) {
-				Msg.error(this, "setFunctionSignature failed: " + e.getMessage(), e);
-				String code = e instanceof ParseException ? "parse_error" :
-					e instanceof DuplicateNameException ? "duplicate_name" :
-					e instanceof CancelledException ? "cancelled" :
-					"invalid_argument";
-				return new TypesContract.SetFunctionSignatureResponse(
-					false,
-					"",
-					"",
-					code,
-					nullableString(e.getMessage()));
+				throw SessionRpcException.from("set function signature", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -456,31 +433,14 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.RenameFunctionParameterResponse renameFunctionParameter(
 			TypesContract.RenameFunctionParameterRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null || request.ordinal() < 0) {
-				return new TypesContract.RenameFunctionParameterResponse(
-					false, "", "invalid_argument", "invalid function parameter request");
-			}
-			String newName = request.newName() != null ? request.newName().trim() : "";
-			if (newName.isEmpty()) {
-				return new TypesContract.RenameFunctionParameterResponse(
-					false, "", "invalid_argument", "parameter name is empty");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			String newName = requireText(request.newName(), "parameter name");
+			Parameter parameter = requireParameter(program, request.address(), request.ordinal());
 			int tx = program.startTransaction("libghidra rename function parameter");
 			boolean commit = false;
 			try {
-				Parameter parameter = FunctionSupport.resolveFunctionParameter(
-					program,
-					request.address(),
-					request.ordinal());
-				if (parameter == null) {
-					return new TypesContract.RenameFunctionParameterResponse(
-						false,
-						"",
-						"not_found",
-						"parameter " + request.ordinal() + " not found for function 0x" +
-							Long.toHexString(request.address()));
-				}
+				parameter = editableParameter(parameter, request.ordinal());
 				parameter.setName(newName, SourceType.USER_DEFINED);
 				commit = true;
 				return new TypesContract.RenameFunctionParameterResponse(
@@ -490,13 +450,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					"");
 			}
 			catch (InvalidInputException | DuplicateNameException | IllegalArgumentException e) {
-				Msg.error(this, "renameFunctionParameter failed: " + e.getMessage(), e);
-				String code = e instanceof DuplicateNameException ? "duplicate_name" : "invalid_argument";
-				return new TypesContract.RenameFunctionParameterResponse(
-					false,
-					"",
-					code,
-					nullableString(e.getMessage()));
+				throw SessionRpcException.from("rename function parameter", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -511,39 +465,15 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.SetFunctionParameterTypeResponse setFunctionParameterType(
 			TypesContract.SetFunctionParameterTypeRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null || request.ordinal() < 0) {
-				return new TypesContract.SetFunctionParameterTypeResponse(
-					false, "", "invalid_argument", "invalid function parameter type request");
-			}
-			String requestedType = request.dataType() != null ? request.dataType().trim() : "";
-			if (requestedType.isEmpty()) {
-				return new TypesContract.SetFunctionParameterTypeResponse(
-					false, "", "invalid_argument", "parameter type is empty");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			String requestedType = requireText(request.dataType(), "parameter type");
+			Parameter parameter = requireParameter(program, request.address(), request.ordinal());
 			int tx = program.startTransaction("libghidra set function parameter type");
 			boolean commit = false;
 			try {
-				Parameter parameter = FunctionSupport.resolveFunctionParameter(
-					program,
-					request.address(),
-					request.ordinal());
-				if (parameter == null) {
-					return new TypesContract.SetFunctionParameterTypeResponse(
-						false,
-						"",
-						"not_found",
-						"parameter " + request.ordinal() + " not found for function 0x" +
-							Long.toHexString(request.address()));
-				}
-				DataType parsed = DataTypeSupport.resolveWritableDataType(program, requestedType);
-				if (parsed == null) {
-					return new TypesContract.SetFunctionParameterTypeResponse(
-						false,
-						"",
-						"unknown_type",
-						"unable to resolve writable data type '" + requestedType + "'");
-				}
+				DataType parsed = requireArgumentType(program, requestedType);
+				parameter = editableParameter(parameter, request.ordinal());
 				parameter.setDataType(parsed, SourceType.USER_DEFINED);
 				commit = true;
 				return new TypesContract.SetFunctionParameterTypeResponse(
@@ -553,12 +483,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					"");
 			}
 			catch (InvalidInputException | IllegalArgumentException e) {
-				Msg.error(this, "setFunctionParameterType failed: " + e.getMessage(), e);
-				return new TypesContract.SetFunctionParameterTypeResponse(
-					false,
-					"",
-					"invalid_argument",
-					nullableString(e.getMessage()));
+				throw SessionRpcException.from("set function parameter type", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -569,21 +494,49 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 		}
 	}
 
+	/**
+	 * Parameter {@code ordinal} of the function at, or containing, {@code address}:
+	 * {@code unmapped_address} / {@code not_found} for the function, {@code not_found}
+	 * for an ordinal it does not have.
+	 */
+	private static Parameter requireParameter(Program program, long address, int ordinal) {
+		if (ordinal < 0) {
+			throw SessionRpcException.invalidArgument("parameter ordinal must be >= 0");
+		}
+		Function function = requireFunction(program, address);
+		Parameter[] parameters = function.getParameters();
+		if (ordinal >= parameters.length) {
+			throw SessionRpcException.notFound("function " + function.getName() + " has no parameter " +
+				ordinal + " (it has " + parameters.length + ")");
+		}
+		return parameters[ordinal];
+	}
+
+	/** Materialize an auto parameter inside the caller's mutation transaction. */
+	private static Parameter editableParameter(Parameter parameter, int ordinal) {
+		if (!parameter.isAutoParameter()) {
+			return parameter;
+		}
+		Function function = parameter.getFunction();
+		// Preserve the signature's current storage, then refetch: the old
+		// AutoParameterImpl remains immutable after the storage conversion.
+		function.setCustomVariableStorage(true);
+		Parameter editable = function.getParameter(ordinal);
+		if (editable == null || editable.isAutoParameter()) {
+			throw SessionRpcException.internalError("could not materialize parameter " + ordinal);
+		}
+		return editable;
+	}
+
 	@Override
 	public TypesContract.RenameFunctionLocalResponse renameFunctionLocal(
 			TypesContract.RenameFunctionLocalRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new TypesContract.RenameFunctionLocalResponse(
-					false, "", "", "not_loaded", "no current program");
-			}
-			String localId = request.localId() != null ? request.localId().trim() : "";
-			String newName = request.newName() != null ? request.newName().trim() : "";
-			if (localId.isEmpty() || newName.isEmpty()) {
-				return new TypesContract.RenameFunctionLocalResponse(
-					false, "", "", "invalid_argument", "local id or new name is empty");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			String localId = requireText(request.localId(), "local id");
+			String newName = requireText(request.newName(), "new local name");
+			requireFunction(program, request.address());
 			int tx = program.startTransaction("libghidra rename function local");
 			boolean commit = false;
 			try {
@@ -624,23 +577,11 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 							true, localId, newName, "", "");
 					}
 				}
-				return new TypesContract.RenameFunctionLocalResponse(
-					false,
-					localId,
-					"",
-					"not_found",
-					"local '" + localId + "' not found for function 0x" +
-						Long.toHexString(request.address()));
+				throw SessionRpcException.notFound("local '" + localId + "' not found for function 0x" +
+					Long.toHexString(request.address()));
 			}
 			catch (InvalidInputException | DuplicateNameException | IllegalArgumentException e) {
-				Msg.error(this, "renameFunctionLocal failed: " + e.getMessage(), e);
-				String code = e instanceof DuplicateNameException ? "duplicate_name" : "invalid_argument";
-				return new TypesContract.RenameFunctionLocalResponse(
-					false,
-					localId,
-					"",
-					code,
-					nullableString(e.getMessage()));
+				throw SessionRpcException.from("rename function local", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -655,29 +596,15 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.SetFunctionLocalTypeResponse setFunctionLocalType(
 			TypesContract.SetFunctionLocalTypeRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new TypesContract.SetFunctionLocalTypeResponse(
-					false, "", "", "not_loaded", "no current program");
-			}
-			String localId = request.localId() != null ? request.localId().trim() : "";
-			String requestedType = request.dataType() != null ? request.dataType().trim() : "";
-			if (localId.isEmpty() || requestedType.isEmpty()) {
-				return new TypesContract.SetFunctionLocalTypeResponse(
-					false, "", "", "invalid_argument", "local id or data type is empty");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			String localId = requireText(request.localId(), "local id");
+			String requestedType = requireText(request.dataType(), "local type");
+			requireFunction(program, request.address());
+			DataType parsed = requireArgumentType(program, requestedType);
 			int tx = program.startTransaction("libghidra set function local type");
 			boolean commit = false;
 			try {
-				DataType parsed = DataTypeSupport.resolveWritableDataType(program, requestedType);
-				if (parsed == null) {
-					return new TypesContract.SetFunctionLocalTypeResponse(
-						false,
-						localId,
-						"",
-						"unknown_type",
-						"unable to resolve writable data type '" + requestedType + "'");
-				}
 				if (localId.startsWith("local:")) {
 					String appliedType = FunctionVariableMutationSupport.decompileAndRetypeHighVariable(
 						state,
@@ -721,23 +648,11 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 							true, localId, appliedType, "", "");
 					}
 				}
-				return new TypesContract.SetFunctionLocalTypeResponse(
-					false,
-					localId,
-					"",
-					"not_found",
-					"local '" + localId + "' not found for function 0x" +
-						Long.toHexString(request.address()));
+				throw SessionRpcException.notFound("local '" + localId + "' not found for function 0x" +
+					Long.toHexString(request.address()));
 			}
 			catch (InvalidInputException | DuplicateNameException | IllegalArgumentException e) {
-				Msg.error(this, "setFunctionLocalType failed: " + e.getMessage(), e);
-				String code = e instanceof DuplicateNameException ? "duplicate_name" : "invalid_argument";
-				return new TypesContract.SetFunctionLocalTypeResponse(
-					false,
-					localId,
-					"",
-					code,
-					nullableString(e.getMessage()));
+				throw SessionRpcException.from("set function local type", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -748,51 +663,46 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 		}
 	}
 
+	/**
+	 * Applies a data type at a mapped address: it retypes the item that starts there,
+	 * or creates one on undefined bytes (the upsert {@code INSERT INTO data_items}
+	 * relies on, including an address inside a larger item). It refuses to lay data
+	 * over instructions ({@code invalid_argument}): clear the code first.
+	 */
 	@Override
 	public TypesContract.ApplyDataTypeResponse applyDataType(TypesContract.ApplyDataTypeRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new TypesContract.ApplyDataTypeResponse(false, "");
-			}
-			String requestedType = request.dataType() != null ? request.dataType().trim() : "";
-			if (requestedType.isEmpty()) {
-				return new TypesContract.ApplyDataTypeResponse(false, "");
-			}
-			int tx = program.startTransaction("libghidra apply data type");
-			boolean commit = false;
-			try {
-				Address address = toAddress(program, request.address());
-				// applyDataType backs BOTH the data_items UPDATE(data_type) path (retype
-				// an item that already starts here — getDataAt != null) AND the
-				// data_items INSERT/create path (create an item at an address that is
-				// currently undefined OR sits INSIDE a larger defined item, e.g. the
-				// reserved-pad uchar[4096]). For the create case getDataAt(address) is
-				// null even though the address is perfectly valid — bailing there made
-				// every create_data_item at a non-boundary address fail. There must be a
-				// real memory block behind the address, though: refuse addresses with no
-				// backing block so a bogus create is still a clean error.
-				Memory memory = program.getMemory();
-				if (memory.getBlock(address) == null) {
-					return new TypesContract.ApplyDataTypeResponse(false, "");
-				}
-				Listing listing = program.getListing();
-				Data data = listing.getDataAt(address);
-				DataType parsed = DataTypeSupport.resolveWritableDataType(program, requestedType);
-				if (parsed == null) {
-					return new TypesContract.ApplyDataTypeResponse(false, "");
-				}
-				// Clear span: for a retype start from the existing item's end; for a
-				// create there is no existing item, so start from the address itself and
-				// let the requested type's length extend it.
-				Address clearEnd = data != null ? data.getMaxAddress() : address;
-				int parsedLength = parsed.getLength();
-				if (parsedLength > 0) {
+			Program program = requireProgram();
+			requireRequest(request);
+			String requestedType = requireText(request.dataType(), "data type");
+			Address address = requireMappedAddress(program, request.address());
+			DataType parsed = requireArgumentType(program, requestedType);
+			Listing listing = program.getListing();
+			Data data = listing.getDataAt(address);
+			// Clear span: for a retype start from the existing item's end; for a
+			// create there is no existing item, so start from the address itself and
+			// let the requested type's length extend it.
+			Address clearEnd = data != null ? data.getMaxAddress() : address;
+			int parsedLength = parsed.getLength();
+			if (parsedLength > 0) {
+				try {
 					Address parsedEnd = address.addNoWrap(parsedLength - 1L);
 					if (parsedEnd.compareTo(clearEnd) > 0) {
 						clearEnd = parsedEnd;
 					}
 				}
+				catch (AddressOverflowException e) {
+					throw SessionRpcException.from("apply data type", e);
+				}
+			}
+			if (listing.getInstructions(new AddressSet(address, clearEnd), true).hasNext()) {
+				throw SessionRpcException.invalidArgument("instructions occupy 0x" +
+					Long.toHexString(request.address()) + ".." + clearEnd +
+					"; clear the code before applying a data type");
+			}
+			int tx = program.startTransaction("libghidra apply data type");
+			boolean commit = false;
+			try {
 				listing.clearCodeUnits(address, clearEnd, false);
 				listing.createData(address, parsed);
 				commit = true;
@@ -802,10 +712,8 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 						: "";
 				return new TypesContract.ApplyDataTypeResponse(true, appliedPath);
 			}
-			catch (AddressOverflowException | IllegalArgumentException |
-				ghidra.program.model.util.CodeUnitInsertionException e) {
-				Msg.error(this, "applyDataType failed: " + e.getMessage(), e);
-				return new TypesContract.ApplyDataTypeResponse(false, "");
+			catch (IllegalArgumentException | ghidra.program.model.util.CodeUnitInsertionException e) {
+				throw SessionRpcException.from("apply data type", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -814,50 +722,40 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	}
 
 	@Override
-	public TypesContract.CreateTypeResponse createType(TypesContract.CreateTypeRequest request) {
+	public TypesContract.CreateTypeResponse createType(
+			TypesContract.CreateTypeRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null) {
-				return new TypesContract.CreateTypeResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			String name = requireText(request.name(), "type name");
+			String kind = requireText(request.kind(), "type kind").toLowerCase(Locale.ROOT);
+			if (!kind.equals("struct") && !kind.equals("enum") && !kind.equals("union")) {
+				throw SessionRpcException.invalidArgument(
+					"unknown type kind '" + request.kind() + "'; expected struct, enum or union");
 			}
-			String name = nullableString(request.name()).trim();
-			String kind = nullableString(request.kind()).trim().toLowerCase(Locale.ROOT);
-			if (name.isEmpty() || kind.isEmpty()) {
-				return new TypesContract.CreateTypeResponse(false);
-			}
+			requireNewTypeName(dtm, name);
 			int tx = program.startTransaction("libghidra create type");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				if (DataTypeSupport.findDataTypeByName(dtm, name) != null) {
-					return new TypesContract.CreateTypeResponse(false);
-				}
-				DataType dataType;
-				switch (kind) {
-					case "struct":
-						dataType = new ghidra.program.model.data.StructureDataType(
-							name,
-							Math.max(0, (int) request.size()));
-						break;
-					case "enum":
-						int width = (int) Math.max(1L, Math.min(8L, request.size() <= 0 ? 4 : request.size()));
-						dataType = new ghidra.program.model.data.EnumDataType(name, width);
-						break;
-					case "union":
-						dataType = new ghidra.program.model.data.UnionDataType(name);
-						break;
-					default:
-						return new TypesContract.CreateTypeResponse(false);
-				}
+				DataType dataType = switch (kind) {
+					case "struct" -> new ghidra.program.model.data.StructureDataType(
+						name, Math.max(0, (int) request.size()));
+					case "enum" -> new ghidra.program.model.data.EnumDataType(
+						name, (int) Math.max(1L, Math.min(8L, request.size() <= 0 ? 4 : request.size())));
+					default -> new ghidra.program.model.data.UnionDataType(name);
+				};
 				dtm.addDataType(
 					dataType,
 					ghidra.program.model.data.DataTypeConflictHandler.DEFAULT_HANDLER);
 				commit = true;
 				return new TypesContract.CreateTypeResponse(true);
 			}
-			catch (IllegalArgumentException e) {
-				Msg.error(this, "createType failed: " + e.getMessage(), e);
-				return new TypesContract.CreateTypeResponse(false);
+			catch (SessionRpcException e) {
+				throw e;
+			}
+			catch (Exception e) {
+				throw SessionRpcException.from("create type", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -866,29 +764,27 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	}
 
 	@Override
-	public TypesContract.DeleteTypeResponse deleteType(TypesContract.DeleteTypeRequest request) {
+	public TypesContract.DeleteTypeResponse deleteType(
+			TypesContract.DeleteTypeRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null || nullableString(request.type()).isBlank()) {
-				return new TypesContract.DeleteTypeResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			DataType dataType = requireType(dtm, request.type());
 			int tx = program.startTransaction("libghidra delete type");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (dataType == null) {
-					return new TypesContract.DeleteTypeResponse(false);
+				if (!dtm.remove(dataType)) {
+					throw SessionRpcException.internalError("type '" + request.type() + "' was not removed");
 				}
-				// remove() returns false when the type did not actually exist /
-				// was not removed; report that honestly instead of a false success.
-				boolean removed = dtm.remove(dataType);
-				commit = removed;
-				return new TypesContract.DeleteTypeResponse(removed);
+				commit = true;
+				return new TypesContract.DeleteTypeResponse(true);
+			}
+			catch (SessionRpcException e) {
+				throw e;
 			}
 			catch (Exception e) {
-				Msg.error(this, "deleteType failed: " + e.getMessage(), e);
-				return new TypesContract.DeleteTypeResponse(false);
+				throw SessionRpcException.from("delete type", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -897,30 +793,26 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	}
 
 	@Override
-	public TypesContract.RenameTypeResponse renameType(TypesContract.RenameTypeRequest request) {
+	public TypesContract.RenameTypeResponse renameType(
+			TypesContract.RenameTypeRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				nullableString(request.newName()).isBlank()) {
-				return new TypesContract.RenameTypeResponse(false, "");
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			DataType dataType = requireType(dtm, request.type());
+			String newName = requireText(request.newName(), "new type name");
 			int tx = program.startTransaction("libghidra rename type");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (dataType == null) {
-					return new TypesContract.RenameTypeResponse(false, "");
-				}
-				String newName = request.newName().trim();
 				dataType.setName(newName);
 				commit = true;
 				return new TypesContract.RenameTypeResponse(true, newName);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "renameType failed: " + e.getMessage(), e);
-				return new TypesContract.RenameTypeResponse(false, "");
+				throw SessionRpcException.from("rename type", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -932,34 +824,27 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.CreateTypeAliasResponse createTypeAlias(
 			TypesContract.CreateTypeAliasRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.name()).isBlank() ||
-				nullableString(request.targetType()).isBlank()) {
-				return new TypesContract.CreateTypeAliasResponse(false);
-			}
-			String name = request.name().trim();
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			String name = requireText(request.name(), "alias name");
+			requireText(request.targetType(), "alias target type");
+			requireNewTypeName(dtm, name);
+			DataType target = requireArgumentType(program, request.targetType());
 			int tx = program.startTransaction("libghidra create type alias");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				if (DataTypeSupport.findDataTypeByName(dtm, name) != null) {
-					return new TypesContract.CreateTypeAliasResponse(false);
-				}
-				DataType target = DataTypeSupport.resolveWritableDataType(program, request.targetType());
-				if (target == null) {
-					return new TypesContract.CreateTypeAliasResponse(false);
-				}
-				DataType alias = new ghidra.program.model.data.TypedefDataType(name, target);
 				dtm.addDataType(
-					alias,
+					new ghidra.program.model.data.TypedefDataType(name, target),
 					ghidra.program.model.data.DataTypeConflictHandler.DEFAULT_HANDLER);
 				commit = true;
 				return new TypesContract.CreateTypeAliasResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "createTypeAlias failed: " + e.getMessage(), e);
-				return new TypesContract.CreateTypeAliasResponse(false);
+				throw SessionRpcException.from("create type alias", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -971,25 +856,24 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.DeleteTypeAliasResponse deleteTypeAlias(
 			TypesContract.DeleteTypeAliasRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null || nullableString(request.type()).isBlank()) {
-				return new TypesContract.DeleteTypeAliasResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			DataType dataType = requireTypeOfKind(dtm, request.type(), TypeDef.class, "a typedef");
 			int tx = program.startTransaction("libghidra delete type alias");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof TypeDef)) {
-					return new TypesContract.DeleteTypeAliasResponse(false);
+				if (!dtm.remove(dataType)) {
+					throw SessionRpcException.internalError("typedef '" + request.type() + "' was not removed");
 				}
-				boolean removed = dtm.remove(dataType);
-				commit = removed;
-				return new TypesContract.DeleteTypeAliasResponse(removed);
+				commit = true;
+				return new TypesContract.DeleteTypeAliasResponse(true);
+			}
+			catch (SessionRpcException e) {
+				throw e;
 			}
 			catch (Exception e) {
-				Msg.error(this, "deleteTypeAlias failed: " + e.getMessage(), e);
-				return new TypesContract.DeleteTypeAliasResponse(false);
+				throw SessionRpcException.from("delete type alias", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1001,41 +885,34 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.SetTypeAliasTargetResponse setTypeAliasTarget(
 			TypesContract.SetTypeAliasTargetRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				nullableString(request.targetType()).isBlank()) {
-				return new TypesContract.SetTypeAliasTargetResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			TypeDef alias = requireTypeOfKind(dtm, request.type(), TypeDef.class, "a typedef");
+			requireText(request.targetType(), "alias target type");
+			DataType target = requireArgumentType(program, request.targetType());
+			DataType currentBase = alias.getBaseDataType();
+			if (currentBase != null && currentBase.isEquivalent(target)) {
+				return new TypesContract.SetTypeAliasTargetResponse(true);
 			}
 			int tx = program.startTransaction("libghidra set type alias target");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof TypeDef)) {
-					return new TypesContract.SetTypeAliasTargetResponse(false);
-				}
-				DataType target = DataTypeSupport.resolveWritableDataType(program, request.targetType());
-				if (target == null) {
-					return new TypesContract.SetTypeAliasTargetResponse(false);
-				}
-				DataType currentBase = ((TypeDef) dataType).getBaseDataType();
-				if (currentBase != null && currentBase.isEquivalent(target)) {
-					return new TypesContract.SetTypeAliasTargetResponse(true);
-				}
 				ghidra.program.model.data.TypedefDataType replacement =
 					new ghidra.program.model.data.TypedefDataType(
-						dataType.getCategoryPath(),
-						dataType.getName(),
+						alias.getCategoryPath(),
+						alias.getName(),
 						target,
 						dtm);
-				dtm.replaceDataType(dataType, replacement, true);
+				dtm.replaceDataType(alias, replacement, true);
 				commit = true;
 				return new TypesContract.SetTypeAliasTargetResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "setTypeAliasTarget failed: " + e.getMessage(), e);
-				return new TypesContract.SetTypeAliasTargetResponse(false);
+				throw SessionRpcException.from("set type alias target", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1047,19 +924,15 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.CreateTypeEnumResponse createTypeEnum(
 			TypesContract.CreateTypeEnumRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null || nullableString(request.name()).isBlank()) {
-				return new TypesContract.CreateTypeEnumResponse(false);
-			}
-			String name = request.name().trim();
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			String name = requireText(request.name(), "enum name");
 			int width = (int) Math.max(1L, Math.min(8L, request.width() <= 0 ? 4 : request.width()));
+			requireNewTypeName(dtm, name);
 			int tx = program.startTransaction("libghidra create enum");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				if (DataTypeSupport.findDataTypeByName(dtm, name) != null) {
-					return new TypesContract.CreateTypeEnumResponse(false);
-				}
 				ghidra.program.model.data.EnumDataType enumType =
 					new ghidra.program.model.data.EnumDataType(name, width);
 				if (request.signed()) {
@@ -1071,9 +944,11 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				commit = true;
 				return new TypesContract.CreateTypeEnumResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "createTypeEnum failed: " + e.getMessage(), e);
-				return new TypesContract.CreateTypeEnumResponse(false);
+				throw SessionRpcException.from("create enum", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1085,25 +960,24 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.DeleteTypeEnumResponse deleteTypeEnum(
 			TypesContract.DeleteTypeEnumRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null || nullableString(request.type()).isBlank()) {
-				return new TypesContract.DeleteTypeEnumResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			DataType dataType = requireTypeOfKind(dtm, request.type(), ghidra.program.model.data.Enum.class, "an enum");
 			int tx = program.startTransaction("libghidra delete enum");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof ghidra.program.model.data.Enum)) {
-					return new TypesContract.DeleteTypeEnumResponse(false);
+				if (!dtm.remove(dataType)) {
+					throw SessionRpcException.internalError("enum '" + request.type() + "' was not removed");
 				}
-				boolean removed = dtm.remove(dataType);
-				commit = removed;
-				return new TypesContract.DeleteTypeEnumResponse(removed);
+				commit = true;
+				return new TypesContract.DeleteTypeEnumResponse(true);
+			}
+			catch (SessionRpcException e) {
+				throw e;
 			}
 			catch (Exception e) {
-				Msg.error(this, "deleteTypeEnum failed: " + e.getMessage(), e);
-				return new TypesContract.DeleteTypeEnumResponse(false);
+				throw SessionRpcException.from("delete enum", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1115,34 +989,25 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.AddTypeEnumMemberResponse addTypeEnumMember(
 			TypesContract.AddTypeEnumMemberRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				nullableString(request.name()).isBlank()) {
-				return new TypesContract.AddTypeEnumMemberResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			ghidra.program.model.data.Enum enumType =
+				requireTypeOfKind(dtm, request.type(), ghidra.program.model.data.Enum.class, "an enum");
+			String nextName = requireText(request.name(), "enum member name");
+			requireNewEnumMemberName(enumType, request.type(), nextName);
 			int tx = program.startTransaction("libghidra add enum member");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof ghidra.program.model.data.Enum)) {
-					return new TypesContract.AddTypeEnumMemberResponse(false);
-				}
-				ghidra.program.model.data.Enum enumType = (ghidra.program.model.data.Enum) dataType;
-				String nextName = request.name().trim();
-				for (String existing : enumType.getNames()) {
-					if (nextName.equals(existing)) {
-						return new TypesContract.AddTypeEnumMemberResponse(false);
-					}
-				}
 				enumType.add(nextName, request.value());
 				commit = true;
 				return new TypesContract.AddTypeEnumMemberResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "addTypeEnumMember failed: " + e.getMessage(), e);
-				return new TypesContract.AddTypeEnumMemberResponse(false);
+				throw SessionRpcException.from("add enum member", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1154,32 +1019,24 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.DeleteTypeEnumMemberResponse deleteTypeEnumMember(
 			TypesContract.DeleteTypeEnumMemberRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				request.ordinal() < 0) {
-				return new TypesContract.DeleteTypeEnumMemberResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			ghidra.program.model.data.Enum enumType =
+				requireTypeOfKind(dtm, request.type(), ghidra.program.model.data.Enum.class, "an enum");
+			String memberName = requireEnumMember(enumType, request.type(), request.ordinal());
 			int tx = program.startTransaction("libghidra delete enum member");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof ghidra.program.model.data.Enum)) {
-					return new TypesContract.DeleteTypeEnumMemberResponse(false);
-				}
-				ghidra.program.model.data.Enum enumType = (ghidra.program.model.data.Enum) dataType;
-				String memberName = DataTypeSupport.enumMemberNameByOrdinal(enumType, request.ordinal());
-				if (memberName == null) {
-					return new TypesContract.DeleteTypeEnumMemberResponse(false);
-				}
 				enumType.remove(memberName);
 				commit = true;
 				return new TypesContract.DeleteTypeEnumMemberResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "deleteTypeEnumMember failed: " + e.getMessage(), e);
-				return new TypesContract.DeleteTypeEnumMemberResponse(false);
+				throw SessionRpcException.from("delete enum member", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1191,41 +1048,32 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.RenameTypeEnumMemberResponse renameTypeEnumMember(
 			TypesContract.RenameTypeEnumMemberRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				nullableString(request.newName()).isBlank() ||
-				request.ordinal() < 0) {
-				return new TypesContract.RenameTypeEnumMemberResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			ghidra.program.model.data.Enum enumType =
+				requireTypeOfKind(dtm, request.type(), ghidra.program.model.data.Enum.class, "an enum");
+			String memberName = requireEnumMember(enumType, request.type(), request.ordinal());
+			String nextName = requireText(request.newName(), "new enum member name");
+			if (memberName.equals(nextName)) {
+				return new TypesContract.RenameTypeEnumMemberResponse(true);
 			}
+			requireNewEnumMemberName(enumType, request.type(), nextName);
 			int tx = program.startTransaction("libghidra rename enum member");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof ghidra.program.model.data.Enum)) {
-					return new TypesContract.RenameTypeEnumMemberResponse(false);
-				}
-				ghidra.program.model.data.Enum enumType = (ghidra.program.model.data.Enum) dataType;
-				String oldName = DataTypeSupport.enumMemberNameByOrdinal(enumType, request.ordinal());
-				String nextName = request.newName().trim();
-				if (oldName == null || nextName.isEmpty() || oldName.equals(nextName)) {
-					return new TypesContract.RenameTypeEnumMemberResponse(false);
-				}
-				for (String existing : enumType.getNames()) {
-					if (nextName.equals(existing)) {
-						return new TypesContract.RenameTypeEnumMemberResponse(false);
-					}
-				}
-				long value = enumType.getValue(oldName);
-				enumType.remove(oldName);
-				enumType.add(nextName, value);
+				long value = enumType.getValue(memberName);
+				String comment = enumType.getComment(memberName);
+				enumType.remove(memberName);
+				enumType.add(nextName, value, comment);
 				commit = true;
 				return new TypesContract.RenameTypeEnumMemberResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "renameTypeEnumMember failed: " + e.getMessage(), e);
-				return new TypesContract.RenameTypeEnumMemberResponse(false);
+				throw SessionRpcException.from("rename enum member", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1237,37 +1085,29 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.SetTypeEnumMemberValueResponse setTypeEnumMemberValue(
 			TypesContract.SetTypeEnumMemberValueRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				request.ordinal() < 0) {
-				return new TypesContract.SetTypeEnumMemberValueResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			ghidra.program.model.data.Enum enumType =
+				requireTypeOfKind(dtm, request.type(), ghidra.program.model.data.Enum.class, "an enum");
+			String memberName = requireEnumMember(enumType, request.type(), request.ordinal());
+			if (enumType.getValue(memberName) == request.value()) {
+				return new TypesContract.SetTypeEnumMemberValueResponse(true);
 			}
 			int tx = program.startTransaction("libghidra set enum member value");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof ghidra.program.model.data.Enum)) {
-					return new TypesContract.SetTypeEnumMemberValueResponse(false);
-				}
-				ghidra.program.model.data.Enum enumType = (ghidra.program.model.data.Enum) dataType;
-				String memberName = DataTypeSupport.enumMemberNameByOrdinal(enumType, request.ordinal());
-				if (memberName == null) {
-					return new TypesContract.SetTypeEnumMemberValueResponse(false);
-				}
-				long oldValue = enumType.getValue(memberName);
-				if (oldValue == request.value()) {
-					return new TypesContract.SetTypeEnumMemberValueResponse(true);
-				}
+				String comment = enumType.getComment(memberName);
 				enumType.remove(memberName);
-				enumType.add(memberName, request.value());
+				enumType.add(memberName, request.value(), comment);
 				commit = true;
 				return new TypesContract.SetTypeEnumMemberValueResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "setTypeEnumMemberValue failed: " + e.getMessage(), e);
-				return new TypesContract.SetTypeEnumMemberValueResponse(false);
+				throw SessionRpcException.from("set enum member value", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1279,26 +1119,16 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.AddTypeMemberResponse addTypeMember(
 			TypesContract.AddTypeMemberRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				nullableString(request.name()).isBlank() ||
-				nullableString(request.memberType()).isBlank()) {
-				return new TypesContract.AddTypeMemberResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			Composite composite = requireTypeOfKind(dtm, request.type(), Composite.class, "a struct or union");
+			String memberName = requireText(request.name(), "member name");
+			requireText(request.memberType(), "member type");
+			DataType parsed = requireArgumentType(program, request.memberType());
 			int tx = program.startTransaction("libghidra add type member");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof Composite)) {
-					return new TypesContract.AddTypeMemberResponse(false);
-				}
-				DataType parsed = DataTypeSupport.resolveWritableDataType(program, request.memberType());
-				if (parsed == null) {
-					return new TypesContract.AddTypeMemberResponse(false);
-				}
-				Composite composite = (Composite) dataType;
 				int memberLen = parsed.getLength();
 				if (memberLen <= 0) {
 					memberLen = (int) Math.max(1L, request.size());
@@ -1307,14 +1137,16 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 					composite.getNumComponents(),
 					parsed,
 					memberLen,
-					request.name().trim(),
+					memberName,
 					null);
 				commit = true;
 				return new TypesContract.AddTypeMemberResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "addTypeMember failed: " + e.getMessage(), e);
-				return new TypesContract.AddTypeMemberResponse(false);
+				throw SessionRpcException.from("add type member", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1326,32 +1158,23 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.DeleteTypeMemberResponse deleteTypeMember(
 			TypesContract.DeleteTypeMemberRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				request.ordinal() < 0) {
-				return new TypesContract.DeleteTypeMemberResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			Composite composite = requireTypeOfKind(dtm, request.type(), Composite.class, "a struct or union");
+			int index = requireComponent(composite, request.type(), request.ordinal());
 			int tx = program.startTransaction("libghidra delete type member");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof Composite)) {
-					return new TypesContract.DeleteTypeMemberResponse(false);
-				}
-				Composite composite = (Composite) dataType;
-				int index = (int) request.ordinal();
-				if (index < 0 || index >= composite.getNumComponents()) {
-					return new TypesContract.DeleteTypeMemberResponse(false);
-				}
 				composite.delete(index);
 				commit = true;
 				return new TypesContract.DeleteTypeMemberResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "deleteTypeMember failed: " + e.getMessage(), e);
-				return new TypesContract.DeleteTypeMemberResponse(false);
+				throw SessionRpcException.from("delete type member", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1363,33 +1186,24 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.RenameTypeMemberResponse renameTypeMember(
 			TypesContract.RenameTypeMemberRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				nullableString(request.newName()).isBlank() ||
-				request.ordinal() < 0) {
-				return new TypesContract.RenameTypeMemberResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			Composite composite = requireTypeOfKind(dtm, request.type(), Composite.class, "a struct or union");
+			int index = requireComponent(composite, request.type(), request.ordinal());
+			String newName = requireText(request.newName(), "new member name");
 			int tx = program.startTransaction("libghidra rename type member");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof Composite)) {
-					return new TypesContract.RenameTypeMemberResponse(false);
-				}
-				Composite composite = (Composite) dataType;
-				int index = (int) request.ordinal();
-				if (index < 0 || index >= composite.getNumComponents()) {
-					return new TypesContract.RenameTypeMemberResponse(false);
-				}
-				composite.getComponent(index).setFieldName(request.newName().trim());
+				composite.getComponent(index).setFieldName(newName);
 				commit = true;
 				return new TypesContract.RenameTypeMemberResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "renameTypeMember failed: " + e.getMessage(), e);
-				return new TypesContract.RenameTypeMemberResponse(false);
+				throw SessionRpcException.from("rename type member", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1401,34 +1215,20 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.SetTypeMemberTypeResponse setTypeMemberType(
 			TypesContract.SetTypeMemberTypeRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				nullableString(request.memberType()).isBlank() ||
-				request.ordinal() < 0) {
-				return new TypesContract.SetTypeMemberTypeResponse(false);
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			Composite composite = requireTypeOfKind(dtm, request.type(), Composite.class, "a struct or union");
+			int index = requireComponent(composite, request.type(), request.ordinal());
+			requireText(request.memberType(), "member type");
+			DataType parsed = requireArgumentType(program, request.memberType());
+			DataType current = composite.getComponent(index).getDataType();
+			if (current != null && current.equals(parsed)) {
+				return new TypesContract.SetTypeMemberTypeResponse(true);
 			}
 			int tx = program.startTransaction("libghidra set type member type");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof Composite)) {
-					return new TypesContract.SetTypeMemberTypeResponse(false);
-				}
-				Composite composite = (Composite) dataType;
-				int index = (int) request.ordinal();
-				if (index < 0 || index >= composite.getNumComponents()) {
-					return new TypesContract.SetTypeMemberTypeResponse(false);
-				}
-				DataType parsed = DataTypeSupport.resolveWritableDataType(program, request.memberType());
-				if (parsed == null) {
-					return new TypesContract.SetTypeMemberTypeResponse(false);
-				}
-				DataType current = composite.getComponent(index).getDataType();
-				if (current != null && current.equals(parsed)) {
-					return new TypesContract.SetTypeMemberTypeResponse(true);
-				}
 				int nextLen = parsed.getLength();
 				if (nextLen <= 0) {
 					nextLen = composite.getComponent(index).getLength();
@@ -1438,8 +1238,7 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				}
 				String fieldName = composite.getComponent(index).getFieldName();
 				String comment = composite.getComponent(index).getComment();
-				if (dataType instanceof Structure) {
-					Structure structure = (Structure) dataType;
+				if (composite instanceof Structure structure) {
 					structure.replace(index, parsed, nextLen, fieldName, comment);
 				}
 				else {
@@ -1449,9 +1248,11 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				commit = true;
 				return new TypesContract.SetTypeMemberTypeResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "setTypeMemberType failed: " + e.getMessage(), e);
-				return new TypesContract.SetTypeMemberTypeResponse(false);
+				throw SessionRpcException.from("set type member type", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1463,32 +1264,20 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.SetTypeMemberCommentResponse setTypeMemberComment(
 			TypesContract.SetTypeMemberCommentRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				request.ordinal() < 0) {
-				return new TypesContract.SetTypeMemberCommentResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			Composite composite = requireTypeOfKind(dtm, request.type(), Composite.class, "a struct or union");
+			int index = requireComponent(composite, request.type(), request.ordinal());
 			int tx = program.startTransaction("libghidra set type member comment");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof Composite)) {
-					return new TypesContract.SetTypeMemberCommentResponse(false);
-				}
-				Composite composite = (Composite) dataType;
-				int index = (int) request.ordinal();
-				if (index < 0 || index >= composite.getNumComponents()) {
-					return new TypesContract.SetTypeMemberCommentResponse(false);
-				}
 				String nextComment = request.comment() != null ? request.comment() : "";
 				var component = composite.getComponent(index);
 				String fieldName = component.getFieldName();
 				DataType memberDt = component.getDataType();
 				int nextLen = component.getLength();
-				if (dataType instanceof Structure) {
-					Structure structure = (Structure) dataType;
+				if (composite instanceof Structure structure) {
 					structure.replace(index, memberDt, nextLen, fieldName, nextComment);
 				}
 				else {
@@ -1498,9 +1287,11 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				commit = true;
 				return new TypesContract.SetTypeMemberCommentResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "setTypeMemberComment failed: " + e.getMessage(), e);
-				return new TypesContract.SetTypeMemberCommentResponse(false);
+				throw SessionRpcException.from("set type member comment", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1512,25 +1303,15 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 	public TypesContract.SetTypeEnumMemberCommentResponse setTypeEnumMemberComment(
 			TypesContract.SetTypeEnumMemberCommentRequest request) {
 		try (LockScope ignored = writeLock()) {
-			Program program = currentProgram();
-			if (program == null || request == null ||
-				nullableString(request.type()).isBlank() ||
-				request.ordinal() < 0) {
-				return new TypesContract.SetTypeEnumMemberCommentResponse(false);
-			}
+			Program program = requireProgram();
+			requireRequest(request);
+			DataTypeManager dtm = program.getDataTypeManager();
+			ghidra.program.model.data.Enum enumType =
+				requireTypeOfKind(dtm, request.type(), ghidra.program.model.data.Enum.class, "an enum");
+			String memberName = requireEnumMember(enumType, request.type(), request.ordinal());
 			int tx = program.startTransaction("libghidra set enum member comment");
 			boolean commit = false;
 			try {
-				DataTypeManager dtm = program.getDataTypeManager();
-				DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, request.type());
-				if (!(dataType instanceof ghidra.program.model.data.Enum)) {
-					return new TypesContract.SetTypeEnumMemberCommentResponse(false);
-				}
-				ghidra.program.model.data.Enum enumType = (ghidra.program.model.data.Enum) dataType;
-				String memberName = DataTypeSupport.enumMemberNameByOrdinal(enumType, request.ordinal());
-				if (memberName == null) {
-					return new TypesContract.SetTypeEnumMemberCommentResponse(false);
-				}
 				String nextComment = request.comment() != null ? request.comment() : "";
 				long value = enumType.getValue(memberName);
 				enumType.remove(memberName);
@@ -1538,9 +1319,11 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 				commit = true;
 				return new TypesContract.SetTypeEnumMemberCommentResponse(true);
 			}
+			catch (SessionRpcException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				Msg.error(this, "setTypeEnumMemberComment failed: " + e.getMessage(), e);
-				return new TypesContract.SetTypeEnumMemberCommentResponse(false);
+				throw SessionRpcException.from("set enum member comment", e);
 			}
 			finally {
 				program.endTransaction(tx, commit);
@@ -1548,70 +1331,177 @@ public final class TypesRuntime extends RuntimeSupport implements TypesOperation
 		}
 	}
 
+	/**
+	 * Parses C declarations into the program's types, all or nothing: a parse error is
+	 * {@code parse_error} and leaves no type behind (the whole parse runs in one
+	 * transaction that is rolled back).
+	 */
 	@Override
 	public TypesContract.ParseDeclarationsResponse parseDeclarations(
 			TypesContract.ParseDeclarationsRequest request) {
-		Program program;
-		try (LockScope ignored = readLock()) {
-			program = currentProgram();
-		}
-		if (program == null || request == null) {
-			return new TypesContract.ParseDeclarationsResponse(0, List.of(), List.of("no program"));
-		}
-		String sourceText = request.sourceText();
-		if (sourceText == null || sourceText.isBlank()) {
-			return new TypesContract.ParseDeclarationsResponse(0, List.of(), List.of("empty source text"));
-		}
 		// Mutating the program's DataTypeManager (parser.parse below) must hold
 		// the host write lock so a concurrent reader (e.g. getAllDataTypes under
-		// readLock) cannot race the newly parsed types. CParser manages its own
-		// Ghidra DB transaction; this is the orthogonal host read/write lock that
-		// every other mutator wraps its body in.
+		// readLock) cannot race the newly parsed types.
 		try (LockScope ignored = writeLock()) {
+			Program program = requireProgram();
+			requireRequest(request);
+			String sourceText = requireText(request.sourceText(), "source text");
 			DataTypeManager dtm = program.getDataTypeManager();
 			List<DataType> beforeTypes = new ArrayList<>();
 			dtm.getAllDataTypes(beforeTypes);
-			int beforeCount = beforeTypes.size();
 
-			CParser parser = new CParser(dtm, true, null);
-			parser.parse(new ByteArrayInputStream(sourceText.getBytes(StandardCharsets.UTF_8)));
+			int tx = program.startTransaction("libghidra parse declarations");
+			boolean commit = false;
+			try {
+				// The parser does not store as it goes (storeDataType = false), so a name
+				// the text uses (`struct S`, `enum E`) resolves to the program's type. A
+				// storing parser never looks in the program for a composite or enum: a
+				// forward reference to an existing S made a new empty S that replaced the
+				// real one. The parsed types are added afterwards, a definition of an
+				// existing type replacing it in place.
+				CParser parser = new CParser(dtm, false, null);
+				parser.parse(new ByteArrayInputStream(sourceText.getBytes(StandardCharsets.UTF_8)));
+				addParsedTypes(dtm, parser.getComposites());
+				addParsedTypes(dtm, parser.getEnums());
+				addParsedTypes(dtm, parser.getTypes());
+				addParsedTypes(dtm, parser.getFunctions());
 
-			List<DataType> afterTypes = new ArrayList<>();
-			dtm.getAllDataTypes(afterTypes);
+				List<DataType> afterTypes = new ArrayList<>();
+				dtm.getAllDataTypes(afterTypes);
 
-			List<String> newTypeNames = new ArrayList<>();
-			for (DataType dt : afterTypes) {
-				boolean found = false;
+				// A type is new when its path was not there before. (Built-in types have
+				// no universal id, so an id comparison counted every one of them.) Only
+				// named types count: a pointer or array the text needed is derived,
+				// unnamed in the decompiler's type system, and counted by neither backend.
+				Set<String> beforePaths = new HashSet<>();
 				for (DataType bt : beforeTypes) {
-					if (bt.getUniversalID() != null && bt.getUniversalID().equals(dt.getUniversalID())) {
-						found = true;
-						break;
+					beforePaths.add(bt.getPathName());
+				}
+				List<String> newTypeNames = new ArrayList<>();
+				for (DataType dt : afterTypes) {
+					if (!beforePaths.contains(dt.getPathName()) && !(dt instanceof Pointer) &&
+						!(dt instanceof Array)) {
+						newTypeNames.add(dt.getPathName());
 					}
 				}
-				if (!found) {
-					newTypeNames.add(dt.getPathName());
-				}
+				commit = true;
+				return new TypesContract.ParseDeclarationsResponse(
+					newTypeNames.size(),
+					newTypeNames,
+					List.of());
 			}
+			catch (ParseException | ghidra.app.util.cparser.C.TokenMgrError e) {
+				throw new SessionRpcException(SessionRpcException.PARSE_ERROR,
+					"parse error: " + e.getMessage());
+			}
+			catch (RuntimeException e) {
+				throw SessionRpcException.from("parse declarations", e);
+			}
+			finally {
+				program.endTransaction(tx, commit);
+			}
+		}
+	}
 
-			int created = afterTypes.size() - beforeCount;
-			return new TypesContract.ParseDeclarationsResponse(
-				Math.max(0, created),
-				newTypeNames,
-				List.of());
+	/** Adds one of the parser's tables to the program, replacing a type of the same path. */
+	private static void addParsedTypes(DataTypeManager dtm, Map<String, DataType> parsed) {
+		for (DataType dt : parsed.values()) {
+			dtm.addDataType(dt, DataTypeConflictHandler.REPLACE_HANDLER);
 		}
-		catch (ParseException e) {
-			Msg.error(this, "parseDeclarations parse failed: " + e.getMessage(), e);
-			return new TypesContract.ParseDeclarationsResponse(
-				0,
-				List.of(),
-				List.of("parse error: " + e.getMessage()));
+	}
+
+	// ---- write-target resolution: one rule per failure, shared by every type write ----
+
+	/** The type {@code typeId} names (id, path or name); {@code not_found} when none. */
+	private static DataType requireType(DataTypeManager dtm, String typeId) {
+		String id = requireText(typeId, "type");
+		DataType dataType = DataTypeSupport.resolveDataTypeById(dtm, id);
+		if (dataType == null) {
+			throw SessionRpcException.notFound("no type '" + id + "'");
 		}
-		catch (Exception e) {
-			Msg.error(this, "parseDeclarations failed: " + e.getMessage(), e);
-			return new TypesContract.ParseDeclarationsResponse(
-				0,
-				List.of(),
-				List.of("error: " + e.getMessage()));
+		return dataType;
+	}
+
+	/** The type, which must be a {@code kind}; another kind is {@code invalid_argument}. */
+	private static <T> T requireTypeOfKind(
+			DataTypeManager dtm, String typeId, Class<T> kind, String kindName) {
+		DataType dataType = requireType(dtm, typeId);
+		if (!kind.isInstance(dataType)) {
+			throw SessionRpcException.invalidArgument("type '" + typeId.trim() + "' is " +
+				describeKind(dataType) + ", not " + kindName);
 		}
+		return kind.cast(dataType);
+	}
+
+	private static String describeKind(DataType dataType) {
+		if (dataType instanceof Structure) {
+			return "a struct";
+		}
+		if (dataType instanceof Union) {
+			return "a union";
+		}
+		if (dataType instanceof ghidra.program.model.data.Enum) {
+			return "an enum";
+		}
+		if (dataType instanceof TypeDef) {
+			return "a typedef";
+		}
+		return "a " + dataType.getClass().getSimpleName();
+	}
+
+	/** A name a new type may take; an existing type of that name is {@code duplicate_name}. */
+	private static void requireNewTypeName(DataTypeManager dtm, String name) {
+		DataType existing = DataTypeSupport.findDataTypeByName(dtm, name);
+		if (existing != null) {
+			throw SessionRpcException.duplicateName(
+				"a type named '" + name + "' already exists: " + existing.getPathName());
+		}
+	}
+
+	/**
+	 * A type named as an argument (a member, parameter, local, alias target or
+	 * ApplyDataType type) -- not the write's target. {@code unknown_type} when it does
+	 * not resolve, which tells a missing argument apart from a missing target.
+	 */
+	private static DataType requireArgumentType(Program program, String typeText) {
+		DataType parsed = DataTypeSupport.resolveWritableDataType(program, typeText);
+		if (parsed == null) {
+			throw SessionRpcException.unknownType(typeText.trim());
+		}
+		return parsed;
+	}
+
+	private static String requireEnumMember(
+			ghidra.program.model.data.Enum enumType, String typeId, long ordinal) {
+		if (ordinal < 0) {
+			throw SessionRpcException.invalidArgument("member ordinal must be >= 0");
+		}
+		String memberName = DataTypeSupport.enumMemberNameByOrdinal(enumType, ordinal);
+		if (memberName == null) {
+			throw SessionRpcException.notFound("enum '" + typeId.trim() + "' has no member " + ordinal +
+				" (it has " + enumType.getCount() + ")");
+		}
+		return memberName;
+	}
+
+	private static void requireNewEnumMemberName(
+			ghidra.program.model.data.Enum enumType, String typeId, String name) {
+		for (String existing : enumType.getNames()) {
+			if (name.equals(existing)) {
+				throw SessionRpcException.duplicateName(
+					"enum '" + typeId.trim() + "' already has a member named '" + name + "'");
+			}
+		}
+	}
+
+	private static int requireComponent(Composite composite, String typeId, long ordinal) {
+		if (ordinal < 0) {
+			throw SessionRpcException.invalidArgument("member ordinal must be >= 0");
+		}
+		if (ordinal >= composite.getNumComponents()) {
+			throw SessionRpcException.notFound("type '" + typeId.trim() + "' has no member " + ordinal +
+				" (it has " + composite.getNumComponents() + ")");
+		}
+		return (int) ordinal;
 	}
 }

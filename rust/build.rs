@@ -212,6 +212,22 @@ fn build_local_bridge() {
     // Library search path.
     if let Some(dir) = lib_dir.as_deref() {
         println!("cargo:rustc-link-search=native={}", dir);
+        // Relink when a prebuilt libghidra archive changes. Without this, a
+        // rebuilt C++ library leaves every Rust test binary linked against the
+        // old one: nothing Rust-side changed, so cargo reuses it.
+        if let Ok(entries) = std::fs::read_dir(dir) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+                let archive = matches!(
+                    path.extension().and_then(|e| e.to_str()),
+                    Some("lib") | Some("a")
+                );
+                if archive && name.contains("libghidra") {
+                    println!("cargo:rerun-if-changed={}", path.display());
+                }
+            }
+        }
     } else {
         println!(
             "cargo:warning=LIBGHIDRA_LIB_DIR / LIBGHIDRA_PREBUILT_DIR not set; \

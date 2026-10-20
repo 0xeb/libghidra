@@ -14,6 +14,8 @@ public interface SymbolsOperations {
 
 	SymbolsContract.ListSymbolsResponse listSymbols(SymbolsContract.ListSymbolsRequest request);
 
+	SymbolsContract.CreateLabelResponse createLabel(SymbolsContract.CreateLabelRequest request);
+
 	SymbolsContract.RenameSymbolResponse renameSymbol(SymbolsContract.RenameSymbolRequest request);
 
 	SymbolsContract.DeleteSymbolResponse deleteSymbol(SymbolsContract.DeleteSymbolRequest request);
