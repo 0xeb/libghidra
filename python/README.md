@@ -70,7 +70,7 @@ open one project program, query it, close it, then open the next.
 import libghidra as ghidra
 
 with ghidra.launch_headless_project(ghidra.HeadlessProjectOptions(
-    ghidra_dir="C:/ghidra_dist/ghidra_12.1_DEV",
+    ghidra_dir="C:/ghidra_dist/ghidra_12.2_PUBLIC",
     project_dir="C:/work/projects",
     project_name="firmware",
     shutdown="save",

@@ -42,8 +42,9 @@ Python, then layer the C++/Rust SDKs on the same host URL.
 
 ### Prerequisites
 
-- [Ghidra](https://ghidra-sre.org/) distribution (12.0.4+)
-- JDK 21 (e.g. [Eclipse Adoptium](https://adoptium.net/)) and [Gradle](https://gradle.org/), for building the Java extension
+- [Ghidra](https://ghidra-sre.org/) 12.2 distribution
+- JDK 25 (e.g. [Eclipse Adoptium](https://adoptium.net/)) and [Gradle](https://gradle.org/) 9.1+, for building the Java extension
+  - the built extension installs only into the Ghidra release it was built against
   - no Gradle wrapper is checked into `ghidra-extension`; with a local Ghidra source tree you can use `ghidra/gradlew.bat` instead
   - `protoc` is optional -- pre-generated Java protobuf stubs ship in-tree
 - C++20 compiler (Visual Studio 2022, GCC 12+, Clang 15+) and CMake 3.26+ -- only for the C++ SDK
@@ -52,7 +53,7 @@ Python, then layer the C++/Rust SDKs on the same host URL.
 
 `GHIDRA_INSTALL_DIR` must be the Ghidra distribution **root** -- the directory
 containing `support/buildExtension.gradle`. If you unpacked Ghidra under
-`C:\ghidra_dist\ghidra_12.1_DEV`, that full inner path is the install dir.
+`C:\ghidra_dist\ghidra_12.2_PUBLIC`, that full inner path is the install dir.
 
 ```bash
 cd ghidra-extension
@@ -62,7 +63,7 @@ gradle installExtension -PGHIDRA_INSTALL_DIR=/path/to/ghidra_dist
 With a local Ghidra source tree, the wrapper variant works too:
 
 ```bat
-C:\path\to\ghidra\gradlew.bat -p libghidra\ghidra-extension installExtension -PGHIDRA_INSTALL_DIR=C:\ghidra_dist\ghidra_12.1_DEV
+C:\path\to\ghidra\gradlew.bat -p libghidra\ghidra-extension installExtension -PGHIDRA_INSTALL_DIR=C:\ghidra_dist\ghidra_12.2_PUBLIC
 ```
 
 The extension unpacks to `/path/to/ghidra_dist/Ghidra/Extensions/LibGhidraHost`.
@@ -81,7 +82,7 @@ at launch:
 
 ```bat
 set GHIDRA_GUI_JAVA_OPTIONS=-Dlibghidra.host.bind=127.0.0.1 -Dlibghidra.host.port=19090
-C:\ghidra_dist\ghidra_12.1_DEV\ghidraRun.bat
+C:\ghidra_dist\ghidra_12.2_PUBLIC\ghidraRun.bat
 ```
 
 **Option B -- Headless, no GUI.** Use the same distribution root (the one
@@ -238,7 +239,7 @@ with an explicit close/open:
 import libghidra as ghidra
 
 with ghidra.launch_headless_project(ghidra.HeadlessProjectOptions(
-    ghidra_dir="C:/ghidra_dist/ghidra_12.1_DEV",
+    ghidra_dir="C:/ghidra_dist/ghidra_12.2_PUBLIC",
     project_dir="C:/work/projects",
     project_name="firmware",
     shutdown="save",
@@ -305,13 +306,12 @@ client, but the local backend is validated with MSVC. This builds
 `libghidra_client` (HTTP only) -- the offline backend is opt-in because it also
 needs a Ghidra **source** checkout.
 
-> **Which Ghidra source.** The local backend tracks Ghidra `master`, not a
-> release branch. It requires source at or after **GP-7063** ("New detection of
-> symbol conflicts"), which split `SymbolEntry` into `MapEntry` and
-> `DynamicEntry`. That landed *after* the 12.1.3 release, so the 12.1.3 source
-> tree (and anything older) fails to compile the local backend with errors about
-> `MapEntry`. CI pins the exact commit it builds against; see
-> `.github/workflows/ci.yml`. The HTTP client has no such requirement.
+> **Which Ghidra source.** The local backend builds against the Ghidra 12.2
+> release source (the `Ghidra_12.2_build` tag), with the `.sla` grammars from
+> the same release. It relies on **GP-7063** ("New detection of symbol
+> conflicts"), which split `SymbolEntry` into `MapEntry` and `DynamicEntry`.
+> CI pins the exact commit it builds against; see `.github/workflows/ci.yml`.
+> The HTTP client has no such requirement.
 
 To also build the offline backend:
 
