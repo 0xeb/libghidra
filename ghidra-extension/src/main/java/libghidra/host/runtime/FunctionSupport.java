@@ -13,7 +13,10 @@ import ghidra.program.model.listing.Parameter;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.listing.Variable;
 import ghidra.program.model.listing.VariableStorage;
+import ghidra.program.model.pcode.DynamicEntry;
 import ghidra.program.model.pcode.HighSymbol;
+import ghidra.program.model.pcode.HighVariable;
+import ghidra.program.model.pcode.SymbolEntry;
 
 final class FunctionSupport {
 
@@ -180,7 +183,52 @@ final class FunctionSupport {
 		long rawSymbolId = symbol.getId();
 		Long dbSymbolId = (rawSymbolId != 0 && (rawSymbolId >>> 56) != (HighSymbol.ID_BASE >>> 56))
 			? Long.valueOf(rawSymbolId) : null;
+		// Key a local that will be committed under dynamic storage on the entry it will be committed
+		// with, so the id neither changes on the first edit nor collides with other temporaries.
+		DynamicEntry dynamic = resolveDynamicEntry(symbol);
+		if (dynamic != null) {
+			return canonicalLocalId(dynamic.getStorage(),
+				firstUseOffset(function, dynamic.getPCAdress()), dbSymbolId);
+		}
 		return canonicalLocalId(symbol.getStorage(), highSymbolFirstUseOffset(function, symbol), dbSymbolId);
+	}
+
+	/**
+	 * The dynamic (HASH) entry an uncommitted decompiler local will receive when it is committed,
+	 * or null when its current entry already is its committed storage.
+	 * <p>
+	 * Mirrors HighSymbol.resolveStorage, which HighFunctionDBUtil.updateDBVariable runs before
+	 * writing a local: the hash and first-use PC come from DynamicEntry.build over the
+	 * representative varnode. Ghidra reports every uncommitted temporary as HASH:00000000:size,
+	 * so keying on the reported storage would give all same-size temporaries one id, and the id
+	 * would change when the first edit commits the real hash.
+	 */
+	static DynamicEntry resolveDynamicEntry(HighSymbol symbol) {
+		SymbolEntry entry = symbol.getFirstWholeMap();
+		boolean unresolvedHash = entry instanceof DynamicEntry dynamic && dynamic.getHash() == 0;
+		if (entry instanceof DynamicEntry && !unresolvedHash) {
+			return null;
+		}
+		HighVariable highVariable = symbol.getHighVariable();
+		if (highVariable == null || highVariable.getRepresentative() == null) {
+			return null;
+		}
+		if (!unresolvedHash && !highVariable.requiresDynamicStorage()) {
+			return null;
+		}
+		try {
+			DynamicEntry resolved = DynamicEntry.build(highVariable.getRepresentative());
+			return resolved.getHash() != 0 ? resolved : null;
+		}
+		catch (RuntimeException e) {
+			return null;
+		}
+	}
+
+	/** The storage a decompiler local has, or will have once committed. */
+	static VariableStorage resolvedStorage(HighSymbol symbol) {
+		DynamicEntry dynamic = resolveDynamicEntry(symbol);
+		return dynamic != null ? dynamic.getStorage() : symbol.getStorage();
 	}
 
 	static String canonicalLocalId(VariableStorage storage, int firstUseOffset, Long symbolId) {
@@ -230,8 +278,11 @@ final class FunctionSupport {
 		if (function == null || symbol == null) {
 			return 0;
 		}
-		Address pcAddress = symbol.getPCAddress();
-		if (pcAddress == null) {
+		return firstUseOffset(function, symbol.getPCAddress());
+	}
+
+	private static int firstUseOffset(Function function, Address pcAddress) {
+		if (function == null || pcAddress == null) {
 			return 0;
 		}
 		try {

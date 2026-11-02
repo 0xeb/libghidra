@@ -14,6 +14,7 @@ import ghidra.program.model.data.DataType;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.listing.VariableStorage;
+import ghidra.program.model.pcode.DynamicEntry;
 import ghidra.program.model.pcode.HighFunction;
 import ghidra.program.model.pcode.HighFunctionDBUtil;
 import ghidra.program.model.pcode.HighSymbol;
@@ -82,6 +83,14 @@ final class FunctionVariableMutationSupport {
 	private static void requireUsableMutationStorage(HighSymbol symbol, String localId)
 			throws InvalidInputException {
 		requireUsableMutationStorage(symbol != null ? symbol.getStorage() : null, localId);
+		// Ghidra 12.2 derives an uncommitted temporary's HASH storage from its HighVariable when
+		// committing; a symbol the decompiler left without one cannot be committed (stock
+		// HighSymbol.resolveStorage throws a NullPointerException for it).
+		if (symbol.getHighVariable() == null &&
+			symbol.getFirstWholeMap() instanceof DynamicEntry dynamic && dynamic.getHash() == 0) {
+			throw new InvalidInputException("local '" + localId +
+				"' has no decompiler variable to derive its dynamic storage from; Ghidra cannot commit it");
+		}
 	}
 
 	static void requireUsableMutationStorage(VariableStorage storage, String localId)
