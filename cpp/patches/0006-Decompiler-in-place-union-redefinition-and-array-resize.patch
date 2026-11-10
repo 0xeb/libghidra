@@ -1,5 +1,40 @@
---- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc	2026-10-02 00:00:00.000000000 -0700
-+++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc	2026-10-02 00:00:00.000000000 -0700
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Fri, 2 Oct 2026 00:00:00 -0700
+Subject: [PATCH 06/11] Decompiler: redefine a union and resize an array in
+ place
+
+The union and array counterparts of TypeFactory::redefineStruct (patch 5),
+for a client that keeps one Architecture for a whole session and edits the
+types it holds.
+
+TypeFactory::setFields only accepts an incomplete union, so a member edit on a
+complete union had no way in: destroying and recreating it leaves every
+pointer, prototype and containing type pointing at freed memory. Add
+TypeFactory::redefineUnion, which replaces the fields of an existing union in
+place (erasing and reinserting it in the type tree, whose order depends on the
+fields) and gives its typedef copies the same fields.
+
+An array's size is fixed when it is created (element count times the
+element's aligned size). When the element is redefined in place with another
+size, the array kept the old one. Add TypeFactory::resizeArray, which
+recomputes the size and alignment of an existing array, and of its typedef
+copies, from its element.
+
+Measured on the rich_fixture project: union member edits, and a structure
+held by value in a packed structure and in an array of it, now lay out
+exactly as Ghidra's DataTypeManager does (member offsets, sizes, the array's
+length and the data item of that array), and the decompilations that read
+them match.
+---
+ .../Decompiler/src/decompile/cpp/type.cc      | 56 +++++++++++++++++++
+ .../Decompiler/src/decompile/cpp/type.hh      |  2 +
+ 2 files changed, 58 insertions(+)
+
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc b/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc
+index 242c3703c9..fc9e6e600b 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc
 @@ -4858,6 +4858,62 @@ void TypeFactory::destroyType(Datatype *ct)
    delete ct;
  }
@@ -63,8 +98,10 @@
  /// The data-type propagation system can push around data-types that are \e partial or are
  /// otherwise unrepresentable in the source language.  This method substitutes those data-types
  /// with a concrete data-type that is representable, or returns the same data-type if is already concrete.
---- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh	2026-10-02 00:00:00.000000000 -0700
-+++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh	2026-10-02 00:00:00.000000000 -0700
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh b/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh
+index 3a1d0cd6bb..bcc302d3aa 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh
 @@ -943,6 +943,8 @@ public:
    void destroyType(Datatype *ct);				///< Remove a data-type from \b this
    Datatype *concretize(Datatype *ct);				///< Convert given data-type to concrete form

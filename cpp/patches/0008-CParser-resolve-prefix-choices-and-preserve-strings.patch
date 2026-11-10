@@ -1,3 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Sun, 11 Oct 2026 01:41:00 -0700
+Subject: [PATCH 08/11] CParser: resolve prefix choices and preserve strings
+
+Resolve each C/CPP JavaCC prefix ambiguity with local grammar choices.
+Correct trailing initializer commas, array/attribute ambiguity, and adjacent
+string handling. Preserve the existing preprocessor header output and compare
+logical lines on Windows. Modernize deprecated boxed-value constructors.
+---
+ .../javacc/ghidra/app/util/cparser/C/C.jj     | 93 ++++++++++---------
+ .../javacc/ghidra/app/util/cparser/CPP/CPP.jj | 27 +++---
+ .../ghidra/app/util/cparser/CParserTest.java  | 19 ++++
+ .../app/util/cparser/PreProcessorTest.java    | 13 ++-
+ 4 files changed, 96 insertions(+), 56 deletions(-)
+
 diff --git a/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/C/C.jj b/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/C/C.jj
 index 3b990dbaa8..6940d19f7f 100644
 --- a/Ghidra/Features/Base/src/main/javacc/ghidra/app/util/cparser/C/C.jj

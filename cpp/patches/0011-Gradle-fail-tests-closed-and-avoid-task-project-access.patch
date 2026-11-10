@@ -1,5 +1,16 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Sun, 11 Oct 2026 01:41:00 -0700
+Subject: [PATCH 11/11] Gradle: fail tests closed and avoid task project access
+
+Make failed or unexpectedly empty test tasks fail the build, and avoid
+deprecated Task.project access during task execution.
+---
+ gradle/javaTestProject.gradle | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
 diff --git a/gradle/javaTestProject.gradle b/gradle/javaTestProject.gradle
-index 4f7f75db33..d995b7a036 100644
+index 423bd232f8..9f8b129258 100644
 --- a/gradle/javaTestProject.gradle
 +++ b/gradle/javaTestProject.gradle
 @@ -141,6 +141,7 @@ rootProject.combinedTestReport {
@@ -25,7 +36,7 @@ index 4f7f75db33..d995b7a036 100644
  	}
  	
  	// If false, then tests are re-run every time, even if no code has changed.
-@@ -228,7 +229,7 @@ def initTestJVM(Task task, String rootDirName) {
+@@ -231,7 +232,7 @@ def initTestJVM(Task task, String rootDirName) {
  			// 
  		]
  		
@@ -34,7 +45,7 @@ index 4f7f75db33..d995b7a036 100644
  			// If project has a FileSystem dependency we must assume there may be a
  			// Ghidra ApplicationConfiguration that will attempt to configure a
  			// serial filter factory which must be done in a lazy fashion when gradle
-@@ -244,7 +245,7 @@ def initTestJVM(Task task, String rootDirName) {
+@@ -247,7 +248,7 @@ def initTestJVM(Task task, String rootDirName) {
   *********************************************************************************/
  def startTestTimer(Task task) {
  	project.ext.testStartTime = new Date()
@@ -43,7 +54,7 @@ index 4f7f75db33..d995b7a036 100644
  }
  
  /*********************************************************************************
-@@ -252,7 +253,7 @@ def startTestTimer(Task task) {
+@@ -255,7 +256,7 @@ def startTestTimer(Task task) {
   *********************************************************************************/
  def endTestTimer(Task task) {
  	Date endTime = new Date();
@@ -52,7 +63,7 @@ index 4f7f75db33..d995b7a036 100644
  	
  	long elapsedMS = endTime.getTime() - testStartTime.getTime();
  	long msPerMin = 60 * 1000;
-@@ -260,6 +261,6 @@ def endTestTimer(Task task) {
+@@ -263,6 +264,6 @@ def endTestTimer(Task task) {
  	long hrs = elapsedMS / msPerHour;
  	long mins = (elapsedMS - (hrs * msPerHour)) / msPerMin;
  	long secs = (elapsedMS - (hrs * msPerHour) - (mins * msPerMin)) / 1000;

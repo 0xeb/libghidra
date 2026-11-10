@@ -8,7 +8,7 @@ package libghidra;
 /**
  * <pre>
  * Define a new function whose entry is `address`, optionally naming it. An
- * absent `name` takes the backend's default (FUN_&lt;address&gt;).
+ * absent `name` takes the backend's default, e.g. FUN_00401000.
  *
  * Errors (RpcResponse error_code):
  * unmapped_address  no memory block contains the address
@@ -291,7 +291,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * Define a new function whose entry is `address`, optionally naming it. An
-   * absent `name` takes the backend's default (FUN_&lt;address&gt;).
+   * absent `name` takes the backend's default, e.g. FUN_00401000.
    *
    * Errors (RpcResponse error_code):
    * unmapped_address  no memory block contains the address

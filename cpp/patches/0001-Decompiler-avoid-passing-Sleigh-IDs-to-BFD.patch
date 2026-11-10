@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Sun, 3 May 2026 12:05:35 -0700
+Subject: [PATCH 01/11] Decompiler: avoid passing Sleigh IDs to BFD
+
+---
+ Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc      | 4 ++++
+ Ghidra/Features/Decompiler/src/decompile/cpp/loadimage_bfd.cc | 3 ++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc b/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc
+index 5a028a8864..451262d13f 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/bfd_arch.cc
+@@ -72,6 +72,10 @@ void BfdArchitecture::buildLoader(DocumentStorage &store)
+   collectSpecFiles(*errorstream);
+   if (getTarget().find("binary")==0)
+     ldr.reset(new LoadImageBfd(getFilename(),"binary"));
++  else if (getTarget().find(':')!=string::npos)
++    // The target is already a Sleigh language id. Let BFD auto-detect the
++    // object format from the file header.
++    ldr.reset(new LoadImageBfd(getFilename(),""));
+   else if (getTarget().find("default")==0)
+     ldr.reset(new LoadImageBfd(getFilename(),"default"));
+   else
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage_bfd.cc b/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage_bfd.cc
+index 477c17e817..85e558390d 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage_bfd.cc
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage_bfd.cc
+@@ -75,7 +75,8 @@ void LoadImageBfd::open(void)
+ 
+ {
+   if (thebfd != (bfd *)0) throw LowlevelError("BFD library did not initialize");
+-  thebfd = bfd_openr(filename.c_str(),target.c_str());
++  const char *bfdtarget = target.empty() ? NULL : target.c_str();
++  thebfd = bfd_openr(filename.c_str(),bfdtarget);
+   if (thebfd == (bfd *)0) {
+     string errmsg="Unable to open image file: ";
+     errmsg += filename;

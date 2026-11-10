@@ -1,3 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Sun, 11 Oct 2026 01:41:00 -0700
+Subject: [PATCH 09/11] MinGW: distinguish absent lists and normalize no-return
+ names
+
+Distinguish an absent MinGW relocation list from malformed discovered data.
+Absence records Unsupported and completes without claiming relocation
+success. Four tests cover absent, empty, nonempty, and malformed lists.
+Normalize the two no-return entries to the spelling the analyzer expects.
+---
+ .../Base/data/PEFunctionsThatDoNotReturn      |   4 +-
+ .../analysis/MingwRelocationAnalyzer.java     |  17 ++-
+ .../analysis/MingwRelocationAnalyzerTest.java | 101 ++++++++++++++++++
+ 3 files changed, 119 insertions(+), 3 deletions(-)
+ create mode 100644 Ghidra/Features/Base/src/test/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzerTest.java
+
 diff --git a/Ghidra/Features/Base/data/PEFunctionsThatDoNotReturn b/Ghidra/Features/Base/data/PEFunctionsThatDoNotReturn
 index 115bf6ff95..ba9c84719a 100644
 --- a/Ghidra/Features/Base/data/PEFunctionsThatDoNotReturn
@@ -57,6 +74,7 @@ index f6988459bc..1f32ee0220 100644
  		createPrimaryLabel(pdwListEndAddr, PSEUDO_RELOC_LIST_END_NAME);
 diff --git a/Ghidra/Features/Base/src/test/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzerTest.java b/Ghidra/Features/Base/src/test/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzerTest.java
 new file mode 100644
+index 0000000000..431448b9d2
 --- /dev/null
 +++ b/Ghidra/Features/Base/src/test/java/ghidra/app/plugin/core/analysis/MingwRelocationAnalyzerTest.java
 @@ -0,0 +1,101 @@

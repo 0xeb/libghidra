@@ -1,5 +1,39 @@
---- a/Ghidra/Features/Decompiler/src/decompile/cpp/funcdata.hh	2026-10-01 00:00:00.000000000 -0700
-+++ b/Ghidra/Features/Decompiler/src/decompile/cpp/funcdata.hh	2026-10-01 00:00:00.000000000 -0700
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Thu, 1 Oct 2026 18:00:00 -0700
+Subject: [PATCH 05/11] Decompiler: edit a structure and rename a function in
+ place
+
+A client that keeps one Architecture for a whole session (an offline
+program database, not a host that re-sends everything per decompile) has to
+edit what it already holds. Two edits had no way to do that.
+
+TypeFactory::setFields only accepts an incomplete structure, so the only way to
+change a complete one was destroyType + a new type: every pointer, array,
+typedef and prototype that referred to the old object was left pointing at
+freed memory, and a type keyed by its id lost its identity. Add
+TypeFactory::redefineStruct, which replaces the fields of an existing
+structure in place (erasing and reinserting it in the type tree, whose order
+depends on the fields), gives its typedef copies the same fields, and keeps
+its name, id and every reference to it.
+
+A Funcdata keeps its own copy of its name, which declarations and call sites
+print, while renameSymbol renames only the FunctionSymbol. Add
+Funcdata::setName so a rename reaches both; the caller renames the symbol.
+
+Measured on the rich_fixture project (198 functions): a member rename on a
+PDB structure reached the decompilation of the function that reads it
+(s->wc_width), and the struct kept its id, its category path and its size.
+---
+ .../Decompiler/src/decompile/cpp/funcdata.hh  |  1 +
+ .../Decompiler/src/decompile/cpp/type.cc      | 40 +++++++++++++++++++
+ .../Decompiler/src/decompile/cpp/type.hh      |  2 +
+ 3 files changed, 43 insertions(+)
+
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/funcdata.hh b/Ghidra/Features/Decompiler/src/decompile/cpp/funcdata.hh
+index 2c6cecf885..2cceda9bcc 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/funcdata.hh
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/funcdata.hh
 @@ -139,6 +139,7 @@ public:
    ~Funcdata(void);							///< Destructor
    const string &getName(void) const { return name; }			///< Get the function's local symbol name
@@ -8,8 +42,10 @@
    const Address &getAddress(void) const { return baseaddr; }		///< Get the entry point address
    int4 getSize(void) const { return size; }				///< Get the function body size in bytes
    Architecture *getArch(void) const { return glb; }			///< Get the program/architecture owning \b this function
---- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc	2026-10-01 00:00:00.000000000 -0700
-+++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc	2026-10-01 00:00:00.000000000 -0700
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc b/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc
+index 6b226036cb..242c3703c9 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.cc
 @@ -4803,6 +4803,46 @@ void TypeFactory::assignRawFields(TypeUnion *ct,vector<TypeField> &fd)
    glb->types->setFields(fd,ct,newSize,newAlign,flags);
  }
@@ -57,8 +93,10 @@
  /// The indicated Datatype object is removed from this container.
  /// Indirect references (via TypeArray TypeStruct etc.) are not affected
  /// \param ct is the data-type to destroy
---- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh	2026-10-01 00:00:00.000000000 -0700
-+++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh	2026-10-01 00:00:00.000000000 -0700
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh b/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh
+index b32741b41c..3a1d0cd6bb 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/type.hh
 @@ -938,6 +938,8 @@ public:
    Datatype *getExactPiece(Datatype *ct,int4 offset,int4 size);	///< Get the data-type associated with piece of a structured data-type
    void assignRawFields(TypeStruct *ct,vector<TypeField> &fd,vector<TypeBitField> &bit);

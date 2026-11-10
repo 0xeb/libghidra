@@ -7,10 +7,9 @@ This folder contains the complete Java host implementation for libghidra. It bui
 ## End-user quick start
 
 Prerequisites:
-- Ghidra 12.2
-- JDK 25
-- Gradle 9.1+, or the local Ghidra source-tree wrapper (`ghidra/gradlew.bat`)
-- The built extension installs only into the Ghidra release it was built against
+- Ghidra 12.0.4+
+- JDK 25 and Gradle 9.1+ (the floors in the Ghidra 12.2 `application.properties`)
+- Gradle, or the local Ghidra source-tree wrapper (`ghidra/gradlew.bat`)
 - `protoc` is optional; pre-generated Java stubs are already included
 
 1. Install the extension with:

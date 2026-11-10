@@ -42,9 +42,8 @@ Python, then layer the C++/Rust SDKs on the same host URL.
 
 ### Prerequisites
 
-- [Ghidra](https://ghidra-sre.org/) 12.2 distribution
+- [Ghidra](https://ghidra-sre.org/) distribution (12.0.4+)
 - JDK 25 (e.g. [Eclipse Adoptium](https://adoptium.net/)) and [Gradle](https://gradle.org/) 9.1+, for building the Java extension
-  - the built extension installs only into the Ghidra release it was built against
   - no Gradle wrapper is checked into `ghidra-extension`; with a local Ghidra source tree you can use `ghidra/gradlew.bat` instead
   - `protoc` is optional -- pre-generated Java protobuf stubs ship in-tree
 - C++20 compiler (Visual Studio 2022, GCC 12+, Clang 15+) and CMake 3.26+ -- only for the C++ SDK
@@ -144,16 +143,16 @@ install and no Java at runtime.
 
 ```bash
 # Linux x86_64 (RHEL 8+, Ubuntu 20.04+, Debian 11+, Fedora 29+)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.11/libghidra-0.0.11-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 
 # Linux aarch64 (Raspberry Pi 4/5 on 64-bit OS, Ubuntu/Debian arm64)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.11/libghidra-0.0.11-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl
 
 # macOS Apple Silicon (M1/M2/M3/M4)
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-macosx_26_0_arm64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.11/libghidra-0.0.11-cp312-abi3-macosx_26_0_arm64.whl
 
 # Windows x64
-pip install https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-win_amd64.whl
+pip install https://github.com/0xeb/libghidra/releases/download/v0.0.11/libghidra-0.0.11-cp312-abi3-win_amd64.whl
 ```
 
 Inspecting an executable **file** offline (rather than a live program) also
@@ -163,11 +162,11 @@ matching Ghidra `language_id`; you can still pass one explicitly on
 `OpenProgramRequest`.
 
 ```bash
-pip install "libghidra[local] @ https://github.com/0xeb/libghidra/releases/download/v0.0.10/libghidra-0.0.10-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+pip install "libghidra[local] @ https://github.com/0xeb/libghidra/releases/download/v0.0.11/libghidra-0.0.11-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
 ```
 
 No wheel for your platform (Intel Mac, Windows on Arm)? The pure-Python
-fallback `libghidra-0.0.10-py3-none-any.whl` inside `libghidra-python-v0.0.10.zip`
+fallback `libghidra-0.0.11-py3-none-any.whl` inside `libghidra-python-v0.0.11.zip`
 on the release page gives you the HTTP/RPC client only -- no local backend.
 
 From a clone, for contributors:
@@ -306,12 +305,13 @@ client, but the local backend is validated with MSVC. This builds
 `libghidra_client` (HTTP only) -- the offline backend is opt-in because it also
 needs a Ghidra **source** checkout.
 
-> **Which Ghidra source.** The local backend builds against the Ghidra 12.2
-> release source (the `Ghidra_12.2_build` tag), with the `.sla` grammars from
-> the same release. It relies on **GP-7063** ("New detection of symbol
-> conflicts"), which split `SymbolEntry` into `MapEntry` and `DynamicEntry`.
-> CI pins the exact commit it builds against; see `.github/workflows/ci.yml`.
-> The HTTP client has no such requirement.
+> **Which Ghidra source.** The local backend builds against the latest NSA
+> Ghidra release, currently **12.2** (tag `Ghidra_12.2_build`). It requires source
+> at or after **GP-7063** ("New detection of symbol conflicts"), which split
+> `SymbolEntry` into `MapEntry` and `DynamicEntry`; 12.1.3 and older fail to
+> compile the local backend with errors about `MapEntry`. CI pins the exact
+> commit it builds against; see `.github/workflows/ci.yml`. The HTTP client has no
+> such requirement.
 
 To also build the offline backend:
 

@@ -181,8 +181,12 @@ struct Decompiler::Impl {
         int temp_counter = 0;
         std::vector<Datatype *> temps;          // bodies parsed under a name of their own
         std::set<Datatype *> composites;        // every composite the parse defined
+        std::set<Datatype *> c99_seeds;         // C99 built-ins seeded for the text
+        std::set<Datatype *> seeded_now;        // ... for the declaration being parsed
         ReplaceComposite replace;
     };
+    Datatype *c99BuiltIn(const std::string& name);
+    void seedC99BuiltIns(const std::string& decl, ParseState& state);
     void parseDeclaration(const std::string& decl, ParseState& state);
     std::vector<CToken> resolveSpecifiers(const std::vector<CToken>& t, size_t first,
                                                  size_t last, const std::string& typedefName,
@@ -698,6 +702,7 @@ bool Decompiler::defineUnion(const std::string& name)
 //   - an anonymous struct or union declared alone, and a variable, create nothing.
 
 static bool namesCallingConvention(Architecture *arch, const std::string &prototype);
+static const char *c99TypedefTarget(const std::string &name);
 std::string dropTypeQualifiers(const std::string &text);
 
 namespace {
@@ -1152,7 +1157,31 @@ void Decompiler::Impl::parseDeclaration(const std::string &decl, ParseState &sta
             Datatype *ct = parse_type(ss, name, arch);
             if (name.empty()) throw ParseError("Missing identifier for typedef");
             ct = namedFunctionPointer(ct, name);
+            // DataTypeUtilities.getTypedefReplacement (CParser.addTypedef): a typedef of
+            // an integer to a name Ghidra maps to a C99 built-in, of the same signedness,
+            // is that built-in when the names match, else a typedef of it. Sizes are not
+            // compared: `typedef unsigned short uint8_t` is the 1-byte uint8_t.
+            if (const char *target = c99TypedefTarget(name)) {
+                Datatype *base = ct;
+                while (base->getTypedef() != nullptr) base = base->getTypedef();
+                const type_metatype want = target[0] == 'u' ? TYPE_UINT : TYPE_INT;
+                if ((base->getMetatype() == TYPE_INT || base->getMetatype() == TYPE_UINT) &&
+                    base->getMetatype() == want) {
+                    Datatype *builtIn = c99BuiltIn(target);
+                    state.c99_seeds.erase(builtIn);  // the text defines it: it stays
+                    state.seeded_now.erase(builtIn);
+                    if (name == target) continue;
+                    ct = builtIn;
+                }
+            }
             Datatype *same = types->findByName(name);
+            if (same != nullptr && state.seeded_now.count(same) != 0 && same->getTypedef() != ct) {
+                // The declaration names a C99 built-in and defines it otherwise itself.
+                state.seeded_now.erase(same);
+                state.c99_seeds.erase(same);
+                types->destroyType(same);
+                same = nullptr;
+            }
             if (same != nullptr && same->getMetatype() != TYPE_CODE) {
                 if (same->getTypedef() == ct) continue;  // already this typedef
                 throw ParseError("Redefinition of " + name);
@@ -1203,6 +1232,80 @@ void Decompiler::Impl::parseDeclaration(const std::string &decl, ParseState &sta
     }
 }
 
+// Ghidra 12.2's C99 built-in integers (GP-6846: Int8TDataType ... UInt64TDataType,
+// PointerSizedIntegerDataType, UnsignedPointerSizedIntegerDataType). CParser resolves a
+// name after the text's and the program's own types, from BuiltInDataTypeManager, and
+// only the ones a parsed type uses reach the program.
+// Size 0 is the pointer size.
+static const struct C99BuiltIn {
+    const char *name;
+    type_metatype meta;
+    int4 size;
+} kC99BuiltIns[] = {
+    {"int8_t", TYPE_INT, 1},   {"uint8_t", TYPE_UINT, 1},  {"int16_t", TYPE_INT, 2},
+    {"uint16_t", TYPE_UINT, 2}, {"int32_t", TYPE_INT, 4},  {"uint32_t", TYPE_UINT, 4},
+    {"int64_t", TYPE_INT, 8},  {"uint64_t", TYPE_UINT, 8}, {"intptr_t", TYPE_INT, 0},
+    {"uintptr_t", TYPE_UINT, 0}};
+
+// DataTypeUtilities.cTypedefBuiltInNameRemap, its integer entries: the C99 built-in a
+// typedef of this name is replaced by (getTypedefReplacement), or null.
+static const char *c99TypedefTarget(const std::string &name)
+{
+    static const std::map<std::string, const char *> kRemap = {
+        {"int8_t", "int8_t"},       {"__int8_t", "int8_t"},     {"__int8", "int8_t"},
+        {"int_fast8_t", "int8_t"},  {"uint8_t", "uint8_t"},     {"__uint8_t", "uint8_t"},
+        {"__uint8", "uint8_t"},     {"uint_fast8_t", "uint8_t"}, {"u_int8_t", "uint8_t"},
+        {"int16_t", "int16_t"},     {"__int16_t", "int16_t"},   {"__int16", "int16_t"},
+        {"int_fast16_t", "int16_t"}, {"_G_int16_t", "int16_t"}, {"uint16_t", "uint16_t"},
+        {"__uint16_t", "uint16_t"}, {"__uint16", "uint16_t"},   {"uint_fast16_t", "uint16_t"},
+        {"u_int16_t", "uint16_t"},  {"_G_uint16_t", "uint16_t"}, {"int32_t", "int32_t"},
+        {"__int32_t", "int32_t"},   {"__int32", "int32_t"},     {"int_fast32_t", "int32_t"},
+        {"_G_int32_t", "int32_t"},  {"uint32_t", "uint32_t"},   {"__uint32_t", "uint32_t"},
+        {"__uint32", "uint32_t"},   {"uint_fast32_t", "uint32_t"}, {"u_int32_t", "uint32_t"},
+        {"_G_uint32_t", "uint32_t"}, {"int64_t", "int64_t"},    {"__int64_t", "int64_t"},
+        {"__int64", "int64_t"},     {"int_fast64_t", "int64_t"}, {"uint64_t", "uint64_t"},
+        {"__uint64_t", "uint64_t"}, {"__uint64", "uint64_t"},   {"uint_fast64_t", "uint64_t"},
+        {"u_int64_t", "uint64_t"},  {"intptr_t", "intptr_t"},   {"__intptr_t", "intptr_t"},
+        {"uintptr_t", "uintptr_t"}, {"__uintptr_t", "uintptr_t"}};
+    const auto it = kRemap.find(name);
+    return it != kRemap.end() ? it->second : nullptr;
+}
+
+// The program's type of a C99 built-in name, else the built-in itself.
+Datatype *Decompiler::Impl::c99BuiltIn(const std::string &name)
+{
+    TypeFactory *types = arch->types;
+    if (Datatype *dt = types->findByName(name)) return dt;
+    for (const C99BuiltIn &b : kC99BuiltIns)
+        if (name == b.name)
+            return types->getBase(b.size != 0 ? b.size : types->getSizeOfPointer(), b.meta, name);
+    return nullptr;
+}
+
+// Seed each C99 built-in the declaration uses as a type and no type has, so the
+// grammar can read it; parseDeclarations drops the seeds no new type uses. A name a
+// typedef declares (followed by ; , or [ there) is not a use: seeding it would make
+// the grammar read the declarator as a type.
+void Decompiler::Impl::seedC99BuiltIns(const std::string &decl, ParseState &state)
+{
+    TypeFactory *types = arch->types;
+    state.seeded_now.clear();
+    const std::vector<CToken> tokens = tokenizeC(decl);
+    const bool is_typedef = !tokens.empty() && tokens[0].text == "typedef";
+    for (const C99BuiltIn &b : kC99BuiltIns) {
+        bool used = false;
+        for (size_t i = 0; i < tokens.size() && !used; ++i) {
+            if (tokens[i].text != b.name) continue;
+            const std::string next = i + 1 < tokens.size() ? tokens[i + 1].text : ";";
+            used = !(is_typedef && (next == ";" || next == "," || next == "["));
+        }
+        if (!used || types->findByName(b.name) != nullptr) continue;
+        Datatype *seed = c99BuiltIn(b.name);
+        state.c99_seeds.insert(seed);
+        state.seeded_now.insert(seed);
+    }
+}
+
 bool Decompiler::parseDeclarations(const std::string& text, std::vector<std::string>& created,
                                    const ReplaceComposite& replace)
 {
@@ -1250,7 +1353,9 @@ bool Decompiler::parseDeclarations(const std::string& text, std::vector<std::str
         if (start == std::string::npos || decl[start] == ';') continue;
         try {
             if (decl.find(';') == std::string::npos) throw ParseError("Missing ';'");
-            impl_->parseDeclaration(dropTypeQualifiers(decl), state);
+            const std::string plain = dropTypeQualifiers(decl);
+            impl_->seedC99BuiltIns(plain, state);
+            impl_->parseDeclaration(plain, state);
         } catch (ParseError &err) {
             error = err.explain;
         } catch (LowlevelError &err) {
@@ -1266,6 +1371,41 @@ bool Decompiler::parseDeclarations(const std::string& text, std::vector<std::str
         try {
             types->destroyType(temp);
         } catch (LowlevelError &) {
+        }
+    }
+    // A C99 seed reaches the program only when a new type uses it (a variable, or a
+    // name the text only mentions, creates nothing).
+    if (error.empty() && !state.c99_seeds.empty()) {
+        vector<Datatype *> now;
+        types->dependentOrder(now);
+        std::vector<Datatype *> work;
+        for (Datatype *dt : now)
+            if (existing.count(dt) == 0 && state.c99_seeds.count(dt) == 0) work.push_back(dt);
+        std::set<Datatype *> seen(work.begin(), work.end());
+        std::set<Datatype *> used;
+        for (size_t i = 0; i < work.size(); ++i) {
+            Datatype *dt = work[i];
+            std::vector<Datatype *> next;
+            if (dt->getTypedef() != nullptr) next.push_back(dt->getTypedef());
+            for (int4 d = 0; d < dt->numDepend(); ++d) next.push_back(dt->getDepend(d));
+            if (dt->getMetatype() == TYPE_CODE) {
+                if (const FuncProto *proto = static_cast<TypeCode *>(dt)->getPrototype()) {
+                    next.push_back(proto->getOutputType());
+                    for (int4 p = 0; p < proto->numParams(); ++p) next.push_back(proto->getParam(p)->getType());
+                }
+            }
+            for (Datatype *n : next) {
+                if (n == nullptr || !seen.insert(n).second) continue;
+                if (state.c99_seeds.count(n) != 0) used.insert(n);
+                if (!n->isCoreType()) work.push_back(n);
+            }
+        }
+        for (Datatype *seed : state.c99_seeds) {
+            if (used.count(seed) != 0) continue;
+            try {
+                types->destroyType(seed);
+            } catch (LowlevelError &) {
+            }
         }
     }
     vector<Datatype *> after;

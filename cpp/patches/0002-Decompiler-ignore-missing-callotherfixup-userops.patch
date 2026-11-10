@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Tue, 5 May 2026 09:34:23 -0700
+Subject: [PATCH 02/11] Decompiler: ignore missing callotherfixup userops
+
+---
+ .../Features/Decompiler/src/decompile/cpp/userop.cc   | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/userop.cc b/Ghidra/Features/Decompiler/src/decompile/cpp/userop.cc
+index c9074bfa6c..f106c7617e 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/userop.cc
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/userop.cc
+@@ -585,7 +585,16 @@ void UserOpManage::decodeCallOtherFixup(Decoder &decoder,Architecture *glb)
+ 
+ {
+   unique_ptr<UserPcodeOp> op(new InjectedUserOp("",glb,0,0));
+-  op->decode(decoder);
++  try {
++    op->decode(decoder);
++  } catch(LowlevelError &err) {
++    // Ignore call-other fixups that reference a userop the loaded language
++    // does not define; the unique_ptr frees op on return.
++    const string unknownUseropPrefix = "Unknown userop name in <callotherfixup>: ";
++    if (err.explain.rfind(unknownUseropPrefix, 0) == 0)
++      return;
++    throw err;
++  }
+   registerOp(op.release());
+ }
+ 

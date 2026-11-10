@@ -1,5 +1,38 @@
---- a/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.cc	2026-09-28 00:00:00.000000000 -0700
-+++ b/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.cc	2026-09-28 00:00:00.000000000 -0700
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Mon, 28 Sep 2026 01:00:00 -0700
+Subject: [PATCH 04/11] Decompiler: per-architecture Sleigh translator
+
+SleighArchitecture cached one Sleigh translator per language in a
+process-wide static map and, when another architecture of the same language
+was built, reset() that shared translator onto the NEW architecture's
+LoadImage and ContextDatabase. Every older architecture of that language kept
+its translate pointer, now aimed at another architecture's loader and
+context.
+
+That is harmless in a process that holds one architecture at a time, and
+wrong in any that holds two: once the newer one is destroyed, the older one
+translates through freed memory, and while both are alive they decode through
+one another's image and share a translator without synchronisation.
+
+Measured in an offline decompilation of a 198-function PE: open program A,
+open and close a second client on the same language, then decompile in A --
+the process dies with 0xc0000409 on the first decompile. Every run.
+
+Give each architecture its own translator: buildTranslator allocates a
+Sleigh bound to this architecture's loader and context, isTranslateReused
+reports false so the .sla is always registered for it, and the destructor no
+longer nulls translate, so Architecture::~Architecture deletes it. The cost is
+one .sla parse per architecture instead of per language per process.
+---
+ .../src/decompile/cpp/sleigh_arch.cc          | 21 +++++++------------
+ .../src/decompile/cpp/sleigh_arch.hh          |  1 -
+ 2 files changed, 8 insertions(+), 14 deletions(-)
+
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.cc b/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.cc
+index 3ee5e859a6..61a02aa7ff 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.cc
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.cc
 @@ -33,7 +33,6 @@ ElementId ELEM_DESCRIPTION = ElementId("description",233);
  ElementId ELEM_LANGUAGE = ElementId("language",234);
  ElementId ELEM_LANGUAGE_DEFINITIONS = ElementId("language_definitions",235);
@@ -47,8 +80,10 @@
  }
  
  PcodeInjectLibrary *SleighArchitecture::buildPcodeInjectLibrary(void)
---- a/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.hh	2026-09-28 00:00:00.000000000 -0700
-+++ b/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.hh	2026-09-28 00:00:00.000000000 -0700
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.hh b/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.hh
+index 5b40bdf10c..ce863fcec0 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.hh
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/sleigh_arch.hh
 @@ -106,7 +106,6 @@ public:
  /// Generally a \e language \e id (i.e. x86:LE:64:default) is provided, then this
  /// object is able to automatically load in configuration and construct the Translate object.

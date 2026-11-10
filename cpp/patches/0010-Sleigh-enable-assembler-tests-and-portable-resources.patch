@@ -1,3 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Sun, 11 Oct 2026 01:41:00 -0700
+Subject: [PATCH 10/11] Sleigh: enable assembler tests and portable resources
+
+Correct Windows resource URI and line-ending comparisons, enable two
+assembler cases with measured equivalent register/displacement spellings,
+and include actual unexpected disassembly text in assertion failures. Run
+the two permission cases with Windows ACLs or POSIX permissions and restore
+their original settings. Exact-byte and all-result checks remain enabled.
+---
+ .../sleigh/SleighLanguageProviderTest.java    | 58 ++++++++++---------
+ .../sleigh/AbstractAssemblyTest.java          |  2 +-
+ .../sleigh/dsPIC30FAssemblyTest.java          |  6 +-
+ .../assembler/sleigh/parse/ParserTest.java    |  4 +-
+ .../assembler/sleigh/x86AssemblyTest.java     |  9 +--
+ .../grammar/SleighPreprocessorTest.java       | 13 ++++-
+ 6 files changed, 54 insertions(+), 38 deletions(-)
+
 diff --git a/Ghidra/Framework/SoftwareModeling/src/test.slow/java/ghidra/app/plugin/processors/sleigh/SleighLanguageProviderTest.java b/Ghidra/Framework/SoftwareModeling/src/test.slow/java/ghidra/app/plugin/processors/sleigh/SleighLanguageProviderTest.java
 index 35ee880cdd..d2a8fcb11e 100644
 --- a/Ghidra/Framework/SoftwareModeling/src/test.slow/java/ghidra/app/plugin/processors/sleigh/SleighLanguageProviderTest.java

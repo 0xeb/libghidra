@@ -446,7 +446,7 @@ pub struct RenameFunctionResponse {
     pub name: ::prost::alloc::string::String,
 }
 /// Define a new function whose entry is `address`, optionally naming it. An
-/// absent `name` takes the backend's default (FUN_<address>).
+/// absent `name` takes the backend's default, e.g. FUN_00401000.
 ///
 /// Errors (RpcResponse error_code):
 ///    unmapped_address  no memory block contains the address

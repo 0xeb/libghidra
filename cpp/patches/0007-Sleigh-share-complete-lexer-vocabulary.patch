@@ -1,3 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Sun, 11 Oct 2026 01:41:00 -0700
+Subject: [PATCH 07/11] Sleigh: share complete lexer vocabulary
+
+Share the complete Sleigh lexer vocabulary through BaseLexer, including the
+synthetic Tokens symbol. Remove ignored delegate options and duplicate
+imports. All generated token constants retain their original values; a
+reflection and lexing test protects the numbering.
+---
+ .../antlr/ghidra/sleigh/grammar/BaseLexer.g   | 27 +++++++++-
+ .../ghidra/sleigh/grammar/DisplayLexer.g      |  1 -
+ .../antlr/ghidra/sleigh/grammar/README.txt    | 13 ++---
+ .../ghidra/sleigh/grammar/SemanticLexer.g     |  1 -
+ .../ghidra/sleigh/grammar/SemanticLexerHex.g  |  1 -
+ .../sleigh/grammar/SemanticLexerIdHex.g       |  1 -
+ .../antlr/ghidra/sleigh/grammar/SleighLexer.g |  7 ++-
+ .../grammar/SleighLexerVocabularyTest.java    | 51 +++++++++++++++++++
+ 8 files changed, 87 insertions(+), 15 deletions(-)
+ create mode 100644 Ghidra/Framework/SoftwareModeling/src/test/java/ghidra/sleigh/grammar/SleighLexerVocabularyTest.java
+
 diff --git a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/BaseLexer.g b/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/BaseLexer.g
 index 076578bacf..a470426493 100644
 --- a/Ghidra/Framework/SoftwareModeling/src/main/antlr/ghidra/sleigh/grammar/BaseLexer.g
@@ -135,6 +156,7 @@ index 485a0c8e31..d0a4509ca5 100644
   */
 diff --git a/Ghidra/Framework/SoftwareModeling/src/test/java/ghidra/sleigh/grammar/SleighLexerVocabularyTest.java b/Ghidra/Framework/SoftwareModeling/src/test/java/ghidra/sleigh/grammar/SleighLexerVocabularyTest.java
 new file mode 100644
+index 0000000000..916420491e
 --- /dev/null
 +++ b/Ghidra/Framework/SoftwareModeling/src/test/java/ghidra/sleigh/grammar/SleighLexerVocabularyTest.java
 @@ -0,0 +1,51 @@

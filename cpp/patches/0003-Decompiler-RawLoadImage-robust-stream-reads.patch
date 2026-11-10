@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Elias Bachaalany <elias.bachaalany@gmail.com>
+Date: Sat, 5 Sep 2026 12:00:00 -0700
+Subject: [PATCH 03/11] Decompiler: RawLoadImage robust stream reads
+
+RawLoadImage opened the program image in TEXT mode and never checked stream
+state, so one short read silently poisoned every later read of the image.
+
+On Windows a text-mode stream treats 0x1A (Ctrl-Z) as end-of-file and collapses
+CRLF. Program images are full of 0x1A bytes, so a read that loadFill had already
+clamped to lie fully within the file still came up short. A short read sets
+failbit (not merely eofbit); once failbit is set, every subsequent seekg/read
+fails its sentry and becomes a no-op. loadFill advanced offset/size by the
+REQUESTED count rather than the delivered one, so the loop still terminated and
+the function returned successfully -- leaving the caller's buffer untouched.
+Callers that zero-initialise their buffer therefore received zeros, silently and
+permanently, for every later read.
+
+Measured end to end in an offline decompilation of a 198-function PE: reads
+returned real bytes until one function tripped the short read, then every later
+read returned zeros, 132 of 198 functions decompiled to nothing, and re-opening
+the program restored everything.
+
+Three fixes: open the image binary; clear() sticky state before each seek; and
+advance by gcount() so a genuine short read reports DataUnavailError instead of
+being mistaken for success.
+---
+ .../Decompiler/src/decompile/cpp/loadimage.cc | 20 +++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage.cc b/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage.cc
+index 558229946c..dafe575b6a 100644
+--- a/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage.cc
++++ b/Ghidra/Features/Decompiler/src/decompile/cpp/loadimage.cc
+@@ -57,7 +57,10 @@ void RawLoadImage::open(void)
+ 
+ {
+   if (thefile != (ifstream *)0) throw LowlevelError("loadimage is already open");
+-  thefile = new ifstream(filename.c_str());
++  // Must be binary: in text mode a 0x1A (Ctrl-Z) byte is treated as end-of-file
++  // on Windows and CRLF pairs are collapsed, so reads of a program image come up
++  // short even when fully in range.
++  thefile = new ifstream(filename.c_str(),ios::binary);
+   if (!(*thefile)) {
+     string errmsg = "Unable to open raw image file: "+filename;
+     delete thefile;
+@@ -98,11 +101,20 @@ void RawLoadImage::loadFill(uint1 *ptr,int4 size,const Address &addr)
+     readsize = size;
+     if (curaddr + readsize > filesize) // Adjust to biggest possible read
+       readsize = filesize - curaddr;
++    // A short read sets failbit (not just eofbit), and once failbit is set every
++    // later seekg/read fails its sentry and becomes a silent no-op. Clearing here
++    // keeps one bad read from permanently poisoning the image for all later reads.
++    thefile->clear();
+     thefile->seekg(curaddr);
+     thefile->read((char *)(ptr+offset),readsize);
+-    offset += readsize;
+-    size -= readsize;
+-    curaddr += readsize;
++    // Advance by what actually arrived, not by what was requested. Assuming
++    // readsize let a no-op read still satisfy the loop, so loadFill returned
++    // successfully while leaving the caller's buffer untouched.
++    uintb actual = (uintb)thefile->gcount();
++    if (actual == 0) break;	// No progress; report it below rather than spin
++    offset += actual;
++    size -= (int4)actual;
++    curaddr += actual;
+   }
+   if (size > 0) {
+     ostringstream errmsg;
