@@ -121,7 +121,7 @@ final class DecompilerSupport {
 				toDecompileLocalKind(symbol),
 				name,
 				dataTypeName,
-				decompileLocalStorage(symbol.getStorage()),
+				decompileLocalStorage(FunctionSupport.resolvedStorage(symbol)),
 				ordinal));
 		}
 		return locals;

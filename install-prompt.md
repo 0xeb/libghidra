@@ -18,10 +18,10 @@ For human users: see `README.md` instead.
 
 | Check | Command | Expected | Remediation |
 |-------|---------|----------|-------------|
-| JDK 21 | `java -version` | `21` in output | Install Eclipse Adoptium 21: <https://adoptium.net/temurin/releases/?version=21> |
+| JDK 25 | `java -version` | `25` in output | Install Eclipse Adoptium 25: <https://adoptium.net/temurin/releases/?version=25>. Ghidra 12.2 refuses to start on an older JDK. |
 | Python ≥ 3.12 | `python --version` | major.minor ≥ 3.12 | <https://www.python.org/downloads/> (the abi3 wheels target cp312) |
 | pip (recent) | `python -m pip --version` | any modern | `python -m ensurepip --upgrade` |
-| Gradle ≥ 8 | `gradle --version` | major ≥ 8 | Install from <https://gradle.org/install/> (**winget has no Gradle package** — do not try `winget install gradle`), or use the `gradlew` wrapper bundled in your Ghidra source checkout at `Ghidra/RuntimeScripts/support/gradle` (currently Gradle 9.4.1) |
+| Gradle ≥ 9.1 | `gradle --version` | ≥ 9.1 (Ghidra 12.2's `application.gradle.min`) | Install from <https://gradle.org/install/> (**winget has no Gradle package** — do not try `winget install gradle`), or use the `gradlew` wrapper bundled in your Ghidra source checkout at `Ghidra/RuntimeScripts/support/gradle` (currently Gradle 9.4.1) |
 | Git | `git --version` | any modern | <https://git-scm.com/downloads> |
 | curl | `curl --version` | any modern | OS package manager |
 
@@ -34,7 +34,7 @@ default the runbook uses.
 
 ## Step 1 — Acquire Ghidra distribution
 
-Download Ghidra 12.0.4+ from the official release page:
+Download Ghidra 12.2 from the official release page:
 <https://github.com/NationalSecurityAgency/ghidra/releases>
 
 Verify the SHA-256 against the release-page hash:
@@ -52,10 +52,10 @@ Ghidra root, **not** its parent):
 
 ```bash
 # Windows (PowerShell)
-$env:GHIDRA_INSTALL_DIR = "C:/ghidra_dist/ghidra_12.1_PUBLIC"
+$env:GHIDRA_INSTALL_DIR = "C:/ghidra_dist/ghidra_12.2_PUBLIC"
 
 # POSIX
-export GHIDRA_INSTALL_DIR=/opt/ghidra_12.1_PUBLIC
+export GHIDRA_INSTALL_DIR=/opt/ghidra_12.2_PUBLIC
 ```
 
 **Gate**:

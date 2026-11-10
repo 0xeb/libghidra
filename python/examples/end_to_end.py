@@ -84,7 +84,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--ghidra", required=True,
-        help="Path to Ghidra distribution (e.g. C:/ghidra_dist/ghidra_12.1_DEV)",
+        help="Path to Ghidra distribution (e.g. C:/ghidra_dist/ghidra_12.2_PUBLIC)",
     )
     parser.add_argument(
         "--binary", required=True,
