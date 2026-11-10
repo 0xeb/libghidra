@@ -25,8 +25,12 @@ message XrefRecord {
   bool is_external = 8;
   bool is_memory = 9;
   bool is_flow = 10;
-  // Populated for exact-from-function reads. These fields let clients enrich
-  // a bounded call graph without issuing one function lookup per reference.
+  // Populated for the exact reads (exact_to_address, exact_from_function,
+  // exact_to_function); empty in a range listing. These fields let clients
+  // enrich a bounded call graph without issuing one function lookup per
+  // reference. With no function at the destination, to_function_address is the
+  // raw destination offset and to_function_name its primary symbol's name (an
+  // external destination's name is the import's).
   uint64 from_function_address = 11;
   string from_function_name = 12;
   uint64 to_function_address = 13;
@@ -43,6 +47,11 @@ message ListXrefsRequest {
   uint64 function_address = 7;
   bool exact_to_function = 8;
   uint64 to_function_address = 9;
+  // With exact_to_address: to_address is an EXTERNAL-space offset (an external
+  // symbol's address, as SymbolRecord.address reports it), not a memory
+  // address. Lists the references to that external symbol, e.g. the calls and
+  // jumps through an import.
+  bool to_external = 10;
 }
 
 message ListXrefsResponse {

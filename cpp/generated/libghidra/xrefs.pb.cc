@@ -107,7 +107,8 @@ inline constexpr ListXrefsRequest::Impl_::Impl_(
         to_function_address_{::uint64_t{0u}},
         exact_to_address_{false},
         exact_from_function_{false},
-        exact_to_function_{false} {}
+        exact_to_function_{false},
+        to_external_{false} {}
 
 template <typename>
 PROTOBUF_CONSTEXPR ListXrefsRequest::ListXrefsRequest(::_pbi::ConstantInitialized)
@@ -174,8 +175,10 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::libghidra::ListXrefsRequest, _impl_.function_address_),
         PROTOBUF_FIELD_OFFSET(::libghidra::ListXrefsRequest, _impl_.exact_to_function_),
         PROTOBUF_FIELD_OFFSET(::libghidra::ListXrefsRequest, _impl_.to_function_address_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::ListXrefsRequest, _impl_.to_external_),
         0,
         1,
+        ~0u,
         ~0u,
         ~0u,
         ~0u,
@@ -196,8 +199,8 @@ const ::uint32_t
 static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::libghidra::XrefRecord)},
-        {22, 38, -1, sizeof(::libghidra::ListXrefsRequest)},
-        {46, -1, -1, sizeof(::libghidra::ListXrefsResponse)},
+        {22, 39, -1, sizeof(::libghidra::ListXrefsRequest)},
+        {48, -1, -1, sizeof(::libghidra::ListXrefsResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_XrefRecord_default_instance_._instance,
@@ -215,18 +218,18 @@ const char descriptor_table_protodef_libghidra_2fxrefs_2eproto[] ABSL_ATTRIBUTE_
     "emory\030\t \001(\010\022\017\n\007is_flow\030\n \001(\010\022\035\n\025from_fun"
     "ction_address\030\013 \001(\004\022\032\n\022from_function_nam"
     "e\030\014 \001(\t\022\033\n\023to_function_address\030\r \001(\004\022\030\n\020"
-    "to_function_name\030\016 \001(\t\"\374\001\n\020ListXrefsRequ"
+    "to_function_name\030\016 \001(\t\"\221\002\n\020ListXrefsRequ"
     "est\022&\n\005range\030\002 \001(\0132\027.libghidra.AddressRa"
     "nge\022#\n\004page\030\003 \001(\0132\025.libghidra.Pagination"
     "\022\030\n\020exact_to_address\030\004 \001(\010\022\022\n\nto_address"
     "\030\005 \001(\004\022\033\n\023exact_from_function\030\006 \001(\010\022\030\n\020f"
     "unction_address\030\007 \001(\004\022\031\n\021exact_to_functi"
-    "on\030\010 \001(\010\022\033\n\023to_function_address\030\t \001(\004\"9\n"
-    "\021ListXrefsResponse\022$\n\005xrefs\030\001 \003(\0132\025.libg"
-    "hidra.XrefRecord2V\n\014XrefsService\022F\n\tList"
-    "Xrefs\022\033.libghidra.ListXrefsRequest\032\034.lib"
-    "ghidra.ListXrefsResponseB\031\n\tlibghidraB\nX"
-    "refsProtoP\001b\006proto3"
+    "on\030\010 \001(\010\022\033\n\023to_function_address\030\t \001(\004\022\023\n"
+    "\013to_external\030\n \001(\010\"9\n\021ListXrefsResponse\022"
+    "$\n\005xrefs\030\001 \003(\0132\025.libghidra.XrefRecord2V\n"
+    "\014XrefsService\022F\n\tListXrefs\022\033.libghidra.L"
+    "istXrefsRequest\032\034.libghidra.ListXrefsRes"
+    "ponseB\031\n\tlibghidraB\nXrefsProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2fxrefs_2eproto_deps[1] =
     {
@@ -236,7 +239,7 @@ static ::absl::once_flag descriptor_table_libghidra_2fxrefs_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fxrefs_2eproto = {
     false,
     false,
-    819,
+    840,
     descriptor_table_protodef_libghidra_2fxrefs_2eproto,
     "libghidra/xrefs.proto",
     &descriptor_table_libghidra_2fxrefs_2eproto_once,
@@ -855,9 +858,9 @@ ListXrefsRequest::ListXrefsRequest(
                offsetof(Impl_, to_address_),
            reinterpret_cast<const char *>(&from._impl_) +
                offsetof(Impl_, to_address_),
-           offsetof(Impl_, exact_to_function_) -
+           offsetof(Impl_, to_external_) -
                offsetof(Impl_, to_address_) +
-               sizeof(Impl_::exact_to_function_));
+               sizeof(Impl_::to_external_));
 
   // @@protoc_insertion_point(copy_constructor:libghidra.ListXrefsRequest)
 }
@@ -871,9 +874,9 @@ inline void ListXrefsRequest::SharedCtor(::_pb::Arena* arena) {
   ::memset(reinterpret_cast<char *>(&_impl_) +
                offsetof(Impl_, range_),
            0,
-           offsetof(Impl_, exact_to_function_) -
+           offsetof(Impl_, to_external_) -
                offsetof(Impl_, range_) +
-               sizeof(Impl_::exact_to_function_));
+               sizeof(Impl_::to_external_));
 }
 ListXrefsRequest::~ListXrefsRequest() {
   // @@protoc_insertion_point(destructor:libghidra.ListXrefsRequest)
@@ -924,15 +927,15 @@ const ::google::protobuf::internal::ClassData* ListXrefsRequest::GetClassData() 
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<3, 8, 2, 0, 2> ListXrefsRequest::_table_ = {
+const ::_pbi::TcParseTable<4, 9, 2, 0, 2> ListXrefsRequest::_table_ = {
   {
     PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_._has_bits_),
     0, // no _extensions_
-    9, 56,  // max_field_number, fast_idx_mask
+    10, 120,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294966785,  // skipmap
+    4294966273,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    8,  // num_field_entries
+    9,  // num_field_entries
     2,  // num_aux_entries
     offsetof(decltype(_table_), aux_entries),
     _class_data_.base(),
@@ -942,12 +945,8 @@ const ::_pbi::TcParseTable<3, 8, 2, 0, 2> ListXrefsRequest::_table_ = {
     ::_pbi::TcParser::GetTable<::libghidra::ListXrefsRequest>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
-    // bool exact_to_function = 8;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ListXrefsRequest, _impl_.exact_to_function_), 63>(),
-     {64, 63, 0, PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.exact_to_function_)}},
-    // uint64 to_function_address = 9;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(ListXrefsRequest, _impl_.to_function_address_), 63>(),
-     {72, 63, 0, PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.to_function_address_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
     // .libghidra.AddressRange range = 2;
     {::_pbi::TcParser::FastMtS1,
      {18, 0, 0, PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.range_)}},
@@ -966,6 +965,20 @@ const ::_pbi::TcParseTable<3, 8, 2, 0, 2> ListXrefsRequest::_table_ = {
     // uint64 function_address = 7;
     {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(ListXrefsRequest, _impl_.function_address_), 63>(),
      {56, 63, 0, PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.function_address_)}},
+    // bool exact_to_function = 8;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ListXrefsRequest, _impl_.exact_to_function_), 63>(),
+     {64, 63, 0, PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.exact_to_function_)}},
+    // uint64 to_function_address = 9;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(ListXrefsRequest, _impl_.to_function_address_), 63>(),
+     {72, 63, 0, PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.to_function_address_)}},
+    // bool to_external = 10;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ListXrefsRequest, _impl_.to_external_), 63>(),
+     {80, 63, 0, PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.to_external_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
   }}, {{
     65535, 65535
   }}, {{
@@ -993,6 +1006,9 @@ const ::_pbi::TcParseTable<3, 8, 2, 0, 2> ListXrefsRequest::_table_ = {
     // uint64 to_function_address = 9;
     {PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.to_function_address_), -1, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
+    // bool to_external = 10;
+    {PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.to_external_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
   }}, {{
     {::_pbi::TcParser::GetTable<::libghidra::AddressRange>()},
     {::_pbi::TcParser::GetTable<::libghidra::Pagination>()},
@@ -1019,8 +1035,8 @@ PROTOBUF_NOINLINE void ListXrefsRequest::Clear() {
     }
   }
   ::memset(&_impl_.to_address_, 0, static_cast<::size_t>(
-      reinterpret_cast<char*>(&_impl_.exact_to_function_) -
-      reinterpret_cast<char*>(&_impl_.to_address_)) + sizeof(_impl_.exact_to_function_));
+      reinterpret_cast<char*>(&_impl_.to_external_) -
+      reinterpret_cast<char*>(&_impl_.to_address_)) + sizeof(_impl_.to_external_));
   _impl_._has_bits_.Clear();
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
@@ -1097,6 +1113,13 @@ PROTOBUF_NOINLINE void ListXrefsRequest::Clear() {
                 9, this_._internal_to_function_address(), target);
           }
 
+          // bool to_external = 10;
+          if (this_._internal_to_external() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                10, this_._internal_to_external(), target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -1162,6 +1185,10 @@ PROTOBUF_NOINLINE void ListXrefsRequest::Clear() {
             if (this_._internal_exact_to_function() != 0) {
               total_size += 2;
             }
+            // bool to_external = 10;
+            if (this_._internal_to_external() != 0) {
+              total_size += 2;
+            }
           }
           return this_.MaybeComputeUnknownFieldsSize(total_size,
                                                      &this_._impl_._cached_size_);
@@ -1215,6 +1242,9 @@ void ListXrefsRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const 
   if (from._internal_exact_to_function() != 0) {
     _this->_impl_.exact_to_function_ = from._impl_.exact_to_function_;
   }
+  if (from._internal_to_external() != 0) {
+    _this->_impl_.to_external_ = from._impl_.to_external_;
+  }
   _this->_impl_._has_bits_[0] |= cached_has_bits;
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -1232,8 +1262,8 @@ void ListXrefsRequest::InternalSwap(ListXrefsRequest* PROTOBUF_RESTRICT other) {
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   ::google::protobuf::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.exact_to_function_)
-      + sizeof(ListXrefsRequest::_impl_.exact_to_function_)
+      PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.to_external_)
+      + sizeof(ListXrefsRequest::_impl_.to_external_)
       - PROTOBUF_FIELD_OFFSET(ListXrefsRequest, _impl_.range_)>(
           reinterpret_cast<char*>(&_impl_.range_),
           reinterpret_cast<char*>(&other->_impl_.range_));

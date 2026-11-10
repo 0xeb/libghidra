@@ -11,6 +11,7 @@ import java.util.List;
 
 import ghidra.program.model.address.Address;
 import ghidra.program.model.address.AddressRange;
+import ghidra.program.model.address.AddressSpace;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.symbol.Reference;
@@ -102,7 +103,11 @@ public final class XrefsRuntime extends RuntimeSupport implements XrefsOperation
 
 				ReferenceManager referenceManager = program.getReferenceManager();
 				if (exactToAddress) {
-					Address toAddress = toAddress(program, request.toAddress());
+					// to_external names an external symbol by its EXTERNAL-space offset,
+					// the address SymbolRecord reports for it.
+					Address toAddress = request.toExternal()
+						? AddressSpace.EXTERNAL_SPACE.getAddress(request.toAddress())
+						: toAddress(program, request.toAddress());
 					ReferenceIterator iterator = referenceManager.getReferencesTo(toAddress);
 					List<XrefsContract.XrefRecord> rows = new ArrayList<>();
 					int seen = 0;
@@ -122,7 +127,12 @@ public final class XrefsRuntime extends RuntimeSupport implements XrefsOperation
 						if (seen++ < offset) {
 							continue;
 						}
-						rows.add(RuntimeMappers.toXrefRecord(ref));
+						// With the function context of both ends, as the from-function
+						// mode gives it: a caller lookup by destination needs the calling
+						// function, and an external destination's name is its symbol's.
+						rows.add(withFunctionContext(program,
+							program.getFunctionManager().getFunctionContaining(ref.getFromAddress()),
+							ref));
 						if (rows.size() >= limit) {
 							break;
 						}

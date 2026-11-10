@@ -24,7 +24,8 @@ public final class SymbolsContract {
 		boolean isPrimary,
 		boolean isExternal,
 		boolean isDynamic,
-		boolean isExternalEntryPoint) {
+		boolean isExternalEntryPoint,
+		long importSlotAddress) {
 	}
 
 	public record GetSymbolRequest(

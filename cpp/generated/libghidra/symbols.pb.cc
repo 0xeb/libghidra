@@ -45,6 +45,7 @@ inline constexpr SymbolRecord::Impl_::Impl_(
             ::_pbi::ConstantInitialized()),
         symbol_id_{::uint64_t{0u}},
         address_{::uint64_t{0u}},
+        import_slot_address_{::uint64_t{0u}},
         is_primary_{false},
         is_external_{false},
         is_dynamic_{false},
@@ -365,6 +366,7 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::libghidra::SymbolRecord, _impl_.is_external_),
         PROTOBUF_FIELD_OFFSET(::libghidra::SymbolRecord, _impl_.is_dynamic_),
         PROTOBUF_FIELD_OFFSET(::libghidra::SymbolRecord, _impl_.is_external_entry_point_),
+        PROTOBUF_FIELD_OFFSET(::libghidra::SymbolRecord, _impl_.import_slot_address_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::libghidra::GetSymbolRequest, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -476,16 +478,16 @@ const ::uint32_t
 static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::libghidra::SymbolRecord)},
-        {19, -1, -1, sizeof(::libghidra::GetSymbolRequest)},
-        {28, 37, -1, sizeof(::libghidra::GetSymbolResponse)},
-        {38, 48, -1, sizeof(::libghidra::ListSymbolsRequest)},
-        {50, -1, -1, sizeof(::libghidra::ListSymbolsResponse)},
-        {59, 70, -1, sizeof(::libghidra::RenameSymbolRequest)},
-        {73, -1, -1, sizeof(::libghidra::RenameSymbolResponse)},
-        {83, -1, -1, sizeof(::libghidra::CreateLabelRequest)},
-        {93, 103, -1, sizeof(::libghidra::CreateLabelResponse)},
-        {105, -1, -1, sizeof(::libghidra::DeleteSymbolRequest)},
-        {115, -1, -1, sizeof(::libghidra::DeleteSymbolResponse)},
+        {20, -1, -1, sizeof(::libghidra::GetSymbolRequest)},
+        {29, 38, -1, sizeof(::libghidra::GetSymbolResponse)},
+        {39, 49, -1, sizeof(::libghidra::ListSymbolsRequest)},
+        {51, -1, -1, sizeof(::libghidra::ListSymbolsResponse)},
+        {60, 71, -1, sizeof(::libghidra::RenameSymbolRequest)},
+        {74, -1, -1, sizeof(::libghidra::RenameSymbolResponse)},
+        {84, -1, -1, sizeof(::libghidra::CreateLabelRequest)},
+        {94, 104, -1, sizeof(::libghidra::CreateLabelResponse)},
+        {106, -1, -1, sizeof(::libghidra::DeleteSymbolRequest)},
+        {116, -1, -1, sizeof(::libghidra::DeleteSymbolResponse)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::libghidra::_SymbolRecord_default_instance_._instance,
@@ -503,41 +505,41 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_libghidra_2fsymbols_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
     "\n\027libghidra/symbols.proto\022\tlibghidra\032\026li"
-    "bghidra/common.proto\"\347\001\n\014SymbolRecord\022\021\n"
+    "bghidra/common.proto\"\204\002\n\014SymbolRecord\022\021\n"
     "\tsymbol_id\030\001 \001(\004\022\017\n\007address\030\002 \001(\004\022\014\n\004nam"
     "e\030\003 \001(\t\022\021\n\tfull_name\030\004 \001(\t\022\014\n\004type\030\005 \001(\t"
     "\022\026\n\016namespace_name\030\006 \001(\t\022\016\n\006source\030\007 \001(\t"
     "\022\022\n\nis_primary\030\010 \001(\010\022\023\n\013is_external\030\t \001("
     "\010\022\022\n\nis_dynamic\030\n \001(\010\022\037\n\027is_external_ent"
-    "ry_point\030\013 \001(\010\"#\n\020GetSymbolRequest\022\017\n\007ad"
-    "dress\030\002 \001(\004\"<\n\021GetSymbolResponse\022\'\n\006symb"
-    "ol\030\001 \001(\0132\027.libghidra.SymbolRecord\"a\n\022Lis"
-    "tSymbolsRequest\022&\n\005range\030\002 \001(\0132\027.libghid"
-    "ra.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidr"
-    "a.Pagination\"\?\n\023ListSymbolsResponse\022(\n\007s"
-    "ymbols\030\001 \003(\0132\027.libghidra.SymbolRecord\"\\\n"
-    "\023RenameSymbolRequest\022\017\n\007address\030\002 \001(\004\022\020\n"
-    "\010new_name\030\003 \001(\t\022\025\n\010old_name\030\004 \001(\tH\000\210\001\001B\013"
-    "\n\t_old_name\"5\n\024RenameSymbolResponse\022\017\n\007r"
-    "enamed\030\001 \001(\010\022\014\n\004name\030\002 \001(\t\"3\n\022CreateLabe"
-    "lRequest\022\017\n\007address\030\002 \001(\004\022\014\n\004name\030\003 \001(\t\""
-    "O\n\023CreateLabelResponse\022\017\n\007created\030\001 \001(\010\022"
-    "\'\n\006symbol\030\002 \001(\0132\027.libghidra.SymbolRecord"
-    "\"4\n\023DeleteSymbolRequest\022\017\n\007address\030\002 \001(\004"
-    "\022\014\n\004name\030\003 \001(\t\">\n\024DeleteSymbolResponse\022\017"
-    "\n\007deleted\030\001 \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\226"
-    "\003\n\016SymbolsService\022F\n\tGetSymbol\022\033.libghid"
-    "ra.GetSymbolRequest\032\034.libghidra.GetSymbo"
-    "lResponse\022L\n\013ListSymbols\022\035.libghidra.Lis"
-    "tSymbolsRequest\032\036.libghidra.ListSymbolsR"
-    "esponse\022L\n\013CreateLabel\022\035.libghidra.Creat"
-    "eLabelRequest\032\036.libghidra.CreateLabelRes"
-    "ponse\022O\n\014RenameSymbol\022\036.libghidra.Rename"
-    "SymbolRequest\032\037.libghidra.RenameSymbolRe"
-    "sponse\022O\n\014DeleteSymbol\022\036.libghidra.Delet"
-    "eSymbolRequest\032\037.libghidra.DeleteSymbolR"
-    "esponseB\033\n\tlibghidraB\014SymbolsProtoP\001b\006pr"
-    "oto3"
+    "ry_point\030\013 \001(\010\022\033\n\023import_slot_address\030\014 "
+    "\001(\004\"#\n\020GetSymbolRequest\022\017\n\007address\030\002 \001(\004"
+    "\"<\n\021GetSymbolResponse\022\'\n\006symbol\030\001 \001(\0132\027."
+    "libghidra.SymbolRecord\"a\n\022ListSymbolsReq"
+    "uest\022&\n\005range\030\002 \001(\0132\027.libghidra.AddressR"
+    "ange\022#\n\004page\030\003 \001(\0132\025.libghidra.Paginatio"
+    "n\"\?\n\023ListSymbolsResponse\022(\n\007symbols\030\001 \003("
+    "\0132\027.libghidra.SymbolRecord\"\\\n\023RenameSymb"
+    "olRequest\022\017\n\007address\030\002 \001(\004\022\020\n\010new_name\030\003"
+    " \001(\t\022\025\n\010old_name\030\004 \001(\tH\000\210\001\001B\013\n\t_old_name"
+    "\"5\n\024RenameSymbolResponse\022\017\n\007renamed\030\001 \001("
+    "\010\022\014\n\004name\030\002 \001(\t\"3\n\022CreateLabelRequest\022\017\n"
+    "\007address\030\002 \001(\004\022\014\n\004name\030\003 \001(\t\"O\n\023CreateLa"
+    "belResponse\022\017\n\007created\030\001 \001(\010\022\'\n\006symbol\030\002"
+    " \001(\0132\027.libghidra.SymbolRecord\"4\n\023DeleteS"
+    "ymbolRequest\022\017\n\007address\030\002 \001(\004\022\014\n\004name\030\003 "
+    "\001(\t\">\n\024DeleteSymbolResponse\022\017\n\007deleted\030\001"
+    " \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\226\003\n\016SymbolsS"
+    "ervice\022F\n\tGetSymbol\022\033.libghidra.GetSymbo"
+    "lRequest\032\034.libghidra.GetSymbolResponse\022L"
+    "\n\013ListSymbols\022\035.libghidra.ListSymbolsReq"
+    "uest\032\036.libghidra.ListSymbolsResponse\022L\n\013"
+    "CreateLabel\022\035.libghidra.CreateLabelReque"
+    "st\032\036.libghidra.CreateLabelResponse\022O\n\014Re"
+    "nameSymbol\022\036.libghidra.RenameSymbolReque"
+    "st\032\037.libghidra.RenameSymbolResponse\022O\n\014D"
+    "eleteSymbol\022\036.libghidra.DeleteSymbolRequ"
+    "est\032\037.libghidra.DeleteSymbolResponseB\033\n\t"
+    "libghidraB\014SymbolsProtoP\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_libghidra_2fsymbols_2eproto_deps[1] =
     {
@@ -547,7 +549,7 @@ static ::absl::once_flag descriptor_table_libghidra_2fsymbols_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_libghidra_2fsymbols_2eproto = {
     false,
     false,
-    1404,
+    1433,
     descriptor_table_protodef_libghidra_2fsymbols_2eproto,
     "libghidra/symbols.proto",
     &descriptor_table_libghidra_2fsymbols_2eproto_once,
@@ -680,15 +682,15 @@ const ::google::protobuf::internal::ClassData* SymbolRecord::GetClassData() cons
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<4, 11, 0, 76, 2> SymbolRecord::_table_ = {
+const ::_pbi::TcParseTable<4, 12, 0, 76, 2> SymbolRecord::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    11, 120,  // max_field_number, fast_idx_mask
+    12, 120,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294965248,  // skipmap
+    4294963200,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    11,  // num_field_entries
+    12,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     _class_data_.base(),
@@ -732,7 +734,9 @@ const ::_pbi::TcParseTable<4, 11, 0, 76, 2> SymbolRecord::_table_ = {
     // bool is_external_entry_point = 11;
     {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SymbolRecord, _impl_.is_external_entry_point_), 63>(),
      {88, 63, 0, PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.is_external_entry_point_)}},
-    {::_pbi::TcParser::MiniParse, {}},
+    // uint64 import_slot_address = 12;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(SymbolRecord, _impl_.import_slot_address_), 63>(),
+     {96, 63, 0, PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.import_slot_address_)}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
@@ -772,6 +776,9 @@ const ::_pbi::TcParseTable<4, 11, 0, 76, 2> SymbolRecord::_table_ = {
     // bool is_external_entry_point = 11;
     {PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.is_external_entry_point_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+    // uint64 import_slot_address = 12;
+    {PROTOBUF_FIELD_OFFSET(SymbolRecord, _impl_.import_slot_address_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt64)},
   }},
   // no aux_entries
   {{
@@ -900,6 +907,13 @@ PROTOBUF_NOINLINE void SymbolRecord::Clear() {
                 11, this_._internal_is_external_entry_point(), target);
           }
 
+          // uint64 import_slot_address = 12;
+          if (this_._internal_import_slot_address() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
+                12, this_._internal_import_slot_address(), target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -960,6 +974,11 @@ PROTOBUF_NOINLINE void SymbolRecord::Clear() {
               total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
                   this_._internal_address());
             }
+            // uint64 import_slot_address = 12;
+            if (this_._internal_import_slot_address() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
+                  this_._internal_import_slot_address());
+            }
             // bool is_primary = 8;
             if (this_._internal_is_primary() != 0) {
               total_size += 2;
@@ -1009,6 +1028,9 @@ void SymbolRecord::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::go
   }
   if (from._internal_address() != 0) {
     _this->_impl_.address_ = from._impl_.address_;
+  }
+  if (from._internal_import_slot_address() != 0) {
+    _this->_impl_.import_slot_address_ = from._impl_.import_slot_address_;
   }
   if (from._internal_is_primary() != 0) {
     _this->_impl_.is_primary_ = from._impl_.is_primary_;

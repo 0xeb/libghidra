@@ -29,6 +29,16 @@ class IXrefsClient {
         error_codes::kNotSupported, "exact destination xrefs are not implemented by this backend");
   }
 
+  // The references to an external symbol, named by its EXTERNAL-space offset
+  // (SymbolRecord.address of an external symbol): the calls and jumps through
+  // an import.
+  virtual StatusOr<ListXrefsResponse> ListXrefsToExternal(std::uint64_t external_address,
+                                                          int limit,
+                                                          int offset) {
+    return StatusOr<ListXrefsResponse>::FromError(
+        error_codes::kNotSupported, "external destination xrefs are not implemented by this backend");
+  }
+
   virtual StatusOr<ListXrefsResponse> ListXrefsFromFunction(
       std::uint64_t function_address,
       int limit,

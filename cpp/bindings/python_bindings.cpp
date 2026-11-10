@@ -62,6 +62,7 @@ static nb::dict to_dict(const SymbolRecord& r) {
   d["is_external"] = r.is_external;
   d["is_dynamic"] = r.is_dynamic;
   d["is_external_entry_point"] = r.is_external_entry_point;
+  d["import_slot_address"] = r.import_slot_address;
   return d;
 }
 

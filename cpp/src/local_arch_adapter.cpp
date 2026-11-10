@@ -553,10 +553,11 @@ std::vector<SymbolRecord> ArchAdapter::listSymbols(std::uint64_t range_start,
     // The imports, at their EXTERNAL-space offsets: that space follows the
     // program's memory in the symbol table's address order, as the host lists them.
     if (project_ != nullptr) {
-      for (const auto& [l, is_function] : project_->externalSymbols(range_start, range_end)) {
-        SymbolRecord rec = labelRecord(l);
-        rec.type = is_function ? "Function" : "Label";
+      for (const auto& ext : project_->externalSymbols(range_start, range_end)) {
+        SymbolRecord rec = labelRecord(ext.label);
+        rec.type = ext.function ? "Function" : "Label";
         rec.is_external = true;
+        rec.import_slot_address = ext.import_slot;
         result.push_back(std::move(rec));
       }
     }

@@ -40,7 +40,8 @@ public final class XrefsContract {
 		boolean exactFromFunction,
 		long functionAddress,
 		boolean exactToFunction,
-		long toFunctionAddress) {
+		long toFunctionAddress,
+		boolean toExternal) {
 	}
 
 	public record ListXrefsResponse(List<XrefRecord> xrefs) {

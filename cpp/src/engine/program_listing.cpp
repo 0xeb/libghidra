@@ -156,13 +156,17 @@ void ProgramListing::load(const ghidra_db::ProjectData& data,
         info.namespace_path = ns_path(e.namespace_id);
         info.primary = true;
         info.source = sourceName(e.source);
-        externals_.emplace_back(std::move(info), e.function);
+        ExternalSymbolInfo ext;
+        ext.label = std::move(info);
+        ext.function = e.function;
+        ext.import_slot = e.import_slot;
+        externals_.push_back(std::move(ext));
         max_id = std::max<uint64_t>(max_id, e.id);
     }
     next_id_ = max_id + 1;
     std::sort(externals_.begin(), externals_.end(), [](const auto& a, const auto& b) {
-        return a.first.address != b.first.address ? a.first.address < b.first.address
-                                                  : a.first.id < b.first.id;
+        return a.label.address != b.label.address ? a.label.address < b.label.address
+                                                  : a.label.id < b.label.id;
     });
     entry_points_ = data.entry_points;
 
@@ -254,11 +258,11 @@ std::vector<LabelInfo> ProgramListing::labels(uint64_t first, uint64_t last) con
     return out;
 }
 
-std::vector<std::pair<LabelInfo, bool>> ProgramListing::externalSymbols(uint64_t first,
-                                                                       uint64_t last) const {
-    std::vector<std::pair<LabelInfo, bool>> out;
+std::vector<ExternalSymbolInfo> ProgramListing::externalSymbols(uint64_t first,
+                                                               uint64_t last) const {
+    std::vector<ExternalSymbolInfo> out;
     for (const auto& e : externals_)
-        if (e.first.address >= first && e.first.address <= last) out.push_back(e);
+        if (e.label.address >= first && e.label.address <= last) out.push_back(e);
     return out;
 }
 

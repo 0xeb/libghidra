@@ -458,7 +458,7 @@ if let Some(s) = &resp.symbol {
 }
 ```
 
-**Returns:** `SymbolRecord { symbol_id, address, name, full_name, r#type, namespace_name, source, is_primary, is_external, is_dynamic, is_external_entry_point }`.
+**Returns:** `SymbolRecord { symbol_id, address, name, full_name, r#type, namespace_name, source, is_primary, is_external, is_dynamic, is_external_entry_point, import_slot_address }`. `import_slot_address` is an external symbol's IAT/GOT slot in memory (0 otherwise).
 
 ### `fn list_symbols(&self, range_start: u64, range_end: u64, limit: i32, offset: i32) -> Result<ListSymbolsResponse>`
 

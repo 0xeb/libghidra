@@ -1126,6 +1126,21 @@ class GhidraClient:
         )
         return ListXrefsResponse(xrefs=[_to_xref(x) for x in resp.xrefs])
 
+    def list_xrefs_to_external(
+        self, external_address: int, limit: int = 0, offset: int = 0,
+    ) -> ListXrefsResponse:
+        """References to an external symbol, by its EXTERNAL-space offset (its SymbolRecord.address)."""
+        req = xrefs_pb2.ListXrefsRequest(
+            exact_to_address=True,
+            to_address=external_address,
+            to_external=True,
+            page=self._pagination(limit, offset),
+        )
+        resp = self._call_rpc(
+            "libghidra.XrefsService/ListXrefs", req, xrefs_pb2.ListXrefsResponse,
+        )
+        return ListXrefsResponse(xrefs=[_to_xref(x) for x in resp.xrefs])
+
     def list_xrefs_from_function(
         self, function_address: int, limit: int = 0, offset: int = 0,
     ) -> ListXrefsResponse:
@@ -2228,6 +2243,7 @@ def _to_symbol(pb_sym: symbols_pb2.SymbolRecord) -> SymbolRecord:
         is_external=pb_sym.is_external,
         is_dynamic=pb_sym.is_dynamic,
         is_external_entry_point=pb_sym.is_external_entry_point,
+        import_slot_address=pb_sym.import_slot_address,
     )
 
 

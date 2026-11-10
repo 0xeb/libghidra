@@ -1848,6 +1848,14 @@ pub struct SymbolRecord {
     pub is_dynamic: bool,
     #[prost(bool, tag = "11")]
     pub is_external_entry_point: bool,
+    /// External symbols only: the memory address of the pointer the program
+    /// reaches this symbol through (a PE import address table slot, an ELF GOT
+    /// entry), i.e. the lowest defined data item in memory that references the
+    /// symbol. 0 for a non-external symbol, or an external one with no such
+    /// pointer. An external symbol's `address` is an EXTERNAL-space offset, not a
+    /// memory address; this is the memory address that stands for it.
+    #[prost(uint64, tag = "12")]
+    pub import_slot_address: u64,
 }
 /// Field 1 reserved for future common request context.
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
@@ -2589,8 +2597,12 @@ pub struct XrefRecord {
     pub is_memory: bool,
     #[prost(bool, tag = "10")]
     pub is_flow: bool,
-    /// Populated for exact-from-function reads. These fields let clients enrich
-    /// a bounded call graph without issuing one function lookup per reference.
+    /// Populated for the exact reads (exact_to_address, exact_from_function,
+    /// exact_to_function); empty in a range listing. These fields let clients
+    /// enrich a bounded call graph without issuing one function lookup per
+    /// reference. With no function at the destination, to_function_address is the
+    /// raw destination offset and to_function_name its primary symbol's name (an
+    /// external destination's name is the import's).
     #[prost(uint64, tag = "11")]
     pub from_function_address: u64,
     #[prost(string, tag = "12")]
@@ -2619,6 +2631,12 @@ pub struct ListXrefsRequest {
     pub exact_to_function: bool,
     #[prost(uint64, tag = "9")]
     pub to_function_address: u64,
+    /// With exact_to_address: to_address is an EXTERNAL-space offset (an external
+    /// symbol's address, as SymbolRecord.address reports it), not a memory
+    /// address. Lists the references to that external symbol, e.g. the calls and
+    /// jumps through an import.
+    #[prost(bool, tag = "10")]
+    pub to_external: bool,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListXrefsResponse {

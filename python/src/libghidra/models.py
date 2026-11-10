@@ -376,6 +376,9 @@ class SymbolRecord:
     is_external: bool = False
     is_dynamic: bool = False
     is_external_entry_point: bool = False
+    # External symbols only: the memory address of the pointer the program
+    # reaches the symbol through (PE IAT slot, ELF GOT entry); 0 otherwise.
+    import_slot_address: int = 0
 
 
 @dataclass

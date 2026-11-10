@@ -293,6 +293,7 @@ SymbolRecord from_proto_symbol_record(const libghidra::SymbolRecord& row) {
   out.is_external = row.is_external();
   out.is_dynamic = row.is_dynamic();
   out.is_external_entry_point = row.is_external_entry_point();
+  out.import_slot_address = row.import_slot_address();
   return out;
 }
 
@@ -2155,6 +2156,31 @@ StatusOr<ListXrefsResponse> HttpClient::ListXrefsTo(std::uint64_t to_address,
   libghidra::ListXrefsRequest rpc_request;
   rpc_request.set_exact_to_address(true);
   rpc_request.set_to_address(to_address);
+  rpc_request.mutable_page()->set_limit(
+      limit > 0 ? static_cast<std::uint32_t>(limit) : 0);
+  rpc_request.mutable_page()->set_offset(
+      offset > 0 ? static_cast<std::uint32_t>(offset) : 0);
+  auto rpc = impl_->call_rpc<libghidra::ListXrefsRequest, libghidra::ListXrefsResponse>(
+      "libghidra.XrefsService/ListXrefs",
+      rpc_request);
+  if (!rpc.ok()) {
+    return StatusOr<ListXrefsResponse>::FromError(rpc.status.code, rpc.status.message);
+  }
+  ListXrefsResponse out;
+  out.xrefs.reserve(static_cast<std::size_t>(rpc.value->xrefs_size()));
+  for (const auto& row : rpc.value->xrefs()) {
+    out.xrefs.push_back(from_proto_xref_record(row));
+  }
+  return StatusOr<ListXrefsResponse>::FromValue(std::move(out));
+}
+
+StatusOr<ListXrefsResponse> HttpClient::ListXrefsToExternal(std::uint64_t external_address,
+                                                            int limit,
+                                                            int offset) {
+  libghidra::ListXrefsRequest rpc_request;
+  rpc_request.set_exact_to_address(true);
+  rpc_request.set_to_address(external_address);
+  rpc_request.set_to_external(true);
   rpc_request.mutable_page()->set_limit(
       limit > 0 ? static_cast<std::uint32_t>(limit) : 0);
   rpc_request.mutable_page()->set_offset(

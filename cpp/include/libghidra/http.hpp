@@ -162,6 +162,9 @@ class HttpClient final : public IClient {
   StatusOr<ListXrefsResponse> ListXrefsTo(std::uint64_t to_address,
                                           int limit,
                                           int offset) override;
+  StatusOr<ListXrefsResponse> ListXrefsToExternal(std::uint64_t external_address,
+                                                  int limit,
+                                                  int offset) override;
   StatusOr<ListXrefsResponse> ListXrefsFromFunction(
       std::uint64_t function_address,
       int limit,

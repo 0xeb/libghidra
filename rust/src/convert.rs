@@ -92,6 +92,7 @@ impl From<pb::SymbolRecord> for models::SymbolRecord {
             is_external: r.is_external,
             is_dynamic: r.is_dynamic,
             is_external_entry_point: r.is_external_entry_point,
+            import_slot_address: r.import_slot_address,
         }
     }
 }

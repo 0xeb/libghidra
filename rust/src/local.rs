@@ -621,6 +621,7 @@ fn decode_symbol(v: &Value) -> SymbolRecord {
         is_external: v["is_external"].as_bool().unwrap_or(false),
         is_dynamic: v["is_dynamic"].as_bool().unwrap_or(false),
         is_external_entry_point: v["is_external_entry_point"].as_bool().unwrap_or(false),
+        import_slot_address: v["import_slot_address"].as_u64().unwrap_or(0),
     }
 }
 

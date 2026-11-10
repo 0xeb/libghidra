@@ -527,7 +527,7 @@ if resp.symbol:
     print(f"{resp.symbol.name} ({resp.symbol.type})")
 ```
 
-**Returns:** `GetSymbolResponse` with `symbol: SymbolRecord | None`. Fields: `symbol_id: int`, `address: int`, `name: str`, `full_name: str`, `type: str`, `namespace_name: str`, `source: str`, `is_primary: bool`, `is_external: bool`, `is_dynamic: bool`, `is_external_entry_point: bool`.
+**Returns:** `GetSymbolResponse` with `symbol: SymbolRecord | None`. Fields: `symbol_id: int`, `address: int`, `name: str`, `full_name: str`, `type: str`, `namespace_name: str`, `source: str`, `is_primary: bool`, `is_external: bool`, `is_dynamic: bool`, `is_external_entry_point: bool`, `import_slot_address: int` (external symbols: the IAT/GOT slot in memory, else 0).
 
 ### `list_symbols(range_start=0, range_end=0, limit=0, offset=0) -> ListSymbolsResponse`
 
@@ -1017,6 +1017,13 @@ for x in xrefs.xrefs:
 
 List references to one exact destination address without scanning the full xref
 surface.
+
+### `list_xrefs_to_external(external_address, limit=0, offset=0) -> ListXrefsResponse`
+
+List references to one external symbol (an import), named by its EXTERNAL-space
+offset, its `SymbolRecord.address`: the calls and jumps through the import. Its
+memory address is `SymbolRecord.import_slot_address`, which `list_xrefs_to`
+answers with the reads of that slot.
 
 ### `list_xrefs_from_function(function_address, limit=0, offset=0) -> ListXrefsResponse`
 

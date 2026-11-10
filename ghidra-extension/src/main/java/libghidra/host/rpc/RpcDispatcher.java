@@ -1512,7 +1512,8 @@ public final class RpcDispatcher {
 				protoRequest.getExactFromFunction(),
 				protoRequest.getFunctionAddress(),
 				protoRequest.getExactToFunction(),
-				protoRequest.getToFunctionAddress()));
+				protoRequest.getToFunctionAddress(),
+				protoRequest.getToExternal()));
 		libghidra.ListXrefsResponse.Builder out = libghidra.ListXrefsResponse.newBuilder();
 		if (response != null && response.xrefs() != null) {
 			for (XrefsContract.XrefRecord row : response.xrefs()) {
@@ -2965,6 +2966,7 @@ public final class RpcDispatcher {
 			.setIsExternal(row.isExternal())
 			.setIsDynamic(row.isDynamic())
 			.setIsExternalEntryPoint(row.isExternalEntryPoint())
+			.setImportSlotAddress(row.importSlotAddress())
 			.build();
 	}
 

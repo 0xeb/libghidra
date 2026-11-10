@@ -74,4 +74,17 @@ public interface ListXrefsRequestOrBuilder extends
    * @return The toFunctionAddress.
    */
   long getToFunctionAddress();
+
+  /**
+   * <pre>
+   * With exact_to_address: to_address is an EXTERNAL-space offset (an external
+   * symbol's address, as SymbolRecord.address reports it), not a memory
+   * address. Lists the references to that external symbol, e.g. the calls and
+   * jumps through an import.
+   * </pre>
+   *
+   * <code>bool to_external = 10;</code>
+   * @return The toExternal.
+   */
+  boolean getToExternal();
 }

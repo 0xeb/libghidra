@@ -2613,7 +2613,7 @@ std::optional<LabelInfo> Decompiler::dynamicSymbol(uint64_t address) const
     return impl_->listing.dynamicSymbol(address);
 }
 
-std::vector<std::pair<LabelInfo, bool>> Decompiler::externalSymbols(uint64_t first, uint64_t last) const
+std::vector<ExternalSymbolInfo> Decompiler::externalSymbols(uint64_t first, uint64_t last) const
 {
     return impl_->listing.externalSymbols(first, last);
 }

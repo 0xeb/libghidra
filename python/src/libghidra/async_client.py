@@ -725,6 +725,15 @@ class AsyncGhidraClient:
         resp = await self._call_rpc("libghidra.XrefsService/ListXrefs", req, xrefs_pb2.ListXrefsResponse)
         return ListXrefsResponse(xrefs=[_to_xref(x) for x in resp.xrefs])
 
+    async def list_xrefs_to_external(self, external_address: int, limit: int = 0, offset: int = 0) -> ListXrefsResponse:
+        """References to an external symbol, by its EXTERNAL-space offset (its SymbolRecord.address)."""
+        req = xrefs_pb2.ListXrefsRequest(
+            exact_to_address=True, to_address=external_address, to_external=True,
+            page=self._pagination(limit, offset),
+        )
+        resp = await self._call_rpc("libghidra.XrefsService/ListXrefs", req, xrefs_pb2.ListXrefsResponse)
+        return ListXrefsResponse(xrefs=[_to_xref(x) for x in resp.xrefs])
+
     async def list_xrefs_from_function(self, function_address: int, limit: int = 0, offset: int = 0) -> ListXrefsResponse:
         req = xrefs_pb2.ListXrefsRequest(
             exact_from_function=True, function_address=function_address,

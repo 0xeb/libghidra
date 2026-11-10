@@ -308,6 +308,26 @@ private static final long serialVersionUID = 0L;
     return isExternalEntryPoint_;
   }
 
+  public static final int IMPORT_SLOT_ADDRESS_FIELD_NUMBER = 12;
+  private long importSlotAddress_ = 0L;
+  /**
+   * <pre>
+   * External symbols only: the memory address of the pointer the program
+   * reaches this symbol through (a PE import address table slot, an ELF GOT
+   * entry), i.e. the lowest defined data item in memory that references the
+   * symbol. 0 for a non-external symbol, or an external one with no such
+   * pointer. An external symbol's `address` is an EXTERNAL-space offset, not a
+   * memory address; this is the memory address that stands for it.
+   * </pre>
+   *
+   * <code>uint64 import_slot_address = 12;</code>
+   * @return The importSlotAddress.
+   */
+  @java.lang.Override
+  public long getImportSlotAddress() {
+    return importSlotAddress_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -354,6 +374,9 @@ private static final long serialVersionUID = 0L;
     }
     if (isExternalEntryPoint_ != false) {
       output.writeBool(11, isExternalEntryPoint_);
+    }
+    if (importSlotAddress_ != 0L) {
+      output.writeUInt64(12, importSlotAddress_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -403,6 +426,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(11, isExternalEntryPoint_);
     }
+    if (importSlotAddress_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(12, importSlotAddress_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -440,6 +467,8 @@ private static final long serialVersionUID = 0L;
         != other.getIsDynamic()) return false;
     if (getIsExternalEntryPoint()
         != other.getIsExternalEntryPoint()) return false;
+    if (getImportSlotAddress()
+        != other.getImportSlotAddress()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -479,6 +508,9 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + IS_EXTERNAL_ENTRY_POINT_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getIsExternalEntryPoint());
+    hash = (37 * hash) + IMPORT_SLOT_ADDRESS_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getImportSlotAddress());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -621,6 +653,7 @@ private static final long serialVersionUID = 0L;
       isExternal_ = false;
       isDynamic_ = false;
       isExternalEntryPoint_ = false;
+      importSlotAddress_ = 0L;
       return this;
     }
 
@@ -687,6 +720,9 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000400) != 0)) {
         result.isExternalEntryPoint_ = isExternalEntryPoint_;
       }
+      if (((from_bitField0_ & 0x00000800) != 0)) {
+        result.importSlotAddress_ = importSlotAddress_;
+      }
     }
 
     @java.lang.Override
@@ -743,6 +779,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getIsExternalEntryPoint() != false) {
         setIsExternalEntryPoint(other.getIsExternalEntryPoint());
+      }
+      if (other.getImportSlotAddress() != 0L) {
+        setImportSlotAddress(other.getImportSlotAddress());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -825,6 +864,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000400;
               break;
             } // case 88
+            case 96: {
+              importSlotAddress_ = input.readUInt64();
+              bitField0_ |= 0x00000800;
+              break;
+            } // case 96
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1390,6 +1434,65 @@ private static final long serialVersionUID = 0L;
     public Builder clearIsExternalEntryPoint() {
       bitField0_ = (bitField0_ & ~0x00000400);
       isExternalEntryPoint_ = false;
+      onChanged();
+      return this;
+    }
+
+    private long importSlotAddress_ ;
+    /**
+     * <pre>
+     * External symbols only: the memory address of the pointer the program
+     * reaches this symbol through (a PE import address table slot, an ELF GOT
+     * entry), i.e. the lowest defined data item in memory that references the
+     * symbol. 0 for a non-external symbol, or an external one with no such
+     * pointer. An external symbol's `address` is an EXTERNAL-space offset, not a
+     * memory address; this is the memory address that stands for it.
+     * </pre>
+     *
+     * <code>uint64 import_slot_address = 12;</code>
+     * @return The importSlotAddress.
+     */
+    @java.lang.Override
+    public long getImportSlotAddress() {
+      return importSlotAddress_;
+    }
+    /**
+     * <pre>
+     * External symbols only: the memory address of the pointer the program
+     * reaches this symbol through (a PE import address table slot, an ELF GOT
+     * entry), i.e. the lowest defined data item in memory that references the
+     * symbol. 0 for a non-external symbol, or an external one with no such
+     * pointer. An external symbol's `address` is an EXTERNAL-space offset, not a
+     * memory address; this is the memory address that stands for it.
+     * </pre>
+     *
+     * <code>uint64 import_slot_address = 12;</code>
+     * @param value The importSlotAddress to set.
+     * @return This builder for chaining.
+     */
+    public Builder setImportSlotAddress(long value) {
+
+      importSlotAddress_ = value;
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * External symbols only: the memory address of the pointer the program
+     * reaches this symbol through (a PE import address table slot, an ELF GOT
+     * entry), i.e. the lowest defined data item in memory that references the
+     * symbol. 0 for a non-external symbol, or an external one with no such
+     * pointer. An external symbol's `address` is an EXTERNAL-space offset, not a
+     * memory address; this is the memory address that stands for it.
+     * </pre>
+     *
+     * <code>uint64 import_slot_address = 12;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearImportSlotAddress() {
+      bitField0_ = (bitField0_ & ~0x00000800);
+      importSlotAddress_ = 0L;
       onChanged();
       return this;
     }

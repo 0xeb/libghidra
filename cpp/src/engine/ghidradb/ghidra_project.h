@@ -147,7 +147,12 @@ struct LabelEntry {
 // address's offset, which is the address the host lists it at.
 struct ExternalSymbolEntry {
     int64_t id = 0;
+    int64_t key = 0;               // its EXTERNAL-space address key
     uint64_t offset = 0;
+    // The lowest defined data item in memory that references it: the pointer
+    // the program reaches it through (a PE import address table slot, an ELF
+    // GOT entry). 0 when there is none. The host's rule, on the database.
+    uint64_t import_slot = 0;
     std::string name;
     int64_t namespace_id = 0;      // its library (or another namespace)
     bool function = false;

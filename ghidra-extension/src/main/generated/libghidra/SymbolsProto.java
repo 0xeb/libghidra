@@ -90,41 +90,41 @@ public final class SymbolsProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\027libghidra/symbols.proto\022\tlibghidra\032\026li" +
-      "bghidra/common.proto\"\347\001\n\014SymbolRecord\022\021\n" +
+      "bghidra/common.proto\"\204\002\n\014SymbolRecord\022\021\n" +
       "\tsymbol_id\030\001 \001(\004\022\017\n\007address\030\002 \001(\004\022\014\n\004nam" +
       "e\030\003 \001(\t\022\021\n\tfull_name\030\004 \001(\t\022\014\n\004type\030\005 \001(\t" +
       "\022\026\n\016namespace_name\030\006 \001(\t\022\016\n\006source\030\007 \001(\t" +
       "\022\022\n\nis_primary\030\010 \001(\010\022\023\n\013is_external\030\t \001(" +
       "\010\022\022\n\nis_dynamic\030\n \001(\010\022\037\n\027is_external_ent" +
-      "ry_point\030\013 \001(\010\"#\n\020GetSymbolRequest\022\017\n\007ad" +
-      "dress\030\002 \001(\004\"<\n\021GetSymbolResponse\022\'\n\006symb" +
-      "ol\030\001 \001(\0132\027.libghidra.SymbolRecord\"a\n\022Lis" +
-      "tSymbolsRequest\022&\n\005range\030\002 \001(\0132\027.libghid" +
-      "ra.AddressRange\022#\n\004page\030\003 \001(\0132\025.libghidr" +
-      "a.Pagination\"?\n\023ListSymbolsResponse\022(\n\007s" +
-      "ymbols\030\001 \003(\0132\027.libghidra.SymbolRecord\"\\\n" +
-      "\023RenameSymbolRequest\022\017\n\007address\030\002 \001(\004\022\020\n" +
-      "\010new_name\030\003 \001(\t\022\025\n\010old_name\030\004 \001(\tH\000\210\001\001B\013" +
-      "\n\t_old_name\"5\n\024RenameSymbolResponse\022\017\n\007r" +
-      "enamed\030\001 \001(\010\022\014\n\004name\030\002 \001(\t\"3\n\022CreateLabe" +
-      "lRequest\022\017\n\007address\030\002 \001(\004\022\014\n\004name\030\003 \001(\t\"" +
-      "O\n\023CreateLabelResponse\022\017\n\007created\030\001 \001(\010\022" +
-      "\'\n\006symbol\030\002 \001(\0132\027.libghidra.SymbolRecord" +
-      "\"4\n\023DeleteSymbolRequest\022\017\n\007address\030\002 \001(\004" +
-      "\022\014\n\004name\030\003 \001(\t\">\n\024DeleteSymbolResponse\022\017" +
-      "\n\007deleted\030\001 \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\226" +
-      "\003\n\016SymbolsService\022F\n\tGetSymbol\022\033.libghid" +
-      "ra.GetSymbolRequest\032\034.libghidra.GetSymbo" +
-      "lResponse\022L\n\013ListSymbols\022\035.libghidra.Lis" +
-      "tSymbolsRequest\032\036.libghidra.ListSymbolsR" +
-      "esponse\022L\n\013CreateLabel\022\035.libghidra.Creat" +
-      "eLabelRequest\032\036.libghidra.CreateLabelRes" +
-      "ponse\022O\n\014RenameSymbol\022\036.libghidra.Rename" +
-      "SymbolRequest\032\037.libghidra.RenameSymbolRe" +
-      "sponse\022O\n\014DeleteSymbol\022\036.libghidra.Delet" +
-      "eSymbolRequest\032\037.libghidra.DeleteSymbolR" +
-      "esponseB\033\n\tlibghidraB\014SymbolsProtoP\001b\006pr" +
-      "oto3"
+      "ry_point\030\013 \001(\010\022\033\n\023import_slot_address\030\014 " +
+      "\001(\004\"#\n\020GetSymbolRequest\022\017\n\007address\030\002 \001(\004" +
+      "\"<\n\021GetSymbolResponse\022\'\n\006symbol\030\001 \001(\0132\027." +
+      "libghidra.SymbolRecord\"a\n\022ListSymbolsReq" +
+      "uest\022&\n\005range\030\002 \001(\0132\027.libghidra.AddressR" +
+      "ange\022#\n\004page\030\003 \001(\0132\025.libghidra.Paginatio" +
+      "n\"?\n\023ListSymbolsResponse\022(\n\007symbols\030\001 \003(" +
+      "\0132\027.libghidra.SymbolRecord\"\\\n\023RenameSymb" +
+      "olRequest\022\017\n\007address\030\002 \001(\004\022\020\n\010new_name\030\003" +
+      " \001(\t\022\025\n\010old_name\030\004 \001(\tH\000\210\001\001B\013\n\t_old_name" +
+      "\"5\n\024RenameSymbolResponse\022\017\n\007renamed\030\001 \001(" +
+      "\010\022\014\n\004name\030\002 \001(\t\"3\n\022CreateLabelRequest\022\017\n" +
+      "\007address\030\002 \001(\004\022\014\n\004name\030\003 \001(\t\"O\n\023CreateLa" +
+      "belResponse\022\017\n\007created\030\001 \001(\010\022\'\n\006symbol\030\002" +
+      " \001(\0132\027.libghidra.SymbolRecord\"4\n\023DeleteS" +
+      "ymbolRequest\022\017\n\007address\030\002 \001(\004\022\014\n\004name\030\003 " +
+      "\001(\t\">\n\024DeleteSymbolResponse\022\017\n\007deleted\030\001" +
+      " \001(\010\022\025\n\rdeleted_count\030\002 \001(\r2\226\003\n\016SymbolsS" +
+      "ervice\022F\n\tGetSymbol\022\033.libghidra.GetSymbo" +
+      "lRequest\032\034.libghidra.GetSymbolResponse\022L" +
+      "\n\013ListSymbols\022\035.libghidra.ListSymbolsReq" +
+      "uest\032\036.libghidra.ListSymbolsResponse\022L\n\013" +
+      "CreateLabel\022\035.libghidra.CreateLabelReque" +
+      "st\032\036.libghidra.CreateLabelResponse\022O\n\014Re" +
+      "nameSymbol\022\036.libghidra.RenameSymbolReque" +
+      "st\032\037.libghidra.RenameSymbolResponse\022O\n\014D" +
+      "eleteSymbol\022\036.libghidra.DeleteSymbolRequ" +
+      "est\032\037.libghidra.DeleteSymbolResponseB\033\n\t" +
+      "libghidraB\014SymbolsProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -136,7 +136,7 @@ public final class SymbolsProto {
     internal_static_libghidra_SymbolRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_libghidra_SymbolRecord_descriptor,
-        new java.lang.String[] { "SymbolId", "Address", "Name", "FullName", "Type", "NamespaceName", "Source", "IsPrimary", "IsExternal", "IsDynamic", "IsExternalEntryPoint", });
+        new java.lang.String[] { "SymbolId", "Address", "Name", "FullName", "Type", "NamespaceName", "Source", "IsPrimary", "IsExternal", "IsDynamic", "IsExternalEntryPoint", "ImportSlotAddress", });
     internal_static_libghidra_GetSymbolRequest_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_libghidra_GetSymbolRequest_fieldAccessorTable = new

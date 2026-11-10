@@ -252,6 +252,7 @@ class SymbolRecord final : public ::google::protobuf::Message
     kSourceFieldNumber = 7,
     kSymbolIdFieldNumber = 1,
     kAddressFieldNumber = 2,
+    kImportSlotAddressFieldNumber = 12,
     kIsPrimaryFieldNumber = 8,
     kIsExternalFieldNumber = 9,
     kIsDynamicFieldNumber = 10,
@@ -357,6 +358,16 @@ class SymbolRecord final : public ::google::protobuf::Message
   void _internal_set_address(::uint64_t value);
 
   public:
+  // uint64 import_slot_address = 12;
+  void clear_import_slot_address() ;
+  ::uint64_t import_slot_address() const;
+  void set_import_slot_address(::uint64_t value);
+
+  private:
+  ::uint64_t _internal_import_slot_address() const;
+  void _internal_set_import_slot_address(::uint64_t value);
+
+  public:
   // bool is_primary = 8;
   void clear_is_primary() ;
   bool is_primary() const;
@@ -402,7 +413,7 @@ class SymbolRecord final : public ::google::protobuf::Message
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      4, 11, 0,
+      4, 12, 0,
       76, 2>
       _table_;
 
@@ -427,6 +438,7 @@ class SymbolRecord final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr source_;
     ::uint64_t symbol_id_;
     ::uint64_t address_;
+    ::uint64_t import_slot_address_;
     bool is_primary_;
     bool is_external_;
     bool is_dynamic_;
@@ -2882,6 +2894,28 @@ inline bool SymbolRecord::_internal_is_external_entry_point() const {
 inline void SymbolRecord::_internal_set_is_external_entry_point(bool value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.is_external_entry_point_ = value;
+}
+
+// uint64 import_slot_address = 12;
+inline void SymbolRecord::clear_import_slot_address() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.import_slot_address_ = ::uint64_t{0u};
+}
+inline ::uint64_t SymbolRecord::import_slot_address() const {
+  // @@protoc_insertion_point(field_get:libghidra.SymbolRecord.import_slot_address)
+  return _internal_import_slot_address();
+}
+inline void SymbolRecord::set_import_slot_address(::uint64_t value) {
+  _internal_set_import_slot_address(value);
+  // @@protoc_insertion_point(field_set:libghidra.SymbolRecord.import_slot_address)
+}
+inline ::uint64_t SymbolRecord::_internal_import_slot_address() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.import_slot_address_;
+}
+inline void SymbolRecord::_internal_set_import_slot_address(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.import_slot_address_ = value;
 }
 
 // -------------------------------------------------------------------

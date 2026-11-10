@@ -551,6 +551,7 @@ if (s.ok() && s.value->symbol) {
     // s.value->symbol->name, address, type, namespace_name, source
     // s.value->symbol->is_primary, is_external, is_dynamic,
     // s.value->symbol->is_external_entry_point, symbol_id
+    // s.value->symbol->import_slot_address (externals: IAT/GOT slot, else 0)
 }
 ```
 

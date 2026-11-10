@@ -92,7 +92,7 @@ public:
     std::optional<LabelInfo> primaryLabel(uint64_t address) const;
     /// The program's symbols in the EXTERNAL space whose offset is in [first, last]
     /// (namespace_path is the library; `function` says a function symbol).
-    std::vector<std::pair<LabelInfo, bool>> externalSymbols(uint64_t first, uint64_t last) const;
+    std::vector<ExternalSymbolInfo> externalSymbols(uint64_t first, uint64_t last) const;
     /// `address` is an external entry point (an export, the program entry).
     bool isEntryPoint(uint64_t address) const { return entry_points_.count(address) != 0; }
     /// The dynamic symbol of a referenced address with no symbol of its own.
@@ -233,7 +233,7 @@ private:
     ghidra::Architecture* arch_ = nullptr;
     Hooks hooks_;
     std::vector<Label> labels_;           // address, then id order
-    std::vector<std::pair<LabelInfo, bool>> externals_;  // offset, then id order
+    std::vector<ExternalSymbolInfo> externals_;  // offset, then id order
     std::set<uint64_t> entry_points_;
     std::map<uint64_t, Data> data_;
     std::map<uint64_t, int> data_mutability_;

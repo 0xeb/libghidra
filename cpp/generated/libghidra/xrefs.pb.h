@@ -796,6 +796,7 @@ class ListXrefsRequest final : public ::google::protobuf::Message
     kExactToAddressFieldNumber = 4,
     kExactFromFunctionFieldNumber = 6,
     kExactToFunctionFieldNumber = 8,
+    kToExternalFieldNumber = 10,
   };
   // .libghidra.AddressRange range = 2;
   bool has_range() const;
@@ -887,12 +888,22 @@ class ListXrefsRequest final : public ::google::protobuf::Message
   void _internal_set_exact_to_function(bool value);
 
   public:
+  // bool to_external = 10;
+  void clear_to_external() ;
+  bool to_external() const;
+  void set_to_external(bool value);
+
+  private:
+  bool _internal_to_external() const;
+  void _internal_set_to_external(bool value);
+
+  public:
   // @@protoc_insertion_point(class_scope:libghidra.ListXrefsRequest)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 8, 2,
+      4, 9, 2,
       0, 2>
       _table_;
 
@@ -920,6 +931,7 @@ class ListXrefsRequest final : public ::google::protobuf::Message
     bool exact_to_address_;
     bool exact_from_function_;
     bool exact_to_function_;
+    bool to_external_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -1670,6 +1682,28 @@ inline ::uint64_t ListXrefsRequest::_internal_to_function_address() const {
 inline void ListXrefsRequest::_internal_set_to_function_address(::uint64_t value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.to_function_address_ = value;
+}
+
+// bool to_external = 10;
+inline void ListXrefsRequest::clear_to_external() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_external_ = false;
+}
+inline bool ListXrefsRequest::to_external() const {
+  // @@protoc_insertion_point(field_get:libghidra.ListXrefsRequest.to_external)
+  return _internal_to_external();
+}
+inline void ListXrefsRequest::set_to_external(bool value) {
+  _internal_set_to_external(value);
+  // @@protoc_insertion_point(field_set:libghidra.ListXrefsRequest.to_external)
+}
+inline bool ListXrefsRequest::_internal_to_external() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.to_external_;
+}
+inline void ListXrefsRequest::_internal_set_to_external(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.to_external_ = value;
 }
 
 // -------------------------------------------------------------------

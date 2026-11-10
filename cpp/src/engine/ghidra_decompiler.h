@@ -79,6 +79,15 @@ struct LabelInfo {
     std::string source;           // SourceType.name(): USER_DEFINED, IMPORTED, ...
 };
 
+/// An external symbol (an import), as the host reports it.
+struct ExternalSymbolInfo {
+    LabelInfo label;              // address: its EXTERNAL-space offset
+    bool function = false;
+    // The memory address of the pointer the program reaches it through (PE IAT
+    // slot, ELF GOT entry): the lowest defined data item referencing it; 0 if none.
+    uint64_t import_slot = 0;
+};
+
 /// A comment of the listing, by CommentType ordinal (0 EOL, 1 PRE, 2 POST,
 /// 3 PLATE, 4 REPEATABLE).
 struct ListingComment {
@@ -330,7 +339,7 @@ public:
     std::optional<LabelInfo> dynamicSymbol(uint64_t address) const;
     /// The program's EXTERNAL-space symbols with offsets in [first, last]; the
     /// bool says a function symbol (else a label).
-    std::vector<std::pair<LabelInfo, bool>> externalSymbols(uint64_t first, uint64_t last) const;
+    std::vector<ExternalSymbolInfo> externalSymbols(uint64_t first, uint64_t last) const;
     /// `address` is an external entry point (an export, the program entry).
     bool isExternalEntryPoint(uint64_t address) const;
     /// A program function (not an import-slot stub) starts at `address`.

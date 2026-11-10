@@ -462,6 +462,10 @@ struct SymbolRecord {
   bool is_external = false;
   bool is_dynamic = false;
   bool is_external_entry_point = false;
+  // External symbols only: the memory address of the pointer the program
+  // reaches the symbol through (PE IAT slot, ELF GOT entry); 0 otherwise.
+  // `address` is then an EXTERNAL-space offset.
+  std::uint64_t import_slot_address = 0;
 };
 
 struct GetSymbolResponse {

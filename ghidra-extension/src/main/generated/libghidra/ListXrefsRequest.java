@@ -165,6 +165,24 @@ private static final long serialVersionUID = 0L;
     return toFunctionAddress_;
   }
 
+  public static final int TO_EXTERNAL_FIELD_NUMBER = 10;
+  private boolean toExternal_ = false;
+  /**
+   * <pre>
+   * With exact_to_address: to_address is an EXTERNAL-space offset (an external
+   * symbol's address, as SymbolRecord.address reports it), not a memory
+   * address. Lists the references to that external symbol, e.g. the calls and
+   * jumps through an import.
+   * </pre>
+   *
+   * <code>bool to_external = 10;</code>
+   * @return The toExternal.
+   */
+  @java.lang.Override
+  public boolean getToExternal() {
+    return toExternal_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -202,6 +220,9 @@ private static final long serialVersionUID = 0L;
     }
     if (toFunctionAddress_ != 0L) {
       output.writeUInt64(9, toFunctionAddress_);
+    }
+    if (toExternal_ != false) {
+      output.writeBool(10, toExternal_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -244,6 +265,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeUInt64Size(9, toFunctionAddress_);
     }
+    if (toExternal_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(10, toExternal_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -281,6 +306,8 @@ private static final long serialVersionUID = 0L;
         != other.getExactToFunction()) return false;
     if (getToFunctionAddress()
         != other.getToFunctionAddress()) return false;
+    if (getToExternal()
+        != other.getToExternal()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -318,6 +345,9 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + TO_FUNCTION_ADDRESS_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getToFunctionAddress());
+    hash = (37 * hash) + TO_EXTERNAL_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getToExternal());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -476,6 +506,7 @@ private static final long serialVersionUID = 0L;
       functionAddress_ = 0L;
       exactToFunction_ = false;
       toFunctionAddress_ = 0L;
+      toExternal_ = false;
       return this;
     }
 
@@ -540,6 +571,9 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000080) != 0)) {
         result.toFunctionAddress_ = toFunctionAddress_;
       }
+      if (((from_bitField0_ & 0x00000100) != 0)) {
+        result.toExternal_ = toExternal_;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -578,6 +612,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getToFunctionAddress() != 0L) {
         setToFunctionAddress(other.getToFunctionAddress());
+      }
+      if (other.getToExternal() != false) {
+        setToExternal(other.getToExternal());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -649,6 +686,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000080;
               break;
             } // case 72
+            case 80: {
+              toExternal_ = input.readBool();
+              bitField0_ |= 0x00000100;
+              break;
+            } // case 80
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1096,6 +1138,59 @@ private static final long serialVersionUID = 0L;
     public Builder clearToFunctionAddress() {
       bitField0_ = (bitField0_ & ~0x00000080);
       toFunctionAddress_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private boolean toExternal_ ;
+    /**
+     * <pre>
+     * With exact_to_address: to_address is an EXTERNAL-space offset (an external
+     * symbol's address, as SymbolRecord.address reports it), not a memory
+     * address. Lists the references to that external symbol, e.g. the calls and
+     * jumps through an import.
+     * </pre>
+     *
+     * <code>bool to_external = 10;</code>
+     * @return The toExternal.
+     */
+    @java.lang.Override
+    public boolean getToExternal() {
+      return toExternal_;
+    }
+    /**
+     * <pre>
+     * With exact_to_address: to_address is an EXTERNAL-space offset (an external
+     * symbol's address, as SymbolRecord.address reports it), not a memory
+     * address. Lists the references to that external symbol, e.g. the calls and
+     * jumps through an import.
+     * </pre>
+     *
+     * <code>bool to_external = 10;</code>
+     * @param value The toExternal to set.
+     * @return This builder for chaining.
+     */
+    public Builder setToExternal(boolean value) {
+
+      toExternal_ = value;
+      bitField0_ |= 0x00000100;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * With exact_to_address: to_address is an EXTERNAL-space offset (an external
+     * symbol's address, as SymbolRecord.address reports it), not a memory
+     * address. Lists the references to that external symbol, e.g. the calls and
+     * jumps through an import.
+     * </pre>
+     *
+     * <code>bool to_external = 10;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearToExternal() {
+      bitField0_ = (bitField0_ & ~0x00000100);
+      toExternal_ = false;
       onChanged();
       return this;
     }

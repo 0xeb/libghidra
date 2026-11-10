@@ -9,6 +9,7 @@ package libghidra.host.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
+import ghidra.program.model.address.Address;
 import ghidra.program.model.data.Array;
 import ghidra.program.model.data.BuiltInDataType;
 import ghidra.program.model.data.Composite;
@@ -23,8 +24,11 @@ import ghidra.program.model.data.Union;
 import ghidra.program.model.lang.OperandType;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Instruction;
+import ghidra.program.model.listing.Listing;
 import ghidra.program.model.listing.Parameter;
+import ghidra.program.model.listing.Program;
 import ghidra.program.model.listing.VariableFilter;
+import ghidra.program.model.mem.Memory;
 import ghidra.program.model.symbol.RefType;
 import ghidra.program.model.symbol.Reference;
 import ghidra.program.model.symbol.Symbol;
@@ -214,7 +218,35 @@ final class RuntimeMappers {
 			symbol.isPrimary(),
 			symbol.isExternal(),
 			symbol.isDynamic(),
-			symbol.isExternalEntryPoint());
+			symbol.isExternalEntryPoint(),
+			importSlotAddress(symbol));
+	}
+
+	/**
+	 * The memory address that stands for an external symbol: the lowest defined
+	 * data item in memory with a reference to it (a PE import address table slot,
+	 * an ELF GOT entry), or 0 when the symbol is not external or has none. The
+	 * offline backend applies the same rule to the program database.
+	 */
+	static long importSlotAddress(Symbol symbol) {
+		if (!symbol.isExternal()) {
+			return 0;
+		}
+		Program program = symbol.getProgram();
+		Memory memory = program.getMemory();
+		Listing listing = program.getListing();
+		Address best = null;
+		for (Reference ref : program.getReferenceManager().getReferencesTo(symbol.getAddress())) {
+			Address from = ref.getFromAddress();
+			if (!from.isMemoryAddress() || !memory.contains(from) ||
+				listing.getDefinedDataAt(from) == null) {
+				continue;
+			}
+			if (best == null || from.compareTo(best) < 0) {
+				best = from;
+			}
+		}
+		return best != null ? best.getOffset() : 0;
 	}
 
 	static XrefsContract.XrefRecord toXrefRecord(Reference reference) {

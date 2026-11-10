@@ -83,8 +83,12 @@ public interface XrefRecordOrBuilder extends
 
   /**
    * <pre>
-   * Populated for exact-from-function reads. These fields let clients enrich
-   * a bounded call graph without issuing one function lookup per reference.
+   * Populated for the exact reads (exact_to_address, exact_from_function,
+   * exact_to_function); empty in a range listing. These fields let clients
+   * enrich a bounded call graph without issuing one function lookup per
+   * reference. With no function at the destination, to_function_address is the
+   * raw destination offset and to_function_name its primary symbol's name (an
+   * external destination's name is the import's).
    * </pre>
    *
    * <code>uint64 from_function_address = 11;</code>

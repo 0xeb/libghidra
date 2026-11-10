@@ -900,6 +900,31 @@ impl GhidraClient {
         })
     }
 
+    /// References to an external symbol, by its EXTERNAL-space offset (its
+    /// `SymbolRecord::address`): the calls and jumps through an import.
+    pub fn list_xrefs_to_external(
+        &self,
+        external_address: u64,
+        limit: i32,
+        offset: i32,
+    ) -> Result<ListXrefsResponse> {
+        let req = pb::ListXrefsRequest {
+            page: Self::pagination(limit, offset),
+            exact_to_address: true,
+            to_address: external_address,
+            to_external: true,
+            ..Default::default()
+        };
+        let resp: pb::ListXrefsResponse = self.call_rpc(
+            "libghidra.XrefsService/ListXrefs",
+            &req,
+            "libghidra.ListXrefsRequest",
+        )?;
+        Ok(ListXrefsResponse {
+            xrefs: resp.xrefs.into_iter().map(Into::into).collect(),
+        })
+    }
+
     pub fn list_xrefs_from_function(
         &self,
         function_address: u64,

@@ -174,6 +174,7 @@ static void encode(Json& j, const SymbolRecord& r) {
     .field("is_external", r.is_external)
     .field("is_dynamic", r.is_dynamic)
     .field("is_external_entry_point", r.is_external_entry_point)
+    .field("import_slot_address", r.import_slot_address)
     .end_obj();
 }
 

@@ -410,11 +410,17 @@ static void markCallingFunctions(BufferFile& bf, const std::vector<MasterTableEn
 // defined data item ("Data" table) whose reference goes to an EXTERNAL-space
 // address that is an external function's symbol address. `external_ids`
 // pairs each entry with the external function's symbol id, for its signature.
+// The same pass gives every external symbol its import slot.
 static void readExternalRefs(
     BufferFile& bf, const std::vector<MasterTableEntry>& tables, const AddressDecoder& addr_dec,
     const std::map<int64_t, std::pair<int64_t, std::string>>& external_fn_by_key,
     ProjectData& data, std::vector<std::pair<ExternalRefEntry*, int64_t>>& external_ids) {
-    if (external_fn_by_key.empty()) return;
+    if (data.external_symbols.empty()) return;
+    // Every external symbol (function or label) by its address key, for its
+    // import slot: the same pass sees each defined pointer's references.
+    std::map<int64_t, std::vector<size_t>> external_by_key;
+    for (size_t i = 0; i < data.external_symbols.size(); ++i)
+        external_by_key[data.external_symbols[i].key].push_back(i);
     auto table = [&](const std::string& name) -> const MasterTableEntry* {
         for (auto& t : tables)
             if (t.name == name && t.indexed_column == -1) return &t;
@@ -442,11 +448,22 @@ static void readExternalRefs(
             if (blob.is_null ||
                 !decodeRefList(blob.binary_val, rec.fields[FROM_REFS_COUNT_COL].asInt(), refs))
                 return true;
+            const uint64_t address = addr_dec.decodeAddress(from_key);
+            bool function_found = false;
             for (const PackedRef& ref : refs) {
                 if ((ref.to_key >> ADDR_TYPE_SHIFT) != EXTERNAL_ADDR_TYPE) continue;
-                if (external_fn_by_key.count(ref.to_key)) {
-                    found.emplace_back(addr_dec.decodeAddress(from_key), ref.to_key);
-                    break;
+                // Keys need not run in address order (a key's base index is
+                // allocated, not sorted), so keep the lowest address.
+                auto ext = external_by_key.find(ref.to_key);
+                if (ext != external_by_key.end()) {
+                    for (size_t i : ext->second) {
+                        uint64_t& slot = data.external_symbols[i].import_slot;
+                        if (slot == 0 || address < slot) slot = address;
+                    }
+                }
+                if (!function_found && external_fn_by_key.count(ref.to_key)) {
+                    found.emplace_back(address, ref.to_key);
+                    function_found = true;
                 }
             }
             return true;
@@ -928,6 +945,7 @@ ProjectData GhidraProject::extract() {
                         if ((addr_key >> ADDR_TYPE_SHIFT) == EXTERNAL_ADDR_TYPE) {
                             ExternalSymbolEntry e;
                             e.id = rec.key.asLong();
+                            e.key = addr_key;
                             e.offset = static_cast<uint64_t>(addr_key & ADDR_OFFSET_MASK);
                             e.name = rec.fields[SYMBOL_NAME_COL].asString();
                             e.namespace_id = rec.fields[SYMBOL_PARENT_COL].asLong();

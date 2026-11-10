@@ -104,4 +104,19 @@ public interface SymbolRecordOrBuilder extends
    * @return The isExternalEntryPoint.
    */
   boolean getIsExternalEntryPoint();
+
+  /**
+   * <pre>
+   * External symbols only: the memory address of the pointer the program
+   * reaches this symbol through (a PE import address table slot, an ELF GOT
+   * entry), i.e. the lowest defined data item in memory that references the
+   * symbol. 0 for a non-external symbol, or an external one with no such
+   * pointer. An external symbol's `address` is an EXTERNAL-space offset, not a
+   * memory address; this is the memory address that stands for it.
+   * </pre>
+   *
+   * <code>uint64 import_slot_address = 12;</code>
+   * @return The importSlotAddress.
+   */
+  long getImportSlotAddress();
 }

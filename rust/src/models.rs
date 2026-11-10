@@ -402,6 +402,9 @@ pub struct SymbolRecord {
     pub is_external: bool,
     pub is_dynamic: bool,
     pub is_external_entry_point: bool,
+    /// External symbols only: the memory address of the pointer the program
+    /// reaches the symbol through (PE IAT slot, ELF GOT entry); 0 otherwise.
+    pub import_slot_address: u64,
 }
 
 #[derive(Debug, Clone, Default)]
